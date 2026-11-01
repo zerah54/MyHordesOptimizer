@@ -6,7 +6,7 @@ export interface MapRoutePointDTO {
     y: number;
 }
 
-/** Destination cliquée lors de la saisie, et mode de calcul du segment qui y mène (`best` ou `l`). */
+/** Destination cliquée lors de la saisie, et mode de calcul du segment qui y mène (`best`, `l` ou `items`). */
 export interface MapRouteStopDTO extends MapRoutePointDTO {
     mode: string;
 }

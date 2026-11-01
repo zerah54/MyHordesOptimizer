@@ -37,6 +37,7 @@ import {
     updateAgeTone
 } from '../../map-corners';
 import { MAP_LEGENDS, MapLegendEntry } from '../../map-legends';
+import { CellSpottedItems, cellSpottedItems, NO_SPOTTED_ITEMS } from '../../map-spotted-items';
 import { DIG_LEVELS, digLevel, remainingDigs } from './pipes/dig-level.pipe';
 import { DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop } from './pipes/dist-borders.pipe';
 import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './pipes/scrut-borders.pipe';
@@ -112,6 +113,8 @@ export class MapCellComponent {
      *  Une entrée plutôt qu'un `:host-context` : sans elle, les ~900 cases porteraient chacune
      *  une image masquée. Elle ne change qu'au franchissement du seuil. */
     public detailed: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    /** Ids des objets repérés sur la carte : la même instance pour toutes les cases. */
+    public spottedItems: InputSignal<ReadonlySet<number>> = input<ReadonlySet<number>>(NO_SPOTTED_ITEMS);
 
     public cellSelected: OutputEmitterRef<MapCellSelection> = output();
     public currentHoveredCellChange: OutputEmitterRef<Cell | undefined> = output();
@@ -158,6 +161,20 @@ export class MapCellComponent {
 
         return classes.join(' ');
     });
+
+    /** Objets repérés de la case : recalculés seulement quand la case ou le choix d'objets change. */
+    private readonly spotted_items: Signal<CellSpottedItems | null> = computed((): CellSpottedItems | null => {
+        return cellSpottedItems(this.cell(), this.spottedItems());
+    });
+    protected readonly spotted: Signal<boolean> = computed((): boolean => this.spotted_items() !== null);
+    /** Icône de l'objet repéré le plus nombreux, posée au milieu à gauche de la case. */
+    protected readonly spotted_icon: Signal<string | null> = computed((): string | null => {
+        const spotted: CellSpottedItems | null = this.spotted_items();
+        if (!spotted) return null;
+        return this.allItems()?.find((item: Item): boolean => item.id === spotted.main_item_id)?.img ?? null;
+    });
+    /** D'autres objets repérés sont sur la case : pastille sur l'icône, le détail est dans l'infobulle. */
+    protected readonly spotted_more: Signal<boolean> = computed((): boolean => (this.spotted_items()?.others ?? 0) > 0);
 
     protected readonly is_my_cell: Signal<boolean> = computed((): boolean => {
         return this.cell().citizens?.some((citizen: Citizen): boolean => citizen.id === getUserId()) ?? false;

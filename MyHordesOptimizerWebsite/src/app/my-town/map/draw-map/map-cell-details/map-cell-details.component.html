@@ -60,8 +60,8 @@
 
         @if (cell().items && cell().items.length > 0) {
             <div class="items">
-                @for (item of cell().items; track item.item_id) {
-                    <div>
+                @for (item of cell().items | spottedItemsFirst:spottedItems(); track item.item_id) {
+                    <div [class.spotted]="spottedItems().has(item.item_id)">
                         @if (item | itemDetails:allItems(); as complete_item) {
                             <img [ngSrc]="HORDES_IMG_REPO + (complete_item | itemImg:item.is_broken)" [class.broken]="item.is_broken" width="16" height="16">
                         }

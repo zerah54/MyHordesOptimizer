@@ -20,8 +20,15 @@
     <div class="editable-container">
         <div class="list">
             @for (item of currentList(); track $index) {
-                <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label && item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
-                     style="cursor: pointer" width="16" height="16">
+                @let element_label = $any(item.label && item.label[$any(locale)] ? item.label[$any(locale)] : item.label);
+                @if (readonly()) {
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="element_label" width="16" height="16">
+                } @else {
+                    <!-- Clic : sélecteur de quantité dans une liste à quantités, retrait sinon. -->
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="element_label" role="button" tabindex="0"
+                         (click)="onElementClick(item, $event)" (keydown.enter)="onElementClick(item, $event)"
+                         style="cursor: pointer" width="16" height="16">
+                }
             }
         </div>
         @if (!label() && !readonly()) {
@@ -44,5 +51,23 @@
     }
 </ng-template>
 
-<mho-menu-add #menuAdd="menuAdd" (add)="add.emit($event);" [class]="class()" [keepOpen]="keepOpen()" [lists]="lists()"></mho-menu-add>
+<mho-menu-add #menuAdd="menuAdd" (add)="add.emit($event);" [class]="class()" [keepOpen]="keepOpen()" [lists]="lists()" [(sortMode)]="sortMode"></mho-menu-add>
 <mho-menu-remove #menuRemove="menuRemove" (remove)="remove.emit($event)" (empty)="empty.emit($event)" [class]="class()"></mho-menu-remove>
+
+<!-- Sélecteur de quantité, ouvert dans un overlay mais créé dans la vue du composant (voir quantity_outlet). -->
+<ng-container #quantityOutlet></ng-container>
+<ng-template #quantityTemplate>
+    @if (quantity_item(); as item) {
+        <div class="quantity-selector" cdkTrapFocus [cdkTrapFocusAutoCapture]="true" role="group"
+             [attr.aria-label]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)">
+            <img [ngSrc]="HORDES_IMG_REPO + item.img" alt="" width="16" height="16">
+            <button mat-icon-button type="button" (click)="decreaseQuantity(item)" aria-label="Retirer un exemplaire" i18n-aria-label>
+                <mat-icon>remove</mat-icon>
+            </button>
+            <span class="quantity-value">{{ quantityOf(item.id) }}</span>
+            <button mat-icon-button type="button" (click)="increaseQuantity(item)" aria-label="Ajouter un exemplaire" i18n-aria-label>
+                <mat-icon>add</mat-icon>
+            </button>
+        </div>
+    }
+</ng-template>

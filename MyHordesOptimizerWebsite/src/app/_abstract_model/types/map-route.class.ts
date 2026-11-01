@@ -25,7 +25,13 @@ export interface MapRoutePoint {
     readonly y: number;
 }
 
-export type MapRouteStopMode = 'best' | 'l';
+/** Meilleur potentiel, le plus direct (en L), ou le plus d'objets repérés (ceux de la personne qui calcule). */
+export type MapRouteStopMode = 'best' | 'l' | 'items';
+
+/** Mode lu de l'API : un mode inconnu du site revient au meilleur potentiel. */
+export function toMapRouteStopMode(mode: string | null | undefined): MapRouteStopMode {
+    return mode === 'l' || mode === 'items' ? mode : 'best';
+}
 
 export interface MapRouteStop extends MapRoutePoint {
     readonly mode: MapRouteStopMode;
@@ -139,7 +145,7 @@ export class MapRoute extends CommonModel<MapRouteDTO> {
             this.is_editable_by_all = dto.isEditableByAll;
             this.shared_user_ids = [...(dto.sharedUserIds ?? [])];
             this.cells = (dto.cells ?? []).map(toMapRoutePoint);
-            this.stops = (dto.stops ?? []).map((stop: MapRouteStopDTO): MapRouteStop => ({ x: stop.x, y: stop.y, mode: stop.mode === 'l' ? 'l' : 'best' }));
+            this.stops = (dto.stops ?? []).map((stop: MapRouteStopDTO): MapRouteStop => ({ x: stop.x, y: stop.y, mode: toMapRouteStopMode(stop.mode) }));
             this.length = dto.length;
             this.version = dto.version;
             this.can_edit = dto.canEdit;

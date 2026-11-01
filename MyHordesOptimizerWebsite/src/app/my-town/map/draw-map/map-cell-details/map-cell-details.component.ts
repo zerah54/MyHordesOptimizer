@@ -19,13 +19,14 @@ import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-i
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../_shared/last-update/last-update.component';
 import { MapCellOrdersComponent } from '../../map-orders/map-cell-orders/map-cell-orders.component';
+import { NO_SPOTTED_ITEMS, SpottedItemsFirstPipe } from '../../map-spotted-items';
 import { MapCellCampingComponent } from '../map-cell-camping/map-cell-camping.component';
 import { CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe } from './cell-details-position.pipe';
 import { RuinInCell } from './ruin-in-cell.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [LastUpdateComponent, IconApComponent, CitizenInfoComponent, MapCellCampingComponent, MapCellOrdersComponent];
-const pipes: Imports = [CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe, CitizensFromShortPipe, ItemImgPipe, ItemDetailsPipe, RuinInCell];
+const pipes: Imports = [CellDetailsBottomPipe, CellDetailsLeftPipe, CellDetailsRightPipe, CellDetailsTopPipe, CitizensFromShortPipe, ItemImgPipe, ItemDetailsPipe, RuinInCell, SpottedItemsFirstPipe];
 const material_modules: Imports = [MatButtonModule, MatDividerModule, MatIconModule];
 
 @Component({
@@ -42,6 +43,8 @@ export class MapCellDetailsComponent {
     public allRuins: InputSignal<Ruin[]> = input.required();
     public allCitizens: InputSignal<Citizen[]> = input.required();
     public allItems: InputSignal<Item[]> = input.required();
+    /** Objets repérés sur la carte : en tête de la liste des objets, surlignés. */
+    public spottedItems: InputSignal<ReadonlySet<number>> = input<ReadonlySet<number>>(NO_SPOTTED_ITEMS);
     /** Carte de la ville, pour le formulaire d'une consigne sur la case. */
     public map: InputSignal<Town | undefined> = input<Town | undefined>(undefined);
     /** Mode observateur : la zone reste consultable, mais elle n'est pas modifiable. */

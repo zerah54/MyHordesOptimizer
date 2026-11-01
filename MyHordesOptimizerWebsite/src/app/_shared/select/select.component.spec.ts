@@ -30,6 +30,26 @@ class SelectModelHostComponent {
     public readonly filter_changes: (string | string[] | undefined)[] = [];
 }
 
+interface SelectOption {
+    id: string;
+    label: string;
+}
+
+/** Hôte `ngModel` multiple avec recherche, valeurs liées par `bindValue` : la forme du sélecteur d'objets. */
+@Component({
+    imports: [FormsModule, SelectComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    template: '<mho-select multiple searchable [options]="options" bindLabel="label" bindValue="id" [ngModel]="value()" (ngModelChange)="value.set($event)"></mho-select>'
+})
+class SelectMultipleHostComponent {
+    public readonly options: SelectOption[] = [
+        { id: 'a', label: 'Alpha' },
+        { id: 'b', label: 'Beta' },
+        { id: 'g', label: 'Gamma' }
+    ];
+    public readonly value: WritableSignal<string[]> = signal(['a']);
+}
+
 /** Valeurs limites acceptées par `coerceBooleanProperty` : `value != null && `${value}` !== 'false'`. */
 const BOOLEAN_COERCION_CASES: [
     unknown,
@@ -324,6 +344,87 @@ describe('SelectComponent', (): void => {
             await settle();
 
             expect(host_fixture.componentInstance.filter_changes.at(-1)).toBe('Beta');
+        });
+    });
+
+    describe('multiple avec recherche', (): void => {
+        let host_fixture: ComponentFixture<SelectMultipleHostComponent>;
+
+        async function settle(): Promise<void> {
+            host_fixture.detectChanges();
+            await host_fixture.whenStable();
+            host_fixture.detectChanges();
+        }
+
+        function open(): void {
+            host_fixture.debugElement.query(By.css('.mat-mdc-select-trigger')).nativeElement.click();
+            host_fixture.detectChanges();
+        }
+
+        /** Laisse mat-select resynchroniser sa sélection sur les options filtrées, comme entre deux gestes réels. */
+        async function search(text: string): Promise<void> {
+            const input: HTMLInputElement = <HTMLInputElement>document.querySelector('.mho-search');
+            input.value = text;
+            input.dispatchEvent(new Event('input'));
+            await settle();
+        }
+
+        async function clickOption(label: string): Promise<void> {
+            Array.from(document.querySelectorAll<HTMLElement>('mat-option')).find((option: HTMLElement): boolean => option.textContent?.trim() === label)?.click();
+            await settle();
+        }
+
+        function triggerText(): string {
+            return host_fixture.debugElement.query(By.css('mat-select-trigger span')).nativeElement.textContent.trim();
+        }
+
+        beforeEach(async (): Promise<void> => {
+            host_fixture = TestBed.createComponent(SelectMultipleHostComponent);
+            await settle();
+        });
+
+        afterEach((): void => {
+            host_fixture.destroy();
+        });
+
+        it('garde les valeurs masquées par la recherche quand on en choisit une autre', async (): Promise<void> => {
+            open();
+            await search('be');
+
+            await clickOption('Beta');
+
+            expect(host_fixture.componentInstance.value()).toEqual(['a', 'b']);
+        });
+
+        it('retire une valeur affichée sans toucher aux valeurs masquées', async (): Promise<void> => {
+            host_fixture.componentInstance.value.set(['a', 'b']);
+            await settle();
+            open();
+            await search('be');
+
+            await clickOption('Beta');
+
+            expect(host_fixture.componentInstance.value()).toEqual(['a']);
+        });
+
+        it('affiche dans le déclencheur les libellés des valeurs masquées par la recherche', async (): Promise<void> => {
+            open();
+            await search('be');
+
+            await clickOption('Beta');
+
+            expect(triggerText()).toBe('Alpha, Beta');
+        });
+
+        it('rouvre le panneau sur toutes les options, sa recherche étant vide', async (): Promise<void> => {
+            open();
+            await search('be');
+            host_fixture.debugElement.query(By.directive(MatSelect)).componentInstance.close();
+            await settle();
+
+            open();
+
+            expect(renderedOptions()).toEqual(['Alpha', 'Beta', 'Gamma']);
         });
     });
 });

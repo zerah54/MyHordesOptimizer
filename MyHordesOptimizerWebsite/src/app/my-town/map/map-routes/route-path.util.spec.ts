@@ -1,4 +1,5 @@
 import { Cell } from '../../../_abstract_model/types/cell.class';
+import { ItemCountShort } from '../../../_abstract_model/types/item-count-short.class';
 import { MapRoutePoint, MapRouteStop } from '../../../_abstract_model/types/map-route.class';
 import {
     bestPath,
@@ -6,7 +7,9 @@ import {
     CellIndex,
     cellScore,
     countFresh,
+    countSpotted,
     isFreshCell,
+    itemsCellScore,
     lPath,
     PathScore,
     pointKey,
@@ -26,6 +29,12 @@ function cell(x: number, y: number, digs: number, never_visited: boolean = false
     result.is_town = is_town;
     result.nb_km = km;
     return result;
+}
+
+/** Case portant des objets au sol : [id, quantité]. */
+function withItems(base: Cell, ...items: [number, number][]): Cell {
+    base.items = items.map(([item_id, count]: [number, number]): ItemCountShort => Object.assign(new ItemCountShort(), { item_id, count, is_broken: false }));
+    return base;
 }
 
 /** Score à un seul critère, pour éprouver `bestPath` seul. */
@@ -190,6 +199,47 @@ describe('segmentPath', (): void => {
 
     it('ignores the potential in L mode', (): void => {
         expect(points(segmentPath({ x: 0, y: 0 }, { x: 1, y: 1 }, 'l', new Set<string>(), cells))).toBe('1,0 1,1');
+    });
+});
+
+describe('mode « objets repérés »', (): void => {
+    const water: number = 1;
+    const spotted: ReadonlySet<number> = new Set<number>([water]);
+    // (1,0) : beaucoup de potentiel, pas d'eau ; (0,1) : épuisée, mais 3 rations d'eau.
+    const cells: CellIndex = index([cell(1, 0, 9, true), withItems(cell(0, 1, 0), [water, 3], [7, 10]), cell(1, 1, 0)]);
+
+    it('classe d\'abord les objets repérés au sol, puis les critères du meilleur potentiel', (): void => {
+        expect(itemsCellScore(cells.get('0,1'), false, spotted)).toEqual([3, 1, 0, 0, 0]);
+        expect(itemsCellScore(cells.get('0,1'), true, spotted)).toEqual([0, 0, 0, 0, 0]);
+        expect(itemsCellScore(withItems(cell(5, 5, 0, false, true), [water, 4]), false, spotted)).toEqual([0, 1, 0, 0, 0]);
+    });
+
+    it('passe par le plus d\'objets repérés, au détriment du potentiel, sans allonger le chemin', (): void => {
+        expect(points(segmentPath({ x: 0, y: 0 }, { x: 1, y: 1 }, 'best', new Set<string>(), cells, spotted))).toBe('1,0 1,1');
+        expect(points(segmentPath({ x: 0, y: 0 }, { x: 1, y: 1 }, 'items', new Set<string>(), cells, spotted))).toBe('0,1 1,1');
+    });
+
+    it('ne compte plus les objets d\'une case déjà sur le tracé', (): void => {
+        expect(points(segmentPath({ x: 0, y: 0 }, { x: 1, y: 1 }, 'items', new Set<string>(['0,1']), cells, spotted))).toBe('1,0 1,1');
+    });
+
+    it('revient au meilleur potentiel sans objet repéré', (): void => {
+        expect(points(segmentPath({ x: 0, y: 0 }, { x: 1, y: 1 }, 'items', new Set<string>(), cells))).toBe('1,0 1,1');
+    });
+
+    it('recalcule les destinations en mode « objets repérés » avec les objets de la personne qui recalcule', (): void => {
+        const stops: MapRouteStop[] = [{ x: 1, y: 1, mode: 'items' }];
+
+        expect(points(routeCells({ x: 0, y: 0 }, buildSegments({ x: 0, y: 0 }, stops, cells, new Set<string>(), spotted)))).toBe('0,0 0,1 1,1');
+        expect(points(routeCells({ x: 0, y: 0 }, buildSegments({ x: 0, y: 0 }, stops, cells)))).toBe('0,0 1,0 1,1');
+    });
+
+    it('additionne les objets repérés des cases distinctes, hors cases exclues', (): void => {
+        const path: MapRoutePoint[] = [{ x: 0, y: 1 }, { x: 1, y: 1 }, { x: 0, y: 1 }];
+
+        expect(countSpotted(path, cells, spotted)).toBe(3);
+        expect(countSpotted(path, cells, spotted, pointKeys([{ x: 0, y: 1 }]))).toBe(0);
+        expect(countSpotted(path, cells, new Set<number>())).toBe(0);
     });
 });
 

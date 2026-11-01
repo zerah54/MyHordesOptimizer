@@ -51,7 +51,7 @@
     <mat-menu #bag (click)="$event.stopPropagation(); $event.preventDefault()" [xPosition]="'before'" [yPosition]="'below'"
               class="mho-menu-citizen-details bag">
         <div (click)="$event.stopPropagation()">
-            <mho-list-element-add-remove [currentList]="citizen.bag?.items || []" label="Sac" i18n-label
+            <mho-list-element-add-remove [currentList]="citizen.bag?.items || []" label="Sac" i18n-label withQuantity
                                          [lists]="bag_lists()"
                                          addLabel="Ajouter au sac" i18n-addLabel
                                          (add)="addItem(+$event)"

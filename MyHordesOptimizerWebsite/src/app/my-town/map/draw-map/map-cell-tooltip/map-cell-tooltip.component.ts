@@ -15,6 +15,7 @@ import { CitizenInfoComponent } from '../../../../_shared/citizen-info/citizen-i
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { LastUpdateComponent } from '../../../../_shared/last-update/last-update.component';
 import { MapCellOrdersComponent } from '../../map-orders/map-cell-orders/map-cell-orders.component';
+import { NO_SPOTTED_ITEMS, SpottedItemsFirstPipe } from '../../map-spotted-items';
 import { DigLevelLabelPipe } from '../map-cell/pipes/dig-level.pipe';
 import { RuinInCell } from '../map-cell-details/ruin-in-cell.pipe';
 
@@ -31,6 +32,7 @@ import { RuinInCell } from '../map-cell-details/ruin-in-cell.pipe';
         MatDivider,
         NgOptimizedImage,
         RuinInCell,
+        SpottedItemsFirstPipe,
         IconApComponent,
         CitizenInfoComponent,
         LastUpdateComponent,
@@ -42,6 +44,8 @@ export class MapCellTooltipComponent {
     public allRuins: WritableSignal<Ruin[]> = signal([]);
     public allCitizens: WritableSignal<Citizen[]> = signal([]);
     public allItems: WritableSignal<Item[]> = signal([]);
+    /** Objets repérés sur la carte : en tête de la liste des objets, surlignés. */
+    public spottedItems: WritableSignal<ReadonlySet<number>> = signal(NO_SPOTTED_ITEMS);
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();

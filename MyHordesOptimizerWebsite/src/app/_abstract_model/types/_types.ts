@@ -43,6 +43,9 @@ export interface ExpeditionDuplicateChoices {
 export interface ListForAddRemove {
     label: string;
     list: (Item | StatusEnum)[];
+    /** Quantité de chaque objet de la liste, par id (sur la carte, en banque…) : affichée à côté de son icône
+     *  dans le menu d'ajout, qui propose alors un tri par quantité. */
+    counts?: ReadonlyMap<number, number>;
 }
 
 export type LogLevel = 'Verbose' | 'Debug' | 'Information' | 'Warning' | 'Error' | 'Fatal';

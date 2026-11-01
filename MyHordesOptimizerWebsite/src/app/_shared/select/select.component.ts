@@ -166,6 +166,7 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
     private _disabled: boolean = false;
 
     private label_pipe: LabelPipe<T> = new LabelPipe();
+    private readonly bind_value_pipe: BindValuePipe = new BindValuePipe();
 
     /** propagate changes into the custom form control */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -248,8 +249,30 @@ export class SelectComponent<T> implements ControlValueAccessor, Validator, MatF
 
     /** Choix de l'utilisateur : seul cas où le formulaire parent est notifié. */
     protected selectValue(value: T | string | undefined | T[] | string[]): void {
-        this.onChange(value);
-        this.filterChange.emit(value);
+        const selected: T | string | undefined | T[] | string[] = Array.isArray(value) ? this.withHiddenValues(value) : value;
+        this.onChange(selected);
+        this.filterChange.emit(selected);
+    }
+
+    /** Panneau refermé : sa recherche repart vide à la réouverture, la liste affichée aussi. */
+    protected onClosed(): void {
+        this.displayed_options.set(this.complete_options());
+        this.closed.emit();
+    }
+
+    /**
+     * Sélection multiple : mat-select ne renvoie que les options affichées. Les valeurs déjà choisies que la
+     * recherche masque sont reprises, sans quoi choisir une option pendant une recherche les retirerait.
+     */
+    private withHiddenValues(value: T[] | string[]): T[] | string[] {
+        const previous: T | string | T[] | string[] | undefined = this.innerValue;
+        if (!Array.isArray(previous) || previous.length === 0 || this.displayed_options() === this.complete_options()) return value;
+
+        const bind_value: string | undefined = this.bindValue();
+        const displayed: Set<unknown> = new Set<unknown>(this.displayed_options()
+            .map((option: T | string): unknown => this.bind_value_pipe.transform(option, bind_value)));
+        const hidden: (T | string)[] = (<(T | string)[]>previous).filter((previous_value: T | string): boolean => !displayed.has(previous_value));
+        return hidden.length ? <T[] | string[]>[...hidden, ...value] : value;
     }
 
     //From ControlValueAccessor interface

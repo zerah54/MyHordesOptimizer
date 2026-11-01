@@ -30,6 +30,17 @@ namespace MyHordesOptimizerApiUnitTests.MapRoutes
             MapRouteJson.ParseStops(json).Should().BeEquivalentTo(stops, options => options.WithStrictOrdering());
         }
 
+        [Fact]
+        public void Stops_ModeObjetsReperes_Conserve()
+        {
+            var stops = new List<MapRouteStopDto> { new() { X = 5, Y = 6, Mode = MapRouteStopModes.Items } };
+
+            var json = MapRouteJson.SerializeStops(stops);
+
+            json.Should().Be("[{\"x\":5,\"y\":6,\"mode\":\"items\"}]");
+            MapRouteJson.ParseStops(json).Should().BeEquivalentTo(stops);
+        }
+
         [Theory]
         [InlineData(null)]
         [InlineData("")]

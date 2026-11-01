@@ -59,26 +59,24 @@
         }
     }
 
-    .menu-add,
-    .menu-remove {
-        padding: 8px;
+}
 
-        .mat-mdc-menu-content {
+/* Sélecteur de quantité : rendu dans l'overlay, hors de l'élément hôte, d'où des règles hors de :host. */
+.quantity-selector {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 8px;
+    border: 1px solid var(--mho-line);
+    border-radius: var(--mho-radius-m);
+    background: var(--mho-surface);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 35%);
+    --mat-icon-button-state-layer-size: 32px;
 
-            .empty-bag {
-                display: flex;
-                align-items: center;
-            }
-
-            .items {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.25em;
-
-                > img {
-                    cursor: pointer;
-                }
-            }
-        }
+    .quantity-value {
+        min-width: 2ch;
+        text-align: center;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
     }
 }

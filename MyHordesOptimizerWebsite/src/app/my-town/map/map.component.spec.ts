@@ -71,6 +71,7 @@ class DrawMapStubComponent {
     public readonly editedCells: InputSignal<ReadonlySet<string>> = input<ReadonlySet<string>>(new Set<string>());
     public readonly cellCut: OutputEmitterRef<MapRoutePoint> = output();
     public readonly cellUpdated: OutputEmitterRef<Cell> = output();
+    public readonly spottedItems: InputSignal<ReadonlySet<number>> = input<ReadonlySet<number>>(new Set<number>());
 }
 
 /** Remplace MapRoutesStore : pas de hub SignalR ni d'appel HTTP, des signaux pilotés par le test. */
@@ -809,6 +810,224 @@ describe('MapComponent', (): void => {
 
             expect(rows[0].querySelector('.zone-count')).toBeNull();
             expect(rows[1].querySelector('.zone-count')?.textContent?.trim()).toBe('0');
+        });
+    });
+
+    describe('repérage d\'objets', (): void => {
+        function newItem(id: number, uid: string, label: string): Item {
+            const item: Item = new Item();
+            item.id = id;
+            item.uid = uid;
+            item.img = `item/${uid}.gif`;
+            item.label = { en: label, fr: label };
+            item.category = Object.assign(new Category(), { id_category: 1, ordering: 1, label: { en: 'Resources', fr: 'Ressources' } });
+            return item;
+        }
+
+        function cellWith(x: number, ...items: [number, number, boolean?][]): Cell {
+            const cell: Cell = new Cell();
+            cell.x = x;
+            cell.y = 0;
+            cell.items = items.map(([item_id, count, is_broken]: [number, number, boolean?]): ItemCountShort => {
+                const item: ItemCountShort = new ItemCountShort();
+                item.item_id = item_id;
+                item.count = count;
+                item.is_broken = is_broken ?? false;
+                return item;
+            });
+            return cell;
+        }
+
+        async function settle(): Promise<void> {
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            fixture.detectChanges();
+            await vi.advanceTimersByTimeAsync(0);
+            fixture.detectChanges();
+        }
+
+        async function createWith(cells: Cell[]): Promise<void> {
+            create();
+            const town: Town = newTown();
+            town.cells = cells;
+            (townService.getMap as Mock).mockReturnValue(of(town));
+            (apiService.getItems as Mock).mockReturnValue(of([newItem(1, 'water_#00', 'Water ration'), newItem(2, 'wood2_#00', 'Wood')]));
+            await settle();
+        }
+
+        /** Menu d'ajout du sélecteur d'objets, comme pour les zones : il reste ouvert après un ajout. */
+        async function openAddMenu(): Promise<void> {
+            (fixture.nativeElement.querySelector('.spotted-items img[src*="small_more"]') as HTMLElement).click();
+            await settle();
+        }
+
+        async function addItem(label: string): Promise<void> {
+            (document.querySelector(`.mho-menu-add img[title="${label}"]`) as HTMLElement).click();
+            await settle();
+        }
+
+        function offered(label: string): HTMLElement | null {
+            return document.querySelector(`.mho-menu-add img[title="${label}"]`);
+        }
+
+        function selectedIcons(): string[] {
+            return Array.from(fixture.nativeElement.querySelectorAll('.spotted-items .list img') as NodeListOf<HTMLImageElement>)
+                .map((img: HTMLImageElement): string => img.title);
+        }
+
+        function summary(): string | undefined {
+            return fixture.nativeElement.querySelector('.spotted-items-summary')?.textContent?.trim();
+        }
+
+        function clearButton(): HTMLButtonElement | undefined {
+            return Array.from(fixture.nativeElement.querySelectorAll('.section-head button') as NodeListOf<HTMLButtonElement>)
+                .find((button: HTMLButtonElement): boolean => button.textContent?.trim() === 'Effacer');
+        }
+
+        it('ne repère rien tant qu\'aucun objet n\'est choisi', async (): Promise<void> => {
+            await createWith([cellWith(1, [1, 2])]);
+
+            expect(drawMapStub().spottedItems().size).toBe(0);
+            expect(summary()).toBeUndefined();
+            expect(clearButton()).toBeUndefined();
+        });
+
+        it('transmet les objets choisis à la carte et fait le bilan des cases, objets cassés compris', async (): Promise<void> => {
+            await createWith([cellWith(1, [1, 2], [1, 1, true]), cellWith(2, [2, 1]), cellWith(3, [3, 4])]);
+            await openAddMenu();
+
+            await addItem('Water ration');
+
+            expect([...drawMapStub().spottedItems()]).toEqual([1]);
+            expect(summary()).toBe('1 case · 3 objets au sol');
+
+            await addItem('Wood');
+
+            expect([...drawMapStub().spottedItems()].sort()).toEqual([1, 2]);
+            expect(summary()).toBe('2 cases · 4 objets au sol');
+            expect(selectedIcons()).toEqual(['Water ration', 'Wood']);
+            expect(offered('Water ration')).toBeNull();
+        });
+
+        it('retire un objet repéré par le menu de retrait', async (): Promise<void> => {
+            await createWith([cellWith(1, [1, 2]), cellWith(2, [2, 1])]);
+            await openAddMenu();
+            await addItem('Water ration');
+            await addItem('Wood');
+            document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+            (document.querySelector('.cdk-overlay-backdrop') as HTMLElement | null)?.click();
+            await settle();
+
+            (fixture.nativeElement.querySelector('.spotted-items img[src*="small_less"]') as HTMLElement).click();
+            await settle();
+            (document.querySelector('.mho-menu-remove img[title="Water ration"]') as HTMLElement).click();
+            await settle();
+
+            expect([...drawMapStub().spottedItems()]).toEqual([2]);
+            expect(selectedIcons()).toEqual(['Wood']);
+        });
+
+        it('montre dans le menu d\'ajout la quantité de chaque objet sur la carte', async (): Promise<void> => {
+            await createWith([cellWith(1, [1, 2], [1, 1, true]), cellWith(2, [1, 4])]);
+            await openAddMenu();
+
+            const count: (label: string) => string | undefined = (label: string): string | undefined => {
+                return offered(label)?.parentElement?.querySelector('.count')?.textContent?.trim();
+            };
+            expect(count('Water ration')).toBe('7');
+            expect(count('Wood')).toBeUndefined();
+        });
+
+        function offeredTitles(): string[] {
+            return Array.from(document.querySelectorAll<HTMLImageElement>('.mho-menu-add .tile img')).map((img: HTMLImageElement): string => img.title);
+        }
+
+        it('enregistre le tri du menu d\'ajout avec les options de la carte', async (): Promise<void> => {
+            await createWith([cellWith(1, [1, 2]), cellWith(2, [2, 5])]);
+            await openAddMenu();
+            expect(offeredTitles()).toEqual(['Water ration', 'Wood']);
+
+            (Array.from(document.querySelectorAll<HTMLButtonElement>('.mho-menu-add .sort button'))
+                .find((button: HTMLButtonElement): boolean => !!button.textContent?.includes('Par quantité')) as HTMLButtonElement).click();
+            await settle();
+
+            expect(offeredTitles()).toEqual(['Wood', 'Water ration']);
+            expect((<MapOptions>JSON.parse(localStorage.getItem('MAP_OPTIONS') as string)).items_sort).toBe('quantity');
+        });
+
+        it('rouvre le menu d\'ajout sur le tri enregistré', async (): Promise<void> => {
+            localStorage.setItem('MAP_OPTIONS', JSON.stringify({ items_sort: 'quantity' }));
+            await createWith([cellWith(1, [1, 2]), cellWith(2, [2, 5])]);
+
+            await openAddMenu();
+
+            expect(offeredTitles()).toEqual(['Wood', 'Water ration']);
+        });
+
+        it('signale qu\'aucune case connue ne porte les objets choisis', async (): Promise<void> => {
+            await createWith([cellWith(1, [3, 4])]);
+            await openAddMenu();
+
+            await addItem('Wood');
+
+            expect(summary()).toBe('Aucune case connue ne porte ces objets.');
+        });
+
+        it('« Effacer » retire tous les objets choisis', async (): Promise<void> => {
+            await createWith([cellWith(1, [1, 2])]);
+            await openAddMenu();
+            await addItem('Water ration');
+
+            clearButton()?.click();
+            await settle();
+
+            expect(drawMapStub().spottedItems().size).toBe(0);
+            expect(summary()).toBeUndefined();
+            expect(clearButton()).toBeUndefined();
+        });
+
+        it('enregistre les objets repérés et les retrouve après un rechargement de la page', async (): Promise<void> => {
+            await createWith([cellWith(1, [1, 2]), cellWith(2, [2, 1])]);
+            await openAddMenu();
+            await addItem('Wood');
+
+            expect((<MapOptions>JSON.parse(localStorage.getItem('MAP_OPTIONS') as string)).spotted_item_uids).toEqual(['wood2_#00']);
+
+            fixture.destroy();
+            await createWith([cellWith(1, [1, 2]), cellWith(2, [2, 1])]);
+
+            expect([...drawMapStub().spottedItems()]).toEqual([2]);
+            expect(selectedIcons()).toEqual(['Wood']);
+            expect(summary()).toBe('1 case · 1 objet au sol');
+        });
+
+        it('« Effacer » vide aussi les objets enregistrés', async (): Promise<void> => {
+            localStorage.setItem('MAP_OPTIONS', JSON.stringify({ spotted_item_uids: ['water_#00'] }));
+            await createWith([cellWith(1, [1, 2])]);
+
+            clearButton()?.click();
+            await settle();
+
+            expect((<MapOptions>JSON.parse(localStorage.getItem('MAP_OPTIONS') as string)).spotted_item_uids).toEqual([]);
+        });
+
+        it('ignore des objets enregistrés illisibles', async (): Promise<void> => {
+            localStorage.setItem('MAP_OPTIONS', JSON.stringify({ spotted_item_uids: 'water_#00' }));
+            await createWith([cellWith(1, [1, 2])]);
+
+            expect(drawMapStub().spottedItems().size).toBe(0);
+            expect(summary()).toBeUndefined();
+        });
+
+        it('met le bilan à jour quand une case est enregistrée, sans recharger la carte', async (): Promise<void> => {
+            await createWith([cellWith(1, [1, 2])]);
+            await openAddMenu();
+            await addItem('Water ration');
+
+            drawMapStub().cellUpdated.emit(cellWith(1, [1, 5]));
+            await settle();
+
+            expect(summary()).toBe('1 case · 5 objets au sol');
         });
     });
 

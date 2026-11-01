@@ -1,26 +1,38 @@
-
 :host {
     display: contents;
+}
 
-    .mho-menu-remove {
-        padding: 0 8px !important;
+/* Contenu du menu : rendu dans l'overlay, hors de l'élément hôte. Les règles ne passent donc pas
+   par :host (elles ne s'y appliquaient jamais) ; l'attribut d'encapsulation du gabarit suffit à
+   les limiter à ce menu. */
+.search {
+    padding: 4px 12px 8px;
+}
 
-        .mat-mdc-menu-content {
+/* Une pastille par objet : de l'air entre les icônes, et une cible de clic plus large que l'icône. */
+.items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 4px 12px 8px;
+}
 
-            .empty-bag {
-                display: flex;
-                align-items: center;
-            }
+.tile {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: var(--mho-radius-s);
+    cursor: pointer;
 
-            .items {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.25em;
-
-                > img {
-                    cursor: pointer;
-                }
-            }
-        }
+    &:hover {
+        background-color: var(--mho-accent-soft);
     }
+
+    img {
+        display: block;
+    }
+}
+
+.empty-bag {
+    display: flex;
+    align-items: center;
 }

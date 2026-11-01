@@ -1,26 +1,73 @@
-
 :host {
     display: contents;
+}
 
-    .mho-menu-add {
-        padding: 0 8px !important;
+/* Contenu du menu : rendu dans l'overlay, hors de l'élément hôte. Les règles ne passent donc pas
+   par :host (elles ne s'y appliquaient jamais) ; l'attribut d'encapsulation du gabarit suffit à
+   les limiter à ce menu. */
+.search {
+    padding: 4px 12px 8px;
+}
 
-        .mat-mdc-menu-content {
+.items {
+    padding: 4px 12px 12px;
+}
 
-            .empty-bag {
-                display: flex;
-                align-items: center;
-            }
+/* Choix de la liste et du tri : segments de largeur égale sur toute la largeur du menu. */
+.segmented {
+    margin-bottom: 8px;
+    --mat-button-toggle-height: 28px;
+    font-size: 12px;
 
-            .items {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 0.25em;
-
-                > img {
-                    cursor: pointer;
-                }
-            }
-        }
+    mat-button-toggle-group {
+        display: flex;
     }
+
+    mat-button-toggle {
+        flex: 1;
+    }
+}
+
+.category:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.category-label {
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mho-text-muted);
+}
+
+/* Une pastille par objet : de l'air entre les icônes, et une cible de clic plus large que l'icône. */
+.item-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.tile {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: var(--mho-radius-s);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--mho-accent-soft);
+    }
+
+    img {
+        display: block;
+    }
+}
+
+/* Quantité collée en bas à droite de l'icône, comme dans l'infobulle des cases : elle se lit avec son
+   icône, pas avec la suivante. Le retrait mange le bord transparent des icônes du jeu. */
+.count {
+    align-self: flex-end;
+    margin-left: -1px;
+    font-size: 11px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
 }
