@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MapRouteDTO, MapRouteRequestDTO } from '../../../_abstract_model/dto/map-route.dto';
 import { Cell } from '../../../_abstract_model/types/cell.class';
+import { ItemCountShort } from '../../../_abstract_model/types/item-count-short.class';
 import { MAP_ROUTE_COLORS, MapRoute, MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { Town } from '../../../_abstract_model/types/town.class';
 import { MapRouteEditor } from './map-route-editor';
@@ -252,6 +253,58 @@ describe('MapRouteEditor', (): void => {
 
         editor.clear();
         expect(editor.length()).toBe(0);
+    });
+
+    describe('mode « objets repérés »', (): void => {
+        const WATER: number = 1;
+
+        /** Deux rations d'eau sur (3, 2), la case aux 6 fouilles. */
+        function townWithWater(): Town {
+            const result: Town = town();
+            const cell: Cell = <Cell>result.cells.find((candidate: Cell): boolean => candidate.x === 3 && candidate.y === 2);
+            cell.items = [Object.assign(new ItemCountShort(), { item_id: WATER, count: 2, is_broken: false })];
+            return result;
+        }
+
+        beforeEach((): void => editor.setMap(townWithWater()));
+
+        it('n\'est proposé qu\'avec des objets repérés, et revient au meilleur potentiel quand il n\'y en a plus', (): void => {
+            expect(editor.has_spotted_items()).toBe(false);
+
+            editor.setSpottedItems(new Set<number>([WATER]));
+            editor.setMode('items');
+            expect(editor.has_spotted_items()).toBe(true);
+
+            editor.setSpottedItems(new Set<number>());
+            expect(editor.mode()).toBe('best');
+        });
+
+        it('rejoint la destination par le plus d\'objets repérés, les annonce dans l\'aperçu et les compte', (): void => {
+            editor.setSpottedItems(new Set<number>([WATER]));
+            startFromTown();
+            editor.setMode('items');
+
+            editor.hover({ x: 3, y: 1 });
+            expect(keys(editor.preview()?.cells ?? [])).toBe('2,2 3,2 3,1');
+            expect(editor.preview()?.items).toBe(2);
+            expect(editor.drawings().find((drawing: MapRouteDrawing): boolean => drawing.key === 'preview')?.label).toBe('+2 PA · 2 objets repérés');
+
+            editor.pick({ x: 3, y: 1 }, false);
+            expect(keys(editor.cells())).toBe('2,2 3,2 3,1');
+            expect(editor.spotted_on_route()).toBe(2);
+            expect(editor.draft()?.segments[0].stop.mode).toBe('items');
+        });
+
+        it('recalcule avec les objets repérés de la personne qui recalcule, au meilleur potentiel sans objet repéré', (): void => {
+            editor.startEdit(route(5, 2, [{ x: 2, y: 2 }, { x: 3, y: 2 }, { x: 3, y: 1 }], { stops: [{ x: 3, y: 1, mode: 'items' }] }));
+
+            editor.recalculate();
+            expect(keys(editor.cells())).toBe('2,2 2,1 3,1');
+
+            editor.setSpottedItems(new Set<number>([WATER]));
+            editor.recalculate();
+            expect(keys(editor.cells())).toBe('2,2 3,2 3,1');
+        });
     });
 
     it('edits a saved route without recomputing it, and recalculates on demand', (): void => {

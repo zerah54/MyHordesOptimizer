@@ -8,14 +8,14 @@ import moment from 'moment';
 import { NEVER, Observable, of, Subject } from 'rxjs';
 import type { Mock, MockInstance } from 'vitest';
 
-import { EXPEDITIONS_EDITION_MODE_KEY } from '../../_abstract_model/const';
+import { EXPEDITIONS_EDITION_MODE_KEY, EXPEDITIONS_ITEMS_SORT_KEY } from '../../_abstract_model/const';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { ExpeditionDuplicateChoices, SpRequirementOperator } from '../../_abstract_model/types/_types';
+import { ExpeditionDuplicateChoices, ListForAddRemove, SpRequirementOperator } from '../../_abstract_model/types/_types';
 import { Cell } from '../../_abstract_model/types/cell.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
@@ -31,9 +31,10 @@ import { Town } from '../../_abstract_model/types/town.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { setTown } from '../../_core/utilities/localstorage.util';
+import { ItemsSortMode } from '../../_shared/list-elements-add-remove/items-sort-mode';
 import { ExpeditionDuplicateDialogComponent, ExpeditionDuplicateDialogData } from './expedition-duplicate-dialog/expedition-duplicate-dialog.component';
 import { ApCheck } from './expedition-resources.util';
-import { ExpeditionsComponent } from './expeditions.component';
+import { bankCountsById, ExpeditionsComponent } from './expeditions.component';
 
 interface RealtimeStub {
     updateExpeditionCitizen: Mock<(part: ExpeditionPart, citizen: CitizenExpedition) => Promise<void>>;
@@ -70,6 +71,9 @@ interface ComponentInternals {
     town_position: Signal<MapRoutePoint | null>;
     all_items: WritableSignal<Item[]>;
     bank_items: WritableSignal<Item[]>;
+    objects_list: Signal<ListForAddRemove[]>;
+    items_sort: WritableSignal<ItemsSortMode>;
+    changeItemsSort(sort_mode: ItemsSortMode): void;
     count_available_ap: { transform: Mock<() => number> };
     apWarning(expedition: Expedition, part_index: number, citizen_index: number, expedition_day: number): ApCheck | null;
     apWarningLabel(check: ApCheck): string;
@@ -498,6 +502,27 @@ describe('ExpeditionsComponent', () => {
         });
     });
 
+    describe('tri de l\'onglet Banque du sac', () => {
+        afterEach(() => localStorage.removeItem(EXPEDITIONS_ITEMS_SORT_KEY));
+
+        it('enregistre le tri choisi', () => {
+            internals.items_sort = signal<ItemsSortMode>('category');
+
+            internals.changeItemsSort('quantity');
+
+            expect(internals.items_sort()).toBe('quantity');
+            expect(localStorage.getItem(EXPEDITIONS_ITEMS_SORT_KEY)).toBe('quantity');
+        });
+
+        it('additionne la quantité en banque d\'un objet présent intact et cassé', () => {
+            const water: Item = Object.assign(new Item(), { id: 1, bank_count: 4 });
+            const broken_water: Item = Object.assign(new Item(), { id: 1, bank_count: 2, is_broken: true });
+            const wood: Item = Object.assign(new Item(), { id: 2, bank_count: 3 });
+
+            expect([...bankCountsById([water, wood, broken_water])]).toEqual([[1, 6], [2, 3]]);
+        });
+    });
+
     describe('PE et avertissement de PA', () => {
         const CITIZEN_ID: number = 7;
 
@@ -530,6 +555,7 @@ describe('ExpeditionsComponent', () => {
             internals.town_position = signal({ x: 10, y: 10 });
             internals.all_items = signal([]);
             internals.bank_items = signal([]);
+            internals.objects_list = signal([]);
             internals.count_available_ap = { transform: vi.fn().mockReturnValue(0) };
             internals.all_citizens = signal([Object.assign(new Citizen(), { id: CITIZEN_ID, is_dead: false })]);
             internals.scouts_lair_built = signal(true);

@@ -63,6 +63,7 @@ import { TownContextService } from '../../_core/services/town-context.service';
 import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { CompassRoseComponent } from '../../_shared/compass-rose/compass-rose.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
+import { DEFAULT_ITEMS_SORT_MODE, ItemsSortMode, sanitizeItemsSortMode } from '../../_shared/list-elements-add-remove/items-sort-mode';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import {
     DISTANCE_BORDER_STYLES,
@@ -110,6 +111,7 @@ import {
     toggleHidden
 } from './map-routes/map-routes-display';
 import { MapRouteCommonColor, MapRoutePersonalColor, MapRoutesPanelComponent } from './map-routes-panel/map-routes-panel.component';
+import { itemCountsOnMap, NO_SPOTTED_ITEMS, sanitizeSpottedItemUids, SpottedItemsSummary, spottedItemsSummary } from './map-spotted-items';
 
 const angular_common: Imports = [CdkConnectedOverlay, CdkOverlayOrigin, CommonModule, FormsModule, RouterLink];
 const components: Imports = [CompassRoseComponent, DrawMapComponent, ListElementAddRemoveComponent, MapRouteEditorComponent, MapRoutesPanelComponent];
@@ -167,7 +169,7 @@ export class MapComponent implements OnInit, AfterViewInit {
     protected edited_distance: Distance | null = null;
     /** La couleur du formulaire est-elle une couleur précise, plutôt qu'une couleur de la palette ? */
     protected distance_color_is_custom: boolean = false;
-    /** Cases du compteur de zones : `map()` ne voit pas les enregistrements de case, que seule la grille conserve. */
+    /** Cases du compteur de zones et du repérage d'objets : `map()` ne voit pas les enregistrements de case, que seule la grille conserve. */
     protected readonly zone_cells: WritableSignal<Cell[] | undefined> = linkedSignal((): Cell[] | undefined => this.map()?.cells);
     protected readonly CUSTOM_DISTANCE_COLOR: string = 'custom';
     protected readonly distance_colors: readonly DistanceColorOption[] = DISTANCE_COLORS;
@@ -184,7 +186,30 @@ export class MapComponent implements OnInit, AfterViewInit {
     /** Objets proposés par le menu d'ajout rapide : ceux qui ne sont pas encore sélectionnés. */
     protected readonly distance_item_lists: Signal<ListForAddRemove[]> = computed((): ListForAddRemove[] => {
         const uids: Set<string> = new Set<string>(this.distance_item_uids());
-        return [{ label: '', list: (this.all_items() ?? []).filter((item: Item): boolean => !uids.has(item.uid)) }];
+        return [{ label: '', list: (this.all_items() ?? []).filter((item: Item): boolean => !uids.has(item.uid)), counts: this.item_counts_on_map() }];
+    });
+
+    /** Objets à repérer sur la carte, par uid comme les zones : enregistrés avec les options, ils survivent au rechargement.
+     *  Même référence tant qu'ils ne changent pas : un cran de zoom ne recalcule rien du repérage. */
+    protected readonly spotted_item_uids: Signal<string[]> = computed((): string[] => this.options().spotted_item_uids);
+    protected readonly spotted_items: Signal<Item[]> = computed((): Item[] => itemsWithUids(this.spotted_item_uids(), this.all_items()));
+    /** Objets proposés par le menu d'ajout : ceux qui ne sont pas encore repérés, avec leur quantité sur la carte. */
+    protected readonly spotted_item_lists: Signal<ListForAddRemove[]> = computed((): ListForAddRemove[] => {
+        const uids: Set<string> = new Set<string>(this.spotted_item_uids());
+        return [{ label: '', list: (this.all_items() ?? []).filter((item: Item): boolean => !uids.has(item.uid)), counts: this.item_counts_on_map() }];
+    });
+    /** Ids des objets repérés, tels que les cases les portent. */
+    protected readonly spotted_item_ids: Signal<ReadonlySet<number>> = computed((): ReadonlySet<number> => {
+        const items: Item[] = this.spotted_items();
+        if (items.length === 0) return NO_SPOTTED_ITEMS;
+        return new Set<number>(items.map((item: Item): number => item.id));
+    });
+    /** Quantité au sol de chaque objet sur la carte, montrée dans les menus d'ajout du repérage et des zones. */
+    protected readonly item_counts_on_map: Signal<ReadonlyMap<number, number>> = computed((): ReadonlyMap<number, number> => {
+        return itemCountsOnMap(this.zone_cells());
+    });
+    protected readonly spotted_summary: Signal<SpottedItemsSummary> = computed((): SpottedItemsSummary => {
+        return spottedItemsSummary(this.zone_cells(), this.spotted_item_ids());
     });
 
     /** Signal : réassigné depuis onResize() (HostListener migré), lu par le propre template. */
@@ -199,7 +224,9 @@ export class MapComponent implements OnInit, AfterViewInit {
         zoom: MapComponent.ZOOM_DEFAULT,
         corners: sanitizeCorners(undefined),
         corners_version: CORNERS_VERSION,
-        routes: DEFAULT_ROUTES_DISPLAY
+        routes: DEFAULT_ROUTES_DISPLAY,
+        spotted_item_uids: [],
+        items_sort: DEFAULT_ITEMS_SORT_MODE
     };
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
@@ -419,6 +446,11 @@ export class MapComponent implements OnInit, AfterViewInit {
             this.route_editor.setMap(this.map());
         });
 
+        // Objets repérés : critère du mode « objets repérés » des tracés.
+        effect((): void => {
+            this.route_editor.setSpottedItems(this.spotted_item_ids());
+        });
+
         // Expéditions du jour de la ville affichée, une fois sa carte et les droits connus : réservées aux citoyens.
         effect((): void => {
             const map: Town | undefined = this.map();
@@ -572,6 +604,22 @@ export class MapComponent implements OnInit, AfterViewInit {
         }));
     }
 
+    protected addSpottedItem(item_id: number): void {
+        const uid: string | undefined = this.itemUid(item_id);
+        if (uid && !this.spotted_item_uids().includes(uid)) {
+            this.changeOptions('spotted_item_uids', [...this.spotted_item_uids(), uid]);
+        }
+    }
+
+    protected removeSpottedItem(item_id: number): void {
+        const uid: string | undefined = this.itemUid(item_id);
+        this.changeOptions('spotted_item_uids', this.spotted_item_uids().filter((spotted_uid: string): boolean => spotted_uid !== uid));
+    }
+
+    protected clearSpottedItems(): void {
+        this.changeOptions('spotted_item_uids', []);
+    }
+
     /** Ouvre le formulaire de zone vierge. */
     protected startAddingDistance(): void {
         this.edited_distance = null;
@@ -656,6 +704,11 @@ export class MapComponent implements OnInit, AfterViewInit {
         current_distances.splice(index, 1);
 
         this.changeOptions('distances', current_distances);
+    }
+
+    /** Uid d'un objet du référentiel : les menus d'ajout et de retrait émettent son id. */
+    private itemUid(item_id: number): string | undefined {
+        return this.all_items()?.find((item: Item): boolean => item.id === item_id)?.uid;
     }
 
     /** Une zone est identifiée par sa distance : l'apparence et les objets peuvent changer. */
@@ -898,6 +951,8 @@ export class MapComponent implements OnInit, AfterViewInit {
         merged.corners = sanitizeCorners(stored.corners, stored.corners_version ?? 1);
         merged.corners_version = CORNERS_VERSION;
         merged.routes = sanitizeRoutesDisplay(stored.routes);
+        merged.spotted_item_uids = sanitizeSpottedItemUids(stored.spotted_item_uids);
+        merged.items_sort = sanitizeItemsSortMode(stored.items_sort);
         return merged;
     }
 
@@ -953,6 +1008,10 @@ export interface MapOptions {
     corners_version: number;
     /** Tracés masqués, couleurs « pour moi seulement », jours précédents. */
     routes: MapRoutesDisplay;
+    /** Objets repérés sur la carte, par uid. Hors de `cell_options` : les cases les reçoivent par leur propre entrée. */
+    spotted_item_uids: string[];
+    /** Tri des menus d'ajout d'objets de la carte (repérage, zones) : par catégorie ou par quantité sur la carte. */
+    items_sort: ItemsSortMode;
 }
 
 export type DistanceBorderStyle = 'dashed' | 'dotted' | 'solid';

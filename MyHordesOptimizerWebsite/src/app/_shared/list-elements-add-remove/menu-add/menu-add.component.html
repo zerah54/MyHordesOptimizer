@@ -8,40 +8,78 @@
             </mat-form-field>
         </div>
         <div (click)="keepOpen() && $event.stopPropagation()" class="items">
-            @if (lists.length === 1) {
-                <ng-container *ngTemplateOutlet="menuContent; context: {$implicit: lists[0].list}"></ng-container>
-            } @else {
-                <mat-tab-group (click)="$event.stopPropagation();">
-                    @for (list of lists; track list.label) {
-                        <mat-tab [label]="list.label">
-                            <ng-container *ngTemplateOutlet="menuContent; context: {$implicit: list.list}"></ng-container>
-                        </mat-tab>
-                    }
-                </mat-tab-group>
+            @if (lists.length > 1) {
+                <!-- Plusieurs listes : un sélecteur segmenté plutôt que des onglets, qui débordaient de la largeur du menu. -->
+                @let selected_index = selected_list() < lists.length ? selected_list() : 0;
+                <div class="segmented lists" (click)="$event.stopPropagation()">
+                    <mat-button-toggle-group [value]="selected_index" (change)="selected_list.set($event.value)" hideSingleSelectionIndicator
+                                             aria-label="Liste d'objets" i18n-aria-label>
+                        @for (list of lists; track list.label; let index = $index) {
+                            <mat-button-toggle [value]="index">{{ list.label }}</mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                </div>
+                <ng-container *ngTemplateOutlet="menuContent; context: {$implicit: lists[selected_index]}"></ng-container>
+            } @else if (lists.length === 1) {
+                <ng-container *ngTemplateOutlet="menuContent; context: {$implicit: lists[0]}"></ng-container>
             }
         </div>
 
-        <ng-template #menuContent let-itemList>
+        <!-- Une liste (ListForAddRemove) : ses quantités, quand elle en fournit, ouvrent le tri par quantité. -->
+        <ng-template #menuContent let-entry>
+            @let itemList = entry.list;
+            @let counts_by_item = entry.counts ?? null;
             @if (itemList | isItems) {
-                @for (category of itemList | itemsGroupByCategory; track category.category.id_category) {
-                    <div>
-                        <div>{{ category.category.label | localizedLabel:'Sans catégorie' }}</div>
-                        @for (item of category.items; track item) {
-                            @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                                <img (click)="add.emit(item.id);" [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? (item.label[$any(locale)] || '') : item.label)" height="16"
-                                     width="16">
-                            }
-                        }
+                @if (counts_by_item) {
+                    <div class="segmented sort" (click)="$event.stopPropagation()">
+                        <mat-button-toggle-group [value]="sortMode()" (change)="sortMode.set($event.value)" hideSingleSelectionIndicator
+                                                 aria-label="Tri des objets" i18n-aria-label>
+                            <mat-button-toggle value="category" i18n>Par catégorie</mat-button-toggle>
+                            <mat-button-toggle value="quantity" i18n>Par quantité</mat-button-toggle>
+                        </mat-button-toggle-group>
                     </div>
                 }
-            } @else {
-                @for (item of itemList; track item) {
-                    @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                        <img (click)="add.emit(item.id);" [class.broken]="item.is_broken" [ngSrc]="HORDES_IMG_REPO + (item | itemImg:item.is_broken)" [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)"
-                             height="16"
-                             width="16">
+                @if (counts_by_item && sortMode() === 'quantity') {
+                    <div class="item-grid">
+                        @for (item of itemList | itemsByQuantity:counts_by_item; track $index) {
+                            <ng-container *ngTemplateOutlet="itemTile; context: {$implicit: item, counts: counts_by_item}"></ng-container>
+                        }
+                    </div>
+                } @else {
+                    @for (category of itemList | itemsGroupByCategory; track category.category.id_category) {
+                        <div class="category">
+                            <div class="category-label">{{ category.category.label | localizedLabel:'Sans catégorie' }}</div>
+                            <div class="item-grid">
+                                @for (item of category.items; track $index) {
+                                    <ng-container *ngTemplateOutlet="itemTile; context: {$implicit: item, counts: counts_by_item}"></ng-container>
+                                }
+                            </div>
+                        </div>
                     }
                 }
+            } @else {
+                <div class="item-grid">
+                    @for (item of itemList; track item) {
+                        @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
+                            <span class="tile" (click)="add.emit(item.id)">
+                                <img [class.broken]="item.is_broken" [ngSrc]="HORDES_IMG_REPO + (item | itemImg:item.is_broken)"
+                                     [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" height="16" width="16">
+                            </span>
+                        }
+                    }
+                </div>
+            }
+        </ng-template>
+
+        <ng-template #itemTile let-item let-counts="counts">
+            @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
+                <span class="tile" (click)="add.emit(item.id)">
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? (item.label[$any(locale)] || '') : item.label)" height="16"
+                         width="16">
+                    @if (counts?.get(item.id); as count) {
+                        <span class="count">{{ count }}</span>
+                    }
+                </span>
             }
         </ng-template>
     </ng-template>

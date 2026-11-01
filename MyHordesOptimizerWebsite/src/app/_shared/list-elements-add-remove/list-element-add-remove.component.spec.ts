@@ -8,6 +8,7 @@ import { Property } from '../../_abstract_model/enum/property.enum';
 import { StatusEnum } from '../../_abstract_model/enum/status.enum';
 import { ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
+import { ItemsSortMode } from './items-sort-mode';
 import { ListElementAddRemoveComponent } from './list-element-add-remove.component';
 import { MenuAddComponent } from './menu-add/menu-add.component';
 import { MenuRemoveComponent } from './menu-remove/menu-remove.component';
@@ -225,6 +226,127 @@ describe('ListElementAddRemoveComponent', (): void => {
         menuRemove.remove.emit('item_1');
 
         expect(emitted).toEqual(['item_1']);
+    });
+
+    it('relaie le tri au menu d\'ajout, et son changement au parent', (): void => {
+        const changes: ItemsSortMode[] = [];
+        fixture.componentInstance.sortMode.subscribe((sort_mode: ItemsSortMode): number => changes.push(sort_mode));
+        setInputs();
+        fixture.componentRef.setInput('sortMode', 'quantity');
+        fixture.detectChanges();
+        const menuAdd: MenuAddComponent = fixture.debugElement.query(By.directive(MenuAddComponent)).componentInstance;
+        expect(menuAdd.sortMode()).toBe('quantity');
+
+        menuAdd.sortMode.set('category');
+        fixture.detectChanges();
+
+        expect(changes).toEqual(['category']);
+    });
+
+    describe('clic sur un élément de la liste', (): void => {
+        let removed: (number | string)[];
+        let added: (number | string)[];
+
+        beforeEach((): void => {
+            removed = [];
+            added = [];
+            fixture.componentInstance.remove.subscribe((value: number | string): number => removed.push(value));
+            fixture.componentInstance.add.subscribe((value: number | string): number => added.push(value));
+        });
+
+        afterEach((): void => fixture.destroy());
+
+        function listIcons(): HTMLImageElement[] {
+            return Array.from(fixture.nativeElement.querySelectorAll('.editable-container .list img'));
+        }
+
+        function quantityValue(): string | undefined {
+            return document.querySelector('.quantity-selector .quantity-value')?.textContent?.trim();
+        }
+
+        function quantityButton(icon: 'add' | 'remove'): HTMLButtonElement {
+            return <HTMLButtonElement>Array.from(document.querySelectorAll<HTMLButtonElement>('.quantity-selector button'))
+                .find((button: HTMLButtonElement): boolean => button.textContent?.trim() === icon);
+        }
+
+        it('retire l\'objet cliqué d\'une liste sans quantités', (): void => {
+            setInputs({ currentList: [createItem(1, 'Bois'), createItem(2, 'Eau')] });
+            fixture.detectChanges();
+
+            listIcons()[1].click();
+
+            expect(removed).toEqual([2]);
+            expect(document.querySelector('.quantity-selector')).toBeNull();
+        });
+
+        it('retire un état cliqué par son identifiant', (): void => {
+            setInputs({ currentList: [StatusEnum.TIRED] });
+            fixture.detectChanges();
+
+            listIcons()[0].click();
+
+            expect(removed).toEqual([StatusEnum.TIRED.id]);
+        });
+
+        it('ne fait rien au clic en lecture seule', (): void => {
+            setInputs({ currentList: [createItem(1, 'Bois')], readonly: true });
+            fixture.detectChanges();
+
+            listIcons()[0].click();
+
+            expect(removed).toEqual([]);
+        });
+
+        it('ouvre le sélecteur de quantité d\'un objet d\'une liste à quantités, sans rien retirer', (): void => {
+            const water: Item = createItem(1, 'Eau');
+            setInputs({ currentList: [water, createItem(2, 'Bois'), water] });
+            fixture.componentRef.setInput('withQuantity', true);
+            fixture.detectChanges();
+
+            listIcons()[2].click();
+            fixture.detectChanges();
+
+            expect(quantityValue()).toBe('2');
+            expect(removed).toEqual([]);
+        });
+
+        it('ajoute et retire un exemplaire, et ferme le sélecteur au dernier retiré', (): void => {
+            const water: Item = createItem(1, 'Eau');
+            let bag: Item[] = [water, water];
+            setInputs({ currentList: bag });
+            fixture.componentRef.setInput('withQuantity', true);
+            // Parent : un exemplaire ajouté en fin de sac, le premier trouvé retiré.
+            fixture.componentInstance.add.subscribe((): void => {
+                bag = [...bag, water];
+                fixture.componentRef.setInput('currentList', bag);
+            });
+            fixture.componentInstance.remove.subscribe((item_id: number | string): void => {
+                const index: number = bag.findIndex((item: Item): boolean => item.id === item_id);
+                bag = bag.filter((_: Item, position: number): boolean => position !== index);
+                fixture.componentRef.setInput('currentList', bag);
+            });
+            fixture.detectChanges();
+            listIcons()[1].click();
+            fixture.detectChanges();
+
+            quantityButton('add').click();
+            fixture.detectChanges();
+            expect(quantityValue()).toBe('3');
+
+            quantityButton('remove').click();
+            fixture.detectChanges();
+            quantityButton('remove').click();
+            fixture.detectChanges();
+            expect(quantityValue()).toBe('1');
+
+            quantityButton('remove').click();
+            fixture.detectChanges();
+
+            expect(added).toEqual([1]);
+            expect(removed).toEqual([1, 1, 1]);
+            expect(document.querySelector('.quantity-selector')).toBeNull();
+            expect(listIcons().length).toBe(0);
+        });
     });
 
     it('emits empty when menu-remove emits empty', (): void => {

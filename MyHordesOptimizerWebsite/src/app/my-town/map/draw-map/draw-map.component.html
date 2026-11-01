@@ -1,6 +1,7 @@
 @if (complete_map(); as complete_map) {
     <div #mapGrid class="mho-draw-map" role="grid" (pointerdown)="onPointerDown($event)" (contextmenu)="onContextMenu($event)"
          [class.route-editing]="routeEditing()"
+         [class.items-spotting]="spottedItems().size > 0"
          [class.zoom-compact]="zoom_tier() === 'compact'"
          [class.zoom-detail]="zoom_tier() === 'detail'"
          [style.--mho-cell]="cell_size()"
@@ -18,7 +19,7 @@
                     <mho-map-cell [cell]="cell"
                                   [allItems]="allItems()" [allRuins]="allRuins()"
                                   [allCitizens]="allCitizens()" [options]="options()" [drawedMap]="drawed_map()"
-                                  [detailed]="zoom_tier() === 'detail'"
+                                  [detailed]="zoom_tier() === 'detail'" [spottedItems]="spottedItems()"
                                   [selected]="row_index === selected_row() && cell_index === selected_column()"
                                   [crossed]="row_index === selected_row() || cell_index === selected_column()"
                                   (cellSelected)="selectCell($event, row_index, cell_index)"
@@ -39,7 +40,7 @@
 
         @if (selected(); as selected) {
             <mho-map-cell-details [cell]="selected.cell" [cellHtml]="selected.element" [map]="complete_map"
-                                  [allRuins]="allRuins()" [allCitizens]="allCitizens()" [allItems]="allItems()"
+                                  [allRuins]="allRuins()" [allCitizens]="allCitizens()" [allItems]="allItems()" [spottedItems]="spottedItems()"
                                   [canUpdate]="!is_readonly()" [canEditOrders]="can_contribute()"
                                   (updateRequested)="openCellUpdate()" (closed)="closeDetail()"></mho-map-cell-details>
         }

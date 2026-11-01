@@ -3,6 +3,7 @@
      [class.selected]="selected()"
      [class.crossed]="crossed()"
      [class.is-me]="is_my_cell()"
+     [class.spotted]="spotted()"
      [class.scrut-border-bottom]="cell() | scrutBorderBottom:options():drawedMap()"
      [class.scrut-border-left]="cell() | scrutBorderLeft:options():drawedMap()"
      [class.scrut-border-right]="cell() | scrutBorderRight:options():drawedMap()"
@@ -10,6 +11,7 @@
      [mhoMapCellTooltipAllCitizens]="allCitizens()"
      [mhoMapCellTooltipAllItems]="allItems()"
      [mhoMapCellTooltipAllRuins]="allRuins()"
+     [mhoMapCellTooltipSpottedItems]="spottedItems()"
      [mhoMapCellTooltip]="cell()">
 
     @if (cell().ruin_id && !cell().is_never_visited) {
@@ -67,6 +69,10 @@
         <div class="my-cell"></div>
     }
 
+    @if (spotted()) {
+        <div class="spotted-ring"></div>
+    }
+
     <div [style.border-bottom]="cell() | distBorderBottom:options():drawedMap()"
          [style.border-left]="cell() | distBorderLeft:options():drawedMap()"
          [style.border-right]="cell() | distBorderRight:options():drawedMap()"
@@ -85,6 +91,14 @@
                     }
                     @if (corner.value !== null) {
                         <span class="detail-value" [class.bare]="!corner.icon" [class.estimation]="corner.estimation">{{ corner.value }}</span>
+                    }
+                </div>
+            }
+            @if (spotted_icon(); as icon) {
+                <div class="spotted-item">
+                    <img [src]="HORDES_IMG_REPO + icon" alt="">
+                    @if (spotted_more()) {
+                        <img class="spotted-more" [src]="HORDES_IMG_REPO + 'icons/small_more2.gif'" alt="">
                     }
                 </div>
             }

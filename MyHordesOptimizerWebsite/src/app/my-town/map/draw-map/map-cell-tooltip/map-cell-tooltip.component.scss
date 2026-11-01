@@ -103,9 +103,25 @@
             }
         }
 
+        /* Icône et quantité alignées en bas, sans l'espace des jambages sous l'icône : le cadre
+           d'un objet repéré l'entoure ainsi à égale distance en haut et en bas. */
+        > div {
+            display: inline-flex;
+            align-items: flex-end;
+        }
+
         .item-quantity {
             font-size: 0.75em;
-            vertical-align: baseline;
+            line-height: 1;
+        }
+
+        /* Objet repéré sur la carte : en tête de liste, sur fond d'accent. */
+        > .spotted {
+            padding: 4px 6px;
+            border-radius: var(--mho-radius-s);
+            background-color: var(--mho-accent-soft);
+            box-shadow: inset 0 0 0 1px var(--mho-accent);
+            color: var(--mho-on-accent-soft);
         }
     }
 }

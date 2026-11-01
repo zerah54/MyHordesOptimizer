@@ -64,7 +64,7 @@ namespace MyHordesOptimizerApi.Services.Impl.MapRoutes
             var cellSet = new HashSet<(int X, int Y)>(cells.Select(cell => (cell.X, cell.Y)));
             foreach (var stop in stops)
             {
-                if (stop is null || (stop.Mode != MapRouteStopModes.Best && stop.Mode != MapRouteStopModes.L))
+                if (stop is null || !MapRouteStopModes.IsKnown(stop.Mode))
                 {
                     throw new MhoTechnicalException("Mode de calcul de destination inconnu.");
                 }

@@ -224,6 +224,19 @@ describe('MapCellDetailsComponent', (): void => {
         expect(img?.src).toContain('item42.gif');
     });
 
+    it('places the spotted items first and highlights them, keeping the order of the others', (): void => {
+        const all_items: Item[] = [41, 42, 43].map((id: number): Item => Object.assign(new Item(), { id, img: `item${id}.gif` }));
+        const on_cell: ItemCountShort[] = [41, 42, 43].map((id: number): ItemCountShort => {
+            return Object.assign(new ItemCountShort(), { item_id: id, count: id - 40, is_broken: false });
+        });
+        fixture.componentRef.setInput('spottedItems', new Set<number>([43]));
+        setInputs(newCell({ items: on_cell }), attachedCellHtml(), [], [], all_items);
+
+        const entries: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('.items > div'));
+        expect(entries.map((entry: HTMLElement): string | undefined => entry.querySelector('.item-quantity')?.textContent?.trim())).toEqual(['3', '1', '2']);
+        expect(entries.map((entry: HTMLElement): boolean => entry.classList.contains('spotted'))).toEqual([true, false, false]);
+    });
+
     it('offers the camping section for a desert cell, not for the town', (): void => {
         setInputs(newCell(), attachedCellHtml());
         expect(fixture.nativeElement.querySelector('mho-map-cell-camping')).not.toBeNull();

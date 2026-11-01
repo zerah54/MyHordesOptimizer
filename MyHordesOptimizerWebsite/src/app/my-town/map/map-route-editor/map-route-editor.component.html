@@ -59,6 +59,11 @@
                             <ng-container i18n>{{ editor.fresh() }} case non épuisée</ng-container>
                         }
                     </span>
+                    @if (editor.has_spotted_items()) {
+                        <span class="spotted-on-route">
+                            <ng-container i18n>{editor.spotted_on_route(), plural, =0 {Aucun objet repéré} =1 {1 objet repéré} other {{{ editor.spotted_on_route() }} objets repérés}}</ng-container>
+                        </span>
+                    }
                     @if (editor.length() > 0) {
                         <span>
                             @if (editor.return_ap() === 0) {
@@ -76,9 +81,17 @@
                                      hideSingleSelectionIndicator aria-label="Calcul du chemin" i18n-aria-label>
                 <mat-button-toggle value="best" i18n>Meilleur potentiel</mat-button-toggle>
                 <mat-button-toggle value="l" i18n>Le plus direct (en L)</mat-button-toggle>
+                @if (editor.has_spotted_items()) {
+                    <mat-button-toggle value="items" i18n>Objets repérés</mat-button-toggle>
+                }
             </mat-button-toggle-group>
             <p class="editor-hint">
-                @if (editor.mode() === 'best') {
+                @if (editor.mode() === 'items') {
+                    <ng-container i18n>Le plus court chemin qui passe par le plus d'objets repérés au sol (cassés compris), puis, à égalité, par
+                        les cases au plus fort potentiel. Les objets repérés sont les vôtres&nbsp;: recalculé par quelqu'un d'autre, le chemin suit
+                        les siens.
+                    </ng-container>
+                } @else if (editor.mode() === 'best') {
                     <ng-container i18n>Le plus court chemin qui passe par les cases au plus fort potentiel&nbsp;: une case jamais visitée d'abord, puis les
                         fouilles restantes maximales (régénération comprise), puis les cases les plus loin de la ville. Il ne repasse par une case
                         déjà sur le tracé que s'il n'a pas d'autre choix.

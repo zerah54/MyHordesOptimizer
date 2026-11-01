@@ -122,6 +122,37 @@ describe('MapRouteEditorComponent', (): void => {
         return (element?.textContent ?? '').replace(/\s+/g, ' ').trim();
     }
 
+    describe('mode « objets repérés »', (): void => {
+        function modeLabels(root: ParentNode): string[] {
+            return Array.from(root.querySelectorAll('mat-button-toggle-group[aria-label="Calcul du chemin"] mat-button-toggle')).map((toggle: Element): string => text(toggle));
+        }
+
+        it('n\'est proposé qu\'avec des objets repérés sur la carte', (): void => {
+            startFromTown();
+            const element: HTMLElement = render();
+            expect(modeLabels(element)).toEqual(['Meilleur potentiel', 'Le plus direct (en L)']);
+            expect(element.querySelector('.spotted-on-route')).toBeNull();
+
+            editor.setSpottedItems(new Set<number>([1]));
+            fixture.detectChanges();
+
+            expect(modeLabels(element)).toEqual(['Meilleur potentiel', 'Le plus direct (en L)', 'Objets repérés']);
+            expect(text(element.querySelector('.spotted-on-route'))).toBe('Aucun objet repéré');
+        });
+
+        it('explique le mode une fois choisi', (): void => {
+            editor.setSpottedItems(new Set<number>([1]));
+            startFromTown();
+            const element: HTMLElement = render();
+
+            button(element, 'Objets repérés')?.click();
+            fixture.detectChanges();
+
+            expect(editor.mode()).toBe('items');
+            expect(text(element.querySelector('.editor-hint'))).toContain('le plus d\'objets repérés');
+        });
+    });
+
     it('renders nothing outside of route input', (): void => {
         expect(render().querySelector('.route-editor')).toBeNull();
     });

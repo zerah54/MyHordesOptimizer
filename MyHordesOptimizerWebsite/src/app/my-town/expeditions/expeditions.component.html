@@ -358,9 +358,10 @@
                                                         }
                                                     </td>
                                                     <td class="bag">
-                                                        <mho-list-element-add-remove [currentList]="expedition_citizen.bag.items"
+                                                        <mho-list-element-add-remove [currentList]="expedition_citizen.bag.items" withQuantity
                                                                                      label="Sac" i18n-label
-                                                                                     [lists]="objectsList"
+                                                                                     [lists]="objects_list()"
+                                                                                     [sortMode]="items_sort()" (sortModeChange)="changeItemsSort($event)"
                                                                                      addLabel="Ajouter au sac" i18n-addLabel
                                                                                      (add)="addItem(expedition_citizen, +$event)"
                                                                                      removeLabel="Retirer du sac" i18n-removeLabel

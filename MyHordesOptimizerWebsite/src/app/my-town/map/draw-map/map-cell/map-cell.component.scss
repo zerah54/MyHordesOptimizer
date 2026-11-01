@@ -59,6 +59,16 @@ $empty-color: var(--mho-map-hatch);
         inset 0 0 0 3.5px var(--mho-map-marker-ink);
     }
 
+    /* Case portant un des objets repérés : anneau de l'encre de la carte, doublé d'un liseré de
+       l'encre opposée pour tenir sur les quatre couleurs de fond. Sous le contenu (z-index 2) :
+       au-dessus, il rognait la valeur collée au bord du coin bas droit. */
+    > .spotted-ring {
+        z-index: 1;
+        pointer-events: none;
+        box-shadow: inset 0 0 0 2px var(--mho-map-fg),
+        inset 0 0 0 3px var(--mho-map-marker-ink);
+    }
+
     > div {
         position: absolute;
         top: 0;
@@ -278,6 +288,30 @@ $empty-color: var(--mho-map-hatch);
                         clip-path: polygon(100% 0, 100% 100%, 0 100%);
                     }
                 }
+
+                /* Objet repéré, le plus nombreux de la case : au milieu à gauche, hors des coins
+                   réglables, à tous les paliers de zoom. Liseré dans l'encre opposée, comme les
+                   icônes des coins, pour tenir sur les quatre couleurs de fond. */
+                &.spotted-item {
+                    top: 50%;
+                    left: 1px;
+                    display: flex;
+                    transform: translateY(-50%);
+                    filter: drop-shadow(0 0 1px var(--mho-map-marker-ink));
+
+                    img {
+                        width: max(10px, calc(var(--mho-cell, 30px) * 0.4));
+                        height: auto;
+                    }
+
+                    /* Plusieurs objets repérés : pastille « + » du jeu dans l'angle bas droit de
+                       l'icône. Même taille que l'icône, le rond du jeu n'en occupe que le centre. */
+                    .spotted-more {
+                        position: absolute;
+                        right: -55%;
+                        bottom: -45%;
+                    }
+                }
             }
         }
     }
@@ -449,6 +483,15 @@ $empty-color: var(--mho-map-hatch);
             box-shadow: inset 0 0 0 2px var(--mho-map-sel),
             inset 0 0 0 3px var(--mho-map-marker-ink);
         }
+    }
+}
+
+/* Repérage d'objets : les cases qui n'en portent pas s'effacent, pour que les autres ressortent
+   d'un coup d'œil. La ville et la case choisie restent pleines, comme repères. L'état est posé
+   une seule fois, sur le conteneur de la grille (mho-draw-map). */
+:host-context(.mho-draw-map.items-spotting) {
+    .map-cell:not(.spotted, .selected, .town) {
+        opacity: 0.35;
     }
 }
 

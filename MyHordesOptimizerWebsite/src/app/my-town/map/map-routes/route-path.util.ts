@@ -1,5 +1,6 @@
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { MapRoutePoint, MapRouteStop, MapRouteStopMode } from '../../../_abstract_model/types/map-route.class';
+import { NO_SPOTTED_ITEMS, spottedQuantity } from '../map-spotted-items';
 
 /** Cases de la carte par coordonnées absolues « x,y » (cf. `cellsByCoordinates`). */
 export type CellIndex = ReadonlyMap<string, Cell>;
@@ -19,6 +20,8 @@ export type PathScore = readonly number[];
 
 /** Nombre de critères de `cellScore`. */
 const CELL_SCORE_CRITERIA: number = 4;
+/** Nombre de critères de `itemsCellScore` : les objets repérés, puis ceux de `cellScore`. */
+const ITEMS_SCORE_CRITERIA: number = CELL_SCORE_CRITERIA + 1;
 
 export function pointKey(point: MapRoutePoint): string {
     return `${point.x},${point.y}`;
@@ -49,6 +52,14 @@ export function cellScore(cell: Cell | undefined, used: boolean = false): PathSc
     return [1, cell.is_never_visited ? 1 : 0, positive(cell.max_potential_remaining_dig), km];
 }
 
+/**
+ * Score d'une case en mode « objets repérés » : la quantité d'objets repérés au sol (cassés compris), puis les
+ * critères de `cellScore`. Une case déjà sur le tracé ne rapporte plus d'objet, ils y ont été ramassés.
+ */
+export function itemsCellScore(cell: Cell | undefined, used: boolean, item_ids: ReadonlySet<number>): PathScore {
+    return [used ? 0 : spottedQuantity(cell, item_ids), ...cellScore(cell, used)];
+}
+
 /** Case non épuisée : jamais visitée, ou avec des fouilles restantes. */
 export function isFreshCell(cell: Cell | undefined): boolean {
     if (!cell || cell.is_town) return false;
@@ -66,6 +77,21 @@ export function countFresh(points: readonly MapRoutePoint[], cells: CellIndex, e
         if (isFreshCell(cells.get(key))) fresh++;
     }
     return fresh;
+}
+
+/** Quantité d'objets repérés au sol sur les cases distinctes de `points`, en ignorant celles de `excluded`. */
+export function countSpotted(points: readonly MapRoutePoint[], cells: CellIndex, item_ids: ReadonlySet<number>,
+                             excluded: ReadonlySet<string> = new Set<string>()): number {
+    if (item_ids.size === 0) return 0;
+    const seen: Set<string> = new Set<string>();
+    let quantity: number = 0;
+    for (const point of points) {
+        const key: string = pointKey(point);
+        if (seen.has(key) || excluded.has(key)) continue;
+        seen.add(key);
+        quantity += spottedQuantity(cells.get(key), item_ids);
+    }
+    return quantity;
 }
 
 /** Le plus direct : horizontal puis vertical. Sans la case de départ, avec l'arrivée. */
@@ -144,11 +170,22 @@ export function bestPath(from: MapRoutePoint, to: MapRoutePoint, score: (point: 
 
 /**
  * Chemin d'une destination à la suivante selon son mode. En « meilleur potentiel » (`cellScore`), le chemin
- * évite les cases déjà sur le tracé (`used`) tant qu'un plus court chemin le permet.
+ * évite les cases déjà sur le tracé (`used`) tant qu'un plus court chemin le permet. En « objets repérés »
+ * (`itemsCellScore`), il passe d'abord par le plus d'objets repérés ; sans objet repéré, il revient au meilleur
+ * potentiel.
+ *
+ * @param spotted_item_ids objets repérés de la personne qui calcule (mode « objets repérés »)
  */
-export function segmentPath(from: MapRoutePoint, to: MapRoutePoint, mode: MapRouteStopMode, used: ReadonlySet<string>, cells: CellIndex): MapRoutePoint[] {
+export function segmentPath(from: MapRoutePoint, to: MapRoutePoint, mode: MapRouteStopMode, used: ReadonlySet<string>, cells: CellIndex,
+                            spotted_item_ids: ReadonlySet<number> = NO_SPOTTED_ITEMS): MapRoutePoint[] {
     if (samePoint(from, to)) return [];
     if (mode === 'l') return lPath(from, to);
+    if (mode === 'items' && spotted_item_ids.size > 0) {
+        return bestPath(from, to, (point: MapRoutePoint): PathScore => {
+            const key: string = pointKey(point);
+            return itemsCellScore(cells.get(key), used.has(key), spotted_item_ids);
+        }, ITEMS_SCORE_CRITERIA);
+    }
     return bestPath(from, to, (point: MapRoutePoint): PathScore => {
         const key: string = pointKey(point);
         return cellScore(cells.get(key), used.has(key));
@@ -160,16 +197,17 @@ export function segmentPath(from: MapRoutePoint, to: MapRoutePoint, mode: MapRou
  * destination identique à la précédente ne produit pas de segment vide : elle est ignorée.
  *
  * @param used cases déjà sur le tracé avant `start` (`start` y est ajoutée)
+ * @param spotted_item_ids objets repérés de la personne qui calcule, pour les destinations en mode « objets repérés »
  */
 export function buildSegments(start: MapRoutePoint, stops: readonly MapRouteStop[], cells: CellIndex,
-                              used: ReadonlySet<string> = new Set<string>()): RouteSegment[] {
+                              used: ReadonlySet<string> = new Set<string>(), spotted_item_ids: ReadonlySet<number> = NO_SPOTTED_ITEMS): RouteSegment[] {
     const visited: Set<string> = new Set<string>(used);
     visited.add(pointKey(start));
     const segments: RouteSegment[] = [];
     let last: MapRoutePoint = start;
     for (const stop of stops) {
         if (samePoint(last, stop)) continue;
-        const path: MapRoutePoint[] = segmentPath(last, stop, stop.mode, visited, cells);
+        const path: MapRoutePoint[] = segmentPath(last, stop, stop.mode, visited, cells, spotted_item_ids);
         path.forEach((point: MapRoutePoint): void => {
             visited.add(pointKey(point));
         });

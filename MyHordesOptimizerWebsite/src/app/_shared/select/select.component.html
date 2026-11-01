@@ -1,6 +1,6 @@
 <mat-select class="mho-select" [multiple]="multiple()" [value]="value" (valueChange)="selectValue($event);"
             [attr.aria-labelledby]="parent_form_field?.getLabelId()"
-            (closed)="closed.emit()" [placeholder]="placeholder" [panelClass]="class()">
+            (closed)="onClosed()" [placeholder]="placeholder" [panelClass]="class()">
     @if (multiple()) {
         <mat-select-trigger>
             @if (chips()) {
@@ -11,7 +11,7 @@
                                 <mat-icon>cancel</mat-icon>
                             </button>
                             @if (single_value) {
-                                @if (single_value | bind:bindValue():displayed_options(); as display_value) {
+                                @if (single_value | bind:bindValue():complete_options(); as display_value) {
                                     <ng-container *ngTemplateOutlet="icons; context: {$implicit: display_value}"></ng-container>
                                     @if (!noLabel()) {
                                         <span>{{ display_value | label:bindLabel() }}</span>
@@ -24,8 +24,8 @@
             } @else {
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="overflow: hidden; text-overflow: ellipsis">
-                            @if (value | bind:bindValue():displayed_options(); as display_values) {
-                                {{ $any(display_values) | multipleLabel:bindLabel() }}
+                            @if (value | bind:bindValue():complete_options(); as display_values) {
+                                {{ ($any(display_values) | multipleLabel:bindLabel()).join(', ') }}
                             }
                         </span>
                     @if (value && clearable()) {
@@ -36,7 +36,7 @@
         </mat-select-trigger>
     } @else {
         <mat-select-trigger style="display: flex; justify-content: space-between;">
-            @if (value | bind:bindValue():displayed_options(); as display_value) {
+            @if (value | bind:bindValue():complete_options(); as display_value) {
                 <span style="display: flex; align-items: center; gap: 0.5em;">
                     <ng-container *ngTemplateOutlet="icons; context: {$implicit: display_value}"></ng-container>
                     @if (!noLabel()) {

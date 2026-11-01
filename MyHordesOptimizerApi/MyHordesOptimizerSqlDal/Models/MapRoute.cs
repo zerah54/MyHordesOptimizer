@@ -42,7 +42,7 @@ public partial class MapRoute
     [Column("cells", TypeName = "longtext")]
     public string Cells { get; set; } = null!;
 
-    /// <summary>Destinations cliquées, JSON [{"x":…,"y":…,"mode":"best"|"l"}].</summary>
+    /// <summary>Destinations cliquées, JSON [{"x":…,"y":…,"mode":"best"|"l"|"items"}].</summary>
     [Column("stops", TypeName = "longtext")]
     public string Stops { get; set; } = null!;
 

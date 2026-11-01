@@ -90,6 +90,29 @@ namespace MyHordesOptimizerApiUnitTests.MapRoutes
         }
 
         [Fact]
+        public void Validate_ModeObjetsReperes_Accepte()
+        {
+            var cells = Cells((12, 12), (13, 12), (13, 11));
+            var stops = Stops((13, 11, MapRouteStopModes.Items));
+
+            Action act = () => MapRoutePath.Validate(cells, stops, Width, Height);
+
+            act.Should().NotThrow();
+        }
+
+        [Theory]
+        [InlineData(MapRouteStopModes.Best, true)]
+        [InlineData(MapRouteStopModes.L, true)]
+        [InlineData(MapRouteStopModes.Items, true)]
+        [InlineData("zigzag", false)]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        public void IsKnown_ReconnaitLesModesDuSite(string? mode, bool expected)
+        {
+            MapRouteStopModes.IsKnown(mode).Should().Be(expected);
+        }
+
+        [Fact]
         public void Validate_ModeInconnu_Refuse()
         {
             Action act = () => MapRoutePath.Validate(Cells((12, 12), (13, 12)), Stops((13, 12, "zigzag")), Width, Height);

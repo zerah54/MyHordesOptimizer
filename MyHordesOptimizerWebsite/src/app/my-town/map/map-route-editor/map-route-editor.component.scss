@@ -133,6 +133,11 @@
     border: 0;
     border-radius: 0;
 
+    /* « Objets repérés », proposé seulement avec des objets repérés : seul sur sa ligne, sur toute la largeur. */
+    .mat-button-toggle:nth-child(3) {
+        grid-column: 1 / -1;
+    }
+
     .mat-button-toggle {
         border: 1px solid var(--mho-line);
         border-radius: var(--mho-radius-s);

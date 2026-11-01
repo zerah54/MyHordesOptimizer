@@ -17,7 +17,7 @@ import moment from 'moment';
 import { firstValueFrom, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { EXPEDITIONS_EDITION_MODE_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { EXPEDITIONS_EDITION_MODE_KEY, EXPEDITIONS_ITEMS_SORT_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { ExpeditionOrdersUpdate, RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
@@ -55,6 +55,7 @@ import { DaySelectorComponent } from '../../_shared/day-selector/day-selector.co
 import { DaysUpToPipe } from '../../_shared/day-selector/days-up-to.pipe';
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { CountAvailableApPipe } from '../../_shared/list-elements-add-remove/count-available-ap.pipe';
+import { ItemsSortMode, sanitizeItemsSortMode } from '../../_shared/list-elements-add-remove/items-sort-mode';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { SelectComponent } from '../../_shared/select/select.component';
 import { TriStateCheckboxComponent } from '../../_shared/tri-state-checkbox/tri-state-checkbox.component';
@@ -117,6 +118,20 @@ export class ExpeditionsComponent implements OnInit {
     protected all_items: WritableSignal<Item[]> = signal([]);
     /** La liste des items en banque */
     private bank_items: WritableSignal<Item[]> = signal([]);
+    /** Quantité en banque de chaque objet, par id, objets cassés compris : montrée dans l'onglet Banque du sac. */
+    private readonly bank_counts: Signal<ReadonlyMap<number, number>> = computed((): ReadonlyMap<number, number> => bankCountsById(this.bank_items()));
+    /** Onglets du menu d'ajout au sac. */
+    protected readonly objects_list: Signal<ListForAddRemove[]> = computed((): ListForAddRemove[] => [
+        {
+            label: $localize`Favoris`, list: this.all_items().filter((item: Item): boolean => {
+                return FAVORITE_EXPEDITION_ITEMS_UID.some((uid: string): boolean => uid === item.uid);
+            })
+        },
+        { label: $localize`Banque`, list: this.bank_items(), counts: this.bank_counts() },
+        { label: $localize`Tous`, list: this.all_items() }
+    ]);
+    /** Tri de l'onglet Banque (par catégorie ou par quantité en banque), enregistré pour la prochaine visite. */
+    protected readonly items_sort: WritableSignal<ItemsSortMode> = signal(sanitizeItemsSortMode(localStorage.getItem(EXPEDITIONS_ITEMS_SORT_KEY)));
     protected expeditions: WritableSignal<Expedition[]> = signal([]);
     /** Carte de la ville (cases, position de la ville) : feuilles de route et cases des consignes. */
     protected map: WritableSignal<Town | undefined> = signal(undefined);
@@ -280,7 +295,7 @@ export class ExpeditionsComponent implements OnInit {
             const part_place: CitizenExpedition | undefined = part_places[index];
             return part_place ? [{ route: part.map_route?.cells ?? [], ruin_visits: ruinVisitsOf(part, part_place) }] : [];
         });
-        return apCheck(legs, { base_ap: place.base_ap ?? 6, bag_ap: this.count_available_ap.transform(place.bag.items, this.objectsList), sp }, town);
+        return apCheck(legs, { base_ap: place.base_ap ?? 6, bag_ap: this.count_available_ap.transform(place.bag.items, this.objects_list()), sp }, town);
     }
 
     /** Infobulle de l'avertissement de PA. */
@@ -866,16 +881,9 @@ export class ExpeditionsComponent implements OnInit {
         return spots;
     }
 
-    protected get objectsList(): ListForAddRemove[] {
-        return [
-            {
-                label: $localize`Favoris`, list: this.all_items().filter((item: Item) => {
-                    return FAVORITE_EXPEDITION_ITEMS_UID.some((uid: string) => uid === item.uid);
-                })
-            },
-            { label: $localize`Banque`, list: this.bank_items() },
-            { label: $localize`Tous`, list: this.all_items() },
-        ];
+    protected changeItemsSort(sort_mode: ItemsSortMode): void {
+        this.items_sort.set(sort_mode);
+        localStorage.setItem(EXPEDITIONS_ITEMS_SORT_KEY, sort_mode);
     }
 
     protected async saveExpedition(expedition: Expedition): Promise<void> {
@@ -1065,3 +1073,11 @@ export class ExpeditionsComponent implements OnInit {
     }
 }
 
+/** Quantité en banque de chaque objet, par id : un objet présent intact et cassé figure deux fois en banque. */
+export function bankCountsById(bank_items: readonly Item[]): ReadonlyMap<number, number> {
+    const counts: Map<number, number> = new Map<number, number>();
+    for (const item of bank_items) {
+        counts.set(item.id, (counts.get(item.id) ?? 0) + (item.bank_count ?? 0));
+    }
+    return counts;
+}

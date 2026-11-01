@@ -6,11 +6,14 @@
                 <input matInput #searchItem>
             </mat-form-field>
         </div>
+        <!-- Un sac peut contenir plusieurs fois le même objet : suivi par position, pas par objet. -->
         <div class="items">
-            @for (item of list; track item) {
+            @for (item of list; track $index) {
                 @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
-                    <img [ngSrc]="HORDES_IMG_REPO + item.img" (click)="remove.emit(item.id)"
-                         [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
+                    <span class="tile" (click)="remove.emit(item.id)">
+                        <img [ngSrc]="HORDES_IMG_REPO + item.img"
+                             [title]="$any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label)" width="16" height="16">
+                    </span>
                 }
             }
         </div>

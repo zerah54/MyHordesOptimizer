@@ -7,6 +7,7 @@ import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { Item } from '../../_abstract_model/types/item.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { MapCellTooltipComponent } from '../../my-town/map/draw-map/map-cell-tooltip/map-cell-tooltip.component';
+import { NO_SPOTTED_ITEMS } from '../../my-town/map/map-spotted-items';
 
 @Directive({
     selector: '[mhoMapCellTooltip]',
@@ -20,6 +21,8 @@ export class MapCellTooltipDirective implements OnDestroy {
     public mhoMapCellTooltipAllRuins: InputSignal<Ruin[]> = input.required();
     public mhoMapCellTooltipAllCitizens: InputSignal<Citizen[]> = input.required();
     public mhoMapCellTooltipAllItems: InputSignal<Item[]> = input.required();
+    /** Objets repérés sur la carte : mis en tête et surlignés dans la liste des objets. */
+    public mhoMapCellTooltipSpottedItems: InputSignal<ReadonlySet<number>> = input<ReadonlySet<number>>(NO_SPOTTED_ITEMS);
 
     private overlayRef: OverlayRef | null = null;
 
@@ -69,6 +72,7 @@ export class MapCellTooltipDirective implements OnDestroy {
         componentRef.instance.allCitizens.set(this.mhoMapCellTooltipAllCitizens());
         componentRef.instance.allItems.set(this.mhoMapCellTooltipAllItems());
         componentRef.instance.allRuins.set(this.mhoMapCellTooltipAllRuins());
+        componentRef.instance.spottedItems.set(this.mhoMapCellTooltipSpottedItems());
     }
 
     /** Survol uniquement : au toucher, c'est le panneau de détail de la case qui s'ouvre. */

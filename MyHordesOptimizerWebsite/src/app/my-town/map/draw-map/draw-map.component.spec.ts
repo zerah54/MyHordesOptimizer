@@ -1,6 +1,6 @@
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
@@ -70,7 +70,9 @@ const options: MapOptions = {
     zoom: 30,
     corners: sanitizeCorners(undefined),
     corners_version: CORNERS_VERSION,
-    routes: DEFAULT_ROUTES_DISPLAY
+    routes: DEFAULT_ROUTES_DISPLAY,
+    spotted_item_uids: [],
+    items_sort: 'category'
 };
 
 describe('DrawMapComponent', (): void => {
@@ -333,6 +335,23 @@ describe('DrawMapComponent', (): void => {
         expect(layer.width()).toBe(2);
         expect(layer.height()).toBe(2);
         expect(layer.drawings().length).toBe(1);
+    });
+
+    it('marks the grid while items are spotted, and passes them to every cell', (): void => {
+        fixture.componentRef.setInput('map', newTown({ map_width: 2, cells: [newCell(0, 0), newCell(1, 0)] }));
+        fixture.detectChanges();
+        const grid: HTMLElement = fixture.nativeElement.querySelector('.mho-draw-map');
+        expect(grid.classList).not.toContain('items-spotting');
+
+        const spotted: ReadonlySet<number> = new Set<number>([1]);
+        fixture.componentRef.setInput('spottedItems', spotted);
+        fixture.detectChanges();
+
+        expect(grid.classList).toContain('items-spotting');
+        const cells: MapCellComponent[] = fixture.debugElement.queryAll(By.directive(MapCellComponent))
+            .map((cell: DebugElement): MapCellComponent => cell.componentInstance);
+        expect(cells.length).toBe(2);
+        expect(cells.every((cell: MapCellComponent): boolean => cell.spottedItems() === spotted)).toBe(true);
     });
 
     it('in route mode, reports the clicked and hovered cells instead of opening the detail', (): void => {

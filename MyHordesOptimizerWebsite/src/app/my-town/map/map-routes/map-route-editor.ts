@@ -13,12 +13,13 @@ import {
     toMapRouteStopDto
 } from '../../../_abstract_model/types/map-route.class';
 import { Town } from '../../../_abstract_model/types/town.class';
+import { NO_SPOTTED_ITEMS } from '../map-spotted-items';
 import { cellsByCoordinates } from './map-route-detail';
 import { MapRouteDrawing } from './map-route-views';
 import { MapRoutesStore } from './map-routes.store';
 import { MapRouteKey, mapRouteKey } from './map-routes-display';
 import { distanceInAp } from './route-geometry.util';
-import { buildSegments, CellIndex, countFresh, pointKeys, routeCells, RouteSegment, samePoint, segmentPath, splitSegments } from './route-path.util';
+import { buildSegments, CellIndex, countFresh, countSpotted, pointKeys, routeCells, RouteSegment, samePoint, segmentPath, splitSegments } from './route-path.util';
 
 /** Longueur maximale du nom d'un tracé (`MapRoutePath.MaxLabelLength` côté API). */
 export const MAP_ROUTE_LABEL_MAX_LENGTH: number = 64;
@@ -60,6 +61,8 @@ export interface MapRoutePreview {
     readonly ap: number;
     /** Cases non épuisées que le segment ajouterait au tracé. */
     readonly fresh: number;
+    /** Objets repérés au sol que le segment ajouterait au tracé. */
+    readonly items: number;
 }
 
 export type MapRouteEditorStatus = 'idle' | 'saving' | 'error';
@@ -74,7 +77,12 @@ function randomColor(): MapRouteColor {
     return MAP_ROUTE_COLORS[Math.floor(Math.random() * MAP_ROUTE_COLORS.length)];
 }
 
-function previewLabel(preview: MapRoutePreview): string {
+function previewLabel(preview: MapRoutePreview, mode: MapRouteStopMode): string {
+    if (mode === 'items') {
+        return preview.items > 1
+            ? $localize`+${preview.ap}:ap: PA · ${preview.items}:items: objets repérés`
+            : $localize`+${preview.ap}:ap: PA · ${preview.items}:items: objet repéré`;
+    }
     return preview.fresh > 1
         ? $localize`+${preview.ap}:ap: PA · ${preview.fresh}:fresh: non épuisées`
         : $localize`+${preview.ap}:ap: PA · ${preview.fresh}:fresh: non épuisée`;
@@ -92,6 +100,8 @@ export class MapRouteEditor {
     private readonly cell_index: WritableSignal<CellIndex> = signal(new Map());
     private readonly draft_state: WritableSignal<MapRouteDraft | null> = signal(null);
     private readonly mode_state: WritableSignal<MapRouteStopMode> = signal('best');
+    /** Objets repérés sur la carte (ids) : critère du mode « objets repérés ». */
+    private readonly spotted_state: WritableSignal<ReadonlySet<number>> = signal(NO_SPOTTED_ITEMS);
     private readonly status_state: WritableSignal<MapRouteEditorStatus> = signal('idle');
     private readonly hovered: WritableSignal<MapRoutePoint | null> = signal(null);
     /** Écran tactile : case touchée une première fois, en aperçu, validée par un second toucher. */
@@ -126,6 +136,12 @@ export class MapRouteEditor {
     public readonly can_undo: Signal<boolean> = computed((): boolean => this.history().length > 0);
 
     public readonly fresh: Signal<number> = computed((): number => countFresh(this.cells(), this.cell_index()));
+
+    /** Le mode « objets repérés » n'est proposé qu'avec des objets repérés sur la carte. */
+    public readonly has_spotted_items: Signal<boolean> = computed((): boolean => this.spotted_state().size > 0);
+
+    /** Objets repérés au sol sur les cases du tracé. */
+    public readonly spotted_on_route: Signal<number> = computed((): number => countSpotted(this.cells(), this.cell_index(), this.spotted_state()));
 
     /** PA pour rentrer en ville depuis la dernière case ; 0 pour une boucle. */
     public readonly return_ap: Signal<number> = computed((): number => {
@@ -170,8 +186,12 @@ export class MapRouteEditor {
         const last: MapRoutePoint = cells[cells.length - 1];
         if (samePoint(last, target)) return null;
         const used: Set<string> = pointKeys(cells);
-        const path: MapRoutePoint[] = segmentPath(last, target, this.mode_state(), used, this.cell_index());
-        return { target, cells: [last, ...path], ap: path.length, fresh: countFresh(path, this.cell_index(), used) };
+        const spotted: ReadonlySet<number> = this.spotted_state();
+        const path: MapRoutePoint[] = segmentPath(last, target, this.mode_state(), used, this.cell_index(), spotted);
+        return {
+            target, cells: [last, ...path], ap: path.length, fresh: countFresh(path, this.cell_index(), used),
+            items: countSpotted(path, this.cell_index(), spotted, used)
+        };
     });
 
     /** Le tracé saisi, puis l'aperçu du prochain segment. */
@@ -189,7 +209,7 @@ export class MapRouteEditor {
         if (preview) {
             drawings.push({
                 key: 'preview', color: draft.color, cells: preview.cells, lane: 0, dashed: true, emphasized: false, dimmed: false,
-                label: previewLabel(preview)
+                label: previewLabel(preview, this.mode_state())
             });
         }
         return drawings;
@@ -199,6 +219,14 @@ export class MapRouteEditor {
     public setMap(town: Town | undefined): void {
         this.town.set(town ? { x: town.town_x, y: town.town_y } : null);
         this.cell_index.set(cellsByCoordinates(town));
+    }
+
+    /** Objets repérés sur la carte. Sans eux, le mode « objets repérés » n'a plus de sens : retour au meilleur potentiel. */
+    public setSpottedItems(item_ids: ReadonlySet<number>): void {
+        this.spotted_state.set(item_ids);
+        if (item_ids.size === 0 && this.mode_state() === 'items') {
+            this.mode_state.set('best');
+        }
     }
 
     /** Nouveau tracé, sans départ : la première case choisie sur la carte le fixe. */
@@ -213,7 +241,8 @@ export class MapRouteEditor {
     public startEdit(route: MapRoute): void {
         const start: MapRoutePoint | null = route.cells[0] ?? this.town();
         if (!start) return;
-        const segments: RouteSegment[] = splitSegments(route.cells, route.stops) ?? buildSegments(start, route.stops, this.cell_index());
+        const segments: RouteSegment[] = splitSegments(route.cells, route.stops)
+            ?? buildSegments(start, route.stops, this.cell_index(), new Set<string>(), this.spotted_state());
         this.begin({
             id: route.id, version: route.version, label: route.label, color: route.color, is_private: route.is_private,
             is_editable_by_all: route.is_editable_by_all, shared_user_ids: [...route.shared_user_ids], author_id: route.author_id,
@@ -293,12 +322,13 @@ export class MapRouteEditor {
     public addStop(point: MapRoutePoint): void {
         const mode: MapRouteStopMode = this.mode_state();
         const cells: CellIndex = this.cell_index();
+        const spotted: ReadonlySet<number> = this.spotted_state();
         this.updatePath((draft: MapRouteDraft): readonly RouteSegment[] => {
             if (!draft.start) return draft.segments;
             const route: MapRoutePoint[] = routeCells(draft.start, draft.segments);
             const last: MapRoutePoint = route[route.length - 1];
             if (samePoint(last, point)) return draft.segments;
-            const path: MapRoutePoint[] = segmentPath(last, point, mode, pointKeys(route), cells);
+            const path: MapRoutePoint[] = segmentPath(last, point, mode, pointKeys(route), cells, spotted);
             return [...draft.segments, { stop: { x: point.x, y: point.y, mode }, cells: path }];
         });
     }
@@ -344,12 +374,13 @@ export class MapRouteEditor {
         this.update((current: MapRouteDraft): MapRouteDraft => ({ ...current, start: null, segments: [] }));
     }
 
-    /** Mêmes destinations, chemin recalculé avec le potentiel du jour. */
+    /** Mêmes destinations, chemin recalculé avec le potentiel du jour (et les objets repérés de la personne qui recalcule). */
     public recalculate(): void {
         const cells: CellIndex = this.cell_index();
+        const spotted: ReadonlySet<number> = this.spotted_state();
         this.updatePath((draft: MapRouteDraft): readonly RouteSegment[] => {
             if (!draft.start) return draft.segments;
-            return buildSegments(draft.start, draft.segments.map((segment: RouteSegment): MapRouteStop => segment.stop), cells);
+            return buildSegments(draft.start, draft.segments.map((segment: RouteSegment): MapRouteStop => segment.stop), cells, new Set<string>(), spotted);
         });
     }
 

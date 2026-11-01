@@ -4,6 +4,7 @@ import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import moment from 'moment';
 
+import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Property } from '../../../../_abstract_model/enum/property.enum';
 import { Trash } from '../../../../_abstract_model/enum/trash.enum';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
@@ -68,7 +69,9 @@ const options: MapOptions = {
     zoom: 30,
     corners: sanitizeCorners(undefined),
     corners_version: CORNERS_VERSION,
-    routes: DEFAULT_ROUTES_DISPLAY
+    routes: DEFAULT_ROUTES_DISPLAY,
+    spotted_item_uids: [],
+    items_sort: 'category'
 };
 
 /** Options dont la disposition des coins du type affiché est remplacée. */
@@ -666,5 +669,72 @@ describe('MapCellComponent', (): void => {
         const cell_element: HTMLElement = fixture.nativeElement.querySelector('.map-cell');
         expect(cell_element.classList).toContain('selected');
         expect(cell_element.classList).toContain('crossed');
+    });
+
+    describe('repérage d\'objets', (): void => {
+        function cellWithItem(item_id: number, is_broken: boolean = false): Cell {
+            const item: ItemCountShort = new ItemCountShort();
+            item.item_id = item_id;
+            item.count = 1;
+            item.is_broken = is_broken;
+            return newCell({ items: [item] });
+        }
+
+        function cellElement(): HTMLElement {
+            return fixture.nativeElement.querySelector('.map-cell');
+        }
+
+        function itemCount(item_id: number, count: number): ItemCountShort {
+            return Object.assign(new ItemCountShort(), { item_id, count, is_broken: false });
+        }
+
+        function spottedIcons(): string[] {
+            return Array.from(fixture.nativeElement.querySelectorAll('.spotted-item img') as NodeListOf<HTMLImageElement>)
+                .map((img: HTMLImageElement): string => img.getAttribute('src') ?? '');
+        }
+
+        it('met en valeur une case portant un des objets repérés, même cassé', (): void => {
+            setInputs(cellWithItem(7, true));
+            fixture.componentRef.setInput('spottedItems', new Set<number>([7]));
+            fixture.detectChanges();
+
+            expect(cellElement().classList).toContain('spotted');
+            expect(fixture.nativeElement.querySelector('.spotted-ring')).not.toBeNull();
+        });
+
+        it('affiche l\'icône de l\'objet repéré, sans pastille quand il est seul', (): void => {
+            setInputs(cellWithItem(7));
+            fixture.componentRef.setInput('allItems', [Object.assign(new Item(), { id: 7, img: 'item/water.gif' })]);
+            fixture.componentRef.setInput('spottedItems', new Set<number>([7]));
+            fixture.detectChanges();
+
+            expect(spottedIcons()).toEqual([`${HORDES_IMG_REPO}item/water.gif`]);
+        });
+
+        it('affiche le plus nombreux des objets repérés, avec la pastille « plusieurs »', (): void => {
+            setInputs(newCell({ items: [itemCount(7, 1), itemCount(8, 4), itemCount(9, 6)] }));
+            fixture.componentRef.setInput('allItems', [
+                Object.assign(new Item(), { id: 7, img: 'item/water.gif' }),
+                Object.assign(new Item(), { id: 8, img: 'item/wood.gif' })
+            ]);
+            fixture.componentRef.setInput('spottedItems', new Set<number>([7, 8]));
+            fixture.detectChanges();
+
+            expect(spottedIcons()).toEqual([`${HORDES_IMG_REPO}item/wood.gif`, `${HORDES_IMG_REPO}icons/small_more2.gif`]);
+        });
+
+        it('laisse une case sans les objets repérés, ou sans repérage, telle quelle', (): void => {
+            setInputs(cellWithItem(7));
+            fixture.detectChanges();
+
+            expect(cellElement().classList).not.toContain('spotted');
+
+            fixture.componentRef.setInput('spottedItems', new Set<number>([8]));
+            fixture.detectChanges();
+
+            expect(cellElement().classList).not.toContain('spotted');
+            expect(fixture.nativeElement.querySelector('.spotted-ring')).toBeNull();
+            expect(fixture.nativeElement.querySelector('.spotted-item')).toBeNull();
+        });
     });
 });
