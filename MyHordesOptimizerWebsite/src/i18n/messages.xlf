@@ -17,6 +17,9 @@
             <trans-unit id="9169108089059362035" datatype="html">
                 <source>Restaure l&apos;ensemble des points d&apos;actions plus deux points</source>
             </trans-unit>
+            <trans-unit id="390035818679444351" datatype="html">
+                <source>Perte</source>
+            </trans-unit>
             <trans-unit id="3901288124583682317" datatype="html">
                 <source>Restaure 4 points d&apos;actions</source>
             </trans-unit>
@@ -146,6 +149,9 @@
             </trans-unit>
             <trans-unit id="3118144948819432615" datatype="html">
                 <source>Chaussures équipées</source>
+            </trans-unit>
+            <trans-unit id="2101216353146774314" datatype="html">
+                <source>Supprimer la perte</source>
             </trans-unit>
             <trans-unit id="2130218545856934012" datatype="html">
                 <source>≈ 1 fouille réussie sur</source>
@@ -564,6 +570,9 @@
             <trans-unit id="8315676423230513910" datatype="html">
                 <source>Renommer</source>
             </trans-unit>
+            <trans-unit id="8315731691681645322" datatype="html">
+                <source>Détruit cette nuit</source>
+            </trans-unit>
             <trans-unit id="8327474089390088254" datatype="html">
                 <source>Peut être trouvé empoisonné</source>
             </trans-unit>
@@ -680,6 +689,9 @@
             </trans-unit>
             <trans-unit id="7098789116821500687" datatype="html">
                 <source>Mini-jeux</source>
+            </trans-unit>
+            <trans-unit id="1327284539504466015" datatype="html">
+                <source>restants sur</source>
             </trans-unit>
             <trans-unit id="1327764723186928694" datatype="html">
                 <source>Provisions</source>
@@ -805,6 +817,12 @@
             </trans-unit>
             <trans-unit id="7654288435585352458" datatype="html">
                 <source>Rechercher une page, un objet, un chantier, un bâtiment, un citoyen, un joueur ou une ville</source>
+            </trans-unit>
+            <trans-unit id="7655576817274995933" datatype="html">
+                <source>Défense gagnée dès cette nuit : l&apos;évolution s&apos;applique avant l&apos;attaque</source>
+            </trans-unit>
+            <trans-unit id="7658111198415947200" datatype="html">
+                <source>prévus</source>
             </trans-unit>
             <trans-unit id="7659914592468009285" datatype="html">
                 <source>Ligne horizontale</source>
@@ -950,6 +968,9 @@
                     sur
                     <x id="PH_2" equiv-text="length"/>
                 </source>
+            </trans-unit>
+            <trans-unit id="2975371412248916708" datatype="html">
+                <source>cette nuit</source>
             </trans-unit>
             <trans-unit id="2978700856860075889" datatype="html">
                 <source>Manques</source>
@@ -1145,6 +1166,9 @@
                 <source>Le débordement plafonne déjà l&apos;attaque au facteur minimum : le tirage du facteur ne change plus rien ici, favorable et défavorable
                     sont identiques au réaliste. Détail ci-dessous sans fourchette.
                 </source>
+            </trans-unit>
+            <trans-unit id="6908960104248423987" datatype="html">
+                <source>Pertes prévues cette nuit</source>
             </trans-unit>
             <trans-unit id="6915017092560181799" datatype="html">
                 <source>Liste de taches</source>
@@ -1501,6 +1525,9 @@
             <trans-unit id="7868632341076973356" datatype="html">
                 <source>Probabilité au moins</source>
             </trans-unit>
+            <trans-unit id="1074965241238322233" datatype="html">
+                <source>déf</source>
+            </trans-unit>
             <trans-unit id="1082394793765994406" datatype="html">
                 <source>Proposition effective du jour</source>
             </trans-unit>
@@ -1687,6 +1714,9 @@
             <trans-unit id="5655305259456025737" datatype="html">
                 <source>Dernière ville</source>
             </trans-unit>
+            <trans-unit id="5655782498735411689" datatype="html">
+                <source>Ajouter une perte</source>
+            </trans-unit>
             <trans-unit id="2833535716885273153" datatype="html">
                 <source>(saison<x id="INTERPOLATION" equiv-text="{{ row.lastTownSeason }}"/>)
                 </source>
@@ -1729,9 +1759,6 @@
                     déplacer ;&lt;/li&gt; &lt;li&gt;en zoom réduit, seul le coin bas droite des cases reste affiché ; en zoom fort, l&apos;illustration des
                     bâtiments apparaît.&lt;/li&gt; &lt;/ul&gt;
                 </source>
-            </trans-unit>
-            <trans-unit id="5318838674475000211" datatype="html">
-                <source>PA restants sur</source>
             </trans-unit>
             <trans-unit id="531885837238775496" datatype="html">
                 <source>Renseignez la simulation pour obtenir vos chances de survie.</source>
@@ -2050,6 +2077,9 @@
             <trans-unit id="6851914371737903015" datatype="html">
                 <source>Secteur connu</source>
             </trans-unit>
+            <trans-unit id="6853922078577050195" datatype="html">
+                <source>Défense de la maison</source>
+            </trans-unit>
             <trans-unit id="6862746102211208409" datatype="html">
                 <source>Impossible de récupérer les pictos.</source>
             </trans-unit>
@@ -2363,6 +2393,9 @@
             </trans-unit>
             <trans-unit id="3854032884475026094" datatype="html">
                 <source>Mode âmes</source>
+            </trans-unit>
+            <trans-unit id="3860715110536742352" datatype="html">
+                <source>restants</source>
             </trans-unit>
             <trans-unit id="3866252963923299661" datatype="html">
                 <source>Points d’âme</source>
@@ -3094,6 +3127,9 @@
                     objets ont été ajoutés à la liste de courses
                 </source>
             </trans-unit>
+            <trans-unit id="4564166912297825708" datatype="html">
+                <source>Chantier non construit au soir, ou sans bonus d&apos;évolution</source>
+            </trans-unit>
             <trans-unit id="4564972525253303830" datatype="html">
                 <source>&lt;p&gt;Placez des paires de pictos sur une grille de 6 × 6, en les glissant ou en cliquant sur une case. Trois pictos identiques
                     alignés ou plus disparaissent. Le but : faire disparaître les 368 pictos. La partie s&apos;arrête quand plus aucune paire ne peut être posée
@@ -3297,8 +3333,16 @@
             <trans-unit id="2682868487071320453" datatype="html">
                 <source>Violet</source>
             </trans-unit>
+            <trans-unit id="2684422002973556559" datatype="html">
+                <source>Les modifications de la proposition affichée ne sont pas enregistrées et seront perdues. Continuer quand même ?</source>
+            </trans-unit>
             <trans-unit id="2688644633550534159" datatype="html">
                 <source>Options du forum</source>
+            </trans-unit>
+            <trans-unit id="5906896176186306776" datatype="html">
+                <source>Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense
+                    propre :
+                </source>
             </trans-unit>
             <trans-unit id="5909537349952143751" datatype="html">
                 <source>Statistiques</source>
@@ -3567,6 +3611,9 @@
             <trans-unit id="8957575198110805301" datatype="html">
                 <source>Les tracés sont réservés aux citoyens de la ville.</source>
             </trans-unit>
+            <trans-unit id="8959675275113452823" datatype="html">
+                <source>Post programme sans ping (relecture)</source>
+            </trans-unit>
             <trans-unit id="8965418109618532770" datatype="html">
                 <source>Modifications non enregistrées :
                     <x id="INTERPOLATION" equiv-text="{{ unsaved_duplicates().join(&apos;, &apos;) }}"/>
@@ -3675,6 +3722,9 @@
             </trans-unit>
             <trans-unit id="4854882544235688864" datatype="html">
                 <source>Qui attendre</source>
+            </trans-unit>
+            <trans-unit id="4855736395257356120" datatype="html">
+                <source>Bonus d&apos;évolution perdu cette nuit</source>
             </trans-unit>
             <trans-unit id="485694852414197759" datatype="html">
                 <source>Ont été pris</source>
@@ -4476,6 +4526,9 @@
             <trans-unit id="6636912229609448537" datatype="html">
                 <source>Utilisateur inconnu</source>
             </trans-unit>
+            <trans-unit id="4315455391205252512" datatype="html">
+                <source>Réinitialiser</source>
+            </trans-unit>
             <trans-unit id="4322254668478976610" datatype="html">
                 <source>Identifiant d&apos;app externe</source>
             </trans-unit>
@@ -4523,6 +4576,9 @@
             </trans-unit>
             <trans-unit id="5789373353616019087" datatype="html">
                 <source>Défense hors chantiers</source>
+            </trans-unit>
+            <trans-unit id="5791141068754641721" datatype="html">
+                <source>Nombre d&apos;utilisations dans la journée</source>
             </trans-unit>
             <trans-unit id="5792949529901716121" datatype="html">
                 <source>Le bouton « Mettre à jour les outils externes »</source>
@@ -4952,6 +5008,9 @@
                     résultats de plus}}
                 </source>
             </trans-unit>
+            <trans-unit id="5751876411326164781" datatype="html">
+                <source>laissé détruire, ne pas réparer</source>
+            </trans-unit>
             <trans-unit id="3243838789504652996" datatype="html">
                 <source>Départ</source>
             </trans-unit>
@@ -4997,6 +5056,12 @@
             <trans-unit id="7010351467879295397" datatype="html">
                 <source>Besoin</source>
             </trans-unit>
+            <trans-unit id="7012975968357498770" datatype="html">
+                <source>Chantier laissé détruire : il compte encore pour l&apos;attaque de cette nuit, puis perd sa défense et son évolution dès le lendemain.
+                    Bonus d&apos;évolution perdu (Lance-grenades sans pamplemousses, chantier à eau sans eau…) : son évolution ne compte pas cette nuit, à
+                    condition que la défense actuelle le compte encore.
+                </source>
+            </trans-unit>
             <trans-unit id="7013342739706915791" datatype="html">
                 <source>Quantité</source>
             </trans-unit>
@@ -5019,6 +5084,9 @@
             </trans-unit>
             <trans-unit id="1759876158817324985" datatype="html">
                 <source>Nombre d&apos;améliorations simples faites sur la case</source>
+            </trans-unit>
+            <trans-unit id="176052315595160675" datatype="html">
+                <source>bonus d&apos;évolution perdu</source>
             </trans-unit>
             <trans-unit id="1569331568164081073" datatype="html">
                 <source>Nombre d&apos;objets de défense installés sur la case</source>
@@ -5116,6 +5184,9 @@
             </trans-unit>
             <trans-unit id="1385801803922806153" datatype="html">
                 <source>Cliquez une case de la mini-carte pour y poser une consigne.</source>
+            </trans-unit>
+            <trans-unit id="1390554533035153631" datatype="html">
+                <source>dès demain</source>
             </trans-unit>
             <trans-unit id="1399288874439090263" datatype="html">
                 <source>PE au départ</source>
@@ -5295,9 +5366,6 @@
             </trans-unit>
             <trans-unit id="1372632094033979250" datatype="html">
                 <source>Fermer la fiche</source>
-            </trans-unit>
-            <trans-unit id="1377741252272567176" datatype="html">
-                <source>PA prévus</source>
             </trans-unit>
             <trans-unit id="1379012751218364572" datatype="html">
                 <source>{VAR_PLURAL, plural, =0 {Aucun objet repéré} =1 {1 objet repéré} other {
@@ -5588,9 +5656,6 @@
             <trans-unit id="8598918991528773310" datatype="html">
                 <source>Orange</source>
             </trans-unit>
-            <trans-unit id="8852931430340854188" datatype="html">
-                <source>Métiers</source>
-            </trans-unit>
             <trans-unit id="8856181074841372570" datatype="html">
                 <source>Emoticone</source>
             </trans-unit>
@@ -5750,11 +5815,6 @@
             </trans-unit>
             <trans-unit id="3960240249403805893" datatype="html">
                 <source>Infecté(e)</source>
-            </trans-unit>
-            <trans-unit id="396392445831166061" datatype="html">
-                <source>Terminer
-                    <x id="label" equiv-text="label"/>
-                </source>
             </trans-unit>
             <trans-unit id="3967570858685153349" datatype="html">
                 <source>Ouvrir automatiquement « Utiliser un objet de mon sac »</source>

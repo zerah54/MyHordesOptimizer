@@ -22,6 +22,10 @@
                 <source>Restaure l&apos;ensemble des points d&apos;actions plus deux points</source>
                 <target state="final">Restores all action points plus two</target>
             </trans-unit>
+            <trans-unit id="390035818679444351" datatype="html">
+                <source>Perte</source>
+                <target state="translated">Loss</target>
+            </trans-unit>
             <trans-unit id="3901288124583682317" datatype="html" approved="yes">
                 <source>Restaure 4 points d&apos;actions</source>
                 <target state="final">Restores 4 action points</target>
@@ -217,6 +221,10 @@
             <trans-unit id="3118144948819432615" datatype="html">
                 <source>Chaussures équipées</source>
                 <target state="translated">Shoes equipped</target>
+            </trans-unit>
+            <trans-unit id="2101216353146774314" datatype="html">
+                <source>Supprimer la perte</source>
+                <target state="translated">Delete loss</target>
             </trans-unit>
             <trans-unit id="2130218545856934012" datatype="html" approved="yes">
                 <source>≈ 1 fouille réussie sur</source>
@@ -803,6 +811,10 @@
                 <source>Renommer</source>
                 <target state="translated">Rename</target>
             </trans-unit>
+            <trans-unit id="8315731691681645322" datatype="html">
+                <source>Détruit cette nuit</source>
+                <target state="translated">Destroyed tonight</target>
+            </trans-unit>
             <trans-unit id="8327474089390088254" datatype="html" approved="yes">
                 <source>Peut être trouvé empoisonné</source>
                 <target state="final">Can be found poisoned</target>
@@ -972,6 +984,10 @@
             <trans-unit id="7098789116821500687" datatype="html" approved="yes">
                 <source>Mini-jeux</source>
                 <target state="final">Mini-games</target>
+            </trans-unit>
+            <trans-unit id="1327284539504466015" datatype="html">
+                <source>restants sur</source>
+                <target state="translated">remaining out of</target>
             </trans-unit>
             <trans-unit id="1327764723186928694" datatype="html" approved="yes">
                 <source>Provisions</source>
@@ -1148,6 +1164,14 @@
             <trans-unit id="7654288435585352458" datatype="html" approved="yes">
                 <source>Rechercher une page, un objet, un chantier, un bâtiment, un citoyen, un joueur ou une ville</source>
                 <target state="final">Search for a page, an item, a construction site, a ruin, a citizen, a player or a town</target>
+            </trans-unit>
+            <trans-unit id="7655576817274995933" datatype="html">
+                <source>Défense gagnée dès cette nuit : l&apos;évolution s&apos;applique avant l&apos;attaque</source>
+                <target state="translated">Defense gained from tonight: the upgrade applies before the attack</target>
+            </trans-unit>
+            <trans-unit id="7658111198415947200" datatype="html">
+                <source>prévus</source>
+                <target state="translated">expected</target>
             </trans-unit>
             <trans-unit id="7659914592468009285" datatype="html" approved="yes">
                 <source>Ligne horizontale</source>
@@ -1609,6 +1633,10 @@
             <trans-unit id="6851914371737903015" datatype="html" approved="yes">
                 <source>Secteur connu</source>
                 <target state="final">Explored zone</target>
+            </trans-unit>
+            <trans-unit id="6853922078577050195" datatype="html">
+                <source>Défense de la maison</source>
+                <target state="translated">House defense</target>
             </trans-unit>
             <trans-unit id="6862746102211208409" datatype="html" approved="yes">
                 <source>Impossible de récupérer les pictos.</source>
@@ -2186,6 +2214,10 @@
                 <source>Dernière ville</source>
                 <target state="final">Last town</target>
             </trans-unit>
+            <trans-unit id="5655782498735411689" datatype="html">
+                <source>Ajouter une perte</source>
+                <target state="translated">Add a loss</target>
+            </trans-unit>
             <trans-unit id="2833535716885273153" datatype="html" approved="yes">
                 <source>(saison<x id="INTERPOLATION" equiv-text="{{ row.lastTownSeason }}"/>)
                 </source>
@@ -2251,10 +2283,6 @@
                     to move it;&lt;/li&gt; &lt;li&gt;when zoomed out, only the bottom-right corner of the zones remains displayed; when zoomed in, the
                     illustration of the ruins appears.&lt;/li&gt; &lt;/ul&gt;
                 </target>
-            </trans-unit>
-            <trans-unit id="5318838674475000211" datatype="html">
-                <source>PA restants sur</source>
-                <target state="translated">AP left out of</target>
             </trans-unit>
             <trans-unit id="531885837238775496" datatype="html" approved="yes">
                 <source>Renseignez la simulation pour obtenir vos chances de survie.</source>
@@ -2782,6 +2810,10 @@
             <trans-unit id="3854032884475026094" datatype="html" approved="yes">
                 <source>Mode âmes</source>
                 <target state="final">Souls mode</target>
+            </trans-unit>
+            <trans-unit id="3860715110536742352" datatype="html">
+                <source>restants</source>
+                <target state="translated">remaining</target>
             </trans-unit>
             <trans-unit id="3866252963923299661" datatype="html" approved="yes">
                 <source>Points d’âme</source>
@@ -3522,6 +3554,10 @@
                     items have been added to the shopping list
                 </target>
             </trans-unit>
+            <trans-unit id="4564166912297825708" datatype="html">
+                <source>Chantier non construit au soir, ou sans bonus d&apos;évolution</source>
+                <target state="translated">Construction site not built by evening, or without upgrade bonus</target>
+            </trans-unit>
             <trans-unit id="4564972525253303830" datatype="html" approved="yes">
                 <source>&lt;p&gt;Placez des paires de pictos sur une grille de 6 × 6, en les glissant ou en cliquant sur une case. Trois pictos identiques
                     alignés ou plus disparaissent. Le but : faire disparaître les 368 pictos. La partie s&apos;arrête quand plus aucune paire ne peut être posée
@@ -3803,9 +3839,21 @@
                 <source>Violet</source>
                 <target state="final">Violet</target>
             </trans-unit>
+            <trans-unit id="2684422002973556559" datatype="html">
+                <source>Les modifications de la proposition affichée ne sont pas enregistrées et seront perdues. Continuer quand même ?</source>
+                <target state="translated">Changes to the displayed proposal are not saved and will be lost. Continue anyway?</target>
+            </trans-unit>
             <trans-unit id="2688644633550534159" datatype="html" approved="yes">
                 <source>Options du forum</source>
                 <target state="final">Forum options</target>
+            </trans-unit>
+            <trans-unit id="5906896176186306776" datatype="html">
+                <source>Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense
+                    propre :
+                </source>
+                <target state="translated">Defense actually gained by the town once finished (defense items consumed, effects on houses, coffins…). Own
+                    defense:
+                </target>
             </trans-unit>
             <trans-unit id="5909537349952143751" datatype="html" approved="yes">
                 <source>Statistiques</source>
@@ -4196,6 +4244,10 @@
                 <source>Les tracés sont réservés aux citoyens de la ville.</source>
                 <target state="final">Routes are reserved for the town&apos;s citizens.</target>
             </trans-unit>
+            <trans-unit id="8959675275113452823" datatype="html">
+                <source>Post programme sans ping (relecture)</source>
+                <target state="translated">Post schedule without ping (proofreading)</target>
+            </trans-unit>
             <trans-unit id="8965418109618532770" datatype="html" approved="yes">
                 <source>Modifications non enregistrées :
                     <x id="INTERPOLATION" equiv-text="{{ unsaved_duplicates().join(&apos;, &apos;) }}"/>
@@ -4357,6 +4409,10 @@
             <trans-unit id="4854882544235688864" datatype="html" approved="yes">
                 <source>Qui attendre</source>
                 <target state="final">Who to wait for</target>
+            </trans-unit>
+            <trans-unit id="4855736395257356120" datatype="html">
+                <source>Bonus d&apos;évolution perdu cette nuit</source>
+                <target state="translated">Upgrade bonus lost tonight</target>
             </trans-unit>
             <trans-unit id="485694852414197759" datatype="html" approved="yes">
                 <source>Ont été pris</source>
@@ -5470,6 +5526,10 @@
                 <source>Utilisateur introuvable.</source>
                 <target state="final">User not found.</target>
             </trans-unit>
+            <trans-unit id="2975371412248916708" datatype="html">
+                <source>cette nuit</source>
+                <target state="translated">tonight</target>
+            </trans-unit>
             <trans-unit id="2978700856860075889" datatype="html">
                 <source>Manques</source>
                 <target state="translated">Shortages</target>
@@ -5686,6 +5746,10 @@
                     unfavorable are identical to realistic. Details below without a range.
                 </target>
             </trans-unit>
+            <trans-unit id="6908960104248423987" datatype="html">
+                <source>Pertes prévues cette nuit</source>
+                <target state="translated">Expected losses tonight</target>
+            </trans-unit>
             <trans-unit id="6915017092560181799" datatype="html" approved="yes">
                 <source>Liste de taches</source>
                 <target state="final">Task list</target>
@@ -5875,6 +5939,10 @@
                 <source>Utilisateur inconnu</source>
                 <target state="final">Unknown user</target>
             </trans-unit>
+            <trans-unit id="4315455391205252512" datatype="html">
+                <source>Réinitialiser</source>
+                <target state="translated">Reset</target>
+            </trans-unit>
             <trans-unit id="4322254668478976610" datatype="html" approved="yes">
                 <source>Identifiant d&apos;app externe</source>
                 <target state="final">External app ID</target>
@@ -5938,6 +6006,10 @@
             <trans-unit id="5789373353616019087" datatype="html">
                 <source>Défense hors chantiers</source>
                 <target state="translated">Defence outside construction sites</target>
+            </trans-unit>
+            <trans-unit id="5791141068754641721" datatype="html">
+                <source>Nombre d&apos;utilisations dans la journée</source>
+                <target state="translated">Number of uses per day</target>
             </trans-unit>
             <trans-unit id="5792949529901716121" datatype="html" approved="yes">
                 <source>Le bouton « Mettre à jour les outils externes »</source>
@@ -6417,6 +6489,10 @@
             <trans-unit id="9108179050199310445" datatype="html" approved="yes">
                 <source>Wiki</source>
                 <target state="final">Wiki</target>
+            </trans-unit>
+            <trans-unit id="1074965241238322233" datatype="html">
+                <source>déf</source>
+                <target state="translated">def</target>
             </trans-unit>
             <trans-unit id="1082394793765994406" datatype="html">
                 <source>Proposition effective du jour</source>
@@ -7061,6 +7137,10 @@
                     more results}}
                 </target>
             </trans-unit>
+            <trans-unit id="5751876411326164781" datatype="html">
+                <source>laissé détruire, ne pas réparer</source>
+                <target state="translated">left to be destroyed, do not repair</target>
+            </trans-unit>
             <trans-unit id="3243838789504652996" datatype="html" approved="yes">
                 <source>Départ</source>
                 <target state="final">Departure</target>
@@ -7121,6 +7201,16 @@
                 <source>Besoin</source>
                 <target state="translated">Needed</target>
             </trans-unit>
+            <trans-unit id="7012975968357498770" datatype="html">
+                <source>Chantier laissé détruire : il compte encore pour l&apos;attaque de cette nuit, puis perd sa défense et son évolution dès le lendemain.
+                    Bonus d&apos;évolution perdu (Lance-grenades sans pamplemousses, chantier à eau sans eau…) : son évolution ne compte pas cette nuit, à
+                    condition que la défense actuelle le compte encore.
+                </source>
+                <target state="translated">Construction site left to be destroyed: it still counts for tonight's attack, then loses its defense and upgrade from
+                    the next day. Upgrade bonus lost (Grenade Launcher without grapefruits, water-based construction site without water…): its upgrade does not
+                    count tonight, provided the current defense still counts it.
+                </target>
+            </trans-unit>
             <trans-unit id="7013342739706915791" datatype="html" approved="yes">
                 <source>Quantité</source>
                 <target state="final">Quantity</target>
@@ -7153,6 +7243,10 @@
             <trans-unit id="1759876158817324985" datatype="html" approved="yes">
                 <source>Nombre d&apos;améliorations simples faites sur la case</source>
                 <target state="final">Number of small improvements in the zone</target>
+            </trans-unit>
+            <trans-unit id="176052315595160675" datatype="html">
+                <source>bonus d&apos;évolution perdu</source>
+                <target state="translated">upgrade bonus lost</target>
             </trans-unit>
             <trans-unit id="1569331568164081073" datatype="html" approved="yes">
                 <source>Nombre d&apos;objets de défense installés sur la case</source>
@@ -7285,6 +7379,10 @@
             <trans-unit id="1385801803922806153" datatype="html" approved="yes">
                 <source>Cliquez une case de la mini-carte pour y poser une consigne.</source>
                 <target state="final">Click a zone on the minimap to place an instruction there.</target>
+            </trans-unit>
+            <trans-unit id="1390554533035153631" datatype="html">
+                <source>dès demain</source>
+                <target state="translated">from tomorrow</target>
             </trans-unit>
             <trans-unit id="1399288874439090263" datatype="html">
                 <source>PE au départ</source>
@@ -7536,10 +7634,6 @@
                 <source>Fermer la fiche</source>
                 <target state="final">Close the sheet</target>
             </trans-unit>
-            <trans-unit id="1377741252272567176" datatype="html">
-                <source>PA prévus</source>
-                <target state="translated">Planned AP</target>
-            </trans-unit>
             <trans-unit id="1379012751218364572" datatype="html">
                 <source>{VAR_PLURAL, plural, =0 {Aucun objet repéré} =1 {1 objet repéré} other {
                     <x id="INTERPOLATION"/>
@@ -7728,10 +7822,6 @@
             <trans-unit id="8598918991528773310" datatype="html">
                 <source>Orange</source>
                 <target state="translated">Orange</target>
-            </trans-unit>
-            <trans-unit id="8852931430340854188" datatype="html">
-                <source>Métiers</source>
-                <target state="translated">Jobs</target>
             </trans-unit>
             <trans-unit id="8856181074841372570" datatype="html" approved="yes">
                 <source>Emoticone</source>
@@ -8006,14 +8096,6 @@
             <trans-unit id="3960240249403805893" datatype="html" approved="yes">
                 <source>Infecté(e)</source>
                 <target state="final">Infected</target>
-            </trans-unit>
-            <trans-unit id="396392445831166061" datatype="html">
-                <source>Terminer
-                    <x id="label" equiv-text="label"/>
-                </source>
-                <target state="translated">Finish
-                    <x id="label" equiv-text="label"/>
-                </target>
             </trans-unit>
             <trans-unit id="3967570858685153349" datatype="html" approved="yes">
                 <source>Ouvrir automatiquement « Utiliser un objet de mon sac »</source>
