@@ -17,7 +17,7 @@
         <mho-external-tools-update-button [isCompact]="!is_gt_sm()"/>
     }
 
-    @if (is_dev) {
+    @if (is_key_login) {
         <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
             @if (saved_external_app_id() === null || saved_external_app_id() === undefined || saved_external_app_id() === '') {
                 <ng-container i18n>Se connecter</ng-container>

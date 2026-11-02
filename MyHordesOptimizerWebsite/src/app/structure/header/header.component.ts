@@ -74,7 +74,7 @@ export class HeaderComponent implements OnInit {
      *  figée à la construction — le header est rendu avant la résolution du getMe() initial
      *  d'AppComponent et doit se resynchroniser tout seul quand celui-ci aboutit. */
     protected readonly me: Signal<Me | null> = user;
-    protected readonly is_dev: boolean = !environment.production;
+    protected readonly is_key_login: boolean = environment.login_mode === 'Key';
     protected readonly myhordes_url: string = environment.myhordes_url;
     protected readonly myhordes_app_id: number = environment.myhordes_app_id;
 

@@ -5,6 +5,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import type { MockInstance } from 'vitest';
 
+import { environment } from '../../../environments/environment';
+import { environment as dev_environment } from '../../../environments/environment.dev';
+import { environment as prod_environment } from '../../../environments/environment.prod';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
 import { Me } from '../../_abstract_model/types/me.class';
 import { setTown, setUser } from '../../_core/utilities/localstorage.util';
@@ -118,6 +121,41 @@ describe('HeaderComponent', (): void => {
             setUser(me);
 
             expect(testable.me()?.username).toBe('Bob');
+        });
+    });
+
+    describe('mode de connexion', (): void => {
+        const initial_login_mode: 'Native' | 'Key' = environment.login_mode;
+
+        /** Crée l'en-tête pour ce mode : le composant lit l'environnement à sa construction. */
+        const renderWith = (mode: 'Native' | 'Key'): ComponentFixture<HeaderComponent> => {
+            environment.login_mode = mode;
+            const mode_fixture: ComponentFixture<HeaderComponent> = TestBed.createComponent(HeaderComponent);
+            mode_fixture.detectChanges();
+            return mode_fixture;
+        };
+
+        afterEach((): void => {
+            environment.login_mode = initial_login_mode;
+        });
+
+        it('propose le lien MyHordes en mode Native', (): void => {
+            const element: HTMLElement = renderWith('Native').nativeElement;
+
+            expect(element.querySelector('a.profil-button')?.getAttribute('href')).toContain(`jx/disclaimer/${environment.myhordes_app_id}`);
+            expect(element.querySelector('button.profil-button')).toBeNull();
+        });
+
+        it('propose le champ d\'identifiant en mode Key', (): void => {
+            const element: HTMLElement = renderWith('Key').nativeElement;
+
+            expect(element.querySelector('button.profil-button')).not.toBeNull();
+            expect(element.querySelector('a.profil-button')).toBeNull();
+        });
+
+        it('garde le lien MyHordes en prod et le champ sur l\'instance de test', (): void => {
+            expect(prod_environment.login_mode).toBe('Native');
+            expect(dev_environment.login_mode).toBe('Key');
         });
     });
 
