@@ -3,8 +3,11 @@
         <ng-container>
             <div [innerHTML]="ruin().description[locale]"></div>
             <br/>
-            <div>
+            <div class="camping-bonus">
                 <ng-container i18n>Bonus en camping</ng-container>&nbsp;:&nbsp;{{ ruin().camping }}
+            </div>
+            <div class="camping-capacity">
+                <ng-container i18n>Capacité</ng-container>&nbsp;:&nbsp;{{ capacity() | ruinCapacity }}
             </div>
         </ng-container>
 
@@ -65,8 +68,8 @@
                         <mat-list-item>
                             <span matListItemTitle>{{ ruin.label[locale] }}</span>
                             <span matListItemLine>
-                                <ng-container i18n>Bonus en camping</ng-container>
-                                &nbsp;:&nbsp;{{ ruin.camping }}
+                                <ng-container i18n>Bonus en camping</ng-container>&nbsp;:&nbsp;{{ ruin.camping }}
+                                &nbsp;/&nbsp;<ng-container i18n>Capacité</ng-container>&nbsp;:&nbsp;{{ ruin.capacity | ruinCapacity }}
                             </span>
                         </mat-list-item>
                     }
