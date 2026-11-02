@@ -302,12 +302,6 @@
             <trans-unit id="3158195591592329115" datatype="html">
                 <source>Privé</source>
             </trans-unit>
-            <trans-unit id="3161840514440455653" datatype="html">
-                <source>{VAR_PLURAL, plural, =1 {1 objet au sol} other {
-                    <x id="INTERPOLATION"/>
-                    objets au sol}}
-                </source>
-            </trans-unit>
             <trans-unit id="3163759747703577519" datatype="html">
                 <source>{VAR_PLURAL, plural, =1 {1 consigne} other {
                     <x id="INTERPOLATION"/>
@@ -527,9 +521,6 @@
             </trans-unit>
             <trans-unit id="623738343364057576" datatype="html">
                 <source>Excaver la zone</source>
-            </trans-unit>
-            <trans-unit id="6239752302360900837" datatype="html">
-                <source>Liste d&apos;objets</source>
             </trans-unit>
             <trans-unit id="6518032478600962138" datatype="html">
                 <source>Titre</source>
@@ -758,9 +749,6 @@
                     par pseudo ou par identifiant MyHordes. Rien n&apos;est enregistré, sauf dans l&apos;onglet « Fouilles » : il estime les fouilles de chaque
                     citoyen présent dans le registre ; indiquez la position (0/0 par défaut) et enregistrez.&lt;/p&gt;
                 </source>
-            </trans-unit>
-            <trans-unit id="7882907500813823899" datatype="html">
-                <source>Par quantité</source>
             </trans-unit>
             <trans-unit id="788292028813273366" datatype="html">
                 <source>Guide de l’Outre-Monde</source>
@@ -1044,9 +1032,6 @@
             </trans-unit>
             <trans-unit id="3275324826090485240" datatype="html">
                 <source>Non affilié à</source>
-            </trans-unit>
-            <trans-unit id="3279519256497061864" datatype="html">
-                <source>Tri des objets</source>
             </trans-unit>
             <trans-unit id="1710853996635517105" datatype="html">
                 <source>Âmes rouges à l&apos;attaque</source>
@@ -1653,9 +1638,6 @@
             <trans-unit id="5987572317992662165" datatype="html">
                 <source>Meilleure survie</source>
             </trans-unit>
-            <trans-unit id="3597555039511505792" datatype="html">
-                <source>Repérer des objets</source>
-            </trans-unit>
             <trans-unit id="3599320612586882011" datatype="html">
                 <source>Sans expédition</source>
             </trans-unit>
@@ -1667,19 +1649,8 @@
             <trans-unit id="5640533345965521921" datatype="html">
                 <source>{VAR_PLURAL, plural, =0 {chantier} =1 {chantier} other {chantiers}}</source>
             </trans-unit>
-            <trans-unit id="5645275645969315999" datatype="html">
-                <source>Ajouter aux objets à repérer</source>
-            </trans-unit>
             <trans-unit id="5647106344749426337" datatype="html">
                 <source>Coffres</source>
-            </trans-unit>
-            <trans-unit id="5648085678889244269" datatype="html">
-                <source>
-                    <x id="ICU" equiv-text="{summary.cells, plural, =1 {1 case} other {{{ summary.cells }} cases}}" xid="5831632060954515323"/>
-                    ·
-                    <x id="ICU_1" equiv-text="{summary.quantity, plural, =1 {1 objet au sol} other {{{ summary.quantity }} objets au sol}}"
-                       xid="7847203946598327361"/>
-                </source>
             </trans-unit>
             <trans-unit id="5654026707541899248" datatype="html">
                 <source>Jeu</source>
@@ -3288,9 +3259,6 @@
             <trans-unit id="2881179225572512277" datatype="html">
                 <source>Ma ville</source>
             </trans-unit>
-            <trans-unit id="288641347616492347" datatype="html">
-                <source>Par catégorie</source>
-            </trans-unit>
             <trans-unit id="268108544779646824" datatype="html">
                 <source>Veilles</source>
             </trans-unit>
@@ -4168,9 +4136,6 @@
             <trans-unit id="1845506701867239771" datatype="html">
                 <source>Débloqués seulement</source>
             </trans-unit>
-            <trans-unit id="1847405375105026716" datatype="html">
-                <source>Retirer un exemplaire</source>
-            </trans-unit>
             <trans-unit id="1848814508781605397" datatype="html">
                 <source>Souligne</source>
             </trans-unit>
@@ -4838,9 +4803,6 @@
             <trans-unit id="452066521029087062" datatype="html">
                 <source>Tenue de camouflage</source>
             </trans-unit>
-            <trans-unit id="4522761575247912913" datatype="html">
-                <source>Retirer des objets à repérer</source>
-            </trans-unit>
             <trans-unit id="4526540825849936333" datatype="html">
                 <source>&lt;p&gt;Ouvrent un formulaire (titre et détails) et publient votre suggestion ou votre signalement de bug sur le serveur de MyHordes
                     Optimizer, en vous mentionnant.&lt;/p&gt;
@@ -4851,14 +4813,6 @@
             </trans-unit>
             <trans-unit id="4540401638459620535" datatype="html">
                 <source>/timer (/minuteur)</source>
-            </trans-unit>
-            <trans-unit id="4549325529510411217" datatype="html">
-                <source>+
-                    <x id="ap" equiv-text="preview.ap"/>
-                    PA ·
-                    <x id="items" equiv-text="preview.items"/>
-                    objets repérés
-                </source>
             </trans-unit>
             <trans-unit id="1294130363465211657" datatype="html">
                 <source>(
@@ -4872,14 +4826,6 @@
             </trans-unit>
             <trans-unit id="7954001980226848388" datatype="html">
                 <source>Campeur professionnel</source>
-            </trans-unit>
-            <trans-unit id="7959593327223134802" datatype="html">
-                <source>+
-                    <x id="ap" equiv-text="preview.ap"/>
-                    PA ·
-                    <x id="items" equiv-text="preview.items"/>
-                    objet repéré
-                </source>
             </trans-unit>
             <trans-unit id="8079361333376398985" datatype="html">
                 <source>Tombe</source>
@@ -5067,9 +5013,6 @@
             </trans-unit>
             <trans-unit id="4077451925170155790" datatype="html">
                 <source>Déplacement (Zone 3km)</source>
-            </trans-unit>
-            <trans-unit id="4079972688141741963" datatype="html">
-                <source>Ajouter un exemplaire</source>
             </trans-unit>
             <trans-unit id="4082503652940437752" datatype="html">
                 <source>Pas assez de données pour obtenir un affinage fiable, saisissez plus de paliers</source>
@@ -5267,11 +5210,6 @@
             <trans-unit id="4642464488615806449" datatype="html">
                 <source>Attaque estimée</source>
             </trans-unit>
-            <trans-unit id="4643495301479354886" datatype="html">
-                <source>Le plus court chemin qui passe par le plus d&apos;objets repérés au sol (cassés compris), puis, à égalité, par les cases au plus fort
-                    potentiel. Les objets repérés sont les vôtres : recalculé par quelqu&apos;un d&apos;autre, le chemin suit les siens.
-                </source>
-            </trans-unit>
             <trans-unit id="464405392288183930" datatype="html">
                 <source>Cet objet figure deux fois dans la même zone : la liste n&apos;est pas enregistrée tant que le doublon reste.</source>
             </trans-unit>
@@ -5298,12 +5236,6 @@
             </trans-unit>
             <trans-unit id="1377741252272567176" datatype="html">
                 <source>PA prévus</source>
-            </trans-unit>
-            <trans-unit id="1379012751218364572" datatype="html">
-                <source>{VAR_PLURAL, plural, =0 {Aucun objet repéré} =1 {1 objet repéré} other {
-                    <x id="INTERPOLATION"/>
-                    objets repérés}}
-                </source>
             </trans-unit>
             <trans-unit id="5676596107664961045" datatype="html">
                 <source>Veilleurs</source>
@@ -5563,9 +5495,6 @@
             <trans-unit id="8564269404291712463" datatype="html">
                 <source>Le texte a bien été copié</source>
             </trans-unit>
-            <trans-unit id="8564537918244853727" datatype="html">
-                <source>Objets repérés</source>
-            </trans-unit>
             <trans-unit id="8571712139466622830" datatype="html">
                 <source>&lt;p&gt;« Mettre à jour Fata Morgana » envoie votre carte à Fata Morgana. Sous-options :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Enregistrer
                     le nombre de zombies tués&lt;/strong&gt; : depuis le désert, quand des zombies ont été tués sur la case ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Met
@@ -5614,12 +5543,6 @@
                     du jeu pour chaque palier de chances de survie en camping, dans la langue choisie (à défaut, celle de votre Discord) ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;discord-cheat-sheet&lt;/strong&gt;
                     (mise-en-forme-discord) : aide-mémoire de la mise en forme des messages Discord.&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;Toutes acceptent
                     private-msg (réponse visible de vous seul).&lt;/p&gt;
-                </source>
-            </trans-unit>
-            <trans-unit id="4946358815961214159" datatype="html">
-                <source>{VAR_PLURAL, plural, =1 {1 case} other {
-                    <x id="INTERPOLATION"/>
-                    cases}}
                 </source>
             </trans-unit>
             <trans-unit id="4946625409219090027" datatype="html">
@@ -5847,9 +5770,6 @@
                 <source>Les pages de « Ma ville » rassemblent ce que la ville sait d&apos;elle-même : carte, banque, citoyens, liste de courses, statistiques et
                     expéditions. Elles apparaissent dans le menu quand vous êtes connecté et incarné dans une ville.
                 </source>
-            </trans-unit>
-            <trans-unit id="6293622586906310349" datatype="html">
-                <source>Aucune case connue ne porte ces objets.</source>
             </trans-unit>
             <trans-unit id="3188135279197834616" datatype="html">
                 <source>Nom du chantier</source>
