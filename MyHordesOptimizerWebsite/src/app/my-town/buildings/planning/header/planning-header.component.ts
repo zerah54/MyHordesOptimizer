@@ -13,12 +13,12 @@ import { DaySelectorComponent } from '../../../../_shared/day-selector/day-selec
 import { PlanningNameDialogComponent, PlanningNameDialogData, PlanningNameDialogResult } from '../name-dialog/planning-name-dialog.component';
 import { BuildingPlanContentDTO, BuildingPlanDTO } from '../plan.types';
 import { PlanningStore } from '../planning.store';
-import { PlanningShareComponent } from '../share/planning-share.component';
+import { confirmDiscardChanges } from '../unsaved-changes.util';
 
-const components: Imports = [DaySelectorComponent, PlanningShareComponent];
+const components: Imports = [DaySelectorComponent];
 const material_modules: Imports = [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule, MatSlideToggleModule, MatTooltipModule];
 
-/** En-tête de la page Chantiers : jour, propositions en puces (menu par proposition), gestion des bannis, partage, enregistrement. */
+/** En-tête de la page Chantiers : jour, propositions en puces (menu par proposition), gestion des bannis, enregistrement. */
 @Component({
     selector: 'mho-planning-header',
     templateUrl: './planning-header.component.html',
@@ -42,6 +42,28 @@ export class PlanningHeaderComponent {
     }
 
     /**
+     * Affiche un autre jour, après confirmation s'il reste des modifications non enregistrées.
+     * @param {number} day Jour choisi.
+     */
+    protected selectDay(day: number): void {
+        if (day === this.store.selected_day()) {
+            return;
+        }
+        this.afterDiscardConfirmed((): void => this.store.selectDay(day));
+    }
+
+    /**
+     * Affiche une autre proposition, après confirmation s'il reste des modifications non enregistrées.
+     * @param {number} plan_id Proposition choisie.
+     */
+    protected selectPlan(plan_id: number): void {
+        if (plan_id === this.store.selected_plan()?.id) {
+            return;
+        }
+        this.afterDiscardConfirmed((): void => this.store.selectPlan(plan_id));
+    }
+
+    /**
      * Active ou coupe la gestion des bannis sur la proposition affichée.
      * @param {boolean} checked Nouvel état.
      */
@@ -56,9 +78,10 @@ export class PlanningHeaderComponent {
         this.askName({ title: $localize`Nouvelle proposition`, name: $localize`Plan`, offerCopy: this.store.selected_plan() !== null },
                      (result: PlanningNameDialogResult): void => {
                          if (result.copy) {
+                             // La copie emporte la copie de travail : rien n'est perdu.
                              this.store.duplicatePlan(result.name);
                          } else {
-                             this.store.createPlan(result.name);
+                             this.afterDiscardConfirmed((): void => this.store.createPlan(result.name));
                          }
                      });
     }
@@ -96,6 +119,18 @@ export class PlanningHeaderComponent {
                     this.store.deletePlan();
                 }
             });
+    }
+
+    /**
+     * Applique une action qui remplace la copie de travail, après confirmation s'il reste des modifications non enregistrées.
+     * @param {() => void} apply Action à appliquer.
+     */
+    private afterDiscardConfirmed(apply: () => void): void {
+        confirmDiscardChanges(this.store, this.dialog).subscribe((confirmed: boolean): void => {
+            if (confirmed) {
+                apply();
+            }
+        });
     }
 
     /**

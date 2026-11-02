@@ -1,5 +1,10 @@
 <mat-card-header class="mho-buildings-header">
-    <mat-card-title i18n>Chantiers</mat-card-title>
+    <mat-card-title>
+        <ng-container i18n>Chantiers</ng-container>
+        @if (!store.loading() && !store.load_failed()) {
+            <mho-planning-share/>
+        }
+    </mat-card-title>
     @if (!store.loading() && !store.load_failed()) {
         <div class="actions">
             <button mat-button type="button" data-action="item-values" (click)="openItemValues()">

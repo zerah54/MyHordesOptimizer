@@ -7,7 +7,8 @@
         <span class="caption"><ng-container i18n>{step_count(), plural, =0 {chantier} =1 {chantier} other {chantiers}}</ng-container></span>
         @if (evaluation !== null) {
             <span class="caption pa">{{ planned_pa() }}
-                <ng-container i18n>PA prévus</ng-container></span>
+                <mho-icon-ap/>
+                <ng-container i18n>prévus</ng-container></span>
         }
         @if (program_alerts() > 0) {
             <span class="alert"><mat-icon aria-hidden="true">warning</mat-icon>
@@ -51,7 +52,8 @@
                             <span class="caption" i18n>Bannis</span>
                             <span><span class="value"
                                         [class.ko]="evaluation.budgets.banned.remaining < 0">{{ evaluation.budgets.banned.remaining }}</span> <span
-                                class="caption"><ng-container i18n>PA restants sur</ng-container>
+                                class="caption"><mho-icon-ap/>
+                                <ng-container i18n>restants sur</ng-container>
                                 {{ evaluation.budgets.banned.budget }}</span></span>
                         </span>
                     }
@@ -62,7 +64,8 @@
                             <span class="caption" i18n>Budget</span>
                         }
                         <span><span class="value" [class.ko]="evaluation.budgets.regular.remaining < 0">{{ evaluation.budgets.regular.remaining }}</span> <span
-                            class="caption"><ng-container i18n>PA restants sur</ng-container>
+                            class="caption"><mho-icon-ap/>
+                            <ng-container i18n>restants sur</ng-container>
                             {{ evaluation.budgets.regular.budget }}</span></span>
                     </span>
                 </span>

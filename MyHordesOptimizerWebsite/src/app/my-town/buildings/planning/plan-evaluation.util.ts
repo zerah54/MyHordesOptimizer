@@ -1,8 +1,11 @@
 import { BudgetLine, CitizenCapacity, citizenCapacity, PoolBudget, poolBudgets } from './budget.util';
 import { BuildingProgress, evaluateProgram, remainingAp, StepResult } from './building-progress.util';
+import { BuildingUpgradesDTO, upgradeDefenseBonus } from './building-upgrades.types';
 import { defenseGap, projectedDefense, rankByDefPerPa, RankCandidate, RankedCandidate } from './defense.util';
+import { buildingDefenseGain, defenseGain, DefenseGainContext, DefenseGainResult, homeDefenseFactor, TownDefenseFactors } from './defense-gain.util';
+import { CIRCULAR_QUARTERS_UID } from './defense-rules.const';
 import { nightLifeLoss, ownNightLoss } from './night-survival.util';
-import { BuildingPlanContentDTO, PlanCitizenDTO, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
+import { BuildingPlanContentDTO, PlanCitizenDTO, PlanLossDTO, PlanLossKind, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
 import { missingResources, ResourceCount, sumResources } from './resources.util';
 import { freeThreshold } from './workshop.util';
 
@@ -64,6 +67,21 @@ export interface DayInput {
     temporaryDefense: number;
     homes: ReadonlyMap<number, HomeLevelRef>;
     hardMode: boolean;
+    /** Composantes de la défense que touchent les chantiers à effet indirect (objets de défense, maisons, morts, échelle). */
+    defenseFactors: TownDefenseFactors;
+    /** Objets qui comptent comme objets de défense. */
+    defenseItemIds: ReadonlySet<number>;
+    /** Évolutions des chantiers (valeurs par niveau extraites du jeu). */
+    upgrades: BuildingUpgradesDTO;
+    /** Niveau d'évolution des chantiers construits, par uid (0 si absent). */
+    buildingLevels: ReadonlyMap<string, number>;
+}
+
+/** Perte prévue évaluée : défense retirée la nuit même (bonus) ou dès le lendemain (chantier détruit). */
+export interface PlannedLoss {
+    buildingId: number;
+    kind: PlanLossKind;
+    defense: number;
 }
 
 /** Résultat de l'évaluation d'une journée. */
@@ -86,10 +104,18 @@ export interface DayEvaluation {
     defenseGap: number | null;
     freeThresholds: Map<number, number>;
     ranking: RankedCandidate[];
+    /** Défense réellement apportée par chaque chantier pas encore construit, s'il était terminé seul aujourd'hui. */
+    realDefense: ReadonlyMap<number, number>;
+    /** Composantes de la défense au soir. */
+    defenseFactorsAfter: TownDefenseFactors;
+    /** Évolution votée le soir : niveau atteint et défense gagnée pour la nuit ; nulle sans vote. */
+    vote: { uid: string; level: number; defense: number } | null;
+    /** Pertes prévues sur des chantiers construits au soir. */
+    losses: PlannedLoss[];
 }
 
 /** Valeurs qui se reportent d'un jour au suivant. */
-type CarriedState = Pick<DayInput, 'progress' | 'workshopLevel' | 'hasSlavery' | 'baseDefense' | 'temporaryDefense'>;
+type CarriedState = Pick<DayInput, 'progress' | 'workshopLevel' | 'hasSlavery' | 'baseDefense' | 'temporaryDefense' | 'defenseFactors' | 'buildingLevels'>;
 
 /**
  * Évalue une journée de plan : étapes, budget par poche, ressources, défense projetée, seuils gratuits et classement.
@@ -136,12 +162,21 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         ...home_tasks.map((task: { citizen: CitizenRef | undefined; level: number }): ResourceCount[] => input.homes.get(task.level)?.resources ?? [])
     ]);
 
-    const completed_def: number = completed_ids.reduce((sum: number, id: number): number => sum + (input.buildings.get(id)?.defence ?? 0), 0);
+    const gain_context: DefenseGainContext = defenseGainContext(input);
+    const completed_refs: BuildingRef[] = completed_ids
+        .map((id: number): BuildingRef | undefined => input.buildings.get(id))
+        .filter((building: BuildingRef | undefined): building is BuildingRef => building !== undefined);
+    const gain: DefenseGainResult = defenseGain(completed_refs, homesDefense(home_tasks, input.homes), gain_context);
+    const homes_gain: number = defenseGain([], homesDefense(home_tasks, input.homes), gain_context).total;
+    const vote: DayEvaluation['vote'] = eveningVote(input, gain.factorsAfter.scale);
+    const losses: PlannedLoss[] = plannedLosses(input, progress_after, vote, gain.factorsAfter.scale);
     const projected: number = projectedDefense({
         baseDefense: input.baseDefense,
-        completedBuildingsDef: completed_def,
+        completedBuildingsDef: gain.total - homes_gain,
         repairsDef: repairsDefense(results, input.progress, progress_after),
-        homesDef: homesDefense(home_tasks, input.homes),
+        homesDef: homes_gain,
+        upgradeDef: vote?.defense ?? 0,
+        lostDef: lossTotal(losses, 'bonus'),
         sources: content.defenseSources.map((source: { def: number; qty: number }): { def: number; qty: number } => ({ def: source.def, qty: source.qty }))
     });
     const attack: number | null = content.attackOverride ?? input.attack;
@@ -164,8 +199,110 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         projectedDefense: projected,
         defenseGap: attack === null ? null : defenseGap(attack, content.allowedOverflow, projected),
         freeThresholds: freeThresholds(input),
-        ranking: rankByDefPerPa(rankCandidates(input), input.itemValues)
+        ranking: rankByDefPerPa(rankCandidates(input, gain_context), input.itemValues),
+        realDefense: realDefenseByBuilding(input, gain_context),
+        defenseFactorsAfter: gain.factorsAfter,
+        vote,
+        losses
     };
+}
+
+/**
+ * Niveau d'évolution d'un chantier au soir : niveau atteint par le vote du soir, sinon niveau connu.
+ * @param {DayInput} input Entrée de la journée.
+ * @param {string} uid Chantier.
+ * @param {DayEvaluation['vote']} vote Évolution votée.
+ * @returns {number} Niveau.
+ */
+function eveningLevel(input: DayInput, uid: string, vote: DayEvaluation['vote']): number {
+    return vote?.uid === uid ? vote.level : (input.buildingLevels.get(uid) ?? 0);
+}
+
+/**
+ * Pertes prévues sur les chantiers construits au soir (les chantiers temporaires disparaissent de toute façon) :
+ * - bonus perdu (Lance-grenades sans pamplemousses, chantier à eau privé d'eau…) : son bonus d'évolution ne compte pas cette nuit ;
+ * - chantier détruit : il compte encore cette nuit, puis perd sa défense et son bonus dès le lendemain.
+ * @param {DayInput} input Entrée de la journée.
+ * @param {ReadonlyMap<number, BuildingProgress>} progress Avancement au soir.
+ * @param {DayEvaluation['vote']} vote Évolution votée.
+ * @param {number} scale Échelle de la défense au soir.
+ * @returns {PlannedLoss[]} Pertes évaluées.
+ */
+function plannedLosses(input: DayInput, progress: ReadonlyMap<number, BuildingProgress>, vote: DayEvaluation['vote'], scale: number): PlannedLoss[] {
+    return (input.content.losses ?? []).flatMap((loss: PlanLossDTO): PlannedLoss[] => {
+        const building: BuildingRef | undefined = input.buildings.get(loss.buildingId);
+        const state: BuildingProgress | undefined = progress.get(loss.buildingId);
+        if (building === undefined || building.temporary || state?.built !== true) {
+            return [];
+        }
+        const bonus: number = upgradeDefenseBonus(input.upgrades, building.uid, building.defence, eveningLevel(input, building.uid, vote));
+        const defense: number = loss.kind === 'bonus' ? bonus : state.def + bonus;
+        return [{ buildingId: loss.buildingId, kind: loss.kind, defense: Math.round(defense * scale) }];
+    });
+}
+
+/**
+ * Défense totale d'un type de perte.
+ * @param {PlannedLoss[]} losses Pertes évaluées.
+ * @param {PlanLossKind} kind Type.
+ * @returns {number} Somme.
+ */
+function lossTotal(losses: PlannedLoss[], kind: PlanLossKind): number {
+    return losses.filter((loss: PlannedLoss): boolean => loss.kind === kind).reduce((sum: number, loss: PlannedLoss): number => sum + loss.defense, 0);
+}
+
+/**
+ * Évolution votée le soir : le chantier passe au niveau suivant avant l'attaque (`onProcessPreAttackUpgrade` du jeu) ; son
+ * bonus de défense (multiple de sa défense propre + défense ajoutée) compte donc pour la nuit même.
+ * @param {DayInput} input Entrée de la journée.
+ * @param {number} scale Échelle de la défense au soir.
+ * @returns {DayEvaluation['vote']} Niveau atteint et défense gagnée, nul sans vote.
+ */
+function eveningVote(input: DayInput, scale: number): DayEvaluation['vote'] {
+    const vote_id: number | null = input.content.eveningVoteBuildingId;
+    const building: BuildingRef | undefined = vote_id === null ? undefined : input.buildings.get(vote_id);
+    if (building === undefined) {
+        return null;
+    }
+    const current: number = input.buildingLevels.get(building.uid) ?? 0;
+    const max_level: number = input.upgrades[building.uid]?.maxLevel ?? Number.MAX_SAFE_INTEGER;
+    const level: number = Math.min(current + 1, max_level);
+    const gain: number = upgradeDefenseBonus(input.upgrades, building.uid, building.defence, level)
+        - upgradeDefenseBonus(input.upgrades, building.uid, building.defence, current);
+    return { uid: building.uid, level, defense: Math.round(gain * scale) };
+}
+
+/**
+ * État de la ville au début de la journée pour le calcul du gain réel de défense.
+ * @param {DayInput} input Entrée de la journée.
+ * @returns {DefenseGainContext} Contexte.
+ */
+function defenseGainContext(input: DayInput): DefenseGainContext {
+    const built_before: Set<string> = new Set<string>();
+    input.progress.forEach((progress: BuildingProgress, id: number): void => {
+        const uid: string | undefined = input.buildings.get(id)?.uid;
+        if (progress.built && uid !== undefined) {
+            built_before.add(uid);
+        }
+    });
+    return { builtBefore: built_before, factors: input.defenseFactors, defenseItemIds: input.defenseItemIds, upgrades: input.upgrades, baseDefense: input.baseDefense };
+}
+
+/**
+ * Défense réelle de chaque chantier pas encore construit, s'il était terminé seul.
+ * @param {DayInput} input Entrée de la journée.
+ * @param {DefenseGainContext} context État de la ville.
+ * @returns {Map<number, number>} Gain réel par chantier.
+ */
+function realDefenseByBuilding(input: DayInput, context: DefenseGainContext): Map<number, number> {
+    const gains: Map<number, number> = new Map<number, number>();
+    input.progress.forEach((progress: BuildingProgress, id: number): void => {
+        const building: BuildingRef | undefined = input.buildings.get(id);
+        if (building !== undefined && !progress.built) {
+            gains.set(id, buildingDefenseGain(building, context));
+        }
+    });
+    return gains;
 }
 
 /**
@@ -185,13 +322,48 @@ export function advanceDay(evaluation: DayEvaluation, input: DayInput): CarriedS
         0
     );
     const night: { progress: Map<number, BuildingProgress>; defLost: number } = passNight(evaluation.progressAfter, input.buildings);
+    const levels: Map<string, number> = new Map<string, number>(input.buildingLevels);
+    if (evaluation.vote !== null) {
+        levels.set(evaluation.vote.uid, evaluation.vote.level);
+    }
+    const destroyed_def: number = destroyBuildings(evaluation.losses, night.progress, levels, input.buildings);
     return {
         progress: night.progress,
         workshopLevel: Math.min(WORKSHOP_MAX_LEVEL, input.workshopLevel + (voted_workshop ? 1 : 0)),
         hasSlavery: input.hasSlavery || slavery_built,
-        baseDefense: evaluation.projectedDefense - (input.temporaryDefense + completed_temporary_def) - night.defLost,
-        temporaryDefense: 0
+        // Un bonus perdu cette nuit revient le lendemain ; un chantier détruit cette nuit ne compte plus.
+        baseDefense: evaluation.projectedDefense - (input.temporaryDefense + completed_temporary_def) - night.defLost
+            + lossTotal(evaluation.losses, 'bonus') - destroyed_def,
+        temporaryDefense: 0,
+        defenseFactors: evaluation.defenseFactorsAfter,
+        buildingLevels: levels
     };
+}
+
+/**
+ * Chantiers détruits pendant l'attaque : redeviennent à construire, perdent leur niveau d'évolution (modifie l'avancement et
+ * les niveaux en place). Un chantier que la nuit a déjà fait tomber n'est pas compté deux fois.
+ * @param {PlannedLoss[]} losses Pertes évaluées.
+ * @param {Map<number, BuildingProgress>} progress Avancement au lever du jour suivant.
+ * @param {Map<string, number>} levels Niveaux d'évolution.
+ * @param {ReadonlyMap<number, BuildingRef>} buildings Chantiers.
+ * @returns {number} Défense retirée.
+ */
+function destroyBuildings(losses: PlannedLoss[], progress: Map<number, BuildingProgress>, levels: Map<string, number>, buildings: ReadonlyMap<number, BuildingRef>): number {
+    let removed: number = 0;
+    for (const loss of losses) {
+        const current: BuildingProgress | undefined = progress.get(loss.buildingId);
+        const uid: string | undefined = buildings.get(loss.buildingId)?.uid;
+        if (loss.kind !== 'destroyed' || current?.built !== true) {
+            continue;
+        }
+        removed += loss.defense;
+        progress.set(loss.buildingId, { ...current, built: false, invested: 0, life: 0, def: 0 });
+        if (uid !== undefined) {
+            levels.delete(uid);
+        }
+    }
+    return removed;
 }
 
 /**
@@ -288,7 +460,8 @@ function homeTasks(content: BuildingPlanContentDTO, citizens: CitizenRef[]): { c
 }
 
 /**
- * Défense gagnée par les montées de niveau de maison ; 0 quand le niveau actuel du citoyen est inconnu.
+ * Défense de maison brute gagnée par les montées de niveau (avant le pourcentage compté par la ville) ; 0 quand le niveau actuel
+ * du citoyen est inconnu.
  * @param {{ citizen: CitizenRef | undefined; level: number }[]} tasks Tâches de maison.
  * @param {ReadonlyMap<number, HomeLevelRef>} homes Référentiel indexé par niveau.
  * @returns {number} Défense ajoutée.
@@ -340,20 +513,24 @@ function freeThresholds(input: DayInput): Map<number, number> {
 }
 
 /**
- * Éléments comparés par le classement déf/PA : chantiers à construire, niveaux de maison, sources de défense.
+ * Éléments comparés par le classement déf/PA, à leur défense réelle : chantiers à construire, niveaux de maison (au pourcentage
+ * compté par la ville), sources de défense.
  * @param {DayInput} input Entrée de la journée.
+ * @param {DefenseGainContext} context État de la ville.
  * @returns {RankCandidate[]} Candidats à défense strictement positive.
  */
-function rankCandidates(input: DayInput): RankCandidate[] {
+function rankCandidates(input: DayInput, context: DefenseGainContext): RankCandidate[] {
     const candidates: RankCandidate[] = [];
     input.progress.forEach((progress: BuildingProgress, id: number): void => {
         const building: BuildingRef | undefined = input.buildings.get(id);
-        if (building !== undefined && !progress.built && building.defence > 0) {
-            candidates.push({ label: building.label, kind: 'building', def: building.defence, pa: remainingAp(progress, input.workshopLevel), resources: building.resources });
+        const gain: number = building === undefined || progress.built ? 0 : buildingDefenseGain(building, context);
+        if (building !== undefined && gain > 0) {
+            candidates.push({ label: building.label, kind: 'building', def: gain, pa: remainingAp(progress, input.workshopLevel), resources: building.resources });
         }
     });
+    const home_factor: number = homeDefenseFactor(context.builtBefore.has(CIRCULAR_QUARTERS_UID)) * input.defenseFactors.scale;
     input.homes.forEach((home: HomeLevelRef): void => {
-        const gain: number = home.def - (input.homes.get(home.level - 1)?.def ?? 0);
+        const gain: number = (home.def - (input.homes.get(home.level - 1)?.def ?? 0)) * home_factor;
         if (home.level >= 1 && gain > 0) {
             candidates.push({ label: home.label, kind: 'home', def: gain, pa: home.ap, resources: home.resources });
         }

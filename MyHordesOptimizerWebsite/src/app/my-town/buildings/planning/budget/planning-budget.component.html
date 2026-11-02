@@ -89,6 +89,18 @@
                                             }
                                         </mat-select>
                                     </mat-form-field>
+                                    @let max_uses = actionMaxUses(citizen.userId, task);
+                                    @if (max_uses > 1) {
+                                        <mat-form-field class="uses" appearance="outline" subscriptSizing="dynamic">
+                                            <mat-select data-field="task-count" [value]="task.count ?? 1" [disabled]="!store.can_edit()"
+                                                        i18n-aria-label aria-label="Nombre d'utilisations dans la journée"
+                                                        (selectionChange)="setTaskCount(citizen.userId, index, $event.value)">
+                                                @for (uses of useOptions(max_uses); track uses) {
+                                                    <mat-option [value]="uses">×{{ uses }}</mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+                                    }
                                 } @else if (task.kind === 'homeUpgrade' && upgradeOf(task); as upgrade) {
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-select data-field="task-upgrade" [value]="task.ref" [disabled]="!store.can_edit()"

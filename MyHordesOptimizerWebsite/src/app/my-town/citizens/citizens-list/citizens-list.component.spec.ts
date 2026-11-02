@@ -27,6 +27,7 @@ import { Status } from '../../../_abstract_model/types/status.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { TownContextService } from '../../../_core/services/town-context.service';
+import { citizenBoolValue } from '../../../_shared/citizen-filters/citizen-filter-sort.util';
 import { CitizenPictosDialogComponent } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
 import { CitizensListComponent } from './citizens-list.component';
 
@@ -46,7 +47,6 @@ interface TestableComponent {
         info: UpdateInfo | undefined;
     }[];
     sortValue(citizen: Citizen, id: string): string | number;
-    citizenBoolValue(citizen: Citizen, id: string): boolean | null;
     getDailyAction(citizen: Citizen, action: DailyActionEnum): {
         element: DailyActionEnum;
         value: boolean;
@@ -158,7 +158,7 @@ describe('CitizensListComponent', (): void => {
     });
 
     it('citizenBoolValue returns true for daily_home_pool when the citizen bathed today', (): void => {
-        expect(testable.citizenBoolValue(citizenWithBathToday(), 'daily_home_pool')).toBe(true);
+        expect(citizenBoolValue(citizenWithBathToday(), 'daily_home_pool', testable.current_day)).toBe(true);
     });
 
     it('getDailyAction resolves the current boolean value for a citizen/action pair', (): void => {
@@ -640,7 +640,7 @@ describe('CitizensListComponent - lien profond (?citizen=)', (): void => {
     });
 
     it('highlights the requested citizen, lifting a filter that hides it', async (): Promise<void> => {
-        component['citizen_filters'] = [component['citizen_list'].data[0]];
+        component['filter_store'].setNames([component['citizen_list'].data[0].id]);
         component['applyCitizenFilters']();
         expect(filteredIds()).toEqual([1]);
 

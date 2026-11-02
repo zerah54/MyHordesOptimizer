@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
 import { DailyAction } from '../../../../_abstract_model/types/daily-action.class';
+import { CitizenFilterSortStore } from '../../../../_shared/citizen-filters/citizen-filter-sort.store';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent } from '../plan.types';
 import { PlanningStore } from '../planning.store';
@@ -33,7 +34,7 @@ describe('PlanningTrackingComponent', (): void => {
         fake.citizens_full()[0].daily_actions = [Object.assign(new DailyAction(), { day: 10, action_key: 'home_scavenge' })];
         await TestBed.configureTestingModule({
             imports: [PlanningTrackingComponent],
-            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }, { provide: PlanningStore, useValue: fake.store }, CitizenFiltersStore]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }, { provide: PlanningStore, useValue: fake.store }, CitizenFilterSortStore, CitizenFiltersStore]
         }).compileComponents();
         fixture = TestBed.createComponent(PlanningTrackingComponent);
         fixture.detectChanges();
@@ -143,14 +144,13 @@ describe('PlanningTrackingComponent', (): void => {
 
     it('filtres : métier, consigne et état', async (): Promise<void> => {
         await render();
-        const component: { jobs: { set(value: ReadonlySet<string>): void }; task: { set(value: string | null): void }; state: { set(value: string): void } } =
-            TestBed.inject(CitizenFiltersStore) as unknown as { jobs: { set(value: ReadonlySet<string>): void }; task: { set(value: string | null): void }; state: { set(value: string): void } };
+        const component: CitizenFiltersStore = TestBed.inject(CitizenFiltersStore);
 
-        component.jobs.set(new Set<string>([JobEnum.SCOUT.key]));
+        component.citizen_filters.setJobs([JobEnum.SCOUT.key]);
         fixture.detectChanges();
         expect(shown()).toEqual(['2']);
 
-        component.jobs.set(new Set<string>());
+        component.citizen_filters.setJobs([]);
         component.task.set('action:home_crows');
         fixture.detectChanges();
         expect(shown()).toEqual(['1']);

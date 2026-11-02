@@ -47,4 +47,82 @@
         </tbody>
     </table>
     <button mat-stroked-button type="button" data-action="add-source" [disabled]="!store.can_edit()" (click)="addSource()" i18n>Ajouter une source</button>
+
+    <section class="losses">
+        <h3 i18n>Pertes prévues cette nuit</h3>
+        <p class="hint" i18n>
+            Chantier laissé détruire : il compte encore pour l'attaque de cette nuit, puis perd sa défense et son évolution dès le
+            lendemain. Bonus d'évolution perdu (Lance-grenades sans pamplemousses, chantier à eau sans eau…) : son évolution ne compte
+            pas cette nuit, à condition que la défense actuelle le compte encore.
+        </p>
+        @if ((draft.losses ?? []).length > 0) {
+            <table class="summary losses-table">
+                <thead>
+                <tr>
+                    <th i18n>Chantier</th>
+                    <th i18n>Perte</th>
+                    <th i18n>Défense</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                    @for (loss of draft.losses ?? []; track $index; let index = $index) {
+                        <tr class="loss" [attr.data-building]="loss.buildingId" [attr.data-kind]="loss.kind">
+                            <td>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-select data-field="loss-building" [value]="loss.buildingId" [disabled]="!store.can_edit()"
+                                                (selectionChange)="setLoss(index, { buildingId: $event.value })">
+                                        @for (candidate of loss_candidates(); track candidate.id) {
+                                            <mat-option [value]="candidate.id">
+                                                <span class="icon-label">
+                                                    @if (candidate.icon) {
+                                                        <img class="building-icon" [src]="candidate.icon" alt="">
+                                                    }
+                                                    {{ candidate.label }}
+                                                </span>
+                                            </mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </td>
+                            <td>
+                                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                                    <mat-select data-field="loss-kind" [value]="loss.kind" [disabled]="!store.can_edit()"
+                                                (selectionChange)="setLoss(index, { kind: $event.value })">
+                                        @for (kind of loss_kinds; track kind) {
+                                            <mat-option [value]="kind">{{ lossKindLabel(kind) }}</mat-option>
+                                        }
+                                    </mat-select>
+                                </mat-form-field>
+                            </td>
+                            <td class="loss-def">
+                                @if (lossDefense(loss); as defense) {
+                                    <span class="icon-label">
+                                        −{{ defense }}
+                                        <img [src]="HORDES_IMG_REPO + 'icons/small_def.gif'" i18n-alt alt="déf">
+                                        @if (loss.kind === 'bonus') {
+                                            <ng-container i18n>cette nuit</ng-container>
+                                        } @else {
+                                            <ng-container i18n>dès demain</ng-container>
+                                        }
+                                    </span>
+                                } @else {
+                                    <span i18n-matTooltip matTooltip="Chantier non construit au soir, ou sans bonus d'évolution">—</span>
+                                }
+                            </td>
+                            <td>
+                                <button mat-icon-button type="button" data-action="remove-loss" [disabled]="!store.can_edit()" (click)="removeLoss(index)"
+                                        i18n-matTooltip matTooltip="Supprimer la perte">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        <button mat-stroked-button type="button" data-action="add-loss" [disabled]="!store.can_edit() || loss_candidates().length === 0" (click)="addLoss()"
+                i18n>Ajouter une perte
+        </button>
+    </section>
 }

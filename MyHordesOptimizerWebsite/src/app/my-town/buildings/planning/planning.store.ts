@@ -14,6 +14,7 @@ import { availabilityIn } from '../../../_core/utilities/building-tree.util';
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import { bannedPoolForced, bannedPoolShown } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
+import { BuildingUpgradesDTO } from './building-upgrades.types';
 import { HomeUpgradeRef, homeUpgradeRefs } from './home-upgrades.util';
 import { KeyedDebounce } from './keyed-debounce.util';
 import { BuildingPlanContentDTO, BuildingPlanDTO, BuildingPlansDTO, emptyPlanContent, PlanPool, PlanTaskDTO, TownBuildingStateDTO } from './plan.types';
@@ -204,6 +205,9 @@ export class PlanningStore {
     public readonly bank: Signal<ReadonlyMap<number, number>> = computed((): ReadonlyMap<number, number> => bankMap(this.static_data()?.bank ?? []));
 
     public readonly items: Signal<readonly Item[]> = computed((): readonly Item[] => this.static_data()?.items ?? []);
+
+    /** Évolutions des chantiers (niveaux, textes, valeurs par niveau) ; vides si l'API ne les fournit pas. */
+    public readonly upgrades: Signal<BuildingUpgradesDTO> = computed((): BuildingUpgradesDTO => this.static_data()?.upgrades ?? {});
 
     /** Évaluation du jour sélectionné, chaînée depuis aujourd'hui ; nulle pour un jour passé ou sans copie de travail. */
     public readonly evaluation: Signal<DayEvaluation | null> = computed((): DayEvaluation | null => {

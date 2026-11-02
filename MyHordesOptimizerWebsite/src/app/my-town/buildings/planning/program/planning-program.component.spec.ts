@@ -390,6 +390,61 @@ describe('PlanningProgramComponent', (): void => {
         expect(ids).toContain(2);
     });
 
+    it('une construction rappelle la défense apportée par le chantier, pas une réparation', async (): Promise<void> => {
+        await render();
+
+        expect(items('regular')[0].querySelector('.def')?.textContent).toContain('+30');
+        expect(items('regular')[2].querySelector('.def')).toBeNull();
+    });
+
+    it('la défense affichée est le gain réel : objets de défense consommés retirés', async (): Promise<void> => {
+        await render();
+        fake.evaluation.set(fakeEvaluation(content(), {
+            defenseFactors: { defenseItems: 4, itemFactor: 1, homeRaw: 0, alive: 3, dead: 0, scale: 1 },
+            defenseItemIds: new Set<number>([5])
+        }));
+        fixture.detectChanges();
+
+        expect(items('regular')[0].querySelector('.def')?.getAttribute('data-real')).toBe('28');
+    });
+
+    it('le libellé du vote porte l\'icône d\'évolution et le chantier voté son icône', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = content();
+        plan.eveningVoteBuildingId = 2;
+        await render(plan);
+
+        const field: HTMLElement = fixture.nativeElement.querySelector('mat-form-field.vote') as HTMLElement;
+        expect(field.querySelector('mat-label img')?.getAttribute('src')).toContain('emotes/fortify.gif');
+        expect(field.querySelector('.mat-mdc-select-value img')?.getAttribute('src')).toContain('building/');
+        expect(field.querySelector('.mat-mdc-select-value')?.textContent).toContain('Atelier');
+    });
+
+    it('le vote affiche le niveau atteint, la défense gagnée pour la nuit et le texte d\'évolution', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = content();
+        plan.eveningVoteBuildingId = 3;
+        await render(plan);
+        fake.upgrades.set({
+            gate: {
+                maxLevel: 2,
+                texts: {
+                    base: null,
+                    levels: [
+                        { de: 'Stufe 1', fr: 'La porte apporte 15 points de défense.', en: 'La porte apporte 15 points de défense.' },
+                        { de: 'Stufe 2', fr: 'Niveau 2', en: 'Level 2' }
+                    ]
+                },
+                effects: { defenseIncrement: { levels: [0, 15, 45], default: 0, source: 'BuildingUpgradeListener' } }
+            }
+        });
+        fake.evaluation.set(fakeEvaluation(plan, { upgrades: fake.upgrades() }));
+        fixture.detectChanges();
+
+        const gain: HTMLElement | null = fixture.nativeElement.querySelector('[data-field="vote-gain"]');
+        expect(gain?.textContent).toContain('Niveau 1');
+        expect(gain?.textContent).toContain('+15');
+        expect(gain?.textContent).toContain('La porte apporte 15 points de défense.');
+    });
+
     it('le vote du soir sur l\'atelier affiche le seuil gratuit des chantiers restants', async (): Promise<void> => {
         const plan: BuildingPlanContentDTO = content();
         plan.eveningVoteBuildingId = 2;

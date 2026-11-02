@@ -11,7 +11,8 @@ use ZipArchive;
  * ① Acquisition du code source MyHordes.
  *
  * Télécharge quatre archives limitées par chemin depuis GitLab (~1,4 Mo au total) et les extrait
- * dans `.source/<sha>/`. Si le SHA est déjà présent, aucun téléchargement n'a lieu.
+ * dans `.source/<sha>/`, plus les traductions des chantiers (fichiers isolés, ~330 Ko). Si le SHA
+ * est déjà présent, seuls les fichiers isolés manquants sont téléchargés.
  */
 final class SourceFetcher
 {
@@ -22,6 +23,17 @@ final class SourceFetcher
         'packages/myhordes-fixtures',
         'packages/myhordes-plugins',
         'config/app',
+    ];
+
+    /**
+     * Fichiers isolés, téléchargés un par un : les traductions des textes de chantiers (dont les
+     * textes d'évolution, rédigés en allemand dans les fixtures). Tout le dossier `translations/`
+     * pèserait ~7 Mo pour trois fichiers utiles.
+     */
+    public const FICHIERS = [
+        'translations/buildings+intl-icu.fr.yml',
+        'translations/buildings+intl-icu.en.yml',
+        'translations/buildings+intl-icu.es.yml',
     ];
 
     /** @var array<string, mixed> */
@@ -53,6 +65,8 @@ final class SourceFetcher
         ];
 
         if (is_dir($destination)) {
+            $this->telechargerFichiersManquants($sha, $destination);
+
             return $destination;
         }
 
@@ -63,6 +77,8 @@ final class SourceFetcher
         foreach (self::CHEMINS as $chemin) {
             $this->extraireArchive($sha, $chemin, $temporaire);
         }
+
+        $this->telechargerFichiersManquants($sha, $temporaire);
 
         file_put_contents(
             $temporaire . '/_source.json',
@@ -197,6 +213,30 @@ final class SourceFetcher
             if (file_exists($fichier)) {
                 unlink($fichier);
             }
+        }
+    }
+
+    /**
+     * Télécharge les fichiers isolés absents de la destination (API « raw » de GitLab) ; une source
+     * mise en cache avant leur ajout est ainsi complétée sans tout retélécharger.
+     */
+    private function telechargerFichiersManquants(string $sha, string $destination): void
+    {
+        foreach (self::FICHIERS as $chemin) {
+            $cible = $destination . '/' . $chemin;
+            if (is_file($cible)) {
+                continue;
+            }
+
+            $url = sprintf(
+                'https://gitlab.com/api/v4/projects/%s/repository/files/%s/raw?ref=%s',
+                self::PROJET,
+                rawurlencode($chemin),
+                rawurlencode($sha)
+            );
+
+            self::creerRepertoire(dirname($cible));
+            file_put_contents($cible, ($this->transport)($url));
         }
     }
 

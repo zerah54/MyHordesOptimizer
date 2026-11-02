@@ -1,4 +1,4 @@
-import { dailyActionAp, DailyActionEnum, displayableDailyActions } from './daily-action.enum';
+import { dailyActionAp, DailyActionEnum, dailyActionMaxUses, displayableDailyActions } from './daily-action.enum';
 import { JobEnum } from './job.enum';
 
 describe('DailyActionEnum', (): void => {
@@ -74,5 +74,21 @@ describe('displayableDailyActions', (): void => {
     it('les actions sans chantier, et celles dont le chantier est construit', (): void => {
         expect(displayableDailyActions(new Set<string>(['small_gallery_#00'])).map((action: DailyActionEnum): string => action.key))
             .toEqual(['home_clean', 'home_rest', 'home_scavenge']);
+    });
+});
+
+describe('dailyActionMaxUses', (): void => {
+    it('le Fouineur creuse jusqu\'à 3 fois dans les galeries, les autres une fois', (): void => {
+        expect(dailyActionMaxUses(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCAVENGER.key)).toBe(3);
+        expect(dailyActionMaxUses(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCOUT.key)).toBe(1);
+        expect(dailyActionMaxUses(DailyActionEnum.HOME_DEFBUFF, JobEnum.GUARDIAN.key)).toBe(1);
+    });
+
+    it('le coût suit le nombre de fouilles prévues, ramené entre 1 et le maximum', (): void => {
+        expect(dailyActionAp(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCAVENGER.key, 1)).toBe(1);
+        expect(dailyActionAp(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCAVENGER.key, 2)).toBe(2);
+        expect(dailyActionAp(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCAVENGER.key, 5)).toBe(3);
+        expect(dailyActionAp(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCAVENGER.key, 0)).toBe(1);
+        expect(dailyActionAp(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCOUT.key, 3)).toBe(2);
     });
 });

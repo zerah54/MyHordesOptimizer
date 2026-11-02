@@ -52,7 +52,7 @@
                             @if (future()) {
                                 <span class="task">{{ entry.label }}@if (entry.task.pa > 0) {
                                     ({{ entry.task.pa }}
-                                    <ng-container i18n>PA</ng-container>)
+                                    <mho-icon-ap/>)
                                 }</span>
                             } @else {
                                 <span class="task" [class.done]="entry.status.done" [class.focused]="isFocused(entry)">
@@ -61,7 +61,7 @@
                                               (change)="onToggle($event, row.citizen.id, entry)">
                                     {{ entry.label }}@if (entry.task.pa > 0) {
                                     ({{ entry.task.pa }}
-                                    <ng-container i18n>PA</ng-container>)
+                                    <mho-icon-ap/>)
                                 }
                                 </mat-checkbox>
                                     @if (entry.status.source === 'data') {

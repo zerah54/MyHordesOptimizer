@@ -24,9 +24,12 @@ function sameTaskKey(task: BulkTaskTemplate): string {
  * @param {number[]} user_ids Citoyens visés.
  * @param {BulkTaskTemplate} template Consigne.
  * @param {(user_id: number) => number} pa_of PA de la consigne pour un citoyen.
+ * @param {(user_id: number) => number} [count_of] Utilisations prévues d'une action pour un citoyen (1 si absent).
  * @returns {number} Nombre de citoyens qui ont reçu la consigne.
  */
-export function bulkAddTask(content: BuildingPlanContentDTO, user_ids: number[], template: BulkTaskTemplate, pa_of: (user_id: number) => number): number {
+export function bulkAddTask(
+    content: BuildingPlanContentDTO, user_ids: number[], template: BulkTaskTemplate, pa_of: (user_id: number) => number, count_of?: (user_id: number) => number
+): number {
     const key: string = sameTaskKey(template);
     const label: string = (template.label ?? '').trim();
     let added: number = 0;
@@ -50,6 +53,10 @@ export function bulkAddTask(content: BuildingPlanContentDTO, user_ids: number[],
             task.label = label;
         }
         task.pa = pa_of(user_id);
+        const count: number = count_of?.(user_id) ?? 1;
+        if (count > 1) {
+            task.count = count;
+        }
         entry.tasks.push(task);
         added++;
     }

@@ -1,7 +1,7 @@
 import { bannedPoolShown, CitizenCapacity } from './budget.util';
 import { StepResult } from './building-progress.util';
 import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from './plan.types';
-import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef } from './plan-evaluation.util';
+import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef, PlannedLoss } from './plan-evaluation.util';
 import { ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
 
 /** Taille maximale d'un message généré : sous la limite du jeu (16 384 caractères) pour garder de la marge. */
@@ -24,6 +24,8 @@ export interface PostContext {
     homes: ReadonlyMap<number, HomeLevelRef>;
     item_label: (item_id: number) => string;
     website_url: string;
+    /** Emote du métier de chaque joueur (`:scav:`…), placée devant chacun de ses pseudos ; un joueur absent n'en a pas. */
+    job_emotes: ReadonlyMap<number, string>;
 }
 
 /**
@@ -85,15 +87,17 @@ export function budgetPost(context: PostContext): string[] {
 /**
  * Post « programme » : consignes personnelles regroupées par ensemble identique, puis chantiers dans l'ordre.
  * @param {PostContext} context Données du jour.
+ * @param {boolean} [ping] Vrai : les citoyens sont mentionnés (notifiés) ; faux : pseudos simples, pour une relecture entre leads.
  * @returns {string[]} Messages à publier.
  */
-export function programPost(context: PostContext): string[] {
+export function programPost(context: PostContext, ping: boolean = true): string[] {
     const blocks: string[] = [
         $localize`[big][b]Programme chantiers · J${context.day}:day:[/b][/big]`,
         dayInstructions(context),
-        `[b]${$localize`Consignes individuelles`}[/b]\n${instructionGroups(context)}`,
+        collapse($localize`Consignes individuelles`, [instructionGroups(context, ping)]),
         `[b]${$localize`Programme chantiers dans l'ordre`}[/b]\n${orderedProgram(context)}`,
         defenseSummary(context),
+        lossBlock(context),
         voteLine(context, true),
         footer($localize`Votre programme du jour et vos consignes individuelles à cocher sont consultables en suivant`, `${context.website_url}my-town/program`)
     ];
@@ -169,6 +173,18 @@ function chunkLines(text: string, size: number): string[] {
     return chunks;
 }
 
+/**
+ * Pseudo (ou mention) précédé de l'emote du métier du joueur, quand elle est connue.
+ * @param {PostContext} context Contexte du post.
+ * @param {number} user_id Joueur.
+ * @param {string} text Pseudo ou mention.
+ * @returns {string} Texte précédé de l'emote.
+ */
+function withJobEmote(context: PostContext, user_id: number, text: string): string {
+    const job_emote: string | undefined = context.job_emotes.get(user_id);
+    return job_emote === undefined ? text : `${job_emote} ${text}`;
+}
+
 /** Libellé d'un chantier ; `#id` s'il est introuvable. */
 function buildingLabel(context: PostContext, building_id: number): string {
     return context.buildings.get(building_id)?.label ?? `#${building_id}`;
@@ -211,12 +227,17 @@ function budgetLines(context: PostContext): string[] {
     }
     for (const capacity of context.evaluation.capacities.filter((candidate: CitizenCapacity): boolean => candidate.overCommitted)) {
         const name: string = context.citizens.find((citizen: CitizenRef): boolean => citizen.userId === capacity.userId)?.name ?? `#${capacity.userId}`;
-        lines.push(`:warning: ${name} : ${$localize`tâches et expédition au-delà des PA de base`}`);
+        lines.push(`:warning: ${withJobEmote(context, capacity.userId, name)} : ${$localize`tâches et expédition au-delà des PA de base`}`);
     }
     return lines;
 }
 
-/** Texte d'une étape selon son mode, suivi de sa note éventuelle. */
+/**
+ * Texte d'une étape selon son mode, suivi de sa note éventuelle.
+ * @param {PostContext} context Contexte du post.
+ * @param {StepResult} result Étape évaluée.
+ * @returns {string} Texte de l'étape.
+ */
 function stepAction(context: PostContext, result: StepResult): string {
     const text: string = stepLabel(buildingLabel(context, result.step.buildingId), result, context.buildings.get(result.step.buildingId)?.maxLife ?? 0);
     const note: string = (result.step.note ?? '').trim();
@@ -234,6 +255,31 @@ function defenseSummary(context: PostContext): string {
 }
 
 /**
+ * Ligne d'une perte prévue cette nuit.
+ * @param {PostContext} context Contexte du post.
+ * @param {PlannedLoss} loss Perte comptée par l'évaluation.
+ * @returns {string} Ligne.
+ */
+function lossLine(context: PostContext, loss: PlannedLoss): string {
+    const label: string = buildingLabel(context, loss.buildingId);
+    return loss.kind === 'destroyed'
+        ? `:middot: ${label} : ${$localize`laissé détruire, ne pas réparer`} (−${loss.defense} ${$localize`dès demain`})`
+        : `:middot: ${label} : ${$localize`bonus d'évolution perdu`} (−${loss.defense} ${$localize`cette nuit`})`;
+}
+
+/**
+ * Bloc des pertes prévues cette nuit (post programme), vide sans perte.
+ * @param {PostContext} context Contexte du post.
+ * @returns {string} Bloc, ou chaîne vide.
+ */
+function lossBlock(context: PostContext): string {
+    if (context.evaluation.losses.length === 0) {
+        return '';
+    }
+    return [`:warning: [b]${$localize`Pertes prévues cette nuit`}[/b]`, ...context.evaluation.losses.map((loss: PlannedLoss): string => lossLine(context, loss))].join('\n');
+}
+
+/**
  * Ligne du chantier à voter ce soir, vide sans vote.
  * @param {PostContext} context Contexte du post.
  * @param {boolean} bold Titre en gras (post programme) ou simple (bloc Plan).
@@ -245,7 +291,7 @@ function voteLine(context: PostContext, bold: boolean): string {
         return '';
     }
     const title: string = $localize`Évolution votée ce soir`;
-    return `${bold ? `[b]${title}[/b]` : title} : ${buildingLabel(context, vote)}`;
+    return `:fortify: ${bold ? `[b]${title}[/b]` : title} : ${buildingLabel(context, vote)}`;
 }
 
 /** Lignes du bloc « Plan » : vote du soir, puis étapes de chaque poche avec leur coût. */
@@ -289,6 +335,9 @@ function defenseLines(context: PostContext): string[] {
             ? `:middot: ${$localize`Reste à couvrir`} : ${evaluation.defenseGap}`
             : `:middot: ${$localize`Surplus`} : ${Math.abs(evaluation.defenseGap)}`);
     }
+    if (evaluation.losses.length > 0) {
+        lines.push(`[b]${$localize`Pertes prévues cette nuit`}[/b]`, ...evaluation.losses.map((loss: PlannedLoss): string => lossLine(context, loss)));
+    }
     if (evaluation.ranking.length > 0) {
         lines.push(`[b]${$localize`Meilleurs rapports défense / coût`}[/b]`);
         for (const candidate of evaluation.ranking.slice(0, RANKING_LINES)) {
@@ -323,24 +372,30 @@ function taskLine(context: PostContext, task: PlanTaskDTO): string {
     return `${icon} ${taskLabel(task, context.homes)}${cost}`;
 }
 
-/** Consignes individuelles : une ligne de mentions par ensemble de tâches identique, suivie de ces tâches. */
-function instructionGroups(context: PostContext): string {
+/**
+ * Consignes individuelles : une ligne de citoyens par ensemble de tâches identique, suivie de ces tâches.
+ * @param {PostContext} context Contexte du post.
+ * @param {boolean} ping Vrai : mentions `@pseudo:id` séparées par une espace ; faux : pseudos simples séparés par une virgule.
+ * @returns {string} Bloc des consignes.
+ */
+function instructionGroups(context: PostContext, ping: boolean): string {
     const groups: Map<string, { tasks: PlanTaskDTO[]; mentions: string[] }> = new Map<string, { tasks: PlanTaskDTO[]; mentions: string[] }>();
     for (const entry of context.content.citizens.filter((candidate: PlanCitizenDTO): boolean => candidate.tasks.length > 0)) {
         const citizen: CitizenRef | undefined = context.citizens.find((candidate: CitizenRef): boolean => candidate.userId === entry.userId);
         if (citizen === undefined) {
             continue;
         }
-        const key: string = JSON.stringify(entry.tasks.map((task: PlanTaskDTO): unknown[] => [task.kind, task.ref ?? null, task.level ?? null, task.label ?? '', task.pa]));
+        const key: string = JSON.stringify(entry.tasks.map((task: PlanTaskDTO): unknown[] => [task.kind, task.ref ?? null, task.level ?? null, task.count ?? null, task.label ?? '', task.pa]));
         const group: { tasks: PlanTaskDTO[]; mentions: string[] } = groups.get(key) ?? { tasks: entry.tasks, mentions: [] };
-        group.mentions.push(mention(citizen.name, citizen.userId));
+        group.mentions.push(withJobEmote(context, citizen.userId, ping ? mention(citizen.name, citizen.userId) : citizen.name));
         groups.set(key, group);
     }
     if (groups.size === 0) {
         return $localize`Aucune consigne individuelle.`;
     }
     return Array.from(groups.values())
-        .map((group: { tasks: PlanTaskDTO[]; mentions: string[] }): string => [group.mentions.join(' '), ...group.tasks.map((task: PlanTaskDTO): string => taskLine(context, task))].join('\n'))
+        .map((group: { tasks: PlanTaskDTO[]; mentions: string[] }): string =>
+            [group.mentions.join(ping ? ' ' : ', '), ...group.tasks.map((task: PlanTaskDTO): string => taskLine(context, task))].join('\n'))
         .join('\n\n');
 }
 

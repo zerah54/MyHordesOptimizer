@@ -7,6 +7,7 @@ import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import type { Mock } from 'vitest';
 
+import { CitizenFilterSortStore } from '../../_shared/citizen-filters/citizen-filter-sort.store';
 import { BuildingsComponent } from './buildings.component';
 import { CitizenFiltersStore } from './planning/citizen-filters.store';
 import { PlanningItemValuesDialogComponent } from './planning/item-values-dialog/planning-item-values-dialog.component';
@@ -27,7 +28,7 @@ describe('BuildingsComponent', (): void => {
             imports: [BuildingsComponent],
             providers: [provideRouter([]), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         })
-            .overrideComponent(BuildingsComponent, { set: { providers: [{ provide: PlanningStore, useValue: fake.store }, CitizenFiltersStore] } })
+            .overrideComponent(BuildingsComponent, { set: { providers: [{ provide: PlanningStore, useValue: fake.store }, CitizenFilterSortStore, CitizenFiltersStore] } })
             .overrideProvider(MatDialog, { useValue: { open } })
             .compileComponents();
         fixture = TestBed.createComponent(BuildingsComponent);
@@ -43,8 +44,53 @@ describe('BuildingsComponent', (): void => {
     it('affiche le titre et lance le chargement', async (): Promise<void> => {
         await render();
 
-        expect(root().querySelector('mat-card-title')?.textContent?.trim()).toBe('Chantiers');
+        expect(root().querySelector('mat-card-title')?.textContent).toContain('Chantiers');
         expect(fake.actions['load']).toHaveBeenCalledTimes(1);
+    });
+
+    describe('modifications non enregistrées', (): void => {
+        it('sans modification, la page se quitte sans confirmation', async (): Promise<void> => {
+            await render();
+            let allowed: boolean | undefined;
+
+            fixture.componentInstance.canLeave().subscribe((value: boolean): void => {
+                allowed = value;
+            });
+
+            expect(allowed).toBe(true);
+            expect(open).not.toHaveBeenCalled();
+        });
+
+        it('avec des modifications, quitter demande confirmation ; annuler retient la page', async (): Promise<void> => {
+            await render();
+            fake.dirty.set(true);
+            open.mockReturnValue({ afterClosed: (): unknown => of(false) });
+            let allowed: boolean | undefined;
+
+            fixture.componentInstance.canLeave().subscribe((value: boolean): void => {
+                allowed = value;
+            });
+
+            expect(open).toHaveBeenCalledTimes(1);
+            expect(allowed).toBe(false);
+        });
+
+        it('fermer l\'onglet avec des modifications déclenche l\'alerte du navigateur', async (): Promise<void> => {
+            await render();
+            fake.dirty.set(true);
+            const event: Event = new Event('beforeunload', { cancelable: true });
+
+            window.dispatchEvent(event);
+
+            expect(event.defaultPrevented).toBe(true);
+        });
+    });
+
+    it('le bouton de partage est à côté du titre, comme sur les autres pages, et plus dans l\'en-tête des propositions', async (): Promise<void> => {
+        await render();
+
+        expect(root().querySelector('mat-card-title button[data-action="share"]')).not.toBeNull();
+        expect(root().querySelector('mho-planning-header button[data-action="share"]')).toBeNull();
     });
 
     describe('valeurs des objets (réglage de la ville)', (): void => {

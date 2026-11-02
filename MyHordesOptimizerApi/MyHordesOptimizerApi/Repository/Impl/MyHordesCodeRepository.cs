@@ -200,6 +200,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dico;
         }
 
+        public Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades()
+        {
+            var path = "Data/Buildings/upgrades.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, BuildingUpgradeCodeModel>>();
+            return dico;
+        }
+
         public List<HomeLevelCodeModel> GetHomeLevels()
         {
             var json = File.ReadAllText("Data/Citizens/home-levels.json");

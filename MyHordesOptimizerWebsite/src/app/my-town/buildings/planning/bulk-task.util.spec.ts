@@ -31,6 +31,15 @@ describe('bulkAddTask', (): void => {
         expect(tasksOf(value, 1)[1].id).not.toBe(tasksOf(value, 2)[0].id);
     });
 
+    it('range le nombre d\'utilisations d\'une action quand il dépasse 1', (): void => {
+        const value: BuildingPlanContentDTO = content();
+
+        bulkAddTask(value, [1, 2], { kind: 'action', ref: 'home_scavenge' }, (user_id: number): number => (user_id === 1 ? 3 : 2), (user_id: number): number => (user_id === 1 ? 3 : 1));
+
+        expect(tasksOf(value, 1)[1].count).toBe(3);
+        expect(tasksOf(value, 2)[0].count).toBeUndefined();
+    });
+
     it('n\'ajoute pas une consigne identique déjà présente', (): void => {
         const value: BuildingPlanContentDTO = content();
 

@@ -87,186 +87,9 @@
 
             <!-- ============ Sidenav droite : tous les filtres ============ -->
             <mat-sidenav [opened]="filters_open()" class="filters-sidenav" mode="side" position="end">
-                <div class="filters-panel">
-                    <div class="filters-header">
-                        <span class="title" i18n>Filtres</span>
-                        <span class="spacer"></span>
-                        <button (click)="resetFilters()" i18n mat-button type="button">Réinitialiser</button>
-                        <button (click)="filters_open.set(false)" aria-label="Fermer" i18n-aria-label mat-icon-button type="button">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </div>
-
-                    <section class="filters-section">
-                        <h4 i18n>Général</h4>
-                        <mat-form-field subscriptSizing="dynamic">
-                            <mat-label i18n>Nom</mat-label>
-                            <mho-select (ngModelChange)="citizen_filters = $event; applyCitizenFilters()" [ngModel]="citizen_filters"
-                                        [options]="alive_citizen_info()!.citizens" bindLabel="name"
-                                        multiple searchable></mho-select>
-                        </mat-form-field>
-                        <div class="filter-row">
-                            <mat-button-toggle-group (change)="job_filters = $event.value; applyCitizenFilters()" [value]="job_filters" class="value-filter"
-                                                     hideMultipleSelectionIndicator multiple>
-                                @for (job of all_jobs; track job.key) {
-                                    <mat-button-toggle [matTooltip]="job.value.label" [value]="job">
-                                        <img [alt]="job.value.label" [src]="HORDES_IMG_REPO + job.value.img" class="toggle-icon">
-                                    </mat-button-toggle>
-                                }
-                            </mat-button-toggle-group>
-                        </div>
-                        <mat-form-field subscriptSizing="dynamic">
-                            <mat-label i18n>Sac</mat-label>
-                            <mho-select (ngModelChange)="bag_filter = $event; applyCitizenFilters()" [bindLabel]="item_bind_label" [ngModel]="bag_filter"
-                                        [options]="all_items" bindIcon="img"
-                                        multiple searchable></mho-select>
-                        </mat-form-field>
-                        <mat-form-field subscriptSizing="dynamic">
-                            <mat-label i18n>États</mat-label>
-                            <mho-select (ngModelChange)="status_filter = $event; applyCitizenFilters()" [ngModel]="status_filter" [options]="all_status"
-                                        bindIcon="img" bindLabel="label"
-                                        multiple searchable></mho-select>
-                        </mat-form-field>
-                        <!-- Chamanique : potions puis immunité, sur une même ligne (ordre de la liste). -->
-                        <div class="filter-row">
-                            @if ((value_options['potions'] || []).length > 0) {
-                                <span class="filter-label" i18n-matTooltip matTooltip="Potions bues">
-                            <img [src]="HORDES_IMG_REPO + 'item/item_potion.gif'" alt="Potions bues" i18n-alt>
-                        </span>
-                                <mat-button-toggle-group (change)="setValueFilter('potions', $event.value)" [value]="valueFilter('potions')"
-                                                         class="value-filter"
-                                                         hideMultipleSelectionIndicator multiple>
-                                    @for (value of value_options['potions']; track value) {
-                                        <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
-                                    }
-                                </mat-button-toggle-group>
-                            }
-                            <span (click)="cycleBoolFilter('immune')" class="bool-control"
-                                  i18n-matTooltip matTooltip="Immunité — coché : oui · décoché : non · indéterminé : tous">
-                        <mat-checkbox [checked]="boolFilter('immune') === true" [indeterminate]="boolFilter('immune') === null"
-                                      class="bool-filter"
-                                      disableRipple>
-                            <img [src]="HORDES_IMG_REPO + 'icons/small_restoresp.gif'" alt="Immunité" class="filter-icon" i18n-alt>
-                        </mat-checkbox>
-                    </span>
-                        </div>
-                    </section>
-
-                    <section class="filters-section">
-                        <h4 i18n>Actions quotidiennes</h4>
-                        @for (action of daily_action_keys(); track action.key) {
-                            <div class="filter-row bool-row">
-                        <span (click)="cycleBoolFilter('daily_' + action.key)" [matTooltip]="action.getLabel() + bool_filter_hint"
-                              class="bool-control">
-                            <mat-checkbox [checked]="boolFilter('daily_' + action.key) === true"
-                                          [indeterminate]="boolFilter('daily_' + action.key) === null"
-                                          class="bool-filter"
-                                          disableRipple>
-                                <img [alt]="action.getLabel()" [src]="HORDES_IMG_REPO + action.value.img" class="filter-icon">
-                            </mat-checkbox>
-                        </span>
-                            </div>
-                        }
-                    </section>
-
-                    <section class="filters-section toggles">
-                        <h4 i18n>Actions héroïques</h4>
-                        @for (action of heroic_actions_all; track action.key) {
-                            @if (action.value.max_lvl === 1) {
-                                <div class="filter-row bool-row">
-                            <span (click)="cycleBoolFilter('heroic_' + action.key)" [matTooltip]="action.getLabel() + bool_filter_hint"
-                                  class="bool-control">
-                                <mat-checkbox [checked]="boolFilter('heroic_' + action.key) === true"
-                                              [indeterminate]="boolFilter('heroic_' + action.key) === null"
-                                              class="bool-filter"
-                                              disableRipple>
-                                    <img [alt]="action.getLabel()" [src]="HORDES_IMG_REPO + action.value.img" class="filter-icon">
-                                </mat-checkbox>
-                            </span>
-                                </div>
-                            } @else if ((value_options['heroic_' + action.key] || []).length > 0) {
-                                <div class="filter-row">
-                            <span [matTooltip]="action.getLabel()" class="filter-label">
-                                <img [alt]="action.getLabel()" [src]="HORDES_IMG_REPO + action.value.img">
-                            </span>
-                                    <mat-button-toggle-group (change)="setValueFilter('heroic_' + action.key, $event.value)"
-                                                             [value]="valueFilter('heroic_' + action.key)" class="value-filter"
-                                                             hideMultipleSelectionIndicator multiple>
-                                        @for (value of value_options['heroic_' + action.key]; track value) {
-                                            <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
-                                        }
-                                    </mat-button-toggle-group>
-                                </div>
-                            }
-                        }
-                    </section>
-
-                    <section class="filters-section toggles">
-                        <h4 i18n>Améliorations</h4>
-                        @for (home of home_all; track home.key) {
-                            @if (home.value.max_lvl === 1) {
-                                <div class="filter-row bool-row">
-                            <span (click)="cycleBoolFilter('home_' + home.key)" [matTooltip]="home.getLabel() + bool_filter_hint"
-                                  class="bool-control">
-                                <mat-checkbox [checked]="boolFilter('home_' + home.key) === true" [indeterminate]="boolFilter('home_' + home.key) === null"
-                                              class="bool-filter"
-                                              disableRipple>
-                                    <img [alt]="home.getLabel()" [src]="HORDES_IMG_REPO + homeHeaderIcon(home)" class="filter-icon">
-                                </mat-checkbox>
-                            </span>
-                                </div>
-                            } @else if ((value_options['home_' + home.key] || []).length > 0) {
-                                <div class="filter-row">
-                            <span [matTooltip]="home.getLabel()" class="filter-label">
-                                <img [alt]="home.getLabel()" [src]="HORDES_IMG_REPO + homeHeaderIcon(home)">
-                            </span>
-                                    <mat-button-toggle-group (change)="setValueFilter('home_' + home.key, $event.value)"
-                                                             [value]="valueFilter('home_' + home.key)"
-                                                             class="value-filter"
-                                                             hideMultipleSelectionIndicator multiple>
-                                        @for (value of value_options['home_' + home.key]; track value) {
-                                            <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
-                                        }
-                                    </mat-button-toggle-group>
-                                </div>
-                            }
-                        }
-                    </section>
-
-                    @if (hasHeroSkillOrCampingOptions()) {
-                        <section class="filters-section toggles">
-                            <h4 i18n>Compétences et camping</h4>
-                            @for (family of hero_skill_families; track family.key) {
-                                @if ((value_options[HERO_SKILL_ID_PREFIX + family.key] || []).length > 0) {
-                                    <div class="filter-row">
-                                        <span [matTooltip]="hero_skill_group_names()[family.key]"
-                                              class="filter-label hero-skill-letter">{{ family.letter }}</span>
-                                        <mat-button-toggle-group (change)="setValueFilter(HERO_SKILL_ID_PREFIX + family.key, $event.value)"
-                                                                 [value]="valueFilter(HERO_SKILL_ID_PREFIX + family.key)" class="value-filter"
-                                                                 hideMultipleSelectionIndicator multiple>
-                                            @for (value of value_options[HERO_SKILL_ID_PREFIX + family.key]; track value) {
-                                                <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
-                                            }
-                                        </mat-button-toggle-group>
-                                    </div>
-                                }
-                            }
-                            @if ((value_options[CAMPING_COUNT_ID] || []).length > 0) {
-                                <div class="filter-row">
-                                    <span [matTooltip]="camping_count_label" class="filter-label">
-                                        <img [alt]="camping_count_label" [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'">
-                                    </span>
-                                    <mat-button-toggle-group (change)="setValueFilter(CAMPING_COUNT_ID, $event.value)" [value]="valueFilter(CAMPING_COUNT_ID)"
-                                                             class="value-filter" hideMultipleSelectionIndicator multiple>
-                                        @for (value of value_options[CAMPING_COUNT_ID]; track value) {
-                                            <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
-                                        }
-                                    </mat-button-toggle-group>
-                                </div>
-                            }
-                        </section>
-                    }
-                </div>
+                <mho-citizen-filter-panel [citizens]="citizen_list.data" [items]="all_items" [daily_actions]="daily_action_keys()"
+                                          [value_options]="value_options()" [hero_skill_names]="hero_skill_group_names()"
+                                          (closed)="filters_open.set(false)"/>
             </mat-sidenav>
 
             <mat-sidenav-content>
@@ -293,13 +116,8 @@
                                     <mat-icon>content_copy</mat-icon>
                                 </button>
 
-                                <button [matMenuTriggerFor]="sortMenu" mat-stroked-button type="button">
-                                    <mat-icon
-                                    >{{ activeSortLabel() ? (sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'sort' }}
-                                    </mat-icon>
-                                    <span>{{ activeSortLabel() ?? sort_button_label }}</span>
-                                </button>
-                                <button (click)="toggleFilters()" [matBadgeHidden]="activeFilterCount() === 0" [matBadge]="activeFilterCount()"
+                                <mho-citizen-sort-button [daily_actions]="daily_action_keys()" [hero_skill_names]="hero_skill_group_names()"/>
+                                <button (click)="toggleFilters()" [matBadgeHidden]="filter_store.active_count() === 0" [matBadge]="filter_store.active_count()"
                                         class="filters-button"
                                         mat-stroked-button type="button">
                                     <mat-icon>filter_alt</mat-icon>
@@ -611,17 +429,6 @@
 </mat-menu>
 
 <!-- ============ Menu « Trier par » ============ -->
-<mat-menu #sortMenu="matMenu">
-    @for (field of sortable_fields(); track field.id) {
-        <button (click)="sortBy(field.id)" mat-menu-item type="button">
-            <span>{{ field.label }}</span>
-            @if (sort_field() === field.id) {
-                <mat-icon>{{ sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
-            }
-        </button>
-    }
-</mat-menu>
-
 <!-- ============ Menu de détail des dernières MàJ (au survol) ============ -->
 <mat-menu #updatesMenu="matMenu" [hasBackdrop]="false" class="mho-menu-updates-detail">
     <div (mouseenter)="cancelUpdatesMenuClose()" (mouseleave)="scheduleUpdatesMenuClose()" class="updates-menu-content">

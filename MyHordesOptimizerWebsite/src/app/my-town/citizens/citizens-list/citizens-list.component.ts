@@ -8,12 +8,12 @@ import {
     DestroyRef,
     effect,
     ElementRef,
-    EventEmitter,
     inject,
     Injector,
     OnInit,
     Signal,
     signal,
+    untracked,
     viewChild,
     WritableSignal
 } from '@angular/core';
@@ -77,6 +77,18 @@ import { getHeroicIcon, getHomeIcon } from '../../../_core/utilities/citizen.uti
 import { DEEP_LINK_PARAMS, deepLinkTargets } from '../../../_core/utilities/deep-link.util';
 import { getTown, getUser, user } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
+import { CitizenFilterPanelComponent } from '../../../_shared/citizen-filters/citizen-filter-panel/citizen-filter-panel.component';
+import { CitizenFilterSortStore } from '../../../_shared/citizen-filters/citizen-filter-sort.store';
+import {
+    CAMPING_COUNT_ID,
+    citizenSortValue,
+    citizenValueOptions,
+    HERO_SKILL_ID_PREFIX,
+    HEROIC_FIELDS,
+    HOME_FIELDS,
+    matchesCitizenFilter
+} from '../../../_shared/citizen-filters/citizen-filter-sort.util';
+import { CitizenSortButtonComponent } from '../../../_shared/citizen-filters/citizen-sort-button/citizen-sort-button.component';
 import { CitizenInfoComponent } from '../../../_shared/citizen-info/citizen-info.component';
 import { CompactStepperComponent } from '../../../_shared/compact-stepper/compact-stepper.component';
 import { CompactToggleComponent } from '../../../_shared/compact-toggle/compact-toggle.component';
@@ -85,12 +97,14 @@ import { LastUpdateComponent } from '../../../_shared/last-update/last-update.co
 import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { NoteDialogComponent, NoteDialogData } from '../../../_shared/note-dialog/note-dialog.component';
 import { NoteIconComponent } from '../../../_shared/note-icon/note-icon.component';
-import { SelectComponent } from '../../../_shared/select/select.component';
 import { CitizenPictosDialogComponent, CitizenPictosDialogData } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
 import { DailyActionForDayPipe } from '../daily-action-for-day.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [AvatarComponent, CitizenInfoComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent, LastUpdateComponent, ListElementAddRemoveComponent, NoteIconComponent, SelectComponent];
+const components: Imports = [
+    AvatarComponent, CitizenFilterPanelComponent, CitizenInfoComponent, CitizenSortButtonComponent, CompactStepperComponent, CompactToggleComponent, DeferredCellComponent,
+    LastUpdateComponent, ListElementAddRemoveComponent, NoteIconComponent
+];
 const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [MatBadgeModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatMenuModule, MatSidenavModule, MatSortModule, MatTableModule, MatTooltipModule];
@@ -105,29 +119,14 @@ interface CitizenUpdateEntry {
 /** Modes d'affichage du tableau des citoyens vivants : « groupé » (bandes) ou « colonnes » (une par champ). */
 export type CitizensDisplayMode = 'grouped' | 'columns';
 
-/** Tri des champs par niveau maximum croissant : les booléens (max_lvl 1) d'abord, les champs à niveau ensuite. */
-const byMaxLvlAsc = (a: { value: { max_lvl: number } }, b: { value: { max_lvl: number } }): number => a.value.max_lvl - b.value.max_lvl;
-
-/** Poids de l'état « immunisé » dans le tri de la colonne immunité : garantit que l'immunité prime sur le nombre de potions. */
-const IMMUNE_SORT_FACTOR: number = 1_000_000;
-
-/** Identifiant (tri, filtre, colonne du mode colonnes) du nombre de campings. */
-const CAMPING_COUNT_ID: string = 'camping_count';
 /** Identifiant de la colonne des chaussures équipées (les deux modes). */
 const SHOES_EQUIPPED_ID: string = 'shoes_equipped';
-/** Préfixe des identifiants des groupes de compétences héroïques (`skill_s`…). */
-const HERO_SKILL_ID_PREFIX: string = 'skill_';
-
-/** Groupe de compétences désigné par un identifiant de colonne `skill_<lettre>`. */
-function heroSkillFamilyOf(id: string): HeroSkillFamily | undefined {
-    return HERO_SKILL_FAMILIES.find((family: HeroSkillFamilyInfo): boolean => HERO_SKILL_ID_PREFIX + family.key === id)?.key;
-}
-
 @Component({
     selector: 'mho-citizens-list',
     templateUrl: './citizens-list.component.html',
     styleUrls: ['./citizens-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [CitizenFilterSortStore],
     imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
 })
 export class CitizensListComponent implements OnInit {
@@ -151,36 +150,16 @@ export class CitizensListComponent implements OnInit {
     protected readonly current_day: number = getTown()?.day || 1;
     /** Mode observateur : désactive toute action d'écriture. */
     protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
-    /** Les filtres de la liste des citoyens (par nom). */
-    protected citizen_filters: Citizen[] = [];
-    /** Les filtres de la liste des citoyens (par métier, mode colonnes). */
-    protected job_filters: JobEnum[] = [];
-    /** Un filtre (nom ou métier) a changé → réappliquer le filtre combiné. */
-    protected citizen_filter_change: EventEmitter<void> = new EventEmitter<void>();
     /** Libellé de l'en-tête de la colonne citoyen (partagée aux deux modes). */
     protected readonly citizen_header: string = $localize`Citoyen`;
     /** Libellé de l'en-tête de la colonne métier. */
     protected readonly job_header: string = $localize`Métier`;
-    /** Aide (tooltip) des filtres booléens à 3 états. */
-    protected readonly bool_filter_hint: string = $localize` — coché : oui · décoché : non · indéterminé : tous`;
-    /** Libellé par défaut du bouton de tri (quand aucun tri actif). */
-    protected readonly sort_button_label: string = $localize`Trier par`;
-    /** Tous les métiers possibles (options du filtre métier). */
-    protected readonly all_jobs: JobEnum[] = JobEnum.getAllValues<JobEnum>();
-    /** Filtres booléens par colonne (checkbox 3 états : coché `true`=oui / décoché `false`=non / indéterminé `null`=tous). */
-    protected readonly bool_filters: Record<string, boolean | null> = {};
-    /** Filtres de valeurs (multi-sélection) par colonne stepper (id → valeurs cochées). */
-    protected readonly value_filters: Record<string, number[]> = {};
-    /** Options de valeurs par colonne stepper (id → valeurs RÉELLEMENT présentes). Construit depuis les données. */
-    protected readonly value_options: Record<string, number[]> = {};
-    /** Filtre sac : un citoyen passe s'il possède au moins un des objets sélectionnés. */
-    protected bag_filter: Item[] = [];
-    /** Filtre états : un citoyen passe s'il possède au moins un des états sélectionnés. */
-    protected status_filter: StatusEnum[] = [];
+    /** Filtres et tri des citoyens, partagés avec le panneau de filtres et le bouton « Trier par ». */
+    protected readonly filter_store: CitizenFilterSortStore = inject(CitizenFilterSortStore);
+    /** Valeurs présentes chez les citoyens pour chaque champ à niveau (options des filtres de valeurs). */
+    protected readonly value_options: WritableSignal<Record<string, number[]>> = signal<Record<string, number[]>>({});
     /** Locale courante (libellé I18n des objets du sac). */
     protected readonly locale: string = moment.locale();
-    /** Chemin du libellé des objets pour le select (I18n). */
-    protected readonly item_bind_label: string = 'label.' + this.locale;
     /** Mode d'affichage courant (persisté en localStorage). */
     protected readonly display_mode: WritableSignal<CitizensDisplayMode> = signal<CitizensDisplayMode>(
         (localStorage.getItem(CITIZENS_LIST_DISPLAY_MODE_KEY) as CitizensDisplayMode | null) ?? 'grouped'
@@ -191,22 +170,9 @@ export class CitizensListComponent implements OnInit {
         { initialValue: displayableDailyActions(null) }
     );
     /** Toutes les actions héroïques possibles, ordonnées (booléens puis niveaux) : pilotent les colonnes du mode étendu. */
-    protected readonly heroic_actions_all: HeroicActionEnum[] = [...HeroicActionEnum.getAllValues<HeroicActionEnum>()].sort(byMaxLvlAsc);
-    /** Toutes les améliorations possibles, ordonnées : pilotent les colonnes du mode étendu. */
-    /**
-     * Champs de la maison, le NIVEAU D'HABITATION en tête.
-     *
-     * C'est lui qui conditionne tous les autres travaux — on ne pose pas une porte blindée dans un
-     * lit de camp — et il est désormais renseigné automatiquement depuis MyHordes. Le laisser au
-     * milieu des améliorations, où le tri par niveau maximum le plaçait, revenait à noyer la seule
-     * information qui donne du sens aux suivantes.
-     */
-    protected readonly home_all: HomeEnum[] = [
-        HomeEnum.HOUSE_LEVEL,
-        ...HomeEnum.getAllValues<HomeEnum>()
-            .filter((home: HomeEnum): boolean => home.key !== HomeEnum.HOUSE_LEVEL.key)
-            .sort(byMaxLvlAsc)
-    ];
+    protected readonly heroic_actions_all: readonly HeroicActionEnum[] = HEROIC_FIELDS;
+    /** Champs de la maison, le niveau d'habitation en tête : pilotent les colonnes du mode étendu. */
+    protected readonly home_all: readonly HomeEnum[] = HOME_FIELDS;
     /** Groupes de compétences héroïques (S, U, P, E, R), saisis à la main. */
     protected readonly hero_skill_families: readonly HeroSkillFamilyInfo[] = HERO_SKILL_FAMILIES;
     /** Niveaux proposés au menu d'un groupe (-1 : inconnu), précédés de la valeur affichée dans la cellule. */
@@ -236,24 +202,6 @@ export class CitizensListComponent implements OnInit {
     protected readonly citizenNotes: WritableSignal<Dictionary<NoteDTO>> = signal({});
     /** Ouverture de la sidenav de filtres. */
     protected readonly filters_open: WritableSignal<boolean> = signal<boolean>(false);
-    /** Colonne de tri active (vide = aucun tri). */
-    protected readonly sort_field: WritableSignal<string> = signal<string>('');
-    /** Sens du tri actif. */
-    protected readonly sort_direction: WritableSignal<SortDirection> = signal<SortDirection>('');
-    /** Champs proposés au menu « Trier par ». */
-    protected readonly sortable_fields: Signal<{ id: string; label: string }[]> = computed((): { id: string; label: string }[] => [
-        { id: 'avatar_name', label: $localize`Nom` },
-        { id: 'job', label: $localize`Métier` },
-        { id: 'immune', label: $localize`Immunité` },
-        ...this.daily_action_keys().map((action: DailyActionEnum): { id: string; label: string } => ({ id: 'daily_' + action.key, label: action.getLabel() })),
-        ...this.heroic_actions_all.map((action: HeroicActionEnum): { id: string; label: string } => ({ id: 'heroic_' + action.key, label: action.getLabel() })),
-        ...this.home_all.map((home: HomeEnum): { id: string; label: string } => ({ id: 'home_' + home.key, label: home.getLabel() })),
-        ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): { id: string; label: string } => ({
-            id: HERO_SKILL_ID_PREFIX + family.key,
-            label: this.hero_skill_group_names()[family.key]
-        })),
-        { id: CAMPING_COUNT_ID, label: $localize`Campings` },
-    ]);
     /** La liste des colonnes pour les citoyens morts */
     protected readonly dead_citizen_list_columns: StandardColumn[] = [
         { id: 'avatar_name', header: $localize`Citoyen`, class: 'center', sticky: true },
@@ -313,6 +261,23 @@ export class CitizensListComponent implements OnInit {
             const sort: MatSort | undefined = this.sort();
             if (sort) this.citizen_list.sort = sort;
         });
+        // Critères changés par le panneau de filtres : la datasource refiltre.
+        effect((): void => {
+            this.filter_store.criteria();
+            untracked((): void => this.applyCitizenFilters());
+        });
+        // Tri choisi au bouton « Trier par » : il pilote le MatSort de la datasource.
+        effect((): void => {
+            const sort: MatSort | undefined = this.sort();
+            const field: string = this.filter_store.sort_field();
+            const direction: SortDirection = this.filter_store.sort_direction();
+            if (!sort) return;
+            untracked((): void => {
+                sort.active = field;
+                sort.direction = direction;
+                sort.sortChange.emit({ active: field, direction });
+            });
+        });
     }
 
     public ngOnInit(): void {
@@ -322,10 +287,6 @@ export class CitizensListComponent implements OnInit {
         this.dead_citizen_list = new MatTableDataSource();
         // Pas de tri sur la table des morts : ne pas lier le MatSort (partagé avec la table des vivants),
         // sinon trier les vivants réordonnerait aussi les morts.
-
-        this.citizen_filter_change
-            .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe((): void => this.applyCitizenFilters());
 
         deepLinkTargets(this.router, DEEP_LINK_PARAMS.citizen)
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -345,7 +306,7 @@ export class CitizensListComponent implements OnInit {
                 }
             });
 
-        this.citizen_list.filterPredicate = (data: Citizen, filter: string): boolean => this.customFilter(data, filter);
+        this.citizen_list.filterPredicate = (data: Citizen): boolean => matchesCitizenFilter(data, this.filter_store.criteria(), this.current_day);
         this.citizen_list.sortingDataAccessor = (citizen: Citizen, id: string): string | number => this.sortValue(citizen, id);
 
         this.api_service
@@ -407,53 +368,9 @@ export class CitizensListComponent implements OnInit {
         this.filters_open.update((open: boolean): boolean => !open);
     }
 
-    /**
-     * Trie par un champ (menu « Trier par »). Cliquer le champ actif fait tourner asc → desc → aucun.
-     * Pilote le MatSort de la datasource (plus de mat-sort-header dans les en-têtes).
-     */
-    protected sortBy(id: string): void {
-        const sort: MatSort | undefined = this.sort();
-        if (!sort) return;
-        let field: string = id;
-        let direction: SortDirection = 'asc';
-        if (this.sort_field() === id) {
-            direction = this.sort_direction() === 'asc' ? 'desc' : this.sort_direction() === 'desc' ? '' : 'asc';
-            if (direction === '') field = '';
-        }
-        this.sort_field.set(field);
-        this.sort_direction.set(direction);
-        sort.active = field;
-        sort.direction = direction;
-        sort.sortChange.emit({ active: field, direction: direction });
-    }
-
-    /** Libellé du champ de tri actif (null si aucun tri) — pour l'afficher sur le bouton « Trier par ». */
-    protected activeSortLabel(): string | null {
-        const field: string = this.sort_field();
-        if (!field) return null;
-        return this.sortable_fields().find((sortable: { id: string; label: string }): boolean => sortable.id === field)?.label ?? null;
-    }
-
-    /** Nombre de dimensions de filtre actives (badge du bouton Filtres). */
-    protected activeFilterCount(): number {
-        let count: number = 0;
-        if (this.citizen_filters.length > 0) count++;
-        if (this.job_filters.length > 0) count++;
-        if (this.bag_filter.length > 0) count++;
-        if (this.status_filter.length > 0) count++;
-        count += Object.values(this.bool_filters).filter((value: boolean | null): boolean => value !== null).length;
-        count += Object.values(this.value_filters).filter((values: number[]): boolean => values.length > 0).length;
-        return count;
-    }
-
-    /** Réinitialise tous les filtres. */
+    /** Lève tous les filtres et refiltre aussitôt. */
     protected resetFilters(): void {
-        this.citizen_filters = [];
-        this.job_filters = [];
-        this.bag_filter = [];
-        this.status_filter = [];
-        Object.keys(this.bool_filters).forEach((key: string): void => { delete this.bool_filters[key]; });
-        Object.keys(this.value_filters).forEach((key: string): void => { delete this.value_filters[key]; });
+        this.filter_store.reset();
         this.applyCitizenFilters();
     }
 
@@ -1038,12 +955,6 @@ export class CitizensListComponent implements OnInit {
             });
     }
 
-    /** Au moins une valeur saisie pour les compétences ou les campings : leurs filtres ont quelque chose à proposer. */
-    protected hasHeroSkillOrCampingOptions(): boolean {
-        return [CAMPING_COUNT_ID, ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): string => HERO_SKILL_ID_PREFIX + family.key)]
-            .some((id: string): boolean => (this.value_options[id] ?? []).length > 0);
-    }
-
     /** Met à jour le nombre de potions chamaniques bues (stepper). */
     protected changePotions(citizen: Citizen, value: number): void {
         citizen.chamanic_detail.nb_potion_shaman = value;
@@ -1077,143 +988,24 @@ export class CitizensListComponent implements OnInit {
         return home.value.img && home.value.img !== '' ? home.value.img : 'home/home_lv0.gif';
     }
 
-    /** État du filtre booléen d'une colonne (null = tous par défaut). */
-    protected boolFilter(id: string): boolean | null {
-        return this.bool_filters[id] ?? null;
-    }
-
-    /** Fait tourner le filtre booléen 3 états : tous (null) → oui (true) → non (false) → tous. */
-    protected cycleBoolFilter(id: string): void {
-        const current: boolean | null = this.boolFilter(id);
-        this.bool_filters[id] = current === null ? true : current === true ? false : null;
-        this.applyCitizenFilters();
-    }
-
-    /** Valeurs cochées d'une colonne stepper. */
-    protected valueFilter(id: string): number[] {
-        return this.value_filters[id] ?? [];
-    }
-
-    /** Applique un filtre de valeurs (multi-toggle) sur une colonne stepper. */
-    protected setValueFilter(id: string, values: number[]): void {
-        this.value_filters[id] = values ?? [];
-        this.applyCitizenFilters();
-    }
-
-    /** Sérialise tous les filtres actifs dans la datasource pour déclencher le filtrage. */
+    /** Refiltre la datasource avec les critères en cours (la chaîne ne sert qu'à déclencher le filtrage). */
     protected applyCitizenFilters(): void {
-        this.citizen_list.filter = JSON.stringify({
-            names: this.citizen_filters.map((citizen: Citizen): number => citizen.id),
-            jobs: this.job_filters.map((job: JobEnum): string => job.key),
-            bools: this.bool_filters,
-            values: this.value_filters,
-            bagIds: this.bag_filter.map((item: Item): number => item.id),
-            statusKeys: this.status_filter.map((status: StatusEnum): string => status.key),
-        });
+        this.citizen_list.filter = JSON.stringify(this.filter_store.criteria());
     }
 
     /**
-     * Valeur de tri d'un citoyen selon la colonne.
-     * - `avatar_name` : nom (insensible à la casse)
-     * - `immune` : immunisé (oui avant non) puis nombre de potions bues (départage)
-     * - `daily_<key>` : action quotidienne faite pour le jour courant (oui/non)
-     * - `heroic_<key>` / `home_<key>` : valeur du champ (booléen → 1/0, inconnu → -1)
+     * Valeur de tri d'un citoyen selon la colonne (actions quotidiennes du jour en cours).
+     * @param {Citizen} citizen Citoyen.
+     * @param {string} id Colonne.
+     * @returns {string | number} Valeur comparable.
      */
     private sortValue(citizen: Citizen, id: string): string | number {
-        if (id === 'avatar_name') return (citizen.name ?? '').toLocaleLowerCase();
-        if (id === 'job') return (citizen.job?.value?.label ?? '').toLocaleLowerCase();
-        if (id === 'immune') {
-            const immune: number = citizen.chamanic_detail?.is_immune_to_soul ? 1 : 0;
-            const potions: number = citizen.chamanic_detail?.nb_potion_shaman ?? 0;
-            return immune * IMMUNE_SORT_FACTOR + potions;
-        }
-        if (id.startsWith('daily_')) return this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, id.substring('daily_'.length)) ? 1 : 0;
-        if (id.startsWith('heroic_')) return this.fieldSortValue(citizen.heroic_actions?.content, id.substring('heroic_'.length));
-        if (id.startsWith('home_')) return this.fieldSortValue(citizen.home?.content, id.substring('home_'.length));
-        if (id === CAMPING_COUNT_ID || heroSkillFamilyOf(id)) return this.citizenNumericValue(citizen, id);
-        return '';
+        return citizenSortValue(citizen, id, this.current_day);
     }
 
-    /** Valeur numérique triable d'un champ héroïque/amélioration : booléen → 1/0, inconnu → -1. */
-    private fieldSortValue(content: (HeroicActionsWithValue | HomeWithValue)[] | undefined, key: string): number {
-        const value: number | boolean | undefined = content?.find(
-            (item: HeroicActionsWithValue | HomeWithValue): boolean => item.element?.key === key
-        )?.value;
-        if (typeof value === 'number') return value;
-        if (value === true) return 1;
-        if (value === false) return 0;
-        return -1;
-    }
-
-    /**
-     * (Re)construit les options des filtres de valeurs pour chaque colonne stepper, à partir des valeurs
-     * RÉELLEMENT présentes chez les citoyens (évite d'afficher 0..13 boutons alors que 2 valeurs existent).
-     */
+    /** Recalcule les valeurs proposées par les filtres de valeurs, d'après les citoyens chargés. */
     private buildValueOptions(): void {
-        const stepper_ids: string[] = [
-            'potions',
-            CAMPING_COUNT_ID,
-            ...HERO_SKILL_FAMILIES.map((family: HeroSkillFamilyInfo): string => HERO_SKILL_ID_PREFIX + family.key),
-            ...this.heroic_actions_all.filter((action: HeroicActionEnum): boolean => action.value.max_lvl > 1).map((action: HeroicActionEnum): string => 'heroic_' + action.key),
-            ...this.home_all.filter((home: HomeEnum): boolean => home.value.max_lvl > 1).map((home: HomeEnum): string => 'home_' + home.key),
-        ];
-        stepper_ids.forEach((id: string): void => {
-            const values: Set<number> = new Set<number>();
-            this.citizen_list.data.forEach((citizen: Citizen): void => {
-                const value: number = this.citizenNumericValue(citizen, id);
-                if (value >= 0) values.add(value);
-            });
-            this.value_options[id] = Array.from(values).sort((a: number, b: number): number => a - b);
-        });
-    }
-
-    /** Valeur booléenne d'un citoyen pour une colonne (ou null si inconnue/non applicable). */
-    private citizenBoolValue(citizen: Citizen, id: string): boolean | null {
-        if (id.startsWith('daily_')) return !!this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, id.substring('daily_'.length));
-        if (id === 'immune') return !!citizen.chamanic_detail?.is_immune_to_soul;
-        const value: number | boolean | undefined = id.startsWith('heroic_')
-            ? citizen.heroic_actions?.content?.find((c: HeroicActionsWithValue): boolean => c.element?.key === id.substring('heroic_'.length))?.value
-            : citizen.home?.content?.find((c: HomeWithValue): boolean => c.element?.key === id.substring('home_'.length))?.value;
-        return typeof value === 'boolean' ? value : null;
-    }
-
-    /** Valeur numérique d'un citoyen pour un champ à valeur (inconnu → -1). */
-    private citizenNumericValue(citizen: Citizen, id: string): number {
-        if (id === 'potions') return citizen.chamanic_detail?.nb_potion_shaman ?? 0;
-        if (id === CAMPING_COUNT_ID) return citizen.camping_count;
-        const family: HeroSkillFamily | undefined = heroSkillFamilyOf(id);
-        if (family) return citizen.hero_skills[family] ?? -1;
-        return id.startsWith('heroic_')
-            ? this.fieldSortValue(citizen.heroic_actions?.content, id.substring('heroic_'.length))
-            : this.fieldSortValue(citizen.home?.content, id.substring('home_'.length));
-    }
-
-    /** Prédicat de filtre combiné : nom, métier, booléens, valeurs, sac et états (tous en ET). */
-    private customFilter(data: Citizen, filter: string): boolean {
-        const active: {
-            names: number[]; jobs: string[]; bools: Record<string, boolean | null>;
-            values: Record<string, number[]>; bagIds: number[]; statusKeys: string[];
-        } = JSON.parse(filter);
-
-        if (active.names?.length > 0 && !active.names.includes(data.id)) return false;
-        if (active.jobs?.length > 0 && !active.jobs.includes(data.job?.key ?? '')) return false;
-
-        for (const id of Object.keys(active.bools ?? {})) {
-            const want: boolean | null = active.bools[id];
-            if (want === null || want === undefined) continue;
-            if (this.citizenBoolValue(data, id) !== want) return false;
-        }
-
-        for (const id of Object.keys(active.values ?? {})) {
-            const wanted: number[] = active.values[id];
-            if (!wanted || wanted.length === 0) continue;
-            if (!wanted.includes(this.citizenNumericValue(data, id))) return false;
-        }
-
-        if (active.bagIds?.length > 0 && !data.bag?.items?.some((item: Item): boolean => active.bagIds.includes(item.id))) return false;
-        if (active.statusKeys?.length > 0 && !data.status?.icons?.some((status: StatusEnum): boolean => active.statusKeys.includes(status?.key))) return false;
-
-        return true;
+        this.value_options.set(citizenValueOptions(this.citizen_list.data));
     }
 
     /** Nom de chaque groupe de compétences, lu dans les compétences servies par l'API (sa lettre à défaut). */

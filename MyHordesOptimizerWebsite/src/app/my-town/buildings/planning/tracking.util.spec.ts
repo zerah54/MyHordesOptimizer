@@ -32,7 +32,7 @@ function citizens(): Citizen[] {
     return list;
 }
 
-const ALL: TrackingFilters = { jobs: new Set<string>(), task: null, state: 'all', pool: 'all' };
+const ALL: TrackingFilters = { citizen_match: (): boolean => true, task: null, state: 'all', pool: 'all' };
 
 describe('trackingRows', (): void => {
     it('une ligne par citoyen : consignes, état et avancement', (): void => {
@@ -57,8 +57,9 @@ describe('filterTrackingRows', (): void => {
         return filterTrackingRows(rows, { ...ALL, ...filters }).map((row: TrackingRow): string => row.citizen.name);
     }
 
-    it('par métier', (): void => {
-        expect(names({ jobs: new Set<string>([JobEnum.SCOUT.key, JobEnum.TECHNICIAN.key]) })).toEqual(['Bob', 'Chloé']);
+    it('par critère du citoyen (ici le métier)', (): void => {
+        const jobs: string[] = [JobEnum.SCOUT.key, JobEnum.TECHNICIAN.key];
+        expect(names({ citizen_match: (citizen: Citizen): boolean => jobs.includes(citizen.job?.key ?? '') })).toEqual(['Bob', 'Chloé']);
     });
 
     it('par consigne', (): void => {

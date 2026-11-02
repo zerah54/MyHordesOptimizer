@@ -2,17 +2,17 @@ import { BuildingDTO } from '../../../_abstract_model/dto/building.dto';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { Building } from '../../../_abstract_model/types/building.class';
-import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
+import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { Home } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { ExpeditionPartPa } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { HomeReferentialDTO } from './home-referential.types';
-import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
 import { TownBuildingStateDTO } from './plan.types';
+import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
 import {
     bankMap,
     buildingProgressMap,

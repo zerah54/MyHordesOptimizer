@@ -148,6 +148,41 @@ describe('PlanningHeaderComponent', (): void => {
         expect(fake.actions['deletePlan']).toHaveBeenCalledTimes(1);
     });
 
+    describe('modifications non enregistrées', (): void => {
+        it('changer de proposition ou de jour demande confirmation ; annuler ne change rien', async (): Promise<void> => {
+            await render();
+            fake.dirty.set(true);
+            open.mockReturnValue({ afterClosed: (): unknown => of(false) });
+
+            root().querySelectorAll<HTMLElement>('.plan-chip')[1].querySelector<HTMLButtonElement>('button[data-action="select-plan"]')?.click();
+            button('next-day')?.click();
+
+            expect(open).toHaveBeenCalledTimes(2);
+            expect(fake.actions['selectPlan']).not.toHaveBeenCalled();
+            expect(fake.actions['selectDay']).not.toHaveBeenCalled();
+        });
+
+        it('confirmer abandonne les modifications et change de proposition', async (): Promise<void> => {
+            await render();
+            fake.dirty.set(true);
+            open.mockReturnValue({ afterClosed: (): unknown => of(true) });
+
+            root().querySelectorAll<HTMLElement>('.plan-chip')[1].querySelector<HTMLButtonElement>('button[data-action="select-plan"]')?.click();
+
+            expect(fake.actions['selectPlan']).toHaveBeenCalledWith(8);
+        });
+
+        it('cliquer la proposition déjà affichée ne demande rien', async (): Promise<void> => {
+            await render();
+            fake.dirty.set(true);
+
+            root().querySelectorAll<HTMLElement>('.plan-chip')[0].querySelector<HTMLButtonElement>('button[data-action="select-plan"]')?.click();
+
+            expect(open).not.toHaveBeenCalled();
+            expect(fake.actions['selectPlan']).not.toHaveBeenCalled();
+        });
+    });
+
     it('supprimer demande confirmation ; annuler ne supprime rien', async (): Promise<void> => {
         await render(undefined);
 

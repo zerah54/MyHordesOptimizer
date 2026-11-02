@@ -44,8 +44,7 @@
                                 <mat-option [value]="option.level">
                                     <ng-container i18n>niv.</ng-container>
                                     {{ option.level }} ({{ option.ap }}
-                                    <ng-container i18n>PA</ng-container>
-                                    )
+                                    <mho-icon-ap/>)
                                 </mat-option>
                             }
                         </mat-select>
@@ -58,8 +57,7 @@
                     <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
                         @for (home of home_levels(); track home.level) {
                             <mat-option [value]="home.level">{{ home.label }} ({{ home.ap }}
-                                <ng-container i18n>PA</ng-container>
-                                )
+                                <mho-icon-ap/>)
                             </mat-option>
                         }
                     </mat-select>

@@ -52,6 +52,13 @@ describe('PlanningResourcesComponent', (): void => {
         expect(row.classList.contains('missing')).toBe(true);
     });
 
+    it('affiche l\'icône de l\'objet devant son nom', async (): Promise<void> => {
+        await render();
+
+        const icon: HTMLImageElement | null = root().querySelector<HTMLImageElement>('tr.resource[data-item="5"] img.item-icon');
+        expect(icon?.getAttribute('src')).toContain('item/item_wood.gif');
+    });
+
     it('envoie les manques à la liste de courses', async (): Promise<void> => {
         await render();
 

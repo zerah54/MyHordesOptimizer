@@ -1,18 +1,21 @@
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
+import { Property } from '../../../_abstract_model/enum/property.enum';
 import { Building, BuildingResource } from '../../../_abstract_model/types/building.class';
-import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
+import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { buildingCost } from '../../../_core/utilities/building-cost.util';
 import { ExpeditionPartPa } from './budget.util';
 import { BuildingProgress, initialProgress } from './building-progress.util';
+import { homeDefenseFactor, TownDefenseFactors } from './defense-gain.util';
+import { CIRCULAR_QUARTERS_UID } from './defense-rules.const';
 import { HomeLevelDTO, HomeReferentialDTO } from './home-referential.types';
+import { TownBuildingResourceDTO, TownBuildingStateDTO, TownDefenseStateDTO } from './plan.types';
 import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
-import { TownBuildingResourceDTO, TownBuildingStateDTO } from './plan.types';
 import { ResourceCount } from './resources.util';
 
 /** Niveau de plan estimé d'un chantier (nombre de plans lus en Pandémonium). */
@@ -131,6 +134,66 @@ export function workshopLevelOf(buildings: Building[], states: TownBuildingState
 export function hasSlaveryOf(buildings: Building[], states: TownBuildingStateDTO[]): boolean {
     const slavery: Building | undefined = buildings.find((building: Building): boolean => building.uid === SLAVERY_UID);
     return slavery !== undefined && stateOf(states, slavery.id)?.isBuilt === true;
+}
+
+/**
+ * Uids des chantiers construits d'après l'état synchronisé.
+ * @param {Building[]} buildings Référentiel des chantiers.
+ * @param {TownBuildingStateDTO[]} states États synchronisés.
+ * @returns {Set<string>} Uids construits.
+ */
+export function builtUidsOf(buildings: Building[], states: TownBuildingStateDTO[]): Set<string> {
+    const built_ids: Set<number> = new Set<number>(states.filter((state: TownBuildingStateDTO): boolean => state.isBuilt).map((state: TownBuildingStateDTO): number => state.buildingId));
+    return new Set<string>(buildings.filter((building: Building): boolean => built_ids.has(building.id)).map((building: Building): string => building.uid));
+}
+
+/**
+ * Niveau d'évolution des chantiers construits, d'après l'état synchronisé (0 quand il est inconnu).
+ * @param {Building[]} buildings Référentiel des chantiers.
+ * @param {TownBuildingStateDTO[]} states États synchronisés.
+ * @returns {Map<string, number>} Niveau par uid.
+ */
+export function buildingLevelsOf(buildings: Building[], states: TownBuildingStateDTO[]): Map<string, number> {
+    const uids: Map<number, string> = new Map<number, string>(buildings.map((building: Building): [number, string] => [building.id, building.uid]));
+    const levels: Map<string, number> = new Map<string, number>();
+    for (const state of states) {
+        const uid: string | undefined = uids.get(state.buildingId);
+        if (state.isBuilt && uid !== undefined) {
+            levels.set(uid, state.level ?? 0);
+        }
+    }
+    return levels;
+}
+
+/**
+ * Objets qui comptent comme objets de défense (propriété `defence`).
+ * @param {readonly Item[]} items Objets du référentiel.
+ * @returns {Set<number>} Identifiants.
+ */
+export function defenseItemIdsOf(items: readonly Item[]): Set<number> {
+    return new Set<number>(items
+        .filter((item: Item): boolean => item.properties.some((property: Property): boolean => property?.key === Property.DEFENCE.key))
+        .map((item: Item): number => item.id));
+}
+
+/**
+ * Composantes de la défense de la ville tirées de la dernière mise à jour : objets de défense en banque et leur multiplicateur,
+ * défense brute des maisons (déduite de la part comptée par la ville), citoyens vivants et morts, échelle globale (1 − bonus).
+ * @param {TownDefenseStateDTO | null} defense Défense synchronisée.
+ * @param {readonly Citizen[]} citizens Citoyens de la ville, morts compris.
+ * @param {ReadonlySet<string>} built_uids Uids des chantiers construits.
+ * @returns {TownDefenseFactors} Composantes.
+ */
+export function townDefenseFactors(defense: TownDefenseStateDTO | null, citizens: readonly Citizen[], built_uids: ReadonlySet<string>): TownDefenseFactors {
+    const dead: number = citizens.filter((citizen: Citizen): boolean => citizen.is_dead === true).length;
+    return {
+        defenseItems: defense?.items ?? 0,
+        itemFactor: defense?.itemsMul ?? 1,
+        homeRaw: (defense?.citizenHomes ?? 0) / homeDefenseFactor(built_uids.has(CIRCULAR_QUARTERS_UID)),
+        alive: citizens.length - dead,
+        dead,
+        scale: 1 - (defense?.bonus ?? 0)
+    };
 }
 
 /**

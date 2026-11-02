@@ -20,9 +20,12 @@ namespace MyHordesOptimizerApi.Services.Impl.BuildingPlans
         private const int MaxItemValue = 10000;
         private const int MaxPlanTier = 2;
         private const int MaxUpgradeLevel = 20;
+        /// <summary>Utilisations d'une action dans la journée : 3 fouilles des galeries pour le Fouineur (MyHordes, <c>home_scavenge_pro</c>).</summary>
+        private const int MaxActionUses = 3;
         private static readonly string[] Pools = { "banned", "regular" };
         private static readonly string[] BuildingStepKinds = { "build", "repair" };
         private static readonly string[] Modes = { "finish", "leave", "survive" };
+        private static readonly string[] LossKinds = { "destroyed", "bonus" };
         private static readonly string[] TaskKinds = { "home", "homeUpgrade", "action", "free" };
         private static readonly Regex TaskIdPattern = new("^[A-Za-z0-9_-]{1,24}$", RegexOptions.Compiled);
         private static readonly Regex ActionKeyPattern = new("^[a-z_]{1,64}$", RegexOptions.Compiled);
@@ -53,6 +56,9 @@ namespace MyHordesOptimizerApi.Services.Impl.BuildingPlans
             Check(content.Instructions is null || content.Instructions.Length <= MaxInstructions, "Consignes du jour trop longues.");
             Check(content.PlanTiers.Count <= MaxRows, "Trop de niveaux de plan.");
             Check(content.PlanTiers.Values.All(tier => tier >= 0 && tier <= MaxPlanTier), "Niveau de plan invalide.");
+            Check(content.Losses.Count <= MaxRows, "Trop de pertes prévues.");
+            Check(content.Losses.All(loss => LossKinds.Contains(loss.Kind)), "Type de perte inconnu.");
+            Check(content.Losses.Select(loss => (loss.BuildingId, loss.Kind)).Distinct().Count() == content.Losses.Count, "Perte prévue en double.");
 
             foreach (var citizen in content.Citizens)
             {
@@ -105,6 +111,7 @@ namespace MyHordesOptimizerApi.Services.Impl.BuildingPlans
             // La clé d'action finit dans l'URL des actions quotidiennes : seules des clés `a_z` sont admises.
             Check(task.Kind != "action" || ActionKeyPattern.IsMatch(task.Ref!), "Référence d'action invalide.");
             Check(task.Kind != "homeUpgrade" || task.Ref is null || (task.Level >= 1 && task.Level <= MaxUpgradeLevel), "Niveau d'amélioration invalide.");
+            Check(task.Count is null || (task.Kind == "action" && task.Count >= 1 && task.Count <= MaxActionUses), "Nombre d'utilisations invalide.");
         }
 
         /// <summary>Une étape porte un chantier (build/repair) ou un texte (instruction), jamais les deux.</summary>

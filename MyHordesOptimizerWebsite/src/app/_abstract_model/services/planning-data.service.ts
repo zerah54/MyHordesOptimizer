@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of, take } from 'rxjs';
 
+import { BuildingUpgradesDTO } from '../../my-town/buildings/planning/building-upgrades.types';
 import { HomeReferentialDTO } from '../../my-town/buildings/planning/home-referential.types';
 import { BuildingPlansDTO, BuildingPlanStateDTO } from '../../my-town/buildings/planning/plan.types';
 import { RefinementViewDTO } from '../dto/refinement.dto';
@@ -25,6 +26,8 @@ export interface PlanningStatic {
     homes: HomeReferentialDTO;
     citizens: Citizen[];
     bank: Item[];
+    /** Évolutions des chantiers ; vide si l'API ne les fournit pas. */
+    upgrades: BuildingUpgradesDTO;
 }
 
 /** Données propres à un jour : expéditions et attaque connue (nulle si aucun affinage n'existe). */
@@ -56,7 +59,8 @@ export class PlanningDataService {
             items: this.api.getItems().pipe(take(1)),
             homes: this.plan_service.getHomeReferential().pipe(take(1)),
             citizens: this.town_service.getCitizens().pipe(take(1), map((info: CitizenInfo): Citizen[] => info.citizens)),
-            bank: this.town_service.getBank().pipe(take(1), map((info: BankInfo): Item[] => info.items))
+            bank: this.town_service.getBank().pipe(take(1), map((info: BankInfo): Item[] => info.items)),
+            upgrades: this.plan_service.getBuildingUpgrades().pipe(take(1))
         });
     }
 

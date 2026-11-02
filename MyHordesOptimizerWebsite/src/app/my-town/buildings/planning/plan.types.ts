@@ -38,6 +38,8 @@ export interface PlanTaskDTO {
     kind: PlanTaskKind;
     ref?: string | null;
     level?: number | null;
+    /** Action de chantier utilisable plusieurs fois par jour (fouilles des galeries du Fouineur) : utilisations prévues ; absent = une. */
+    count?: number | null;
     label?: string | null;
     pa: number;
 }
@@ -70,6 +72,15 @@ export interface PlanDefenseSourceDTO {
     qty: number;
 }
 
+/** Perte prévue cette nuit : chantier laissé détruire (perdu dès le lendemain) ou bonus d'évolution perdu (la nuit même). */
+export type PlanLossKind = 'destroyed' | 'bonus';
+
+/** Perte prévue sur un chantier construit. */
+export interface PlanLossDTO {
+    buildingId: number;
+    kind: PlanLossKind;
+}
+
 /** Contenu d'une proposition de plan. */
 export interface BuildingPlanContentDTO {
     attackOverride: number | null;
@@ -84,6 +95,8 @@ export interface BuildingPlanContentDTO {
     defenseSources: PlanDefenseSourceDTO[];
     instructions: string | null;
     planTiers: Record<string, number>;
+    /** Pertes prévues cette nuit ; absent dans une proposition enregistrée avant leur ajout. */
+    losses?: PlanLossDTO[];
 }
 
 /** Proposition de plan d'un jour. */
@@ -187,7 +200,8 @@ export function emptyPlanContent(): BuildingPlanContentDTO {
         programs: { banned: [], regular: [] },
         defenseSources: [],
         instructions: null,
-        planTiers: {}
+        planTiers: {},
+        losses: []
     };
 }
 

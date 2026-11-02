@@ -71,6 +71,30 @@
         font-weight: 600;
     }
 
+    .vote-gain {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.4em;
+        font-size: 0.9em;
+
+        .vote-text {
+            opacity: 0.85;
+        }
+    }
+
+    .def {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2em;
+        font-size: 0.9em;
+        white-space: nowrap;
+
+        &.loss {
+            color: var(--mho-danger);
+        }
+    }
+
     .action {
         display: inline-flex;
         flex-wrap: wrap;
@@ -169,4 +193,17 @@
     .cdk-drag-placeholder {
         opacity: 0.3;
     }
+}
+
+// Hors de `:host` : le libellé du vote et ses options sont aussi rendus dans le panneau du select (overlay).
+.icon-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+// Taille NON fixée : sprites pixel art.
+.game-icon,
+.icon-label .building-icon {
+    flex: 0 0 auto;
 }

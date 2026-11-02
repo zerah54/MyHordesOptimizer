@@ -47,7 +47,16 @@ describe('PlanningShareComponent', (): void => {
         await menu.open();
         const labels: string[] = await Promise.all((await menu.getItems()).map((item: MatMenuItemHarness): Promise<string> => item.getText()));
 
-        expect(labels).toEqual(['Post budget', 'Post programme']);
+        expect(labels).toEqual(['Post budget', 'Post programme', 'Post programme sans ping (relecture)']);
+    });
+
+    it('chaque pseudo est précédé de l\'emote de son métier', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = { ...emptyPlanContent(), citizens: [{ userId: 1, tasks: [{ id: 't1', kind: 'free', label: 'Puits', pa: 1 }] }] };
+        const menu: MatMenuHarness = await render(plan);
+
+        await menu.clickItem({ text: 'Post programme' });
+
+        expect(copy.mock.calls[0][0]).toContain(':scav: @Alice:1');
     });
 
     it('un clic copie le post choisi', async (): Promise<void> => {

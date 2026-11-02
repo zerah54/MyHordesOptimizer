@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-import { dailyActionAp, DailyActionEnum } from '../../../../_abstract_model/enum/daily-action.enum';
+import { dailyActionAp, DailyActionEnum, dailyActionMaxUses } from '../../../../_abstract_model/enum/daily-action.enum';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { CitizenChipComponent } from '../../../../_shared/citizen-chip/citizen-chip.component';
@@ -22,6 +22,7 @@ import { PlanningStore } from '../planning.store';
 import { toInt, toNonNegativeInt } from '../planning-input.util';
 import { newTaskId } from '../task-id.util';
 import { homeLevelOf } from '../task-status.util';
+import { TrackingRow } from '../tracking.util';
 
 const angular_common: Imports = [FormsModule];
 const material_modules: Imports = [MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatTooltipModule];
@@ -39,6 +40,19 @@ function entryFor(content: BuildingPlanContentDTO, user_id: number): PlanCitizen
         content.citizens.push(entry);
     }
     return entry;
+}
+
+/**
+ * Range le nombre d'utilisations d'une consigne d'action : seulement s'il dépasse 1 (absent = une utilisation).
+ * @param {PlanTaskDTO} task Consigne modifiée en place.
+ * @param {number} count Utilisations prévues.
+ */
+function setTaskCountField(task: PlanTaskDTO, count: number): void {
+    if (count > 1) {
+        task.count = count;
+    } else {
+        delete task.count;
+    }
 }
 
 /**
@@ -64,10 +78,12 @@ export class PlanningBudgetComponent {
     protected readonly store: PlanningStore = inject(PlanningStore);
     protected readonly filters: CitizenFiltersStore = inject(CitizenFiltersStore);
 
-    /** Citoyens retenus par les filtres partagés avec le Suivi. */
+    /** Citoyens retenus par les filtres partagés avec le Suivi, dans l'ordre du tri choisi. */
     protected readonly shown_citizens: Signal<CitizenRef[]> = computed((): CitizenRef[] => {
-        const shown: ReadonlySet<number> = this.filters.shown_user_ids();
-        return this.store.citizens().filter((citizen: CitizenRef): boolean => shown.has(citizen.userId));
+        const refs: ReadonlyMap<number, CitizenRef> = new Map<number, CitizenRef>(this.store.citizens().map((citizen: CitizenRef): [number, CitizenRef] => [citizen.userId, citizen]));
+        return this.filters.shown_rows()
+            .map((row: TrackingRow): CitizenRef | undefined => refs.get(row.citizen.id))
+            .filter((citizen: CitizenRef | undefined): citizen is CitizenRef => citizen !== undefined);
     });
 
 
@@ -176,18 +192,61 @@ export class PlanningBudgetComponent {
     }
 
     /**
-     * Choisit l'action de chantier d'une consigne ; PA selon le métier du citoyen.
+     * Choisit l'action de chantier d'une consigne ; toutes les utilisations possibles pour le métier du citoyen, PA en conséquence.
      * @param {number} user_id Identifiant du citoyen.
      * @param {number} index Rang de la consigne.
      * @param {string} key Clé de l'action.
      */
     protected setTaskAction(user_id: number, index: number, key: string): void {
         const action: DailyActionEnum | undefined = DailyActionEnum.getByKey<DailyActionEnum>(key);
-        const pa: number = action === undefined ? 0 : dailyActionAp(action, this.fullCitizen(user_id)?.job?.key ?? null);
+        const job_key: string | null = this.fullCitizen(user_id)?.job?.key ?? null;
+        const count: number = action === undefined ? 1 : dailyActionMaxUses(action, job_key);
+        const pa: number = action === undefined ? 0 : dailyActionAp(action, job_key, count);
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
             const task: PlanTaskDTO = entryFor(content, user_id).tasks[index];
             task.ref = key;
             task.pa = pa;
+            setTaskCountField(task, count);
+        });
+    }
+
+    /**
+     * Utilisations possibles dans la journée de l'action d'une consigne, pour le métier du citoyen.
+     * @param {number} user_id Identifiant du citoyen.
+     * @param {PlanTaskDTO} task Consigne d'action.
+     * @returns {number} Utilisations possibles (1 pour une action unique ou inconnue).
+     */
+    protected actionMaxUses(user_id: number, task: PlanTaskDTO): number {
+        const action: DailyActionEnum | undefined = DailyActionEnum.getByKey<DailyActionEnum>(task.ref ?? '');
+        return action === undefined ? 1 : dailyActionMaxUses(action, this.fullCitizen(user_id)?.job?.key ?? null);
+    }
+
+    /**
+     * Choix proposés pour le nombre d'utilisations d'une action.
+     * @param {number} max_uses Utilisations possibles.
+     * @returns {number[]} De 1 au maximum.
+     */
+    protected useOptions(max_uses: number): number[] {
+        return Array.from({ length: max_uses }, (_: unknown, index: number): number => index + 1);
+    }
+
+    /**
+     * Choisit le nombre d'utilisations d'une action (fouilles des galeries) ; PA recalculés selon le métier.
+     * @param {number} user_id Identifiant du citoyen.
+     * @param {number} index Rang de la consigne.
+     * @param {number} count Utilisations prévues.
+     */
+    protected setTaskCount(user_id: number, index: number, count: number): void {
+        const job_key: string | null = this.fullCitizen(user_id)?.job?.key ?? null;
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            const task: PlanTaskDTO = entryFor(content, user_id).tasks[index];
+            const action: DailyActionEnum | undefined = DailyActionEnum.getByKey<DailyActionEnum>(task.ref ?? '');
+            if (action === undefined) {
+                return;
+            }
+            const uses: number = Math.min(dailyActionMaxUses(action, job_key), Math.max(1, count));
+            task.pa = dailyActionAp(action, job_key, uses);
+            setTaskCountField(task, uses);
         });
     }
 
@@ -259,6 +318,7 @@ export class PlanningBudgetComponent {
             task.kind = kind;
             delete task.level;
             delete task.ref;
+            delete task.count;
             if (kind === 'action') {
                 delete task.label;
             }

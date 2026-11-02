@@ -8,20 +8,24 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Building } from '../../../../_abstract_model/types/building.class';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { BuildingProgress, repairLifeAfterPa, repairPaFor, StepIssue, StepResult } from '../building-progress.util';
+import { upgradeLevelText } from '../building-upgrades.types';
+import { BuildingPlanContentDTO, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO, PlanStepKind, PlanStepMode, stepMode } from '../plan.types';
 import { stepIssueLabel } from '../plan-alerts.util';
 import { BuildingRef, WORKSHOP_UID } from '../plan-evaluation.util';
-import { BuildingPlanContentDTO, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO, PlanStepKind, PlanStepMode, stepMode } from '../plan.types';
-import { toNonNegativeInt } from '../planning-input.util';
 import { PlanningStore } from '../planning.store';
+import { toNonNegativeInt } from '../planning-input.util';
 import { addInstruction, ItemPosition, moveItem, removeItem, setInstructions, setInstructionText, setStepMode, setStepNote } from '../program-edit.util';
 import { repairHpPerAp } from '../workshop.util';
 
 const angular_common: Imports = [FormsModule];
+const components: Imports = [IconApComponent];
 const cdk_modules: Imports = [DragDropModule];
 const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSelectModule, MatTooltipModule];
 
@@ -29,6 +33,13 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
 interface ModeOption {
     value: string;
     label: string;
+}
+
+/** Gain de l'évolution votée le soir : niveau atteint, défense gagnée pour la nuit et texte du niveau. */
+interface VoteGain {
+    level: number;
+    defense: number;
+    text: string | null;
 }
 
 /** PV avant et après une réparation évaluée. */
@@ -44,7 +55,7 @@ interface RepairLives {
     templateUrl: './planning-program.component.html',
     styleUrls: ['./planning-program.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...cdk_modules, ...material_modules]
+    imports: [...angular_common, ...components, ...cdk_modules, ...material_modules]
 })
 export class PlanningProgramComponent {
 
@@ -54,6 +65,9 @@ export class PlanningProgramComponent {
     protected readonly store: PlanningStore = inject(PlanningStore);
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly issueLabel: (issue: StepIssue) => string = stepIssueLabel;
+    private readonly locale: string = moment.locale();
+    /** Aide de la défense d'un chantier, suivie de sa défense propre. */
+    protected readonly defenceTooltip: string = $localize`Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense propre :`;
 
     /** Sections dont le champ « nouvelle consigne » est ouvert. */
     protected readonly adding: WritableSignal<ReadonlySet<PlanPool>> = signal<ReadonlySet<PlanPool>>(new Set<PlanPool>());
@@ -111,6 +125,25 @@ export class PlanningProgramComponent {
     protected icon(building_id: number): string {
         const img: string | undefined = this.icons().get(building_id);
         return img === undefined ? '' : HORDES_IMG_REPO + img;
+    }
+
+    /**
+     * Défense propre d'un chantier (référentiel).
+     * @param {number} building_id Chantier.
+     * @returns {number} Défense du référentiel, 0 s'il est inconnu.
+     */
+    protected defence(building_id: number): number {
+        return this.store.buildings().get(building_id)?.defence ?? 0;
+    }
+
+    /**
+     * Défense réellement gagnée par la ville une fois le chantier terminé (objets de défense consommés, effets sur les maisons,
+     * cercueils…) ; sa défense propre sans évaluation.
+     * @param {number} building_id Chantier.
+     * @returns {number} Gain réel, négatif si le chantier consomme plus de défense qu'il n'en apporte.
+     */
+    protected realDefence(building_id: number): number {
+        return this.store.evaluation()?.realDefense.get(building_id) ?? this.defence(building_id);
     }
 
     /**
@@ -307,6 +340,19 @@ export class PlanningProgramComponent {
             .sort((a: BuildingRef, b: BuildingRef): number => a.label.localeCompare(b.label))
             .filter((building: BuildingRef): boolean => building.id === voted_id
                 || (upgradable.has(building.id) && (progress === undefined || progress.get(building.id)?.built === true)));
+    }
+
+    /**
+     * Gain de l'évolution votée : niveau atteint, défense gagnée pour la nuit (l'évolution s'applique avant l'attaque) et texte du
+     * niveau dans la langue du site ; nul sans vote ou sans évaluation.
+     * @returns {VoteGain | null} Gain.
+     */
+    protected voteGain(): VoteGain | null {
+        const vote: { uid: string; level: number; defense: number } | null = this.store.evaluation()?.vote ?? null;
+        if (vote === null) {
+            return null;
+        }
+        return { level: vote.level, defense: vote.defense, text: upgradeLevelText(this.store.upgrades(), vote.uid, vote.level, this.locale) };
     }
 
     /**

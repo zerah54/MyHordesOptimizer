@@ -5,8 +5,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Observable } from 'rxjs';
 
 import { Imports } from '../../_abstract_model/types/_types';
+import { CitizenFilterSortStore } from '../../_shared/citizen-filters/citizen-filter-sort.store';
 import { PlanningBudgetComponent } from './planning/budget/planning-budget.component';
 import { PlanningCard, PlanningCardsComponent } from './planning/cards/planning-cards.component';
 import { CitizenFiltersStore } from './planning/citizen-filters.store';
@@ -19,12 +21,14 @@ import { alertAnchor, alertCard, PlanAlert } from './planning/plan-alerts.util';
 import { PlanningStore } from './planning/planning.store';
 import { PlanningProgramComponent } from './planning/program/planning-program.component';
 import { PlanningResourcesComponent } from './planning/resources/planning-resources.component';
+import { PlanningShareComponent } from './planning/share/planning-share.component';
 import { PlanningTrackingComponent } from './planning/tracking/planning-tracking.component';
 import { PlanningTreeDrawerComponent, PlanningTreeDrawerData } from './planning/tree-drawer/planning-tree-drawer.component';
+import { confirmDiscardChanges } from './planning/unsaved-changes.util';
 
 const components: Imports = [
     PlanningBudgetComponent, PlanningCardsComponent, PlanningDefenseComponent, PlanningHeaderComponent, PlanningKpisComponent, PlanningProgramComponent,
-    PlanningResourcesComponent, PlanningTrackingComponent
+    PlanningResourcesComponent, PlanningShareComponent, PlanningTrackingComponent
 ];
 const cdk_modules: Imports = [CdkScrollable];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule];
@@ -38,7 +42,10 @@ const NARROW_SCREEN: number = 600;
     templateUrl: './buildings.component.html',
     styleUrls: ['./buildings.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [PlanningStore, CitizenFiltersStore],
+    host: {
+        '(window:beforeunload)': 'onBeforeUnload($event)'
+    },
+    providers: [PlanningStore, CitizenFilterSortStore, CitizenFiltersStore],
     imports: [...components, ...cdk_modules, ...material_modules]
 })
 export class BuildingsComponent implements OnInit {
@@ -55,6 +62,25 @@ export class BuildingsComponent implements OnInit {
 
     public ngOnInit(): void {
         this.store.load();
+    }
+
+    /**
+     * Sortie de la page (garde de route) : confirmation s'il reste des modifications non enregistrées.
+     * @returns {Observable<boolean>} Vrai si la navigation peut continuer.
+     */
+    public canLeave(): Observable<boolean> {
+        return confirmDiscardChanges(this.store, this.dialog);
+    }
+
+    /**
+     * Fermeture ou rechargement de l'onglet : le navigateur demande confirmation s'il reste des modifications non enregistrées.
+     * @param {BeforeUnloadEvent} event Événement du navigateur.
+     */
+    protected onBeforeUnload(event: BeforeUnloadEvent): void {
+        this.store.flushEdits();
+        if (this.store.dirty()) {
+            event.preventDefault();
+        }
     }
 
     /** Ouvre la boîte des valeurs des objets (réglage de la ville). */

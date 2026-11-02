@@ -1,8 +1,9 @@
 import { HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 import { getTown } from '../../_core/utilities/localstorage.util';
+import { BuildingUpgradesDTO } from '../../my-town/buildings/planning/building-upgrades.types';
 import { HomeReferentialDTO } from '../../my-town/buildings/planning/home-referential.types';
 import {
     BuildingPlanDTO,
@@ -25,6 +26,17 @@ export class BuildingPlanService extends GlobalService {
     /** Niveaux de maison et améliorations (référentiel statique du jeu). */
     public getHomeReferential(): Observable<HomeReferentialDTO> {
         return this.get<HomeReferentialDTO>(`${this.API_URL}/Fetcher/HomeReferential`).pipe(map(BuildingPlanService.body));
+    }
+
+    /**
+     * Évolutions des chantiers (référentiel statique du jeu) ; vide, sans message d'erreur, si l'API ne les fournit pas encore.
+     * @returns {Observable<BuildingUpgradesDTO>} Évolutions par uid.
+     */
+    public getBuildingUpgrades(): Observable<BuildingUpgradesDTO> {
+        return this.get<BuildingUpgradesDTO>(`${this.API_URL}/Fetcher/BuildingUpgrades`, true, undefined, true).pipe(
+            map(BuildingPlanService.body),
+            catchError((): Observable<BuildingUpgradesDTO> => of({}))
+        );
     }
 
     /**

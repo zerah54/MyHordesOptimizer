@@ -23,9 +23,10 @@ export interface TrackingRow {
     done_count: number;
 }
 
-/** Filtres du suivi ; un ensemble de métiers vide = tous. */
+/** Filtres du suivi. */
 export interface TrackingFilters {
-    jobs: ReadonlySet<string>;
+    /** Critères portés par le citoyen (filtres partagés de `_shared/citizen-filters`) ; vrai = retenu. */
+    citizen_match: (citizen: Citizen) => boolean;
     /** Clé de `taskFilterKey`, nulle = toutes. */
     task: string | null;
     state: TrackingState | 'all';
@@ -84,14 +85,14 @@ export function rowState(row: TrackingRow, task_key: string | null): TrackingSta
 }
 
 /**
- * Lignes retenues par les filtres de métier, de poche et de consigne (l'état mis à part).
+ * Lignes retenues par les filtres du citoyen, de poche et de consigne (l'état mis à part).
  * @param {TrackingRow[]} rows Lignes.
  * @param {TrackingFilters} filters Filtres.
  * @returns {TrackingRow[]} Lignes retenues.
  */
 function scopedRows(rows: TrackingRow[], filters: TrackingFilters): TrackingRow[] {
     return rows.filter((row: TrackingRow): boolean =>
-        (filters.jobs.size === 0 || filters.jobs.has(row.citizen.job?.key ?? ''))
+        filters.citizen_match(row.citizen)
         && (filters.task === null || rowState(row, filters.task) !== 'none')
         && (filters.pool === 'all' || row.pool === filters.pool));
 }

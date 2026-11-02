@@ -15,7 +15,14 @@
             <tbody>
                 @for (row of rows(); track row.itemId) {
                     <tr class="resource" [attr.data-item]="row.itemId" [class.missing]="row.gap > 0">
-                        <td>{{ row.label }}</td>
+                        <td>
+                            <span class="item">
+                                @if (row.icon !== '') {
+                                    <img class="item-icon" [src]="row.icon" alt="">
+                                }
+                                {{ row.label }}
+                            </span>
+                        </td>
                         <td class="need">{{ row.need }}</td>
                         <td class="stock">{{ row.stock }}</td>
                         <td class="gap">{{ row.gap }}</td>

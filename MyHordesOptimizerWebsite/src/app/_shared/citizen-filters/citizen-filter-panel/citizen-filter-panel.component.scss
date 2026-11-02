@@ -1,0 +1,108 @@
+@use '@angular/material' as mat;
+
+:host {
+    display: block;
+
+    // Toggles de filtre plus compacts que le 42px global (theming.scss), via l'API officielle Material.
+    .filters-panel {
+        @include mat.button-toggle-overrides((height: 32px));
+
+        display: flex;
+        flex-direction: column;
+        padding: 0.25em 0.75em 1em;
+
+        .filters-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            padding: 0.25em 0;
+
+            .title {
+                font-weight: 600;
+                font-size: 1.1em;
+            }
+
+            .spacer {
+                flex: 1 1 auto;
+            }
+        }
+
+        .filters-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25em;
+            margin-top: 0.4em;
+
+            h4 {
+                margin: 0.2em 0;
+                opacity: 0.7;
+                font-weight: 600;
+            }
+
+            mat-form-field {
+                width: 100%;
+            }
+
+            // Sections de toggles (libellés icône seule) : grille compacte, 3 colonnes et plus.
+            &.toggles {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+                gap: 0.25em 0.5em;
+                align-items: center;
+
+                h4 {
+                    grid-column: 1 / -1;
+                }
+            }
+
+            .filter-row {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 0.5em;
+
+                .filter-label {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4em;
+                    min-width: 0;
+                }
+
+                .hero-skill-letter {
+                    min-width: 1em;
+                    font-weight: 700;
+                    text-align: center;
+                }
+
+                .value-filter {
+                    flex-shrink: 0;
+                    flex-wrap: wrap;
+                }
+
+                // Icônes MH dans les toggles (métiers) : taille native, en ligne ; un `display: block` casse le toggle.
+                .toggle-icon,
+                .filter-icon {
+                    display: inline-block;
+                    vertical-align: middle;
+                }
+
+                // Bouton qui fait tourner le filtre 3 états ; la case est purement présentationnelle (pilotée par ses entrées),
+                // sinon son état interne au clic « rebat » [checked] / [indeterminate].
+                .bool-control {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 0;
+                    border: 0;
+                    background: none;
+                    color: inherit;
+                    font: inherit;
+                    cursor: pointer;
+
+                    mat-checkbox {
+                        pointer-events: none;
+                    }
+                }
+            }
+        }
+    }
+}

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, model, ModelSigna
 import { MatIconModule } from '@angular/material/icon';
 
 import { Imports } from '../../../../_abstract_model/types/_types';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { StepResult } from '../building-progress.util';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { BuildingPlanContentDTO, isBuildingStep, PlanDefenseSourceDTO } from '../plan.types';
@@ -22,7 +23,7 @@ export type PlanningCard = 'program' | 'tracking' | 'budget' | 'resources' | 'de
     templateUrl: './planning-cards.component.html',
     styleUrls: ['./planning-cards.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...material_modules]
+    imports: [IconApComponent, ...material_modules]
 })
 export class PlanningCardsComponent {
 

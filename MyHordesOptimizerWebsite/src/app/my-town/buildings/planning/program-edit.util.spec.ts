@@ -203,6 +203,16 @@ describe('program-edit.util', (): void => {
             expect(content.programs.regular.length).toBe(4);
         });
 
+        it('sanitizeContent ne garde qu\'une perte par chantier et par type (doublons refusés par l\'API)', (): void => {
+            const content: BuildingPlanContentDTO = {
+                ...emptyPlanContent(),
+                losses: [{ buildingId: 3, kind: 'destroyed' }, { buildingId: 3, kind: 'bonus' }, { buildingId: 3, kind: 'destroyed' }]
+            };
+
+            expect(sanitizeContent(content).losses).toEqual([{ buildingId: 3, kind: 'destroyed' }, { buildingId: 3, kind: 'bonus' }]);
+            expect(content.losses?.length).toBe(3);
+        });
+
         it('sanitizeContent retire les consignes « action » sans action (refusées par l\'API)', (): void => {
             const content: BuildingPlanContentDTO = {
                 ...emptyPlanContent(),

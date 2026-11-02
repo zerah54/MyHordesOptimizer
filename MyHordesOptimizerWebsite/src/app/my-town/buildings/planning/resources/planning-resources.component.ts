@@ -5,10 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import moment from 'moment';
 
+import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { WishlistService } from '../../../../_abstract_model/services/wishlist.service';
 import { Imports } from '../../../../_abstract_model/types/_types';
-import { itemLabel } from '../planning-labels.util';
+import { Item } from '../../../../_abstract_model/types/item.class';
 import { PlanningStore } from '../planning.store';
+import { itemLabel } from '../planning-labels.util';
 import { ResourceCount } from '../resources.util';
 
 const material_modules: Imports = [MatButtonModule, MatIconModule, MatProgressSpinnerModule];
@@ -17,6 +19,8 @@ const material_modules: Imports = [MatButtonModule, MatIconModule, MatProgressSp
 interface ResourceRow {
     itemId: number;
     label: string;
+    /** Chemin complet de l'icône, vide si l'objet est inconnu. */
+    icon: string;
     need: number;
     stock: number;
     gap: number;
@@ -42,10 +46,19 @@ export class PlanningResourcesComponent {
     /** Lignes du tableau, triées par libellé. */
     protected rows(): ResourceRow[] {
         const needs: ReadonlyMap<number, number> = this.store.evaluation()?.needs ?? new Map<number, number>();
+        const items: readonly Item[] = this.store.items();
         const rows: ResourceRow[] = [];
         needs.forEach((need: number, item_id: number): void => {
             const stock: number = this.store.bank().get(item_id) ?? 0;
-            rows.push({ itemId: item_id, label: itemLabel(this.store.items(), item_id, this.locale), need, stock, gap: Math.max(0, need - stock) });
+            const img: string = items.find((item: Item): boolean => item.id === item_id)?.img ?? '';
+            rows.push({
+                itemId: item_id,
+                label: itemLabel(items, item_id, this.locale),
+                icon: img === '' ? '' : HORDES_IMG_REPO + img,
+                need,
+                stock,
+                gap: Math.max(0, need - stock)
+            });
         });
         return rows.sort((a: ResourceRow, b: ResourceRow): number => a.label.localeCompare(b.label));
     }

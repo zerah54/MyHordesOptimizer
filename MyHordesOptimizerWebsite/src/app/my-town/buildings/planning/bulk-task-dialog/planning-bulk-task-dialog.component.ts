@@ -5,9 +5,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
-import { dailyActionAp, DailyActionEnum } from '../../../../_abstract_model/enum/daily-action.enum';
+import { dailyActionAp, DailyActionEnum, dailyActionMaxUses } from '../../../../_abstract_model/enum/daily-action.enum';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { bulkAddTask, BulkTaskTemplate } from '../bulk-task.util';
 import { HomeUpgradeRef } from '../home-upgrades.util';
 import { BuildingPlanContentDTO, PlanTaskKind } from '../plan.types';
@@ -28,7 +29,7 @@ export interface PlanningBulkTaskDialogData {
     templateUrl: './planning-bulk-task-dialog.component.html',
     styleUrls: ['./planning-bulk-task-dialog.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...material_modules]
+    imports: [IconApComponent, ...material_modules]
 })
 export class PlanningBulkTaskDialogComponent {
 
@@ -98,9 +99,10 @@ export class PlanningBulkTaskDialogComponent {
         }
         const template: BulkTaskTemplate = this.template();
         const pa_of: (user_id: number) => number = this.paOf();
+        const count_of: ((user_id: number) => number) | undefined = this.countOf();
         let added: number = 0;
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
-            added = bulkAddTask(content, this.data.user_ids, template, pa_of);
+            added = bulkAddTask(content, this.data.user_ids, template, pa_of, count_of);
         });
         this.dialog_ref.close(added);
     }
@@ -123,6 +125,27 @@ export class PlanningBulkTaskDialogComponent {
     }
 
     /**
+     * Utilisations prévues d'une action pour un citoyen : toutes celles que permet son métier (fouilles des galeries du Fouineur).
+     * @returns {((user_id: number) => number) | undefined} Calcul des utilisations, absent hors action.
+     */
+    private countOf(): ((user_id: number) => number) | undefined {
+        const action: DailyActionEnum | undefined = this.kind() === 'action' ? DailyActionEnum.getByKey<DailyActionEnum>(this.action_key() ?? '') : undefined;
+        if (action === undefined) {
+            return undefined;
+        }
+        const jobs: Map<number, string | null> = this.jobsByUser();
+        return (user_id: number): number => dailyActionMaxUses(action, jobs.get(user_id) ?? null);
+    }
+
+    /**
+     * Métier de chaque citoyen vivant.
+     * @returns {Map<number, string | null>} Clé `JobEnum` par identifiant de joueur.
+     */
+    private jobsByUser(): Map<number, string | null> {
+        return new Map<number, string | null>(this.store.citizens_full().map((citizen: Citizen): [number, string | null] => [citizen.id, citizen.job?.key ?? null]));
+    }
+
+    /**
      * PA de la consigne pour un citoyen : selon son métier pour une action, du référentiel pour la maison et les améliorations.
      * @returns {(user_id: number) => number} Calcul des PA.
      */
@@ -131,8 +154,7 @@ export class PlanningBulkTaskDialogComponent {
         switch (this.kind()) {
             case 'action': {
                 const action: DailyActionEnum | undefined = DailyActionEnum.getByKey<DailyActionEnum>(this.action_key() ?? '');
-                const jobs: Map<number, string | null> = new Map<number, string | null>(this.store.citizens_full()
-                    .map((citizen: Citizen): [number, string | null] => [citizen.id, citizen.job?.key ?? null]));
+                const jobs: Map<number, string | null> = this.jobsByUser();
                 return (user_id: number): number => (action === undefined ? 0 : dailyActionAp(action, jobs.get(user_id) ?? null));
             }
             case 'homeUpgrade': {

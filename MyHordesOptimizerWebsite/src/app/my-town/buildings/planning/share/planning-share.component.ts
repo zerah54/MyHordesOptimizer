@@ -7,6 +7,7 @@ import moment from 'moment';
 
 import { environment } from '../../../../../environments/environment';
 import { Imports } from '../../../../_abstract_model/types/_types';
+import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { ClipboardService } from '../../../../_core/services/clipboard.service';
 import { budgetPost, PostContext, programPost } from '../forum-post.util';
 import { BuildingPlanDTO } from '../plan.types';
@@ -22,7 +23,10 @@ interface ShareEntry {
     text: string;
 }
 
-/** Bouton « Copier au format forum » : un menu avec un item par mode (budget, programme), un par message si le post est découpé. */
+/**
+ * Bouton « Copier au format forum » : un menu avec un item par mode (budget, programme), un par message si le post est découpé.
+ * Chaque pseudo est précédé de l'emote de son métier.
+ */
 @Component({
     selector: 'mho-planning-share',
     templateUrl: './planning-share.component.html',
@@ -45,7 +49,8 @@ export class PlanningShareComponent {
         }
         return [
             ...this.entriesOf('budget', $localize`Post budget`, budgetPost(context)),
-            ...this.entriesOf('program', $localize`Post programme`, programPost(context))
+            ...this.entriesOf('program', $localize`Post programme`, programPost(context)),
+            ...this.entriesOf('program-review', $localize`Post programme sans ping (relecture)`, programPost(context, false))
         ];
     });
 
@@ -73,8 +78,24 @@ export class PlanningShareComponent {
             citizens: this.store.citizens(),
             homes: this.store.homes(),
             item_label: (item_id: number): string => itemLabel(this.store.items(), item_id, this.locale),
-            website_url: environment.website_url
+            website_url: environment.website_url,
+            job_emotes: this.jobEmoteMap()
         };
+    }
+
+    /**
+     * Emote forum du métier de chaque citoyen vivant dont le métier est connu.
+     * @returns {ReadonlyMap<number, string>} Emote par identifiant de joueur.
+     */
+    private jobEmoteMap(): ReadonlyMap<number, string> {
+        const emotes: Map<number, string> = new Map<number, string>();
+        this.store.citizens_full().forEach((citizen: Citizen): void => {
+            const forum_icon: string | undefined = citizen.job?.value.forum_icon;
+            if (forum_icon !== undefined && forum_icon !== '') {
+                emotes.set(citizen.id, `:${forum_icon}:`);
+            }
+        });
+        return emotes;
     }
 
     private entriesOf(key: string, label: string, parts: string[]): ShareEntry[] {

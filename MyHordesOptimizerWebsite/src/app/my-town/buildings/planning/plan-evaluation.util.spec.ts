@@ -1,9 +1,10 @@
 import { CitizenCapacity } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { RankedCandidate } from './defense.util';
+import { neutralDefenseFactors } from './defense-gain.util';
 import { REACTOR_UID } from './night-survival.util';
 import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
-import { BuildingRef, CitizenRef, DayEvaluation, DayInput, evaluateDay, evaluateDays, HomeLevelRef, WORKSHOP_UID } from './plan-evaluation.util';
+import { advanceDay, BuildingRef, CitizenRef, DayEvaluation, DayInput, evaluateDay, evaluateDays, HomeLevelRef, WORKSHOP_UID } from './plan-evaluation.util';
 
 function ref(overrides: Partial<BuildingRef>): BuildingRef {
     return { id: 0, uid: 'x', label: 'X', pa: 10, defence: 0, maxLife: 0, temporary: false, breakable: true, parentId: null, resources: [], ...overrides };
@@ -52,6 +53,10 @@ function input(content: Partial<BuildingPlanContentDTO>, overrides: Partial<DayI
         temporaryDefense: 0,
         homes: new Map<number, HomeLevelRef>(),
         hardMode: false,
+        defenseFactors: neutralDefenseFactors(),
+        defenseItemIds: new Set<number>(),
+        upgrades: {},
+        buildingLevels: new Map<string, number>(),
         ...overrides
     };
 }
@@ -148,7 +153,7 @@ describe('plan-evaluation.util', (): void => {
             expect(evaluation.projectedDefense).toBe(1010);
         });
 
-        it('une tâche de maison ajoute sa défense et ses ressources et réduit la capacité du citoyen', (): void => {
+        it('une tâche de maison ajoute sa défense (comptée à 40 % par la ville) et ses ressources et réduit la capacité du citoyen', (): void => {
             const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([
                 [1, { level: 1, label: 'Zelt', def: 1, ap: 2, apUrbanism: 2, resources: [] }],
                 [2, { level: 2, label: 'Baracke', def: 4, ap: 4, apUrbanism: 4, resources: [{ itemId: 5, count: 1 }] }]
@@ -160,7 +165,8 @@ describe('plan-evaluation.util', (): void => {
                 { homes, citizens }
             ));
 
-            expect(evaluation.projectedDefense).toBe(1003);
+            // Maison 1 → 2 : +3 de défense de maison, dont la ville compte 40 % (arrondi à l'inférieur).
+            expect(evaluation.projectedDefense).toBe(1001);
             expect(evaluation.needs.get(5)).toBe(1);
             expect(evaluation.capacities[0].capacity).toBe(15);
         });
@@ -184,6 +190,80 @@ describe('plan-evaluation.util', (): void => {
             const labels: string[] = evaluation.ranking.map((candidate: RankedCandidate): string => candidate.label);
             expect(labels[0]).toBe('OD');
             expect(labels).toContain('Mur');
+        });
+    });
+
+    describe('évolution votée le soir', (): void => {
+        // La Porte (id 3, construite au niveau 1) gagne 15 puis 45 de défense par niveau, comme le Portail du jeu.
+        const upgrades: DayInput['upgrades'] = {
+            gate: { maxLevel: 3, effects: { defenseIncrement: { levels: [0, 15, 45, 75], default: 0, source: 'BuildingUpgradeListener' } } }
+        };
+        const levels: Map<string, number> = new Map<string, number>([['gate', 1]]);
+
+        it('compte le gain du niveau suivant dans la défense de la nuit même', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ eveningVoteBuildingId: 3 }, { upgrades, buildingLevels: levels }));
+
+            expect(evaluation.vote).toEqual({ uid: 'gate', level: 2, defense: 30 });
+            expect(evaluation.projectedDefense).toBe(1030);
+        });
+
+        it('le niveau atteint se reporte au lendemain ; au niveau maximum, plus de gain', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ eveningVoteBuildingId: 3 }, { upgrades, buildingLevels: new Map<string, number>([['gate', 3]]) }));
+
+            expect(evaluation.vote?.defense).toBe(0);
+            expect(advanceDay(evaluateDay(input({ eveningVoteBuildingId: 3 }, { upgrades, buildingLevels: levels })), input({ eveningVoteBuildingId: 3 }, { upgrades, buildingLevels: levels })).buildingLevels.get('gate')).toBe(2);
+        });
+
+        it('sans donnée d\'évolution, le vote ne change pas la défense', (): void => {
+            expect(evaluateDay(input({ eveningVoteBuildingId: 3 })).vote?.defense).toBe(0);
+        });
+    });
+
+    describe('pertes prévues cette nuit', (): void => {
+        // La Porte (id 3, construite au niveau 1, 5 de défense actuelle) gagne 15 de défense à ce niveau.
+        const upgrades: DayInput['upgrades'] = {
+            gate: { maxLevel: 3, effects: { defenseIncrement: { levels: [0, 15, 45, 75], default: 0, source: 'BuildingUpgradeListener' } } }
+        };
+        const levels: Map<string, number> = new Map<string, number>([['gate', 1]]);
+
+        it('bonus perdu : le bonus d\'évolution ne compte pas cette nuit et revient le lendemain', (): void => {
+            const [day1, day2]: DayEvaluation[] = evaluateDays([
+                input({ losses: [{ buildingId: 3, kind: 'bonus' }] }, { upgrades, buildingLevels: levels }),
+                input({}, { upgrades })
+            ]);
+
+            expect(day1.losses).toEqual([{ buildingId: 3, kind: 'bonus', defense: 15 }]);
+            expect(day1.projectedDefense).toBe(985);
+            expect(day2.projectedDefense).toBe(1000);
+        });
+
+        it('chantier détruit : compte encore cette nuit, puis perd défense, évolution et construction le lendemain', (): void => {
+            const day1_input: DayInput = input({ losses: [{ buildingId: 3, kind: 'destroyed' }] }, { upgrades, buildingLevels: levels });
+            const day1: DayEvaluation = evaluateDay(day1_input);
+            const carried: ReturnType<typeof advanceDay> = advanceDay(day1, day1_input);
+
+            expect(day1.losses).toEqual([{ buildingId: 3, kind: 'destroyed', defense: 20 }]);
+            expect(day1.projectedDefense).toBe(1000);
+            expect(carried.baseDefense).toBe(980);
+            expect(carried.progress.get(3)?.built).toBe(false);
+            expect(carried.buildingLevels.has('gate')).toBe(false);
+        });
+
+        it('le bonus perdu suit le niveau voté le soir même', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input(
+                { eveningVoteBuildingId: 3, losses: [{ buildingId: 3, kind: 'bonus' }] },
+                { upgrades, buildingLevels: levels }
+            ));
+
+            expect(evaluation.losses[0].defense).toBe(45);
+            expect(evaluation.projectedDefense).toBe(985);
+        });
+
+        it('ignore un chantier non construit au soir ou temporaire', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ losses: [{ buildingId: 1, kind: 'destroyed' }, { buildingId: 4, kind: 'bonus' }] }));
+
+            expect(evaluation.losses).toEqual([]);
+            expect(evaluation.projectedDefense).toBe(1000);
         });
     });
 

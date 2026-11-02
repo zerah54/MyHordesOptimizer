@@ -315,7 +315,8 @@ describe('MyProgramComponent', (): void => {
     it('conserve le bloc Chantiers actuel', async (): Promise<void> => {
         await render(content({ citizens: [{ userId: 1, tasks: [{ kind: 'free', label: 'Puits', pa: 3 }] }] }));
 
-        expect(text('.block.buildings .steps')).toContain('Terminer Mur');
+        expect(text('.block.buildings .steps')).toContain('Mur');
+        expect(text('.block.buildings .steps')).not.toContain('Terminer');
         expect(text('.block.buildings .tasks')).toContain('Puits');
         expect(root().querySelector('.block.expedition .steps')).toBeNull();
     });
@@ -351,7 +352,8 @@ describe('MyProgramComponent', (): void => {
     it('non-banni : ses étapes, pas celles des bannis', async (): Promise<void> => {
         await render();
 
-        expect(text('.steps')).toContain('Terminer Mur');
+        expect(text('.steps')).toContain('Mur');
+        expect(text('.steps')).not.toContain('Terminer');
         expect(text('.steps')).not.toContain('Réparer entièrement Porte');
         expect(root().querySelector('.notice')).toBeNull();
     });
@@ -370,7 +372,7 @@ describe('MyProgramComponent', (): void => {
 
         expect(root().querySelector('.notice[data-notice="banned-forbidden"]')).not.toBeNull();
         expect(text('.steps')).toContain('Réparer entièrement Porte');
-        expect(text('.steps')).not.toContain('Terminer');
+        expect(text('.steps')).not.toContain('Mur');
     });
 
     it('affiche les consignes du jour, les consignes de la section et les notes d\'étape', async (): Promise<void> => {

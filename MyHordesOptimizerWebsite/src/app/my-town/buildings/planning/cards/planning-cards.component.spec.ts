@@ -2,8 +2,8 @@ import { signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CitizenFiltersStore } from '../citizen-filters.store';
-import { DayEvaluation } from '../plan-evaluation.util';
 import { BuildingPlanContentDTO, emptyPlanContent } from '../plan.types';
+import { DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, FakePlanningStore } from '../planning.store.fake';
 import { TrackingRow } from '../tracking.util';
@@ -114,7 +114,8 @@ describe('PlanningCardsComponent', (): void => {
             expect(pool('banned')?.querySelector('.value')?.textContent?.trim()).toBe(`${budgets.banned.remaining}`);
             expect(pool('regular')?.textContent).toContain('Non-bannis');
             expect(pool('regular')?.querySelector('.value')?.textContent?.trim()).toBe(`${budgets.regular.remaining}`);
-            expect(pool('regular')?.textContent).toContain(`PA restants sur ${budgets.regular.budget}`);
+            expect(pool('regular')?.textContent).toContain(`restants sur ${budgets.regular.budget}`);
+            expect(pool('regular')?.querySelector('mho-icon-ap')).not.toBeNull();
         });
 
         it('un budget dépassé est en évidence', async (): Promise<void> => {

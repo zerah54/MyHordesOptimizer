@@ -1,7 +1,7 @@
 import { Item } from '../../../_abstract_model/types/item.class';
 import { StepResult } from './building-progress.util';
-import { HomeLevelRef } from './plan-evaluation.util';
 import { PlanStepDTO } from './plan.types';
+import { HomeLevelRef } from './plan-evaluation.util';
 import { itemLabel, ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
 
 describe('planning-labels.util', (): void => {
@@ -17,8 +17,8 @@ describe('planning-labels.util', (): void => {
         return { step, pool: 'regular', index: 0, points: 0, paCost: pa_cost, remainingAfter: 0, completes: false, issues: [] };
     }
 
-    it('stepLabel : terminer ou laisser à N PA', (): void => {
-        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0 }), 30)).toBe('Terminer Mur');
+    it('stepLabel : chantier à terminer par son seul nom (consigne par défaut), ou laisser à N PA', (): void => {
+        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0 }), 30)).toBe('Mur');
         expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', mode: 'leave', targetRemaining: 12 }), 30)).toBe('Laisser Mur à 12 :ap:');
         expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', targetRemaining: 12 }), 30)).toBe('Laisser Mur à 12 :ap:');
     });
@@ -42,6 +42,11 @@ describe('taskLabel', (): void => {
 
     it('action de chantier : libellé officiel de l\'action', (): void => {
         expect(taskLabel({ kind: 'action', ref: 'home_crows', pa: 1 }, homes)).toBe('Cartographier le désert');
+    });
+
+    it('action utilisable plusieurs fois : nombre d\'utilisations prévues', (): void => {
+        expect(taskLabel({ kind: 'action', ref: 'home_scavenge', count: 2, pa: 2 }, homes)).toBe('Creuser dans les galeries ×2');
+        expect(taskLabel({ kind: 'action', ref: 'home_scavenge', count: 1, pa: 1 }, homes)).toBe('Creuser dans les galeries');
     });
 
     it('action inconnue : sa clé', (): void => {

@@ -13,7 +13,8 @@ function context(content: BuildingPlanContentDTO, evaluation_overrides: Partial<
         citizens: FAKE_CITIZENS,
         homes: FAKE_HOMES,
         item_label: (item_id: number): string => (item_id === 5 ? 'Bois' : `#${item_id}`),
-        website_url: 'https://site.test/'
+        website_url: 'https://site.test/',
+        job_emotes: new Map<number, string>()
     };
 }
 
@@ -157,16 +158,17 @@ describe('forum-post.util', (): void => {
             }
         });
 
-        it('étapes du plan : terminer, réparer, coût en PA', (): void => {
+        it('étapes du plan : chantier à terminer par son seul nom, réparer, coût en PA', (): void => {
             const text: string = joined(budgetPost(context(plan())));
 
-            expect(text).toContain('Terminer Mur');
+            expect(text).toMatch(/:middot: Mur → \d+ :ap:/);
+            expect(text).not.toContain('Terminer');
             expect(text).toContain('Réparer entièrement Porte');
             expect(text).toContain('30 :ap:');
         });
 
         it('le bloc Plan annonce le chantier à voter ce soir', (): void => {
-            expect(joined(budgetPost(context({ ...plan(), eveningVoteBuildingId: 2 })))).toContain('Évolution votée ce soir : Atelier');
+            expect(joined(budgetPost(context({ ...plan(), eveningVoteBuildingId: 2 })))).toContain(':fortify: Évolution votée ce soir : Atelier');
         });
 
         it('le bloc Plan reprend les notes d\'étape', (): void => {
@@ -175,7 +177,7 @@ describe('forum-post.util', (): void => {
                 programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0, note: 'après 20h' }] }
             };
 
-            expect(joined(budgetPost(context(content)))).toContain('Terminer Mur — [i]après 20h[/i] → 30 :ap:');
+            expect(joined(budgetPost(context(content)))).toContain(':middot: Mur — [i]après 20h[/i] → 30 :ap:');
         });
 
         it('« laisser à N PA » pour une cible non nulle', (): void => {
@@ -250,7 +252,34 @@ describe('forum-post.util', (): void => {
             const text: string = joined(programPost(context(plan())));
 
             expect(text).toContain('[big][b]Programme chantiers · J10[/b][/big]');
-            expect(text).toContain('[b]Consignes individuelles[/b]');
+            expect(text).toContain('[collapse=Consignes individuelles]');
+            expect(balanced(text)).toBe(true);
+        });
+
+        it('l\'emote du métier précède aussi le pseudo d\'un citoyen sur-engagé', (): void => {
+            const content: BuildingPlanContentDTO = { ...plan(), basePa: 1 };
+            const job_emotes: ReadonlyMap<number, string> = new Map<number, string>([[1, ':scav:'], [2, ':scout:'], [3, ':tech:']]);
+
+            const text: string = joined(budgetPost({ ...context(content), job_emotes }));
+
+            expect(text).toMatch(/:warning: :(scav|scout|tech): (Alice|Bob|Chloé) : /);
+        });
+
+        it('sans ping : pseudos simples, avec leur emote, et aucune mention', (): void => {
+            const job_emotes: ReadonlyMap<number, string> = new Map<number, string>([[1, ':scav:'], [3, ':tech:']]);
+
+            const text: string = joined(programPost({ ...context(plan()), job_emotes }, false));
+
+            expect(text).toContain(':scav: Alice, :tech: Chloé');
+            expect(text).not.toMatch(/@\S+:\d+/);
+        });
+
+        it('l\'emote du métier précède la mention quand elle est fournie', (): void => {
+            const job_emotes: ReadonlyMap<number, string> = new Map<number, string>([[1, ':scav:'], [3, ':tech:']]);
+
+            const text: string = joined(programPost({ ...context(plan()), job_emotes }));
+
+            expect(text).toContain(':scav: @Alice:1 :tech: @Chloé:3');
         });
 
         it('les citoyens aux mêmes consignes sont regroupés sur une ligne de mentions', (): void => {
@@ -303,7 +332,8 @@ describe('forum-post.util', (): void => {
             expect(text.indexOf(':arrowright: [b]Bannis')).toBeLessThan(text.indexOf(':arrowright: [b]Non-bannis'));
             expect(text).toContain('Laisser Mur à 10 :ap:');
             expect(text).toContain('Réparer entièrement Porte');
-            expect(text).toContain('Terminer #99');
+            expect(text).toContain(':middot: #99');
+            expect(text).not.toContain('Terminer');
         });
 
         it('consignes du jour en tête, consignes intercalées et notes d\'étape dans l\'ordre du programme', (): void => {
@@ -324,9 +354,9 @@ describe('forum-post.util', (): void => {
 
             expect(text).toContain('[b]Consignes du jour[/b]\nPlanches en banque avant 18h.');
             expect(text.indexOf('Consignes du jour')).toBeLessThan(text.indexOf('Consignes individuelles'));
-            expect(text).toContain(':middot: Terminer Mur — [i]après 20h[/i]');
+            expect(text).toContain(':middot: Mur — [i]après 20h[/i]');
             expect(text).toContain('» [i]Attendre le retour de l\'expé[/i]');
-            expect(text.indexOf('Terminer Mur')).toBeLessThan(text.indexOf('Attendre le retour'));
+            expect(text.indexOf(':middot: Mur')).toBeLessThan(text.indexOf('Attendre le retour'));
             expect(text.indexOf('Attendre le retour')).toBeLessThan(text.indexOf('Réparer entièrement Porte'));
         });
 
@@ -339,11 +369,23 @@ describe('forum-post.util', (): void => {
         it('annonce le chantier à voter ce soir', (): void => {
             const text: string = joined(programPost(context({ ...plan(), eveningVoteBuildingId: 2 })));
 
-            expect(text).toContain('[b]Évolution votée ce soir[/b] : Atelier');
+            expect(text).toContain(':fortify: [b]Évolution votée ce soir[/b] : Atelier');
         });
 
         it('sans vote prévu, pas de ligne de vote', (): void => {
             expect(joined(programPost(context(plan())))).not.toContain('Évolution votée ce soir');
+        });
+
+        it('pertes prévues : défense du chantier au soir (Porte réparée par le plan), aussi dans le bloc Défense du budget', (): void => {
+            const content: BuildingPlanContentDTO = { ...plan(), losses: [{ buildingId: 3, kind: 'destroyed' }] };
+            const line: string = ':middot: Porte : laissé détruire, ne pas réparer (−15 dès demain)';
+
+            expect(joined(programPost(context(content)))).toContain(`:warning: [b]Pertes prévues cette nuit[/b]\n${line}`);
+            expect(joined(budgetPost(context(content)))).toContain(line);
+        });
+
+        it('sans perte prévue, pas de bloc de pertes', (): void => {
+            expect(joined(programPost(context(plan())))).not.toContain('Pertes prévues');
         });
 
         it('sans consignes du jour, pas de bloc vide', (): void => {

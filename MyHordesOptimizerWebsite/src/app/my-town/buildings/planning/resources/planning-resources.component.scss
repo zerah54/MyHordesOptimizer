@@ -18,6 +18,17 @@
         }
     }
 
+    .item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4em;
+    }
+
+    // Taille NON fixée : sprites pixel art.
+    .item-icon {
+        flex: 0 0 auto;
+    }
+
     .label {
         display: inline-flex;
         align-items: center;

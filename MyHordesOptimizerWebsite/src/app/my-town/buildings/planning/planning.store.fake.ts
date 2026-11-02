@@ -11,6 +11,8 @@ import { Home } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { bannedPoolForced, bannedPoolShown } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
+import { BuildingUpgradesDTO } from './building-upgrades.types';
+import { neutralDefenseFactors } from './defense-gain.util';
 import { HomeUpgradeRef } from './home-upgrades.util';
 import { KeyedDebounce } from './keyed-debounce.util';
 import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanPool, PlanTaskDTO } from './plan.types';
@@ -106,6 +108,10 @@ export function fakeEvaluation(content: BuildingPlanContentDTO, overrides: Parti
         temporaryDefense: 0,
         homes: FAKE_HOMES,
         hardMode: false,
+        defenseFactors: neutralDefenseFactors(),
+        defenseItemIds: new Set<number>(),
+        upgrades: {},
+        buildingLevels: new Map<string, number>(),
         ...overrides
     });
 }
@@ -129,6 +135,7 @@ export interface FakePlanningStore {
     item_values: WritableSignal<ReadonlyMap<number, number>>;
     bank: WritableSignal<ReadonlyMap<number, number>>;
     items: WritableSignal<readonly Item[]>;
+    upgrades: WritableSignal<BuildingUpgradesDTO>;
     catalog: WritableSignal<readonly Building[]>;
     selected_day: WritableSignal<number>;
     citizens: WritableSignal<CitizenRef[]>;
@@ -166,6 +173,7 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         item_values: signal<ReadonlyMap<number, number>>(new Map<number, number>([[5, 2]])),
         bank: signal<ReadonlyMap<number, number>>(new Map<number, number>([[5, 1]])),
         items: signal<readonly Item[]>([Object.assign(new Item(), { id: 5, uid: 'wood', label: { fr: 'Bois' }, img: 'item/item_wood.gif' })]),
+        upgrades: signal<BuildingUpgradesDTO>({}),
         catalog: signal<readonly Building[]>(fakeCatalog()),
         selected_day: signal(10),
         citizens: signal<CitizenRef[]>(FAKE_CITIZENS),

@@ -1,11 +1,11 @@
 <div class="planning-header">
     <mho-day-selector [days]="store.days()" [value]="store.selected_day()" [today]="store.current_day"
-                      (valueChange)="store.selectDay($event)"></mho-day-selector>
+                      (valueChange)="selectDay($event)"></mho-day-selector>
 
     <div class="plans" role="list">
         @for (plan of store.plans_of_day(); track plan.id) {
             <span class="plan-chip" role="listitem" [class.selected]="isSelected(plan)">
-                <button mat-button type="button" data-action="select-plan" (click)="store.selectPlan(plan.id)">
+                <button mat-button type="button" data-action="select-plan" (click)="selectPlan(plan.id)">
                     <span class="label">
                         @if (plan.isEffective) {
                             <mat-icon class="effective" i18n-matTooltip matTooltip="Proposition effective du jour">star</mat-icon>
@@ -38,7 +38,6 @@
                               i18n>Gestion des bannis
             </mat-slide-toggle>
         }
-        <mho-planning-share/>
         <button mat-flat-button type="button" data-action="save" [disabled]="!store.can_edit() || !store.dirty() || store.saving()" (click)="store.save()">
             @if (store.saving()) {
                 <mat-spinner diameter="20"/>

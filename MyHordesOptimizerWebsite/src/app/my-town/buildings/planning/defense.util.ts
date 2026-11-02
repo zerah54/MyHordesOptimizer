@@ -6,6 +6,10 @@ export interface DefenseInputs {
     completedBuildingsDef: number;
     repairsDef: number;
     homesDef: number;
+    /** Évolution votée le soir : appliquée avant l'attaque, elle compte pour la nuit même. */
+    upgradeDef?: number;
+    /** Bonus d'évolution prévus perdus cette nuit (retirés). */
+    lostDef?: number;
     sources: { def: number; qty: number }[];
 }
 
@@ -29,13 +33,13 @@ export interface RankedCandidate extends RankCandidate {
 }
 
 /**
- * Défense projetée : base + chantiers terminés + réparations + maisons + sources.
+ * Défense projetée : base + chantiers terminés + réparations + maisons + évolution votée + sources − bonus perdus.
  * @param {DefenseInputs} inputs Composantes de la défense.
  * @returns {number} Défense projetée.
  */
 export function projectedDefense(inputs: DefenseInputs): number {
     const sources: number = inputs.sources.reduce((sum: number, source: { def: number; qty: number }): number => sum + source.def * source.qty, 0);
-    return inputs.baseDefense + inputs.completedBuildingsDef + inputs.repairsDef + inputs.homesDef + sources;
+    return inputs.baseDefense + inputs.completedBuildingsDef + inputs.repairsDef + inputs.homesDef + (inputs.upgradeDef ?? 0) + sources - (inputs.lostDef ?? 0);
 }
 
 /**

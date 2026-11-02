@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DailyActionEnum } from '../../../../_abstract_model/enum/daily-action.enum';
 import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
+import { CitizenFilterSortStore } from '../../../../_shared/citizen-filters/citizen-filter-sort.store';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { BuildingPlanContentDTO, emptyPlanContent, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } from '../plan.types';
 import { PlanningStore } from '../planning.store';
@@ -14,6 +15,7 @@ interface BudgetInternals {
     setTaskLevel(user_id: number, index: number, level: number): void;
     setTaskAction(user_id: number, index: number, key: string): void;
     setTaskUpgradeLevel(user_id: number, index: number, level: number): void;
+    setTaskCount(user_id: number, index: number, count: number): void;
     actionOptions(task: PlanTaskDTO): DailyActionEnum[];
 }
 
@@ -33,7 +35,7 @@ describe('PlanningBudgetComponent', (): void => {
         fake = createFakeStore(plan);
         await TestBed.configureTestingModule({
             imports: [PlanningBudgetComponent],
-            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }, { provide: PlanningStore, useValue: fake.store }, CitizenFiltersStore]
+            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }, { provide: PlanningStore, useValue: fake.store }, CitizenFilterSortStore, CitizenFiltersStore]
         }).compileComponents();
         fixture = TestBed.createComponent(PlanningBudgetComponent);
         fixture.detectChanges();
@@ -162,7 +164,7 @@ describe('PlanningBudgetComponent', (): void => {
         await render();
         expect(root().querySelector('mho-planning-citizen-filters')).not.toBeNull();
 
-        TestBed.inject(CitizenFiltersStore).onJobs([JobEnum.SCOUT.key]);
+        TestBed.inject(CitizenFilterSortStore).setJobs([JobEnum.SCOUT.key]);
         fixture.detectChanges();
 
         expect(Array.from(root().querySelectorAll<HTMLElement>('tr.citizen')).map((row: HTMLElement): string => row.dataset['user'] ?? '')).toEqual(['2']);
@@ -189,10 +191,40 @@ describe('PlanningBudgetComponent', (): void => {
         expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'action', ref: 'home_crows', pa: 1 });
 
         internals.setTaskAction(1, 0, 'home_scavenge');
-        expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'action', ref: 'home_scavenge', pa: 3 });
+        expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'action', ref: 'home_scavenge', pa: 3, count: 3 });
         fixture.detectChanges();
         expect(internals.actionOptions(fake.draft()?.citizens[0].tasks[0] ?? { kind: 'free', pa: 0 }).map((action: DailyActionEnum): string => action.key))
             .toEqual(['home_crows', 'home_scavenge']);
+    });
+
+    it('fouilles des galeries : le Fouineur choisit de 1 à 3 fouilles, à 1 PA chacune', async (): Promise<void> => {
+        await render();
+        const internals: BudgetInternals = fixture.componentInstance as unknown as BudgetInternals;
+        internals.setTaskKind(1, 0, 'action');
+        internals.setTaskAction(1, 0, 'home_scavenge');
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('tr.citizen[data-user="1"] [data-field="task-count"]')).not.toBeNull();
+
+        internals.setTaskCount(1, 0, 2);
+        expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'action', ref: 'home_scavenge', pa: 2, count: 2 });
+
+        internals.setTaskCount(1, 0, 1);
+        expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'action', ref: 'home_scavenge', pa: 1 });
+
+        internals.setTaskKind(1, 0, 'free');
+        expect(fake.draft()?.citizens[0].tasks[0].count).toBeUndefined();
+    });
+
+    it('fouilles des galeries : un non-Fouineur n\'a qu\'une fouille, sans choix du nombre', async (): Promise<void> => {
+        await render({ ...content(), citizens: [{ userId: 3, tasks: [{ kind: 'free', label: 'RDE', pa: 3 }] }] });
+        const internals: BudgetInternals = fixture.componentInstance as unknown as BudgetInternals;
+        internals.setTaskKind(3, 0, 'action');
+        internals.setTaskAction(3, 0, 'home_scavenge');
+        fixture.detectChanges();
+
+        expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'action', ref: 'home_scavenge', pa: 2 });
+        expect(fixture.nativeElement.querySelector('tr.citizen[data-user="3"] [data-field="task-count"]')).toBeNull();
     });
 
     it('sans chantier à action construit : le type « Action de chantier » n\'est pas applicable', async (): Promise<void> => {

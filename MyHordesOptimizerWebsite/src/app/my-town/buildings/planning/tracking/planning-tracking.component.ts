@@ -7,6 +7,7 @@ import { Imports } from '../../../../_abstract_model/types/_types';
 import { isHouseLevelEditable } from '../../../../_abstract_model/types/town-details.class';
 import { getTown } from '../../../../_core/utilities/localstorage.util';
 import { CitizenChipComponent } from '../../../../_shared/citizen-chip/citizen-chip.component';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { PlanningCitizenFiltersComponent } from '../citizen-filters/planning-citizen-filters.component';
 import { PlanTaskDTO } from '../plan.types';
@@ -22,7 +23,7 @@ const material_modules: Imports = [MatCheckboxModule, MatIconModule, MatTooltipM
     templateUrl: './planning-tracking.component.html',
     styleUrls: ['./planning-tracking.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...material_modules, CitizenChipComponent, PlanningCitizenFiltersComponent]
+    imports: [...material_modules, CitizenChipComponent, IconApComponent, PlanningCitizenFiltersComponent]
 })
 export class PlanningTrackingComponent {
 

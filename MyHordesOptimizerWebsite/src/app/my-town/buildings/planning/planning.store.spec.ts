@@ -61,7 +61,8 @@ function static_data(plans: BuildingPlansDTO): PlanningStatic {
         items: [Object.assign(new Item(), { id: 5, uid: 'wood' })],
         homes: { levels: [], upgrades: [] },
         citizens: [Object.assign(new Citizen(), { id: 1, name: 'A', is_dead: false })],
-        bank: []
+        bank: [],
+        upgrades: {}
     };
 }
 

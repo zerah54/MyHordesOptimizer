@@ -22,14 +22,50 @@
                     }
                     @if (pool === 'regular') {
                         <mat-form-field class="vote" appearance="outline" subscriptSizing="dynamic">
-                            <mat-label i18n>Chantier voté ce soir</mat-label>
-                            <mat-select [value]="draft.eveningVoteBuildingId" [disabled]="!store.can_edit()" (selectionChange)="onVote($event.value)">
+                            <mat-label>
+                                <span class="icon-label">
+                                    <img class="game-icon" [src]="HORDES_IMG_REPO + 'emotes/fortify.gif'" alt="">
+                                    <ng-container i18n>Chantier voté ce soir</ng-container>
+                                </span>
+                            </mat-label>
+                            <mat-select data-field="vote" [value]="draft.eveningVoteBuildingId" [disabled]="!store.can_edit()" (selectionChange)="onVote($event.value)">
+                                @if (draft.eveningVoteBuildingId !== null) {
+                                    <mat-select-trigger>
+                                        <span class="icon-label">
+                                            @if (icon(draft.eveningVoteBuildingId); as src) {
+                                                <img class="building-icon" [src]="src" alt="">
+                                            }
+                                            {{ label(draft.eveningVoteBuildingId) }}
+                                        </span>
+                                    </mat-select-trigger>
+                                }
                                 <mat-option [value]="null" i18n>Aucun</mat-option>
                                 @for (building of voteOptions(); track building.id) {
-                                    <mat-option [value]="building.id">{{ building.label }}</mat-option>
+                                    <mat-option [value]="building.id">
+                                        <span class="icon-label">
+                                            @if (icon(building.id); as src) {
+                                                <img class="building-icon" [src]="src" alt="">
+                                            }
+                                            {{ building.label }}
+                                        </span>
+                                    </mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
+                        @if (voteGain(); as gain) {
+                            <span class="vote-gain" data-field="vote-gain">
+                                <ng-container i18n>Niveau</ng-container> {{ gain.level }}
+                                @if (gain.defense !== 0) {
+                                    <span class="def" i18n-matTooltip matTooltip="Défense gagnée dès cette nuit : l'évolution s'applique avant l'attaque">
+                                        {{ gain.defense > 0 ? '+' : '' }}{{ gain.defense }}
+                                        <img class="game-icon" [src]="HORDES_IMG_REPO + 'icons/small_def.gif'" i18n-alt alt="déf">
+                                    </span>
+                                }
+                                @if (gain.text; as text) {
+                                    <span class="vote-text">{{ text }}</span>
+                                }
+                            </span>
+                        }
                     }
                     @if (store.can_edit()) {
                         <span class="pool-actions">
@@ -56,6 +92,16 @@
                                         <img class="building-icon" [src]="src" alt="">
                                     }
                                     <span class="name">{{ label(step.buildingId) }}</span>
+                                    @if (step.kind === 'build') {
+                                        @let real_def = realDefence(step.buildingId);
+                                        @if (real_def !== 0 || defence(step.buildingId) > 0) {
+                                            <span class="def" [attr.data-real]="real_def" [class.loss]="real_def < 0"
+                                                  [matTooltip]="defenceTooltip + ' ' + defence(step.buildingId)">
+                                                {{ real_def > 0 ? '+' : '' }}{{ real_def }}
+                                                <img class="game-icon" [src]="HORDES_IMG_REPO + 'icons/small_def.gif'" i18n-alt alt="déf">
+                                            </span>
+                                        }
+                                    }
                                     @if (isLocked(step.buildingId)) {
                                         <span class="badge-locked" i18n i18n-matTooltip matTooltip="Ce chantier n'est pas encore débloqué dans la ville">non débloqué</span>
                                     }
@@ -96,14 +142,14 @@
                                         @if (freeThreshold(step.buildingId); as threshold) {
                                             <span class="free-threshold"><ng-container i18n>Gratuit demain si ≤</ng-container>
                                                 {{ threshold }}
-                                                <ng-container i18n>PA</ng-container></span>
+                                                <mho-icon-ap/></span>
                                         }
                                     }
                                 </span>
 
                                 @if (res) {
                                     <span class="cost">{{ res.paCost }}
-                                        <ng-container i18n>PA</ng-container></span>
+                                        <mho-icon-ap/></span>
                                     @if (step.kind === 'build') {
                                         <span class="result" [attr.data-done]="res.completes">
                                             @if (res.completes) {
@@ -111,7 +157,8 @@
                                                 <ng-container i18n>terminé</ng-container>
                                             } @else {
                                                 {{ res.remainingAfter + res.points }} → {{ res.remainingAfter }}
-                                                <ng-container i18n>PA restants</ng-container>
+                                                <mho-icon-ap/>
+                                                <ng-container i18n>restants</ng-container>
                                             }
                                         </span>
                                     } @else {

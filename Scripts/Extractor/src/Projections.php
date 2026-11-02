@@ -93,7 +93,92 @@ final class Projections
                     self::overridesRarete($brut)
                 )
             ),
+
+            // Évolutions des chantiers : niveau maximum et textes (fixtures, traduits), valeurs par
+            // niveau relevées dans le code du jeu (UpgradeEffectsReader). Pas de schéma d'entrée fixe :
+            // les clés de premier niveau sont des uids de chantiers.
+            new Projection(
+                'Buildings/upgrades.json',
+                'myhordes.fixtures.buildings',
+                null,
+                static fn(array $buildings, array $brut): array => self::evolutionsChantiers(
+                    $buildings,
+                    self::chaineAuxiliaire($brut, 'mho.buildings.upgrade_effects'),
+                    self::chaineAuxiliaire($brut, 'mho.buildings.translations')
+                ),
+                false
+            ),
         ];
+    }
+
+    /**
+     * Évolutions par chantier : chantiers à évolution (niveau de vote > 0) et chantiers dont le code du jeu lit le niveau.
+     * - `maxLevel` : niveau maximum ;
+     * - `texts` (si présents) : texte de base et un texte par niveau (`levels[0]` = niveau 1), traduits ;
+     * - `effects` (si présents) : par effet, une valeur par niveau de 0 à `maxLevel` (le défaut comble les niveaux sans
+     *   valeur propre ; nul si le défaut est calculé), le défaut et l'origine dans le code du jeu.
+     *
+     * @param array<string, array<string, mixed>> $buildings
+     * @param array<string, array<string, array{valeurs: array<int, int|float>, defaut: int|float|null, source: string}>> $effets
+     * @param array<string, array<string, string>> $traductions
+     * @return array<string, array<string, mixed>>
+     */
+    public static function evolutionsChantiers(array $buildings, array $effets, array $traductions): array
+    {
+        $uids = array_keys(array_filter($buildings, static fn(array $building): bool => (int)($building['voteLevel'] ?? 0) > 0));
+        $uids = array_values(array_unique([...$uids, ...array_keys($effets)]));
+        sort($uids);
+
+        $resultat = [];
+
+        foreach ($uids as $uid) {
+            $building = $buildings[$uid] ?? [];
+            $niveauMax = (int)($building['voteLevel'] ?? 0);
+            $entree = ['maxLevel' => $niveauMax];
+
+            $textesNiveaux = array_values(array_filter($building['upgradeTexts'] ?? [], 'is_string'));
+            if (is_string($building['baseVoteText'] ?? null) || $textesNiveaux !== []) {
+                $entree['texts'] = [
+                    'base' => is_string($building['baseVoteText'] ?? null)
+                        ? BuildingTranslationsReader::traduire($building['baseVoteText'], $traductions)
+                        : null,
+                    'levels' => array_map(
+                        static fn(string $texte): array => BuildingTranslationsReader::traduire($texte, $traductions),
+                        $textesNiveaux
+                    ),
+                ];
+            }
+
+            foreach ($effets[$uid] ?? [] as $nom => $effet) {
+                $niveauxConnus = array_keys($effet['valeurs']);
+                $dernier = max($niveauMax, $niveauxConnus === [] ? 0 : max($niveauxConnus));
+                $niveaux = [];
+                for ($niveau = 0; $niveau <= $dernier; $niveau++) {
+                    $niveaux[] = $effet['valeurs'][$niveau] ?? $effet['defaut'];
+                }
+
+                $entree['effects'][$nom] = ['levels' => $niveaux, 'default' => $effet['defaut'], 'source' => $effet['source']];
+            }
+
+            $resultat[$uid] = $entree;
+        }
+
+        return $resultat;
+    }
+
+    /**
+     * Chaîne auxiliaire entière (lue hors fixtures par extract.php).
+     *
+     * @param array<string, array<mixed>> $brut
+     * @return array<mixed>
+     */
+    private static function chaineAuxiliaire(array $brut, string $chaine): array
+    {
+        if (!isset($brut[$chaine]) || !is_array($brut[$chaine])) {
+            throw new RuntimeException("Chaîne auxiliaire « $chaine » absente.");
+        }
+
+        return $brut[$chaine];
     }
 
     /**

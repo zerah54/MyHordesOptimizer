@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { Route } from '@angular/router';
+import { Observable } from 'rxjs';
 
 import { InDevModeGuard } from '../_core/guards/in-dev-mode.guard';
 import { BankComponent } from './bank/bank.component';
@@ -33,6 +34,7 @@ export const MY_TOWN_ROUTES: Route[] = [
         path: 'buildings',
         component: BuildingsComponent,
         title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Chantiers`,
+        canDeactivate: [(component: BuildingsComponent): Observable<boolean> => component.canLeave()]
     },
     {
         path: 'campings',

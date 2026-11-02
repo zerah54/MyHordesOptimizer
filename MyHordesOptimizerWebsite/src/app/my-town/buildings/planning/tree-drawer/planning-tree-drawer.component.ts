@@ -26,6 +26,7 @@ import {
 import { getTown } from '../../../../_core/utilities/localstorage.util';
 import { normalizeString } from '../../../../_core/utilities/string.utils';
 import { CompactStepperComponent } from '../../../../_shared/compact-stepper/compact-stepper.component';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { BuildingProgress, remainingAp } from '../building-progress.util';
 import { rankByDefPerPa } from '../defense.util';
 import { PlanningKpisComponent } from '../kpis/planning-kpis.component';
@@ -38,7 +39,7 @@ import { canToggleBuilding, hasBuilding, setPlanTier, toggleBuilding, ToggleCont
 import { ResourceCount } from '../resources.util';
 import { workshopCap } from '../workshop.util';
 
-const components: Imports = [CompactStepperComponent, PlanningKpisComponent];
+const components: Imports = [CompactStepperComponent, IconApComponent, PlanningKpisComponent];
 const material_modules: Imports = [
     MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
     MatSlideToggleModule, MatTooltipModule

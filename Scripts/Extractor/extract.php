@@ -14,12 +14,14 @@ declare(strict_types=1);
  *   --raw-only         S'arrête après l'écriture de raw/.
  */
 
+use MyHordesOptimizer\Extractor\BuildingTranslationsReader;
 use MyHordesOptimizer\Extractor\Config;
 use MyHordesOptimizer\Extractor\DriftReport;
 use MyHordesOptimizer\Extractor\FixtureHarness;
 use MyHordesOptimizer\Extractor\Projections;
 use MyHordesOptimizer\Extractor\RulesYamlReader;
 use MyHordesOptimizer\Extractor\SourceFetcher;
+use MyHordesOptimizer\Extractor\UpgradeEffectsReader;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -65,6 +67,16 @@ try {
     $catalogueBuildingUids = array_keys($brut['myhordes.fixtures.buildings'] ?? []);
     $brut['mho.buildings.availability'] = $rulesYaml->disponibilite($cheminRules, $catalogueBuildingUids);
     $brut['mho.buildings.rarity_overrides'] = $rulesYaml->overridesRarete($cheminRules);
+
+    echo '→ Lecture des effets d\'évolution dans le code du jeu et des traductions des chantiers…', PHP_EOL;
+    $lecteurEvolutions = new UpgradeEffectsReader($source);
+    $brut['mho.buildings.upgrade_effects'] = $lecteurEvolutions->lire();
+    $brut['mho.buildings.translations'] = (new BuildingTranslationsReader($source))->lire();
+    echo '  ', count($brut['mho.buildings.upgrade_effects']), ' chantiers à effets par niveau', PHP_EOL;
+    // Forme non reconnue dans le code du jeu : la valeur n'est pas reprise, à vérifier à la main.
+    foreach ($lecteurEvolutions->ignores() as $ignore) {
+        echo '  ⚠ ', $ignore, PHP_EOL;
+    }
 
     if ($rawOnly) {
         echo 'Terminé (--raw-only).', PHP_EOL;

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
@@ -1558,6 +1559,11 @@ namespace MyHordesOptimizerApi.Services.Impl
         public HomeReferentialDto GetHomeReferential()
         {
             return Citizens.HomeReferentialMapper.Map(MyHordesCodeRepository.GetHomeLevels(), MyHordesCodeRepository.GetHomeUpgrades());
+        }
+
+        public Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades()
+        {
+            return MyHordesCodeRepository.GetBuildingUpgrades();
         }
 
         public IEnumerable<BuildingDto> GetBuildings()

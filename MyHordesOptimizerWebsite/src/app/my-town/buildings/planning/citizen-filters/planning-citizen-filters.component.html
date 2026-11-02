@@ -1,15 +1,9 @@
 <div class="filters">
-    @if (filters.job_options().length > 1) {
-        <mat-button-toggle-group multiple hideMultipleSelectionIndicator data-filter="jobs" [value]="[...filters.jobs()]"
-                                 (change)="filters.onJobs($event.value)"
-                                 i18n-aria-label aria-label="Métiers">
-            @for (job of filters.job_options(); track job.key) {
-                <mat-button-toggle [value]="job.key" [matTooltip]="job.value.label">
-                    <img [src]="HORDES_IMG_REPO + job.value.img" [alt]="job.value.label">
-                </mat-button-toggle>
-            }
-        </mat-button-toggle-group>
-    }
+    <button mat-stroked-button type="button" data-action="citizen-filters" [matBadge]="filters.citizen_filters.active_count()"
+            [matBadgeHidden]="filters.citizen_filters.active_count() === 0" (click)="openCitizenFilters()">
+        <span class="label"><mat-icon>filter_alt</mat-icon><ng-container i18n>Filtres</ng-container></span>
+    </button>
+    <mho-citizen-sort-button [daily_actions]="store.displayable_actions()"/>
     <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label i18n>Consigne</mat-label>
         <mat-select data-filter="task" [value]="filters.task()" (selectionChange)="filters.task.set($event.value)">
