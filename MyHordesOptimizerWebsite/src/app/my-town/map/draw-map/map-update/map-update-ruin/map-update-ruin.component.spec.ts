@@ -4,6 +4,7 @@ import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import moment from 'moment';
 
+import { BURIED_RUIN_ID } from '../../../../../_abstract_model/const';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Item } from '../../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
@@ -68,6 +69,46 @@ describe('MapUpdateRuinComponent', (): void => {
 
         expect(fixture.nativeElement.querySelector('.mho-map-update-ruin').textContent).toContain('Cave sombre');
         expect(fixture.nativeElement.textContent).toContain('8');
+    });
+
+    it('shows the camping capacity of the ruin', (): void => {
+        setInputs(newRuin({ capacity: 2 }), newCell());
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('.camping-capacity').textContent).toContain('2');
+    });
+
+    it('shows an unlimited camping capacity when the ruin capacity is negative', (): void => {
+        setInputs(newRuin({ capacity: -1 }), newCell());
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('.camping-capacity').textContent).toContain('∞');
+    });
+
+    it('shows an unknown camping capacity when the ruin has none', (): void => {
+        setInputs(newRuin({ capacity: undefined }), newCell());
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('.camping-capacity').textContent).toContain('?');
+    });
+
+    it('computes the camping capacity of a buried ruin from the remaining digs, live', (): void => {
+        setInputs(newRuin({ id: BURIED_RUIN_ID, capacity: 0 }), newCell({ ruin_id: BURIED_RUIN_ID, nb_ruin_dig: 7 }));
+        fixture.detectChanges();
+
+        const capacity: () => string = (): string => fixture.nativeElement.querySelector('.camping-capacity').textContent;
+        expect(capacity()).toContain('2');
+
+        const digs_input: HTMLInputElement = fixture.nativeElement.querySelector('[formcontrolname="nb_ruin_dig"]');
+        digs_input.value = '12';
+        digs_input.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+        expect(capacity()).toContain('3');
+
+        digs_input.value = '2';
+        digs_input.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+        expect(capacity()).toContain('0');
     });
 
     it('shows the dig-count field when the ruin is not explorable and the cell ruin_id is negative', (): void => {
@@ -137,5 +178,15 @@ describe('MapUpdateRuinComponent', (): void => {
         const items: string = fixture.nativeElement.querySelector('mat-list').textContent;
         expect(items).toContain('Proche');
         expect(items).not.toContain('Loin');
+    });
+
+    it('shows the camping bonus and capacity of each possible building when the ruin id is -1', (): void => {
+        const possible: Ruin = newRuin({ id: 2, camping: 9, capacity: 4, min_dist: 0, max_dist: 5 });
+        setInputs(newRuin({ id: BURIED_RUIN_ID }), newCell({ ruin_id: BURIED_RUIN_ID, nb_km: 3 }), [possible]);
+        fixture.detectChanges();
+
+        const line: string = fixture.nativeElement.querySelector('mat-list [matListItemLine]').textContent;
+        expect(line).toContain('9');
+        expect(line).toContain('4');
     });
 });

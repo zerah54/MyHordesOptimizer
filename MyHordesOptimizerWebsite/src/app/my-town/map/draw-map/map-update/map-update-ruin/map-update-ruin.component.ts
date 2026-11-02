@@ -1,5 +1,5 @@
 import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, InputSignal, OnInit, output, OutputEmitterRef, Signal, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -9,15 +9,17 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import moment from 'moment';
 
-import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
+import { BURIED_RUIN_ID, HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { Imports } from '../../../../../_abstract_model/types/_types';
 import { Cell } from '../../../../../_abstract_model/types/cell.class';
 import { Ruin } from '../../../../../_abstract_model/types/ruin.class';
 import { FilterRuinsByKmPipe } from '../../../../../_core/pipes/filter-ruins-by-km.pipe';
+import { RuinCapacityPipe } from '../../../../../_core/pipes/ruin-capacity.pipe';
+import { getBuriedRuinCapacity } from '../../../../../_core/utilities/ruin.util';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [];
-const pipes: Imports = [DecimalPipe, FilterRuinsByKmPipe];
+const pipes: Imports = [DecimalPipe, FilterRuinsByKmPipe, RuinCapacityPipe];
 const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatListModule];
 
 @Component({
@@ -42,6 +44,15 @@ export class MapUpdateRuinComponent implements OnInit {
 
     protected cell_form!: FormGroup;
 
+    /** Fouilles restantes pour déterrer le bâtiment, suivies en direct depuis le formulaire. */
+    private readonly bury_count: WritableSignal<number> = signal(0);
+
+    /** Places en camping du bâtiment : enseveli, elles dépendent des fouilles restantes. */
+    protected readonly capacity: Signal<number | undefined> = computed((): number | undefined => {
+        const ruin: Ruin = this.ruin();
+        return ruin.id === BURIED_RUIN_ID ? getBuriedRuinCapacity(this.bury_count()) : ruin.capacity;
+    });
+
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {
@@ -54,6 +65,7 @@ export class MapUpdateRuinComponent implements OnInit {
             nb_ruin_dig: [this.cell().nb_ruin_dig],
             is_ruin_dryed: [this.cell().is_ruin_dryed]
         });
+        this.bury_count.set(+this.cell().nb_ruin_dig);
 
         this.cell_form.valueChanges
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -65,6 +77,7 @@ export class MapUpdateRuinComponent implements OnInit {
                 new_cell.nb_eruin_violet = +values.nb_eruin_violet;
                 new_cell.nb_ruin_dig = +values.nb_ruin_dig;
                 new_cell.is_ruin_dryed = !!values.is_ruin_dryed;
+                this.bury_count.set(new_cell.nb_ruin_dig);
                 this.cellChange.emit(new_cell);
             });
     }

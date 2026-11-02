@@ -29,6 +29,7 @@ import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { FilterRuinsByKmPipe } from '../../_core/pipes/filter-ruins-by-km.pipe';
 import { ClipboardService } from '../../_core/services/clipboard.service';
 import { getTown } from '../../_core/utilities/localstorage.util';
+import { getBuriedRuinCapacity } from '../../_core/utilities/ruin.util';
 import { SelectComponent } from '../../_shared/select/select.component';
 import { CampingDisplayBonusPipe } from './camping-display-bonus.pipe';
 
@@ -227,7 +228,7 @@ export class CampingComponent implements OnInit {
             if (ruin.id === -1000) {
                 capacity = '';
             } else if (ruin.id === -1) {
-                capacity = formatNumber(Math.max(0, Math.min(3, Math.floor((+this.configuration_form()!.get('bury_count')?.value || 0) / 3))), this.locale, '1.0-0');
+                capacity = formatNumber(getBuriedRuinCapacity(+this.configuration_form()!.get('bury_count')?.value || 0), this.locale, '1.0-0');
             } else {
                 capacity = formatNumber(ruin.capacity || 0, this.locale, '1.0-0');
             }
