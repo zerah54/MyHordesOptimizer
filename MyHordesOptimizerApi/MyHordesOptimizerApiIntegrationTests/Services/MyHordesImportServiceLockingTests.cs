@@ -263,6 +263,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => throw new NotSupportedException();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => throw new NotSupportedException();
             public List<int> GetTownList(int? season = null) => throw new NotSupportedException();
+            public List<int> GetAlphaTownList() => throw new NotSupportedException();
         }
 
         /// <summary>Comme <see cref="SingleTownMigrationRepository"/>, mais renvoie une réponse différente selon le mapId interrogé (ids[0]) — nécessaire pour faire tourner deux migrations distinctes en parallèle sur la même instance factice.</summary>
@@ -289,6 +290,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => throw new NotSupportedException();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => throw new NotSupportedException();
             public List<int> GetTownList(int? season = null) => throw new NotSupportedException();
+            public List<int> GetAlphaTownList() => throw new NotSupportedException();
         }
     }
 }

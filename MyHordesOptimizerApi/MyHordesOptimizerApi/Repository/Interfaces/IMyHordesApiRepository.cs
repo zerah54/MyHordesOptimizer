@@ -19,6 +19,8 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, MyHordesApiRuinDto> GetRuins();
         Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync();
         List<int> GetTownList(int? season = null);
+        /// <summary>Villes de saison nulle : <c>/json/townlist?season=a</c>.</summary>
+        List<int> GetAlphaTownList();
         List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids);
         MyHordesMap GetMapDetails(int mapId);
     }

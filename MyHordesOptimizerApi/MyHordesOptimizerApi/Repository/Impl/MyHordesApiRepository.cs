@@ -158,6 +158,14 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return response?.Towns ?? new List<int>();
         }
 
+        public List<int> GetAlphaTownList()
+        {
+            var url = GenerateUrl(EndpointTownList);
+            url = AddParameterToQuery(url, "season", "a");
+            var response = base.Get<MyHordesTownListResponseDto>(url);
+            return response?.Towns ?? new List<int>();
+        }
+
         public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids)
         {
             if (ids == null || ids.Count == 0)

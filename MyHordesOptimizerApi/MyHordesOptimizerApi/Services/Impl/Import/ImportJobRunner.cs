@@ -39,6 +39,17 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             string userKey,
             string userName,
             Func<IMyHordesImportService, Action<ImportStepProgress>, Task> work)
+            => TryStartScoped(jobKey, userId, userKey, userName,
+                (services, onStep) => work(services.GetRequiredService<IMyHordesImportService>(), onStep));
+
+        /// <summary>
+        /// Comme <see cref="TryStart"/>, pour un import porté par un autre service que <see cref="IMyHordesImportService"/>.
+        /// </summary>
+        public bool TryStartScoped(string jobKey,
+            int userId,
+            string userKey,
+            string userName,
+            Func<IServiceProvider, Action<ImportStepProgress>, Task> work)
         {
             lock (_lock)
             {
@@ -71,7 +82,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             int userId,
             string userKey,
             string userName,
-            Func<IMyHordesImportService, Action<ImportStepProgress>, Task> work)
+            Func<IServiceProvider, Action<ImportStepProgress>, Task> work)
         {
             try
             {
@@ -82,8 +93,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 userInfoProvider.UserKey = userKey;
                 userInfoProvider.UserName = userName;
 
-                var importService = scope.ServiceProvider.GetRequiredService<IMyHordesImportService>();
-                await work(importService, progress => OnStep(jobKey, progress));
+                await work(scope.ServiceProvider, progress => OnStep(jobKey, progress));
 
                 lock (_lock)
                 {

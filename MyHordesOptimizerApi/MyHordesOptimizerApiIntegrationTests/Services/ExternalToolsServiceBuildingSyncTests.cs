@@ -59,6 +59,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => _inner.GetRuins();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => _inner.GetBuildingAsync();
             public List<int> GetTownList(int? season = null) => _inner.GetTownList(season);
+            public List<int> GetAlphaTownList() => _inner.GetAlphaTownList();
             public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => _inner.GetTownDetails(ids);
             public MyHordesMap GetMapDetails(int mapId) => _inner.GetMapDetails(mapId);
 

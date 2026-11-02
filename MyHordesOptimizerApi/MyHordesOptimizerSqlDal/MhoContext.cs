@@ -151,6 +151,10 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownBuildingPlanSettings> TownBuildingPlanSettings { get; set; }
 
+    public virtual DbSet<TownRankingSnapshot> TownRankingSnapshots { get; set; }
+
+    public virtual DbSet<TownRankingSnapshotCitizen> TownRankingSnapshotCitizens { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder

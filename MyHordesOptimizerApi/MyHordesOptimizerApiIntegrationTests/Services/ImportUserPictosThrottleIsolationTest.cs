@@ -44,6 +44,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => new();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => Task.FromResult(new Dictionary<string, MyHordesApiBuildingDto>());
             public List<int> GetTownList(int? season = null) => new();
+            public List<int> GetAlphaTownList() => new();
             public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => new();
             public MyHordesMap GetMapDetails(int mapId) => null!;
         }
@@ -170,6 +171,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => new();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => Task.FromResult(new Dictionary<string, MyHordesApiBuildingDto>());
             public List<int> GetTownList(int? season = null) => new();
+            public List<int> GetAlphaTownList() => new();
             public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => new();
             public MyHordesMap GetMapDetails(int mapId) => null!;
         }
@@ -237,6 +239,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => new();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => Task.FromResult(new Dictionary<string, MyHordesApiBuildingDto>());
             public List<int> GetTownList(int? season = null) => new();
+            public List<int> GetAlphaTownList() => new();
             public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => new();
             public MyHordesMap GetMapDetails(int mapId) => null!;
         }

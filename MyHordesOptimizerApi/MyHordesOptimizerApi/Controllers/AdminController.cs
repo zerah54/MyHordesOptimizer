@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi.Attributes;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Models.Import;
@@ -271,6 +272,22 @@ namespace MyHordesOptimizerApi.Controllers
         public ActionResult<ImportJobState> ImportTowns([FromQuery] int? season = null, [FromQuery] bool resume = false)
         {
             return StartImportJob(ImportJobKeys.Towns, (service, onStep) => service.ImportTownsAsync(season, resume, onStep));
+        }
+
+        // Capture, en tâche de fond, la réponse brute de MyHordes sur les villes suspectes (~86 appels).
+        // `refresh` réinterroge aussi les villes déjà capturées. Ne modifie que les tables d'instantané.
+        [HttpPost("import/town-snapshot")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult<ImportJobState> CaptureTownSnapshot([FromQuery] bool refresh = false)
+        {
+            var started = _importJobRunner.TryStartScoped(ImportJobKeys.TownSnapshot,
+                _userInfoProvider.UserId,
+                _userInfoProvider.UserKey!,
+                _userInfoProvider.UserName!,
+                (services, onStep) => services.GetRequiredService<ITownSnapshotService>().CaptureAsync(refresh, null, onStep));
+            var state = _importJobRunner.GetState(ImportJobKeys.TownSnapshot);
+            return started ? Accepted(state) : Conflict(state);
         }
 
         /// <summary>

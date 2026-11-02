@@ -63,6 +63,7 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => throw new NotSupportedException();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => throw new NotSupportedException();
             public List<int> GetTownList(int? season = null) => throw new NotSupportedException();
+            public List<int> GetAlphaTownList() => throw new NotSupportedException();
             public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => throw new NotSupportedException();
             public MyHordesMap GetMapDetails(int mapId) => throw new NotSupportedException();
         }

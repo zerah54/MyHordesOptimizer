@@ -201,6 +201,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => throw new NotImplementedException();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => throw new NotImplementedException();
             public List<int> GetTownList(int? season = null) => throw new NotImplementedException();
+            public List<int> GetAlphaTownList() => throw new NotImplementedException();
             public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => throw new NotImplementedException();
             public MyHordesMap GetMapDetails(int mapId) => throw new NotImplementedException();
         }
@@ -276,6 +277,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             public Dictionary<string, MyHordesApiRuinDto> GetRuins() => throw new NotImplementedException();
             public Task<Dictionary<string, MyHordesApiBuildingDto>> GetBuildingAsync() => throw new NotImplementedException();
             public List<int> GetTownList(int? season = null) => throw new NotImplementedException();
+            public List<int> GetAlphaTownList() => throw new NotImplementedException();
             public List<MyHordesTownDetailsDto> GetTownDetails(List<int> ids) => throw new NotImplementedException();
             public MyHordesMap GetMapDetails(int mapId) => throw new NotImplementedException();
         }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,6 +35,7 @@ using MyHordesOptimizerApi.Services.Impl.Estimations;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl.Import;
 using MyHordesOptimizerApi.Services.Impl.Locking;
+using MyHordesOptimizerApi.Services.Impl.Towns;
 using MyHordesOptimizerApi.Services.Impl.Translations;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Estimations;
@@ -44,6 +46,7 @@ using Sentry;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -222,6 +225,7 @@ builder.Services.AddSingleton<ITranslastionRepository, GitlabWebApiTranslationRe
 builder.Services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
 builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 builder.Services.AddScoped<IMyHordesImportService, MyHordesImportService>();
+builder.Services.AddScoped<ITownSnapshotService, TownSnapshotService>();
 // Singleton : porte l'état de l'import global, qui survit à la requête qui l'a déclenché
 builder.Services.AddSingleton<ImportJobRunner>();
 // Singleton : porte l'état des mises à jour d'outils externes, qui survit à la requête qui les a déclenchées
@@ -312,6 +316,15 @@ builder.Services.AddRateLimiter(options =>
 });
 
 var app = builder.Build();
+
+// Garde-fou de migration des clés de villes : une erreur de lecture du marqueur empêche le démarrage.
+using (var guardScope = app.Services.CreateScope())
+{
+    var guardContext = guardScope.ServiceProvider.GetRequiredService<MhoContext>();
+    var markerPresent = guardContext.Parameters.AsNoTracking()
+        .Any(p => p.Name == TownIdentityStartupGuard.MarkerName && p.Value == "1");
+    TownIdentityStartupGuard.Check(markerPresent, codeExpectsMigratedKeys: false);
+}
 
 // Tout premier middleware du pipeline : doit envelopper toute réponse, y compris celles produites
 // par les middlewares ajoutés plus loin (Swagger, HttpLogging, etc.).
