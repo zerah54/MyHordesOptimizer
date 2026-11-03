@@ -91,8 +91,8 @@
                                         <ng-container i18n>PV</ng-container> {{ row.life }} / {{ row.maxLife }}
                                     }
                                     @case ('in-progress') {
-                                        <ng-container i18n>reste</ng-container> {{ row.remaining }}
-                                        <mho-icon-ap/>
+                                        <ng-container i18n>reste</ng-container>
+                                        <mho-icon-ap [value]="row.remaining"/>
                                     }
                                     @case ('unlocked') {
                                         <ng-container i18n>débloqué</ng-container>

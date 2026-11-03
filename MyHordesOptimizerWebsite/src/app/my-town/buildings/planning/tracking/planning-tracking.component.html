@@ -51,8 +51,8 @@
                         @for (entry of row.tasks; track entry.task.id ?? $index) {
                             @if (future()) {
                                 <span class="task">{{ entry.label }}@if (entry.task.pa > 0) {
-                                    ({{ entry.task.pa }}
-                                    <mho-icon-ap/>)
+                                    (
+                                    <mho-icon-ap [value]="entry.task.pa"/>)
                                 }</span>
                             } @else {
                                 <span class="task" [class.done]="entry.status.done" [class.focused]="isFocused(entry)">
@@ -60,8 +60,8 @@
                                               [disabled]="!store.can_track() || store.isPending(row.citizen.id, entry.task) || locked(entry.task, entry.status)"
                                               (change)="onToggle($event, row.citizen.id, entry)">
                                     {{ entry.label }}@if (entry.task.pa > 0) {
-                                    ({{ entry.task.pa }}
-                                    <mho-icon-ap/>)
+                                    (
+                                    <mho-icon-ap [value]="entry.task.pa"/>)
                                 }
                                 </mat-checkbox>
                                     @if (entry.status.source === 'data') {

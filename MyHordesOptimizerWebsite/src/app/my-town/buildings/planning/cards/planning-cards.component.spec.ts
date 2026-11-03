@@ -118,6 +118,13 @@ describe('PlanningCardsComponent', (): void => {
             expect(pool('regular')?.querySelector('mho-icon-ap')).not.toBeNull();
         });
 
+        it('aucun espace entre les PA prévus et l\'icône PA', async (): Promise<void> => {
+            await render();
+
+            const icon: Element | null = card('program').querySelector('.pa mho-icon-ap');
+            expect(icon?.querySelector('img')?.previousSibling?.textContent).toMatch(/^\d+$/);
+        });
+
         it('un budget dépassé est en évidence', async (): Promise<void> => {
             await render({ ...emptyPlanContent(), basePa: 0, programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0 }] } });
 

@@ -6,8 +6,7 @@
         <span class="value">{{ step_count() }}</span>
         <span class="caption"><ng-container i18n>{step_count(), plural, =0 {chantier} =1 {chantier} other {chantiers}}</ng-container></span>
         @if (evaluation !== null) {
-            <span class="caption pa">{{ planned_pa() }}
-                <mho-icon-ap/>
+            <span class="caption pa"><mho-icon-ap [value]="planned_pa()"/>
                 <ng-container i18n>prévus</ng-container></span>
         }
         @if (program_alerts() > 0) {

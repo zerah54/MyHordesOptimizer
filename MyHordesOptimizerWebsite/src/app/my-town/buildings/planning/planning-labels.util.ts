@@ -42,14 +42,14 @@ export function stepLabel(label: string, result: StepResult, max_life: number): 
     const mode: PlanStepMode = stepMode(step);
     const cost: number = result.paCost;
     if (step.kind === 'build') {
-        return mode === 'leave' ? $localize`Laisser ${label}:label: à ${step.targetRemaining}:remaining: :ap:` : label;
+        return mode === 'leave' ? $localize`Laisser ${label}:label: à ${step.targetRemaining}:remaining::ap:` : label;
     }
     if (mode === 'survive') {
-        return $localize`Réparer ${label}:label: pour passer la nuit (≈ ${cost}:cost: :ap:)`;
+        return $localize`Réparer ${label}:label: pour passer la nuit (≈ ${cost}:cost::ap:)`;
     }
     if (mode === 'leave') {
         const life: number = Math.max(0, max_life - step.targetRemaining);
-        return $localize`Réparer ${label}:label: jusqu'à ${life}:life:/${max_life}:max: PV (≈ ${cost}:cost: :ap:)`;
+        return $localize`Réparer ${label}:label: jusqu'à ${life}:life:/${max_life}:max: PV (≈ ${cost}:cost::ap:)`;
     }
     return $localize`Réparer entièrement ${label}:label:`;
 }

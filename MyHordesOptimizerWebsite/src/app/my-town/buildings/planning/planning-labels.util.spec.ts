@@ -19,14 +19,14 @@ describe('planning-labels.util', (): void => {
 
     it('stepLabel : chantier à terminer par son seul nom (consigne par défaut), ou laisser à N PA', (): void => {
         expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0 }), 30)).toBe('Mur');
-        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', mode: 'leave', targetRemaining: 12 }), 30)).toBe('Laisser Mur à 12 :ap:');
-        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', targetRemaining: 12 }), 30)).toBe('Laisser Mur à 12 :ap:');
+        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', mode: 'leave', targetRemaining: 12 }), 30)).toBe('Laisser Mur à 12:ap:');
+        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'build', targetRemaining: 12 }), 30)).toBe('Laisser Mur à 12:ap:');
     });
 
     it('stepLabel : réparer entièrement, pour passer la nuit ou jusqu\'à N PV, avec le coût estimé', (): void => {
         expect(stepLabel('Mur', result({ buildingId: 1, kind: 'repair', mode: 'finish', targetRemaining: 0 }, 10), 30)).toBe('Réparer entièrement Mur');
-        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'repair', mode: 'survive', targetRemaining: 0 }, 6), 30)).toBe('Réparer Mur pour passer la nuit (≈ 6 :ap:)');
-        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'repair', mode: 'leave', targetRemaining: 8 }, 6), 30)).toBe('Réparer Mur jusqu\'à 22/30 PV (≈ 6 :ap:)');
+        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'repair', mode: 'survive', targetRemaining: 0 }, 6), 30)).toBe('Réparer Mur pour passer la nuit (≈ 6:ap:)');
+        expect(stepLabel('Mur', result({ buildingId: 1, kind: 'repair', mode: 'leave', targetRemaining: 8 }, 6), 30)).toBe('Réparer Mur jusqu\'à 22/30 PV (≈ 6:ap:)');
     });
 
     it('ratioLabel : valeur arrondie, infini, absent', (): void => {

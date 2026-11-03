@@ -1,7 +1,7 @@
 import { bannedPoolShown, CitizenCapacity } from './budget.util';
 import { StepResult } from './building-progress.util';
-import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef, PlannedLoss } from './plan-evaluation.util';
 import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from './plan.types';
+import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef, PlannedLoss } from './plan-evaluation.util';
 import { ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
 
 /** Taille maximale d'un message généré : sous la limite du jeu (16 384 caractères) pour garder de la marge. */
@@ -220,12 +220,12 @@ function budgetLines(context: PostContext): string[] {
         if (showsPools(context)) {
             lines.push(`[b]${poolLabel(pool)}[/b]`);
         }
-        lines.push(`:middot: ${$localize`Citoyens`} : ${budget.citizenCapacity} :ap:`);
+        lines.push(`:middot: ${$localize`Citoyens`} : ${budget.citizenCapacity}:ap:`);
         for (const line of context.content.townLines.filter((candidate: { pool: PlanPool }): boolean => candidate.pool === pool)) {
-            lines.push(`:middot: ${line.label === '' ? '—' : line.label} : ${signed(line.pa)} :ap:`);
+            lines.push(`:middot: ${line.label === '' ? '—' : line.label} : ${signed(line.pa)}:ap:`);
         }
         const warning: string = budget.remaining < 0 ? ' :warning:' : '';
-        lines.push(`${$localize`Budget`} : ${budget.budget} :ap: · ${$localize`Coût`} : ${budget.cost} :ap: · ${$localize`Reste`} : ${budget.remaining} :ap:${warning}`);
+        lines.push(`${$localize`Budget`} : ${budget.budget}:ap: · ${$localize`Coût`} : ${budget.cost}:ap: · ${$localize`Reste`} : ${budget.remaining}:ap:${warning}`);
     }
     for (const capacity of context.evaluation.capacities.filter((candidate: CitizenCapacity): boolean => candidate.overCommitted)) {
         const name: string = context.citizens.find((citizen: CitizenRef): boolean => citizen.userId === capacity.userId)?.name ?? `#${capacity.userId}`;
@@ -316,7 +316,7 @@ function planLines(context: PostContext): string[] {
         }
         for (const result of results) {
             const warning: string = result.issues.length > 0 ? ' :warning:' : '';
-            lines.push(`:middot: ${stepAction(context, result)} → ${result.paCost} :ap:${warning}`);
+            lines.push(`:middot: ${stepAction(context, result)} → ${result.paCost}:ap:${warning}`);
         }
     }
     return lines;
@@ -369,7 +369,7 @@ function resourceLines(context: PostContext): string[] {
 
 /** Libellé d'une tâche personnelle, avec son coût quand il n'est pas nul. */
 function taskLine(context: PostContext, task: PlanTaskDTO): string {
-    const cost: string = task.pa > 0 ? ` (${task.pa} :ap:)` : '';
+    const cost: string = task.pa > 0 ? ` (${task.pa}:ap:)` : '';
     const icon: string = task.kind === 'home' || task.kind === 'homeUpgrade' ? ':home:' : ':middot:';
     return `${icon} ${taskLabel(task, context.homes)}${cost}`;
 }

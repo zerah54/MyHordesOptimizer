@@ -142,9 +142,9 @@ describe('forum-post.util', (): void => {
         it('lignes ville signées et budget par poche', (): void => {
             const text: string = joined(budgetPost(context(plan())));
 
-            expect(text).toContain('Guitare : +40 :ap:');
-            expect(text).toContain('Portes : -2 :ap:');
-            expect(text).toContain('Budget : 82 :ap: · Coût : 40 :ap: · Reste : 42 :ap:');
+            expect(text).toContain('Guitare : +40:ap:');
+            expect(text).toContain('Portes : -2:ap:');
+            expect(text).toContain('Budget : 82:ap: · Coût : 40:ap: · Reste : 42:ap:');
         });
 
         it('budget et plan : bannis avant non-bannis', (): void => {
@@ -162,10 +162,10 @@ describe('forum-post.util', (): void => {
         it('étapes du plan : chantier à terminer par son seul nom, réparer, coût en PA', (): void => {
             const text: string = joined(budgetPost(context(plan())));
 
-            expect(text).toMatch(/:middot: Mur → \d+ :ap:/);
+            expect(text).toMatch(/:middot: Mur → \d+:ap:/);
             expect(text).not.toContain('Terminer');
             expect(text).toContain('Réparer entièrement Porte');
-            expect(text).toContain('30 :ap:');
+            expect(text).toContain('30:ap:');
         });
 
         it('le bloc Plan annonce le chantier à voter ce soir', (): void => {
@@ -178,13 +178,13 @@ describe('forum-post.util', (): void => {
                 programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0, note: 'après 20h' }] }
             };
 
-            expect(joined(budgetPost(context(content)))).toContain(':middot: Mur — [i]après 20h[/i] → 30 :ap:');
+            expect(joined(budgetPost(context(content)))).toContain(':middot: Mur — [i]après 20h[/i] → 30:ap:');
         });
 
         it('« laisser à N PA » pour une cible non nulle', (): void => {
             const content: BuildingPlanContentDTO = { ...plan(), programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', targetRemaining: 5 }] } };
 
-            expect(joined(budgetPost(context(content)))).toContain('Laisser Mur à 5 :ap:');
+            expect(joined(budgetPost(context(content)))).toContain('Laisser Mur à 5:ap:');
         });
 
         it('défense : attaque, cible, projetée, reste à couvrir et meilleur rapport', (): void => {
@@ -304,9 +304,9 @@ describe('forum-post.util', (): void => {
         it('tâches : maison avec son libellé et son coût, tâche libre', (): void => {
             const text: string = joined(programPost(context(plan())));
 
-            expect(text).toContain(':home: Baracke (4 :ap:)');
+            expect(text).toContain(':home: Baracke (4:ap:)');
             expect(text).toContain(':middot: RDE');
-            expect(text).toContain(':home: Cuisine 1 (3 :ap:)');
+            expect(text).toContain(':home: Cuisine 1 (3:ap:)');
         });
 
         it('actions de chantier et améliorations structurées : libellés officiels, distinguées par leur référence', (): void => {
@@ -321,9 +321,9 @@ describe('forum-post.util', (): void => {
 
             const text: string = joined(programPost(context(content)));
 
-            expect(text).toContain(':middot: Cartographier le désert (1 :ap:)');
-            expect(text).toContain(':middot: Creuser dans les galeries (1 :ap:)');
-            expect(text).toContain(':home: Cuisine niv. 2 (3 :ap:)');
+            expect(text).toContain(':middot: Cartographier le désert (1:ap:)');
+            expect(text).toContain(':middot: Creuser dans les galeries (1:ap:)');
+            expect(text).toContain(':home: Cuisine niv. 2 (3:ap:)');
             expect(text).not.toMatch(/@Alice:1 @Chloé:3/);
         });
 
@@ -341,7 +341,7 @@ describe('forum-post.util', (): void => {
 
             expect(text).toContain('[b]Programme chantiers dans l\'ordre[/b]');
             expect(text.indexOf(':arrowright: [b]Bannis')).toBeLessThan(text.indexOf(':arrowright: [b]Non-bannis'));
-            expect(text).toContain('Laisser Mur à 10 :ap:');
+            expect(text).toContain('Laisser Mur à 10:ap:');
             expect(text).toContain('Réparer entièrement Porte');
             expect(text).toContain(':middot: #99');
             expect(text).not.toContain('Terminer');

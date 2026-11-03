@@ -43,8 +43,10 @@
                             @for (option of upgrade.levels; track option.level) {
                                 <mat-option [value]="option.level">
                                     <ng-container i18n>niv.</ng-container>
-                                    {{ option.level }} ({{ option.ap }}
-                                    <mho-icon-ap/>)
+                                    {{ option.level }}
+                                    (
+                                    <mho-icon-ap [value]="option.ap"/>
+                                    )
                                 </mat-option>
                             }
                         </mat-select>
@@ -56,8 +58,10 @@
                     <mat-label i18n>Niveau visé</mat-label>
                     <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
                         @for (home of home_levels(); track home.level) {
-                            <mat-option [value]="home.level">{{ home.label }} ({{ home.ap }}
-                                <mho-icon-ap/>)
+                            <mat-option [value]="home.level">{{ home.label }}
+                                (
+                                <mho-icon-ap [value]="home.ap"/>
+                                )
                             </mat-option>
                         }
                     </mat-select>

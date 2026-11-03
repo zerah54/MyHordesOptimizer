@@ -28,7 +28,8 @@
                                     <ng-container i18n>Chantier voté ce soir</ng-container>
                                 </span>
                             </mat-label>
-                            <mat-select data-field="vote" [value]="draft.eveningVoteBuildingId" [disabled]="!store.can_edit()" (selectionChange)="onVote($event.value)">
+                            <mat-select data-field="vote" [value]="draft.eveningVoteBuildingId" [disabled]="!store.can_edit()"
+                                        (selectionChange)="onVote($event.value)">
                                 @if (draft.eveningVoteBuildingId !== null) {
                                     <mat-select-trigger>
                                         <span class="icon-label">
@@ -54,7 +55,8 @@
                         </mat-form-field>
                         @if (voteGain(); as gain) {
                             <span class="vote-gain" data-field="vote-gain">
-                                <ng-container i18n>Niveau</ng-container> {{ gain.level }}
+                                <ng-container i18n>Niveau</ng-container>
+                                {{ gain.level }}
                                 @if (gain.defense !== 0) {
                                     <span class="def" i18n-matTooltip matTooltip="Défense gagnée dès cette nuit : l'évolution s'applique avant l'attaque">
                                         {{ gain.defense > 0 ? '+' : '' }}{{ gain.defense }}
@@ -141,23 +143,21 @@
                                     @if (step.kind === 'build') {
                                         @if (freeThreshold(step.buildingId); as threshold) {
                                             <span class="free-threshold"><ng-container i18n>Gratuit demain si ≤</ng-container>
-                                                {{ threshold }}
-                                                <mho-icon-ap/></span>
+                                                <mho-icon-ap [value]="threshold"/></span>
                                         }
                                     }
                                 </span>
 
                                 @if (res) {
-                                    <span class="cost">{{ res.paCost }}
-                                        <mho-icon-ap/></span>
+                                    <span class="cost"><mho-icon-ap [value]="res.paCost"/></span>
                                     @if (step.kind === 'build') {
                                         <span class="result" [attr.data-done]="res.completes">
                                             @if (res.completes) {
                                                 <mat-icon>check</mat-icon>
                                                 <ng-container i18n>terminé</ng-container>
                                             } @else {
-                                                {{ res.remainingAfter + res.points }} → {{ res.remainingAfter }}
-                                                <mho-icon-ap/>
+                                                {{ res.remainingAfter + res.points }} →
+                                                <mho-icon-ap [value]="res.remainingAfter"/>
                                                 <ng-container i18n>restants</ng-container>
                                             }
                                         </span>
