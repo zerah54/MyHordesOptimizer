@@ -38,19 +38,18 @@
                               i18n>Gestion des bannis
             </mat-slide-toggle>
         }
-        <button mat-flat-button type="button" data-action="save" [disabled]="!store.can_edit() || !store.dirty() || store.saving()" (click)="store.save()">
-            @if (store.saving()) {
-                <mat-spinner diameter="20"/>
-            } @else {
-                <span class="label">
-                    <mat-icon>save</mat-icon>
-                    <ng-container i18n>Enregistrer</ng-container>
-                    @if (store.dirty()) {
-                        <span class="dirty-dot" i18n-matTooltip matTooltip="Modifications non enregistrées"></span>
-                    }
-                </span>
+        <span class="save-state" data-field="save-state" role="status">
+            @if (store.save_state() === 'pending' || store.save_state() === 'saving') {
+                <mat-icon aria-hidden="true">sync</mat-icon>
+                <ng-container i18n>Enregistrement…</ng-container>
+            } @else if (store.save_state() === 'saved') {
+                <mat-icon aria-hidden="true">check</mat-icon>
+                <ng-container i18n>Enregistré</ng-container>
+            } @else if (store.save_state() === 'error') {
+                <mat-icon aria-hidden="true">error</mat-icon>
+                <ng-container i18n>Échec de l'enregistrement</ng-container>
             }
-        </button>
+        </span>
     </div>
 </div>
 

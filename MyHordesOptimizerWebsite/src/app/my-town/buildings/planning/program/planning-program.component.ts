@@ -1,4 +1,5 @@
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, output, OutputEmitterRef, Signal, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,13 +19,13 @@ import { BuildingProgress, repairLifeAfterPa, repairPaFor, StepIssue, StepResult
 import { upgradeLevelText } from '../building-upgrades.types';
 import { BuildingPlanContentDTO, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO, PlanStepKind, PlanStepMode, stepMode } from '../plan.types';
 import { stepIssueLabel } from '../plan-alerts.util';
-import { BuildingRef, WORKSHOP_UID } from '../plan-evaluation.util';
+import { BuildingRef, DayEvaluation, EveningVote, WORKSHOP_UID } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
 import { addInstruction, ItemPosition, moveItem, removeItem, setInstructions, setInstructionText, setStepMode, setStepNote } from '../program-edit.util';
 import { repairHpPerAp } from '../workshop.util';
 
-const angular_common: Imports = [FormsModule];
+const angular_common: Imports = [FormsModule, NgTemplateOutlet];
 const components: Imports = [IconApComponent];
 const cdk_modules: Imports = [DragDropModule];
 const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSelectModule, MatTooltipModule];
@@ -323,23 +324,31 @@ export class PlanningProgramComponent {
      * @returns {number | null} Seuil strictement positif, sinon nul.
      */
     protected freeThreshold(building_id: number): number | null {
-        const vote_id: number | null = this.store.draft()?.eveningVoteBuildingId ?? null;
-        if (vote_id === null || this.store.buildings().get(vote_id)?.uid !== WORKSHOP_UID) {
+        const evaluation: DayEvaluation | null = this.store.evaluation();
+        if (evaluation?.vote?.uid !== WORKSHOP_UID && evaluation?.secondVote?.uid !== WORKSHOP_UID) {
             return null;
         }
-        const threshold: number = this.store.evaluation()?.freeThresholds.get(building_id) ?? 0;
+        const threshold: number = evaluation.freeThresholds.get(building_id) ?? 0;
         return threshold > 0 ? threshold : null;
+    }
+
+    /**
+     * Brasier Sacrificiel construit au soir : la nuit applique une seconde évolution.
+     * @returns {boolean} Vrai si le second vote est proposé.
+     */
+    protected doubleVote(): boolean {
+        return this.store.evaluation()?.doubleVote === true;
     }
 
     /** Chantiers votables le soir : à évolution et construits en fin de journée (déjà ou par le programme), plus le chantier déjà voté. */
     protected voteOptions(): BuildingRef[] {
-        const progress: ReadonlyMap<number, BuildingProgress> | undefined = this.store.evaluation()?.progressAfter;
-        const voted_id: number | null = this.store.draft()?.eveningVoteBuildingId ?? null;
-        const upgradable: ReadonlySet<number> = new Set<number>(this.store.catalog().filter((building: Building): boolean => building.has_upgrade).map((building: Building): number => building.id));
-        return [...this.store.plannable_buildings()]
-            .sort((a: BuildingRef, b: BuildingRef): number => a.label.localeCompare(b.label))
-            .filter((building: BuildingRef): boolean => building.id === voted_id
-                || (upgradable.has(building.id) && (progress === undefined || progress.get(building.id)?.built === true)));
+        return this.upgradableOptions(this.store.draft()?.eveningVoteBuildingId ?? null, null);
+    }
+
+    /** Chantiers votables en second : comme le premier vote, sans le chantier déjà voté en premier (jamais deux fois le même). */
+    protected secondVoteOptions(): BuildingRef[] {
+        const draft: BuildingPlanContentDTO | null = this.store.draft();
+        return this.upgradableOptions(draft?.eveningSecondVoteBuildingId ?? null, draft?.eveningVoteBuildingId ?? null);
     }
 
     /**
@@ -348,21 +357,65 @@ export class PlanningProgramComponent {
      * @returns {VoteGain | null} Gain.
      */
     protected voteGain(): VoteGain | null {
-        const vote: { uid: string; level: number; defense: number } | null = this.store.evaluation()?.vote ?? null;
-        if (vote === null) {
-            return null;
-        }
-        return { level: vote.level, defense: vote.defense, text: upgradeLevelText(this.store.upgrades(), vote.uid, vote.level, this.locale) };
+        return this.gainOf(this.store.evaluation()?.vote ?? null);
     }
 
     /**
-     * Choisit le chantier voté le soir.
+     * Gain de la seconde évolution, comme {@link voteGain}.
+     * @returns {VoteGain | null} Gain.
+     */
+    protected secondVoteGain(): VoteGain | null {
+        return this.gainOf(this.store.evaluation()?.secondVote ?? null);
+    }
+
+    /**
+     * Choisit le chantier voté le soir ; s'il était le second vote, celui-ci est vidé (jamais deux fois le même chantier).
      * @param {number | null} building_id Chantier, nul pour aucun.
      */
     protected onVote(building_id: number | null): void {
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
             content.eveningVoteBuildingId = building_id;
+            if (building_id !== null && content.eveningSecondVoteBuildingId === building_id) {
+                content.eveningSecondVoteBuildingId = null;
+            }
         });
+    }
+
+    /**
+     * Choisit le second chantier voté le soir.
+     * @param {number | null} building_id Chantier, nul pour aucun.
+     */
+    protected onSecondVote(building_id: number | null): void {
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            content.eveningSecondVoteBuildingId = building_id;
+        });
+    }
+
+    /**
+     * Chantiers votables : à évolution et construits en fin de journée (déjà ou par le programme), plus le chantier déjà choisi.
+     * @param {number | null} kept_id Chantier déjà choisi, toujours proposé.
+     * @param {number | null} excluded_id Chantier à écarter.
+     * @returns {BuildingRef[]} Chantiers triés par nom.
+     */
+    private upgradableOptions(kept_id: number | null, excluded_id: number | null): BuildingRef[] {
+        const progress: ReadonlyMap<number, BuildingProgress> | undefined = this.store.evaluation()?.progressAfter;
+        const upgradable: ReadonlySet<number> = new Set<number>(this.store.catalog().filter((building: Building): boolean => building.has_upgrade).map((building: Building): number => building.id));
+        return [...this.store.plannable_buildings()]
+            .sort((a: BuildingRef, b: BuildingRef): number => a.label.localeCompare(b.label))
+            .filter((building: BuildingRef): boolean => building.id !== excluded_id && (building.id === kept_id
+                || (upgradable.has(building.id) && (progress === undefined || progress.get(building.id)?.built === true))));
+    }
+
+    /**
+     * Gain d'une évolution votée, avec le texte du niveau dans la langue du site.
+     * @param {EveningVote | null} vote Évolution évaluée.
+     * @returns {VoteGain | null} Gain, nul sans vote.
+     */
+    private gainOf(vote: EveningVote | null): VoteGain | null {
+        if (vote === null) {
+            return null;
+        }
+        return { level: vote.level, defense: vote.defense, text: upgradeLevelText(this.store.upgrades(), vote.uid, vote.level, this.locale) };
     }
 
     /**

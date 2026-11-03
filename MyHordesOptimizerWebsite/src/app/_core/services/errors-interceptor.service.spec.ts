@@ -106,6 +106,28 @@ describe('errorInterceptor', (): void => {
         expect(snackbar_spy.errorSnackbar).not.toHaveBeenCalled();
     });
 
+    it('sur un statut présent dans la liste silencieuse, transmet l\'erreur sans snackbar', (): void => {
+        let received: unknown;
+        http_client.get('/test', { context: new HttpContext().set(SILENT_ERROR_STATUS, [409, 423]) }).subscribe({
+            error: (error: unknown): void => {
+                received = error;
+            }
+        });
+
+        http_mock.expectOne('/test').flush('verrou', { status: 423, statusText: 'Locked' });
+
+        expect((received as HttpErrorResponse).status).toBe(423);
+        expect(snackbar_spy.errorSnackbar).not.toHaveBeenCalled();
+    });
+
+    it('sur un statut absent de la liste silencieuse, garde la snackbar', (): void => {
+        http_client.get('/test', { context: new HttpContext().set(SILENT_ERROR_STATUS, [409, 423]) }).subscribe({ error: (): void => { } });
+
+        http_mock.expectOne('/test').flush('interdit', { status: 403, statusText: 'Forbidden' });
+
+        expect(snackbar_spy.errorSnackbar).toHaveBeenCalledTimes(1);
+    });
+
     it('sur un autre statut que le statut silencieux, garde la snackbar', (): void => {
         http_client.get('/test', { context: new HttpContext().set(SILENT_ERROR_STATUS, 409) }).subscribe({ error: (): void => { } });
 

@@ -8,12 +8,12 @@ import type { Mock } from 'vitest';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { DailyAction } from '../../_abstract_model/types/daily-action.class';
+import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
-import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Me } from '../../_abstract_model/types/me.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -394,6 +394,16 @@ describe('MyProgramComponent', (): void => {
         await render(content({ eveningVoteBuildingId: 2 }));
 
         expect(text('.vote')).toContain('Atelier');
+    });
+
+    it('avec le Brasier Sacrificiel, affiche les deux chantiers votés ce soir', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = content({ eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
+        await render(plan);
+        fake.evaluation.set({ ...fakeEvaluation(plan), doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0 } });
+        fixture.detectChanges();
+
+        expect(text('.vote')).toContain('Évolutions votées ce soir');
+        expect(text('.vote')).toContain('Atelier, Porte');
     });
 
     it('les consignes du jour gardent leurs retours à la ligne', async (): Promise<void> => {

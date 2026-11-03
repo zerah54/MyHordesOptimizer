@@ -261,6 +261,17 @@ export class MyProgramComponent implements OnInit {
     }
 
     /**
+     * Libellés des chantiers à voter ce soir (le second seulement avec le Brasier Sacrificiel).
+     * @param {MyProgram} program Programme du citoyen.
+     * @returns {string[]} Libellés, vide sans vote.
+     */
+    protected voteNames(program: MyProgram): string[] {
+        return [program.voteBuildingId, program.secondVoteBuildingId]
+            .filter((building_id: number | null): building_id is number => building_id !== null)
+            .map((building_id: number): string => this.buildingName(building_id));
+    }
+
+    /**
      * Clic sur une case : elle reprend aussitôt l'état réel, qui ne change qu'une fois l'écriture acceptée.
      * @param {MatCheckboxChange} event Changement de la case.
      * @param {number} user_id Joueur.

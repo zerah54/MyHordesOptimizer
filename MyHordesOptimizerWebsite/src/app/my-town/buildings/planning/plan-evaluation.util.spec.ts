@@ -2,9 +2,21 @@ import { CitizenCapacity } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { RankedCandidate } from './defense.util';
 import { neutralDefenseFactors } from './defense-gain.util';
+import { DEFENSE_FIXINGS_UID } from './defense-rules.const';
 import { REACTOR_UID } from './night-survival.util';
 import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
-import { advanceDay, BuildingRef, CitizenRef, DayEvaluation, DayInput, evaluateDay, evaluateDays, HomeLevelRef, WORKSHOP_UID } from './plan-evaluation.util';
+import {
+    advanceDay,
+    BuildingRef,
+    CitizenRef,
+    DayEvaluation,
+    DayInput,
+    evaluateDay,
+    evaluateDays,
+    HomeLevelRef,
+    PYRE_UID,
+    WORKSHOP_UID
+} from './plan-evaluation.util';
 
 function ref(overrides: Partial<BuildingRef>): BuildingRef {
     return { id: 0, uid: 'x', label: 'X', pa: 10, defence: 0, maxLife: 0, temporary: false, breakable: true, parentId: null, resources: [], ...overrides };
@@ -216,6 +228,127 @@ describe('plan-evaluation.util', (): void => {
 
         it('sans donnée d\'évolution, le vote ne change pas la défense', (): void => {
             expect(evaluateDay(input({ eveningVoteBuildingId: 3 })).vote?.defense).toBe(0);
+        });
+    });
+
+    describe('second vote avec le Brasier Sacrificiel', (): void => {
+        const PYRE: BuildingRef = ref({ id: 8, uid: PYRE_UID, label: 'Brasier', pa: 10, temporary: true });
+        const upgrades: DayInput['upgrades'] = {
+            gate: { maxLevel: 3, effects: { defenseIncrement: { levels: [0, 15, 45, 75], default: 0, source: 'BuildingUpgradeListener' } } }
+        };
+
+        /**
+         * Atelier voté en premier, Porte (niveau 1) en second, Brasier à construire.
+         * @param {Partial<BuildingPlanContentDTO>} content Contenu du plan.
+         * @returns {DayInput} Entrée.
+         */
+        function pyreInput(content: Partial<BuildingPlanContentDTO>): DayInput {
+            return input({ eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3, ...content }, {
+                buildings: new Map<number, BuildingRef>([[1, WALL], [2, WORKSHOP], [3, GATE], [8, PYRE]]),
+                progress: new Map<number, BuildingProgress>([...baseProgress(), [8, progress({ buildingId: 8, paCurrent: 10 })]]),
+                upgrades,
+                buildingLevels: new Map<string, number>([['gate', 1]])
+            });
+        }
+
+        it('Brasier construit dans la journée : la seconde évolution compte pour la nuit et le lendemain', (): void => {
+            const day: DayInput = pyreInput({ programs: { banned: [], regular: [step(8, 0)] } });
+            const evaluation: DayEvaluation = evaluateDay(day);
+
+            expect(evaluation.doubleVote).toBe(true);
+            expect(evaluation.vote?.uid).toBe(WORKSHOP_UID);
+            expect(evaluation.secondVote).toEqual({ uid: 'gate', level: 2, defense: 30 });
+            expect(evaluation.projectedDefense).toBe(1030);
+            const next: ReturnType<typeof advanceDay> = advanceDay(evaluation, day);
+            expect(next.buildingLevels.get('gate')).toBe(2);
+            expect(next.workshopLevel).toBe(1);
+        });
+
+        it('un Atelier voté en second agit aussi sur le lendemain', (): void => {
+            const day: DayInput = pyreInput({ eveningVoteBuildingId: 3, eveningSecondVoteBuildingId: 2, programs: { banned: [], regular: [step(8, 0)] } });
+
+            expect(advanceDay(evaluateDay(day), day).workshopLevel).toBe(1);
+        });
+
+        it('sans Brasier, le second vote est ignoré', (): void => {
+            const day: DayInput = pyreInput({});
+            const evaluation: DayEvaluation = evaluateDay(day);
+
+            expect(evaluation.doubleVote).toBe(false);
+            expect(evaluation.secondVote).toBeNull();
+            expect(evaluation.projectedDefense).toBe(1000);
+            expect(advanceDay(evaluation, day).buildingLevels.get('gate')).toBe(1);
+        });
+
+        it('le Brasier ne vaut que la nuit de sa construction', (): void => {
+            const [day1, day2]: DayEvaluation[] = evaluateDays([pyreInput({ programs: { banned: [], regular: [step(8, 0)] } }), pyreInput({})]);
+
+            expect(day1.doubleVote).toBe(true);
+            expect(day2.doubleVote).toBe(false);
+            expect(day2.secondVote).toBeNull();
+        });
+
+        it('le même chantier ne monte pas deux fois', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(pyreInput({ eveningVoteBuildingId: 3, programs: { banned: [], regular: [step(8, 0)] } }));
+
+            expect(evaluation.secondVote).toBeNull();
+            expect(evaluation.projectedDefense).toBe(1030);
+        });
+    });
+
+    describe('vote sur les Fixations de défenses', (): void => {
+        const PLATE: number = 50;
+        const FIXINGS: BuildingRef = ref({ id: 6, uid: DEFENSE_FIXINGS_UID, label: 'Fixations', pa: 10 });
+        const SCOUTS: BuildingRef = ref({ id: 7, uid: 'scouts', label: 'Repaire', pa: 10, resources: [{ itemId: PLATE, count: 1 }] });
+
+        /**
+         * Fixations construites au niveau 0, 8 objets de défense en banque, Repaire à construire.
+         * @param {Partial<BuildingPlanContentDTO>} content Contenu du plan.
+         * @param {Partial<DayInput>} overrides Entrées à remplacer.
+         * @returns {DayInput} Entrée.
+         */
+        function fixingsInput(content: Partial<BuildingPlanContentDTO>, overrides: Partial<DayInput> = {}): DayInput {
+            return input({ eveningVoteBuildingId: 6, ...content }, {
+                buildings: new Map<number, BuildingRef>([[1, WALL], [2, WORKSHOP], [3, GATE], [6, FIXINGS], [7, SCOUTS]]),
+                progress: new Map<number, BuildingProgress>([
+                    ...baseProgress(),
+                    [6, progress({ buildingId: 6, built: true })],
+                    [7, progress({ buildingId: 7, paCurrent: 10 })]
+                ]),
+                bank: new Map<number, number>([[5, 1], [PLATE, 8]]),
+                defenseFactors: { ...neutralDefenseFactors(), defenseItems: 8, itemFactor: 1.5 },
+                defenseItemIds: new Set<number>([PLATE]),
+                buildingLevels: new Map<string, number>([[DEFENSE_FIXINGS_UID, 0]]),
+                ...overrides
+            });
+        }
+
+        it('relève le multiplicateur des objets de défense pour la nuit même et le lendemain', (): void => {
+            const day: DayInput = fixingsInput({});
+            const evaluation: DayEvaluation = evaluateDay(day);
+
+            expect(evaluation.vote).toEqual({ uid: DEFENSE_FIXINGS_UID, level: 1, defense: 4 });
+            expect(evaluation.projectedDefense).toBe(1004);
+            expect(advanceDay(evaluation, day).defenseFactors.itemFactor).toBe(2);
+        });
+
+        it('un objet de défense consommé le même jour compte au multiplicateur voté', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(fixingsInput({ programs: { banned: [], regular: [step(7, 0)] } }));
+
+            expect(evaluation.realDefense.get(7)).toBe(-2);
+            expect(evaluation.vote?.defense).toBe(4);
+            expect(evaluation.projectedDefense).toBe(1002);
+        });
+
+        it('au niveau maximum, le vote ne change plus le multiplicateur', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(fixingsInput({}, {
+                upgrades: { [DEFENSE_FIXINGS_UID]: { maxLevel: 3 } },
+                buildingLevels: new Map<string, number>([[DEFENSE_FIXINGS_UID, 3]])
+            }));
+
+            expect(evaluation.vote?.defense).toBe(0);
+            expect(evaluation.projectedDefense).toBe(1000);
+            expect(evaluation.defenseFactorsAfter.itemFactor).toBe(1.5);
         });
     });
 

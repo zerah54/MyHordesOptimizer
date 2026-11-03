@@ -14,6 +14,10 @@
                 <source>/faq</source>
                 <target state="final">/faq</target>
             </trans-unit>
+            <trans-unit id="9163396455893071919" datatype="html">
+                <source>Quelqu&apos;un a pris la main sur cette proposition : vos dernières modifications n&apos;ont pas pu être enregistrées.</source>
+                <target state="translated">Someone has taken over this proposal: your latest changes could not be saved.</target>
+            </trans-unit>
             <trans-unit id="9166056573127391797" datatype="html" approved="yes">
                 <source>Serveur occupé, réessayez dans un instant</source>
                 <target state="final">Server busy, please try again in a moment</target>
@@ -1600,6 +1604,10 @@
                 <source>Chantiers</source>
                 <target state="final">Construction sites</target>
             </trans-unit>
+            <trans-unit id="426994883080077069" datatype="html">
+                <source>Tu as pris la main dans un autre onglet</source>
+                <target state="translated">You took over in another tab</target>
+            </trans-unit>
             <trans-unit id="4273057282113946093" datatype="html" approved="yes">
                 <source>Dépendant</source>
                 <target state="final">Addicted</target>
@@ -1898,12 +1906,10 @@
                 <source>Groupé</source>
                 <target state="final">Grouped</target>
             </trans-unit>
-            <trans-unit id="2892258614148420204" datatype="html">
+            <trans-unit id="1075511902879442503" datatype="html">
                 <source>Laisser
                     <x id="label" equiv-text="label"/>
-                    à
-                    <x id="remaining" equiv-text="step.targetRemaining"/>
-                    :ap:
+                    à<x id="remaining" equiv-text="step.targetRemaining"/>:ap:
                 </source>
                 <target state="translated">Leave
                     <x id="label" equiv-text="label"/>
@@ -2023,6 +2029,10 @@
                 <target state="translated">Citizen
                     <x id="PH" equiv-text="index + 1"/>
                 </target>
+            </trans-unit>
+            <trans-unit id="119694628530161263" datatype="html">
+                <source>Évolutions votées ce soir</source>
+                <target state="translated">Upgrades voted tonight</target>
             </trans-unit>
             <trans-unit id="1199075748231436486" datatype="html" approved="yes">
                 <source>Identifiant MyHordes</source>
@@ -2702,6 +2712,10 @@
             <trans-unit id="4125935080176240286" datatype="html" approved="yes">
                 <source>Points de contrôles requis</source>
                 <target state="final">Required control points</target>
+            </trans-unit>
+            <trans-unit id="4127384894846398448" datatype="html">
+                <source>Tu modifies cette proposition dans un autre onglet</source>
+                <target state="translated">You are editing this proposal in another tab</target>
             </trans-unit>
             <trans-unit id="4128885944450604559" datatype="html" approved="yes">
                 <source>Survivants en moyenne</source>
@@ -3635,6 +3649,10 @@
                 <source>Consommer</source>
                 <target state="final">Consume</target>
             </trans-unit>
+            <trans-unit id="5774600331666856188" datatype="html">
+                <source>Cette proposition a été supprimée</source>
+                <target state="translated">This proposal has been deleted</target>
+            </trans-unit>
             <trans-unit id="577664839739965914" datatype="html" approved="yes">
                 <source>Exploration</source>
                 <target state="final">Exploration</target>
@@ -3843,8 +3861,8 @@
                 <source>Violet</source>
                 <target state="final">Violet</target>
             </trans-unit>
-            <trans-unit id="2684422002973556559" datatype="html">
-                <source>Les modifications de la proposition affichée ne sont pas enregistrées et seront perdues. Continuer quand même ?</source>
+            <trans-unit id="319408636887380758" datatype="html">
+                <source>Les modifications de la proposition affichée n&apos;ont pas pu être enregistrées et seront perdues. Continuer quand même ?</source>
                 <target state="translated">Changes to the displayed proposal are not saved and will be lost. Continue anyway?</target>
             </trans-unit>
             <trans-unit id="2688644633550534159" datatype="html" approved="yes">
@@ -4064,6 +4082,10 @@
                 <source>Répartition des valeurs</source>
                 <target state="final">Values distribution</target>
             </trans-unit>
+            <trans-unit id="4031413646820776086" datatype="html">
+                <source>Échec de l&apos;enregistrement</source>
+                <target state="translated">Save failed</target>
+            </trans-unit>
             <trans-unit id="4032218604605059227" datatype="html" approved="yes">
                 <source>Aucune estimation saisie à affiner</source>
                 <target state="final">No entered estimate to refine</target>
@@ -4071,6 +4093,10 @@
             <trans-unit id="4034420321472748193" datatype="html">
                 <source>Renommer et modifier les couleurs</source>
                 <target state="translated">Rename and edit the colours</target>
+            </trans-unit>
+            <trans-unit id="4034455525597514950" datatype="html">
+                <source>Prendre la main</source>
+                <target state="translated">Take over</target>
             </trans-unit>
             <trans-unit id="7451632765834808757" datatype="html">
                 <source>Ajouter une consigne</source>
@@ -4683,14 +4709,12 @@
                     piles
                 </target>
             </trans-unit>
-            <trans-unit id="8697586560188003468" datatype="html">
+            <trans-unit id="1514264624187743506" datatype="html">
                 <source>Réparer
                     <x id="label" equiv-text="label"/>
                     jusqu&apos;à<x id="life" equiv-text="life"/>/
                     <x id="max" equiv-text="max_life"/>
-                    PV (≈
-                    <x id="cost" equiv-text="cost"/>
-                    :ap:)
+                    PV (≈<x id="cost" equiv-text="cost"/>:ap:)
                 </source>
                 <target state="translated">Repair
                     <x id="label" equiv-text="label"/>
@@ -5314,6 +5338,10 @@
                     the button: click &quot;View all registry entries&quot; at the bottom of the registry, then relaunch the update.&lt;/p&gt;
                 </target>
             </trans-unit>
+            <trans-unit id="7491570996281685809" datatype="html">
+                <source>modifie cette proposition</source>
+                <target state="translated">is editing this proposal</target>
+            </trans-unit>
             <trans-unit id="6188037361891823447" datatype="html" approved="yes">
                 <source>Zone de rappatriement</source>
                 <target state="final">Repatriation zone</target>
@@ -5456,8 +5484,7 @@
                     my-town/wishlist]ce lien[/link]
                 </source>
                 <target state="translated">This list was generated from the MyHordes Optimizer website. You can find it by following [link=
-                    <x id="PH"
-                       equiv-text="environment.website_url"/>
+                    <x id="PH" equiv-text="environment.website_url"/>
                     my-town/wishlist]this link[/link]
                 </target>
             </trans-unit>
@@ -6054,6 +6081,16 @@
             <trans-unit id="3600316095632998024" datatype="html" approved="yes">
                 <source>Le plus direct (en L)</source>
                 <target state="final">Most direct (L-shaped)</target>
+            </trans-unit>
+            <trans-unit id="3603610149048252866" datatype="html">
+                <source>
+                    <x id="pseudo" equiv-text="this.citizenName(known.userId)"/>
+                    a pris la main
+                </source>
+                <target state="translated">
+                    <x id="pseudo" equiv-text="this.citizenName(known.userId)"/>
+                    took over
+                </target>
             </trans-unit>
             <trans-unit id="3605978488400419603" datatype="html" approved="yes">
                 <source>Zoomer</source>
@@ -6831,6 +6868,10 @@
                 <source>Points de contrôle</source>
                 <target state="final">Control points</target>
             </trans-unit>
+            <trans-unit id="7203336193845533401" datatype="html">
+                <source>Second chantier voté ce soir</source>
+                <target state="translated">Second construction voted tonight</target>
+            </trans-unit>
             <trans-unit id="7207482748149833374" datatype="html" approved="yes">
                 <source>Ville observée</source>
                 <target state="final">Observed town</target>
@@ -7570,6 +7611,16 @@
                 <source>Centrer</source>
                 <target state="final">Center</target>
             </trans-unit>
+            <trans-unit id="929052224451282812" datatype="html">
+                <source>
+                    <x id="pseudo" equiv-text="this.citizenName(state.userId)"/>
+                    modifie déjà cette proposition
+                </source>
+                <target state="translated">
+                    <x id="pseudo" equiv-text="this.citizenName(state.userId)"/>
+                    is already editing this proposal
+                </target>
+            </trans-unit>
             <trans-unit id="936747164743906718" datatype="html" approved="yes">
                 <source>À cocher</source>
                 <target state="final">To check off</target>
@@ -7756,12 +7807,10 @@
                 <source>Ouvre</source>
                 <target state="final">Opens</target>
             </trans-unit>
-            <trans-unit id="4625121266566616556" datatype="html">
+            <trans-unit id="6890236536786684128" datatype="html">
                 <source>Réparer
                     <x id="label" equiv-text="label"/>
-                    pour passer la nuit (≈
-                    <x id="cost" equiv-text="cost"/>
-                    :ap:)
+                    pour passer la nuit (≈<x id="cost" equiv-text="cost"/>:ap:)
                 </source>
                 <target state="translated">Repair
                     <x id="label" equiv-text="label"/>
@@ -8289,6 +8338,10 @@
                 <source>Défense</source>
                 <target state="final">Defense</target>
             </trans-unit>
+            <trans-unit id="5478429085270168780" datatype="html">
+                <source>a pris la main sur cette proposition : vos dernières modifications n&apos;ont pas pu être enregistrées.</source>
+                <target state="translated">has taken over this proposal: your latest changes could not be saved.</target>
+            </trans-unit>
             <trans-unit id="548628609723380663" datatype="html" approved="yes">
                 <source>Points de vie</source>
                 <target state="final">Hit points</target>
@@ -8495,6 +8548,10 @@
                 <target state="final">Slot
                     <x id="place" equiv-text="index + 1"/>
                 </target>
+            </trans-unit>
+            <trans-unit id="8718305312804238326" datatype="html">
+                <source>Enregistré</source>
+                <target state="translated">Saved</target>
             </trans-unit>
             <trans-unit id="87247766251045848" datatype="html" approved="yes">
                 <source>Réglages mémorisés</source>

@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BuildingProgress } from '../building-progress.util';
 import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO } from '../plan.types';
-import { BuildingRef } from '../plan-evaluation.util';
+import { BuildingRef, DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { PlanningProgramComponent } from './planning-program.component';
@@ -25,6 +25,9 @@ function content(): BuildingPlanContentDTO {
 
 interface TestableProgram {
     voteOptions: () => BuildingRef[];
+    secondVoteOptions: () => BuildingRef[];
+    onVote: (building_id: number | null) => void;
+    onSecondVote: (building_id: number | null) => void;
     onDrop: (event: CdkDragDrop<PlanPool>) => void;
 }
 
@@ -452,5 +455,57 @@ describe('PlanningProgramComponent', (): void => {
         await render(plan);
 
         expect(items('regular')[0].querySelector<HTMLElement>('.free-threshold')?.textContent).toContain('2');
+    });
+
+    describe('second vote (Brasier Sacrificiel)', (): void => {
+        /**
+         * Rend le plan avec une évaluation où le Brasier est construit au soir.
+         * @param {BuildingPlanContentDTO} plan Contenu du plan.
+         * @param {Partial<DayEvaluation>} overrides Champs d'évaluation à remplacer.
+         */
+        async function renderDouble(plan: BuildingPlanContentDTO, overrides: Partial<DayEvaluation> = {}): Promise<void> {
+            await render(plan);
+            fake.evaluation.set({ ...fakeEvaluation(plan), doubleVote: true, ...overrides });
+            fixture.detectChanges();
+        }
+
+        it('sans Brasier, un seul vote', async (): Promise<void> => {
+            await render();
+
+            expect(root().querySelector('mat-select[data-field="second-vote"]')).toBeNull();
+        });
+
+        it('avec le Brasier, le second vote exclut le premier chantier et garde celui déjà choisi', async (): Promise<void> => {
+            const plan: BuildingPlanContentDTO = { ...content(), eveningVoteBuildingId: 3, eveningSecondVoteBuildingId: 2 };
+            await renderDouble(plan);
+
+            expect(root().querySelector('mat-select[data-field="second-vote"]')).not.toBeNull();
+            const ids: number[] = (fixture.componentInstance as unknown as TestableProgram).secondVoteOptions().map((building: BuildingRef): number => building.id);
+            expect(ids).toContain(2);
+            expect(ids).not.toContain(3);
+        });
+
+        it('le second vote affiche sa défense gagnée pour la nuit', async (): Promise<void> => {
+            await renderDouble({ ...content(), eveningSecondVoteBuildingId: 3 }, { secondVote: { uid: 'gate', level: 2, defense: 30 } });
+
+            expect(root().querySelector('[data-field="second-vote-gain"]')?.textContent).toContain('+30');
+        });
+
+        it('choisir le second chantier l\'enregistre dans le plan', async (): Promise<void> => {
+            await renderDouble(content());
+
+            (fixture.componentInstance as unknown as TestableProgram).onSecondVote(3);
+
+            expect(fake.draft()?.eveningSecondVoteBuildingId).toBe(3);
+        });
+
+        it('voter en premier le second chantier vide le second vote', async (): Promise<void> => {
+            await renderDouble({ ...content(), eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
+
+            (fixture.componentInstance as unknown as TestableProgram).onVote(3);
+
+            expect(fake.draft()?.eveningVoteBuildingId).toBe(3);
+            expect(fake.draft()?.eveningSecondVoteBuildingId).toBeNull();
+        });
     });
 });

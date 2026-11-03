@@ -1,4 +1,4 @@
-import { provideHttpClient, withXhr } from '@angular/common/http';
+import { HttpErrorResponse, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
@@ -20,7 +20,12 @@ describe('BuildingPlanService', (): void => {
 
     beforeEach((): void => {
         setTown(new TownDetails({ townId: 42 } as TownDetailsDTO));
-        TestBed.configureTestingModule({ providers: [provideHttpClient(withXhr()), provideHttpClientTesting()] });
+        TestBed.configureTestingModule({
+            providers: [
+                provideHttpClient(withXhr()),
+                provideHttpClientTesting()
+            ]
+        });
         service = TestBed.inject(BuildingPlanService);
         http_mock = TestBed.inject(HttpTestingController);
     });
@@ -75,11 +80,11 @@ describe('BuildingPlanService', (): void => {
         expect(result?.id).toBe(3);
     });
 
-    it('savePlan d\'une proposition existante : le 409 est laissé au store, sans message', (): void => {
+    it('savePlan d\'une proposition existante : les 409 et 423 sont laissés au store, sans message', (): void => {
         service.savePlan({ id: 3, version: 1, day: 5, name: 'Plan A', content: emptyPlanContent() }).subscribe();
 
         const request: TestRequest = http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans`);
-        expect(request.request.context.get(SILENT_ERROR_STATUS)).toBe(409);
+        expect(request.request.context.get(SILENT_ERROR_STATUS)).toEqual([409, 423]);
         expect(request.request.context.get(BYPASS_ERROR)).toBe(false);
         request.flush(plan);
     });
@@ -98,6 +103,52 @@ describe('BuildingPlanService', (): void => {
         const request: TestRequest = http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans/3`);
         expect(request.request.method).toBe('DELETE');
         request.flush(null);
+    });
+
+    it('les écritures envoient Mho-Hub-Connection quand une connexion est donnée', (): void => {
+        service.savePlan({ id: 3, version: 1, day: 5, name: 'Plan A', content: emptyPlanContent() }, 'abc').subscribe();
+        service.deletePlan(3, 'abc').subscribe();
+        service.setEffective(3, 'abc').subscribe();
+        service.saveSettings({ itemValues: {}, version: 1 }, 'abc').subscribe();
+
+        const requests: TestRequest[] = [
+            http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans`),
+            http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans/3`),
+            http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans/3/effective`),
+            http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/settings`)
+        ];
+        expect(requests.map((request: TestRequest): string | null => request.request.headers.get('Mho-Hub-Connection'))).toEqual(['abc', 'abc', 'abc', 'abc']);
+        requests.forEach((request: TestRequest): void => request.flush(null));
+    });
+
+    it('les écritures sans connexion (absente ou vide) : pas d\'en-tête Mho-Hub-Connection', (): void => {
+        service.savePlan({ day: 5, name: 'Plan A', content: emptyPlanContent() }).subscribe();
+        service.deletePlan(3, '').subscribe();
+        service.setEffective(3, null).subscribe();
+        service.saveSettings({ itemValues: {}, version: 1 }).subscribe();
+
+        const requests: TestRequest[] = [
+            http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans`),
+            http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans/3`),
+            http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans/3/effective`),
+            http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/settings`)
+        ];
+        expect(requests.map((request: TestRequest): boolean => request.request.headers.has('Mho-Hub-Connection'))).toEqual([false, false, false, false]);
+        requests.forEach((request: TestRequest): void => request.flush(null));
+    });
+
+    it('un 423 sur savePlan remonte en HttpErrorResponse de statut 423', (): void => {
+        let received: unknown;
+        service.savePlan({ id: 3, version: 1, day: 5, name: 'Plan A', content: emptyPlanContent() }).subscribe({
+            error: (error: unknown): void => {
+                received = error;
+            }
+        });
+
+        http_mock.expectOne(`${environment.api_url}/BuildingPlans/42/plans`).flush('verrou', { status: 423, statusText: 'Locked' });
+
+        expect(received).toBeInstanceOf(HttpErrorResponse);
+        expect((received as HttpErrorResponse).status).toBe(423);
     });
 
     it('setEffective PUT /BuildingPlans/:mapId/plans/:id/effective', (): void => {

@@ -1,6 +1,23 @@
 import { BuildingUpgradesDTO, CEMETERY_RATIO_EFFECT, TOWN_DEFENSE_SCALE_EFFECT } from './building-upgrades.types';
-import { buildingDefenseGain, defenseGain, DefenseGainContext, DefenseGainResult, neutralDefenseFactors, TownDefenseFactors } from './defense-gain.util';
-import { CEMETERY_UID, CIRCULAR_QUARTERS_UID, COFFINS_UID, DEFENSE_ADJUSTMENT_UID, DEFENSE_FIXINGS_UID, FORTIFIED_HOMES_UID } from './defense-rules.const';
+import {
+    buildingDefenseGain,
+    defenseGain,
+    DefenseGainContext,
+    DefenseGainResult,
+    neutralDefenseFactors,
+    PlannedDefense,
+    plannedDefenseGains,
+    TownDefenseFactors
+} from './defense-gain.util';
+import {
+    CEMETERY_UID,
+    CIRCULAR_QUARTERS_UID,
+    COFFINS_UID,
+    DEFENSE_ADJUSTMENT_UID,
+    DEFENSE_FIXINGS_STEP,
+    DEFENSE_FIXINGS_UID,
+    FORTIFIED_HOMES_UID
+} from './defense-rules.const';
 import { BuildingRef } from './plan-evaluation.util';
 
 /** Objet de défense de test (tôle). */
@@ -107,5 +124,77 @@ describe('defense-gain.util', (): void => {
 
     it('un chantier déjà construit ne compte pas deux fois ses effets', (): void => {
         expect(buildingDefenseGain(building(CIRCULAR_QUARTERS_UID, 0), context({}, [CIRCULAR_QUARTERS_UID]))).toBe(0);
+    });
+
+    it('le vote sur les Fixations relève le multiplicateur des objets de défense', (): void => {
+        const result: DefenseGainResult = defenseGain([], 0, context({ itemFactor: 1.5 }), DEFENSE_FIXINGS_STEP);
+
+        expect(result.total).toBe(5);
+        expect(result.factorsAfter.itemFactor).toBe(2);
+    });
+
+    describe('plannedDefenseGains', (): void => {
+        const scouts: BuildingRef = building('scouts', 0, [{ itemId: PLATE, count: 1 }]);
+        const fixings: BuildingRef = building(DEFENSE_FIXINGS_UID, 0);
+        const fortified: BuildingRef = building(FORTIFIED_HOMES_UID, 0);
+        const circular: BuildingRef = building(CIRCULAR_QUARTERS_UID, 0);
+
+        it('un objet consommé compte au multiplicateur du soir, les Fixations sur la banque actuelle', (): void => {
+            const planned: PlannedDefense = plannedDefenseGains([scouts, fixings], [], 0, context({ defenseItems: 8 }), 0);
+
+            expect(planned.buildings.get(fixings.id)).toBe(4);
+            expect(planned.buildings.get(scouts.id)).toBe(-2);
+        });
+
+        it('la banque est arrondie à l\'inférieur : à 1,5, un objet consommé fait perdre 1 ou 2', (): void => {
+            const planned: PlannedDefense = plannedDefenseGains([scouts, fixings], [], 0, context({ defenseItems: 7 }), 0);
+
+            expect(planned.buildings.get(fixings.id)).toBe(3);
+            expect(planned.buildings.get(scouts.id)).toBe(-1);
+        });
+
+        it('le vote sur les Fixations compte sur la banque actuelle ; la somme égale le gain de la journée', (): void => {
+            const day: DefenseGainContext = context({ defenseItems: 8 });
+            const planned: PlannedDefense = plannedDefenseGains([scouts, fixings], [], 0, day, DEFENSE_FIXINGS_STEP);
+
+            expect(planned.buildings.get(fixings.id)).toBe(4);
+            expect(planned.vote).toBe(4);
+            expect(planned.buildings.get(scouts.id)).toBe(-2);
+            expect(planned.vote + 4 - 2).toBe(defenseGain([scouts, fixings], 0, day, DEFENSE_FIXINGS_STEP).total);
+        });
+
+        it('Quartiers circulaires reprennent les Habitations fortifiées du jour, qui restent au facteur actuel', (): void => {
+            const planned: PlannedDefense = plannedDefenseGains([circular, fortified], [], 0, context(), 0);
+
+            expect(planned.buildings.get(fortified.id)).toBe(32);
+            expect(planned.buildings.get(circular.id)).toBe(72);
+        });
+
+        it('Quartiers circulaires reprennent les montées de maison du jour', (): void => {
+            expect(plannedDefenseGains([circular], [], 10, context(), 0).buildings.get(circular.id)).toBe(44);
+        });
+
+        it('Cercueils sur ressorts comptent avec le Cimetière construit le même jour', (): void => {
+            const coffins: BuildingRef = building(COFFINS_UID, 0);
+            const cemetery: BuildingRef = building(CEMETERY_UID, 0);
+            const planned: PlannedDefense = plannedDefenseGains([coffins, cemetery], [], 0, context(), 0);
+
+            expect(planned.buildings.get(coffins.id)).toBe(50);
+            expect(planned.buildings.get(cemetery.id)).toBe(15);
+        });
+
+        it('Ajustement défensif compte sur la défense actuelle, les autres chantiers du jour à sa nouvelle échelle', (): void => {
+            const adjustment: BuildingRef = building(DEFENSE_ADJUSTMENT_UID, 0);
+            const wall: BuildingRef = building('wall', 30);
+            const planned: PlannedDefense = plannedDefenseGains([wall, adjustment], [], 0, { ...context(), baseDefense: 1000 }, 0);
+
+            expect(planned.buildings.get(adjustment.id)).toBe(100);
+            expect(planned.buildings.get(wall.id)).toBe(33);
+        });
+
+        it('un chantier non terminé dans la journée compte comme ajouté à l\'état du soir', (): void => {
+            expect(plannedDefenseGains([fixings], [scouts], 0, context({ defenseItems: 8 }), 0).buildings.get(scouts.id)).toBe(-2);
+            expect(plannedDefenseGains([circular], [fortified], 0, context(), 0).buildings.get(fortified.id)).toBe(64);
+        });
     });
 });

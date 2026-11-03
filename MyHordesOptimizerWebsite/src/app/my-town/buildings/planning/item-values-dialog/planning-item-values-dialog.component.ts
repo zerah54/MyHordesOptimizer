@@ -35,6 +35,8 @@ export class PlanningItemValuesDialogComponent {
     private readonly locale: string = moment.locale();
     /** Valeurs en cours d'édition ; nul tant que rien n'a été modifié localement. */
     private readonly edits: WritableSignal<Record<string, number> | null> = signal<Record<string, number> | null>(null);
+    /** Version des réglages sur laquelle portent les modifications locales : un enregistrement fait ailleurs entre-temps donne un 409. */
+    private base_version: number | null = null;
 
     /** Valeurs affichées : modifications locales, sinon valeurs enregistrées. */
     private readonly values: Signal<Record<string, number>> = computed((): Record<string, number> => {
@@ -76,7 +78,7 @@ export class PlanningItemValuesDialogComponent {
      * @param {string} value Valeur saisie ; invalide ou négative = 0.
      */
     protected onItemValue(item_id: number, value: string): void {
-        this.edits.set({ ...this.values(), [String(item_id)]: toNonNegativeInt(value) });
+        this.edit({ ...this.values(), [String(item_id)]: toNonNegativeInt(value) });
     }
 
     /**
@@ -90,13 +92,25 @@ export class PlanningItemValuesDialogComponent {
         if (item === undefined || String(item.id) in this.values()) {
             return;
         }
-        this.edits.set({ ...this.values(), [String(item.id)]: 0 });
+        this.edit({ ...this.values(), [String(item.id)]: 0 });
         input.value = '';
     }
 
-    /** Enregistre les valeurs (version lue par le store). */
+    /** Enregistre les valeurs avec la version lue à la première modification (version courante sans modification). */
     protected saveValues(): void {
-        this.store.saveItemValues(this.values());
+        this.store.saveItemValues(this.values(), this.base_version);
         this.edits.set(null);
+        this.base_version = null;
+    }
+
+    /**
+     * Remplace les valeurs éditées ; la première modification retient la version des réglages lue.
+     * @param {Record<string, number>} values Valeurs.
+     */
+    private edit(values: Record<string, number>): void {
+        if (this.edits() === null) {
+            this.base_version = this.store.settings_version();
+        }
+        this.edits.set(values);
     }
 }

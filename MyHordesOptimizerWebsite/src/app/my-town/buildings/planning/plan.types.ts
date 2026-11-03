@@ -86,6 +86,8 @@ export interface BuildingPlanContentDTO {
     attackOverride: number | null;
     allowedOverflow: number;
     eveningVoteBuildingId: number | null;
+    /** Second chantier voté le soir, compté seulement si le Brasier Sacrificiel est construit (absent des plans antérieurs). */
+    eveningSecondVoteBuildingId?: number | null;
     /** Gestion des bannis activée à la main sur cette proposition. */
     manageBanned: boolean;
     basePa: number;
@@ -193,6 +195,7 @@ export function emptyPlanContent(): BuildingPlanContentDTO {
         attackOverride: null,
         allowedOverflow: 0,
         eveningVoteBuildingId: null,
+        eveningSecondVoteBuildingId: null,
         manageBanned: false,
         basePa: 19,
         citizens: [],

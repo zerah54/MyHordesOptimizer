@@ -19,7 +19,7 @@ import { KeyedDebounce } from './keyed-debounce.util';
 import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanPool, PlanTaskDTO } from './plan.types';
 import { PlanAlert, planAlerts } from './plan-alerts.util';
 import { BuildingRef, CitizenRef, DayEvaluation, DayInput, evaluateDay, HomeLevelRef, WORKSHOP_UID } from './plan-evaluation.util';
-import { PlanningStore } from './planning.store';
+import { PlanConflict, PlanLockState, PlanningStore, PlanSaveState } from './planning.store';
 import { ToggleContext } from './program-edit.util';
 import { taskLockKey } from './task-status.util';
 
@@ -123,12 +123,14 @@ export interface FakePlanningStore {
     draft: WritableSignal<BuildingPlanContentDTO | null>;
     evaluation: WritableSignal<DayEvaluation | null>;
     can_edit: WritableSignal<boolean>;
+    can_write: WritableSignal<boolean>;
     can_edit_settings: WritableSignal<boolean>;
+    settings_version: WritableSignal<number | null>;
     dirty: WritableSignal<boolean>;
     saving: WritableSignal<boolean>;
     loading: WritableSignal<boolean>;
     load_failed: WritableSignal<boolean>;
-    conflict: WritableSignal<{ author: string | null } | null>;
+    conflict: WritableSignal<PlanConflict | null>;
     selected_plan: WritableSignal<BuildingPlanDTO | null>;
     plans_of_day: WritableSignal<BuildingPlanDTO[]>;
     is_citizen: WritableSignal<boolean>;
@@ -146,7 +148,9 @@ export interface FakePlanningStore {
     pending_checks: WritableSignal<ReadonlySet<string>>;
     displayable_actions: WritableSignal<DailyActionEnum[]>;
     home_upgrades: WritableSignal<HomeUpgradeRef[]>;
-    actions: Record<'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'deletePlan' | 'setEffective' | 'save' | 'dismissConflict' | 'saveItemValues' | 'renamePlan' | 'setTaskDone', Mock>;
+    lock: WritableSignal<PlanLockState>;
+    save_state: WritableSignal<PlanSaveState>;
+    actions: Record<'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'deletePlan' | 'setEffective' | 'save' | 'dismissConflict' | 'saveItemValues' | 'renamePlan' | 'setTaskDone' | 'takeLock' | 'leave', Mock>;
     updateDraft: Mock<(mutate: (content: BuildingPlanContentDTO) => void) => void>;
 }
 
@@ -162,12 +166,14 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         draft,
         evaluation: signal<DayEvaluation | null>(fakeEvaluation(content)),
         can_edit: signal(true),
+        can_write: signal(true),
         can_edit_settings: signal(true),
+        settings_version: signal<number | null>(1),
         dirty: signal(false),
         saving: signal(false),
         loading: signal(false),
         load_failed: signal(false),
-        conflict: signal<{ author: string | null } | null>(null),
+        conflict: signal<PlanConflict | null>(null),
         selected_plan: signal<BuildingPlanDTO | null>(plan),
         plans_of_day: signal<BuildingPlanDTO[]>([plan]),
         is_citizen: signal(true),
@@ -184,11 +190,14 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         can_track: signal(true),
         pending_checks: signal<ReadonlySet<string>>(new Set<string>()),
         displayable_actions: signal<DailyActionEnum[]>(displayableDailyActions(new Set<string>(['small_gallery_#00', 'small_watchmen_#01']))),
-        home_upgrades: signal<HomeUpgradeRef[]>(FAKE_UPGRADES)
+        home_upgrades: signal<HomeUpgradeRef[]>(FAKE_UPGRADES),
+        lock: signal<PlanLockState>({ kind: 'free' }),
+        save_state: signal<PlanSaveState>('idle')
     };
     const actions: FakePlanningStore['actions'] = {
         load: vi.fn(), selectDay: vi.fn(), selectPlan: vi.fn(), createPlan: vi.fn(), duplicatePlan: vi.fn(),
-        deletePlan: vi.fn(), setEffective: vi.fn(), save: vi.fn(), dismissConflict: vi.fn(), saveItemValues: vi.fn(), renamePlan: vi.fn(), setTaskDone: vi.fn()
+        deletePlan: vi.fn(), setEffective: vi.fn(), save: vi.fn(), dismissConflict: vi.fn(), saveItemValues: vi.fn(), renamePlan: vi.fn(), setTaskDone: vi.fn(),
+        takeLock: vi.fn(), leave: vi.fn((): Promise<boolean> => Promise.resolve(true))
     };
     const update_draft: FakePlanningStore['updateDraft'] = vi.fn((mutate: (value: BuildingPlanContentDTO) => void): void => {
         const copy: BuildingPlanContentDTO = JSON.parse(JSON.stringify(draft())) as BuildingPlanContentDTO;

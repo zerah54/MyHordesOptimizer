@@ -387,6 +387,20 @@ describe('forum-post.util', (): void => {
             expect(joined(programPost(context(plan())))).not.toContain('Évolution votée ce soir');
         });
 
+        it('avec le Brasier Sacrificiel, annonce les deux évolutions du soir', (): void => {
+            const base: PostContext = context({ ...plan(), eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
+            const text: string = joined(programPost({ ...base, evaluation: { ...base.evaluation, doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0 } } }));
+
+            expect(text).toContain(':fortify: [b]Évolutions votées ce soir[/b] : Atelier, Porte');
+        });
+
+        it('sans Brasier, le second vote n\'est pas annoncé', (): void => {
+            const text: string = joined(programPost(context({ ...plan(), eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 })));
+
+            expect(text).toContain(':fortify: [b]Évolution votée ce soir[/b] : Atelier');
+            expect(text).not.toContain('Atelier, Porte');
+        });
+
         it('pertes prévues : défense du chantier au soir (Porte réparée par le plan), aussi dans le bloc Défense du budget', (): void => {
             const content: BuildingPlanContentDTO = { ...plan(), losses: [{ buildingId: 3, kind: 'destroyed' }] };
             const line: string = ':middot: Porte : laissé détruire, ne pas réparer (−15 dès demain)';

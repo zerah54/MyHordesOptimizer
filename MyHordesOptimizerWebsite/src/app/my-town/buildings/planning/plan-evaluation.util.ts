@@ -2,8 +2,17 @@ import { BudgetLine, CitizenCapacity, citizenCapacity, PoolBudget, poolBudgets }
 import { BuildingProgress, evaluateProgram, remainingAp, StepResult } from './building-progress.util';
 import { BuildingUpgradesDTO, upgradeDefenseBonus } from './building-upgrades.types';
 import { defenseGap, projectedDefense, rankByDefPerPa, RankCandidate, RankedCandidate } from './defense.util';
-import { buildingDefenseGain, defenseGain, DefenseGainContext, DefenseGainResult, homeDefenseFactor, TownDefenseFactors } from './defense-gain.util';
-import { CIRCULAR_QUARTERS_UID } from './defense-rules.const';
+import {
+    buildingDefenseGain,
+    defenseGain,
+    DefenseGainContext,
+    DefenseGainResult,
+    homeDefenseFactor,
+    PlannedDefense,
+    plannedDefenseGains,
+    TownDefenseFactors
+} from './defense-gain.util';
+import { CIRCULAR_QUARTERS_UID, DEFENSE_FIXINGS_STEP, DEFENSE_FIXINGS_UID } from './defense-rules.const';
 import { nightLifeLoss, ownNightLoss } from './night-survival.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanLossDTO, PlanLossKind, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
 import { missingResources, ResourceCount, sumResources } from './resources.util';
@@ -14,6 +23,9 @@ export const WORKSHOP_UID: string = 'small_refine_#00';
 
 /** Uid du chantier « Bureau des esclavagistes ». */
 export const SLAVERY_UID: string = 'small_slave_#00';
+
+/** Uid du chantier « Brasier Sacrificiel » : construit, la nuit applique deux évolutions. */
+export const PYRE_UID: string = 'small_pyre_#00';
 
 /** Niveau maximal de l'atelier. */
 const WORKSHOP_MAX_LEVEL: number = 5;
@@ -84,6 +96,13 @@ export interface PlannedLoss {
     defense: number;
 }
 
+/** Évolution votée le soir : niveau atteint et défense gagnée pour la nuit. */
+export interface EveningVote {
+    uid: string;
+    level: number;
+    defense: number;
+}
+
 /** Résultat de l'évaluation d'une journée. */
 export interface DayEvaluation {
     workshopLevel: number;
@@ -108,8 +127,12 @@ export interface DayEvaluation {
     realDefense: ReadonlyMap<number, number>;
     /** Composantes de la défense au soir. */
     defenseFactorsAfter: TownDefenseFactors;
-    /** Évolution votée le soir : niveau atteint et défense gagnée pour la nuit ; nulle sans vote. */
-    vote: { uid: string; level: number; defense: number } | null;
+    /** Évolution votée le soir ; nulle sans vote. */
+    vote: EveningVote | null;
+    /** Brasier Sacrificiel construit au soir : la nuit applique une seconde évolution. */
+    doubleVote: boolean;
+    /** Seconde évolution du soir (Brasier Sacrificiel construit, chantier différent du premier) ; nulle sinon. */
+    secondVote: EveningVote | null;
     /** Pertes prévues sur des chantiers construits au soir. */
     losses: PlannedLoss[];
 }
@@ -166,16 +189,24 @@ export function evaluateDay(input: DayInput): DayEvaluation {
     const completed_refs: BuildingRef[] = completed_ids
         .map((id: number): BuildingRef | undefined => input.buildings.get(id))
         .filter((building: BuildingRef | undefined): building is BuildingRef => building !== undefined);
-    const gain: DefenseGainResult = defenseGain(completed_refs, homesDefense(home_tasks, input.homes), gain_context);
-    const homes_gain: number = defenseGain([], homesDefense(home_tasks, input.homes), gain_context).total;
-    const vote: DayEvaluation['vote'] = eveningVote(input, gain.factorsAfter.scale);
-    const losses: PlannedLoss[] = plannedLosses(input, progress_after, vote, gain.factorsAfter.scale);
+    const home_raw_gain: number = homesDefense(home_tasks, input.homes);
+    const double_vote: boolean = builtInEvening(progress_after, input.buildings, PYRE_UID);
+    const vote_ids: (number | null)[] = eveningVoteIds(content, double_vote);
+    const voted_item_step: number = votedItemStep(input, vote_ids);
+    const gain: DefenseGainResult = defenseGain(completed_refs, home_raw_gain, gain_context, voted_item_step);
+    const homes_gain: number = defenseGain([], home_raw_gain, gain_context).total;
+    const planned: PlannedDefense = plannedDefenseGains(completed_refs, pendingBuildings(input, completed_ids), home_raw_gain, gain_context, voted_item_step);
+    const [vote, second_vote]: (EveningVote | null)[] = vote_ids.map((vote_id: number | null): EveningVote | null => {
+        const item_defense: number = vote_id !== null && input.buildings.get(vote_id)?.uid === DEFENSE_FIXINGS_UID ? planned.vote : 0;
+        return eveningVote(input, vote_id, gain.factorsAfter.scale, item_defense);
+    });
+    const losses: PlannedLoss[] = plannedLosses(input, progress_after, [vote, second_vote], gain.factorsAfter.scale);
     const projected: number = projectedDefense({
         baseDefense: input.baseDefense,
-        completedBuildingsDef: gain.total - homes_gain,
+        completedBuildingsDef: gain.total - homes_gain - planned.vote,
         repairsDef: repairsDefense(results, input.progress, progress_after),
         homesDef: homes_gain,
-        upgradeDef: vote?.defense ?? 0,
+        upgradeDef: (vote?.defense ?? 0) + (second_vote?.defense ?? 0),
         lostDef: lossTotal(losses, 'bonus'),
         sources: content.defenseSources.map((source: { def: number; qty: number }): { def: number; qty: number } => ({ def: source.def, qty: source.qty }))
     });
@@ -200,22 +231,47 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         defenseGap: attack === null ? null : defenseGap(attack, content.allowedOverflow, projected),
         freeThresholds: freeThresholds(input),
         ranking: rankByDefPerPa(rankCandidates(input, gain_context), input.itemValues),
-        realDefense: realDefenseByBuilding(input, gain_context),
+        realDefense: planned.buildings,
         defenseFactorsAfter: gain.factorsAfter,
         vote,
+        doubleVote: double_vote,
+        secondVote: second_vote,
         losses
     };
 }
 
 /**
- * Niveau d'évolution d'un chantier au soir : niveau atteint par le vote du soir, sinon niveau connu.
+ * Chantier construit au soir.
+ * @param {ReadonlyMap<number, BuildingProgress>} progress Avancement au soir.
+ * @param {ReadonlyMap<number, BuildingRef>} buildings Chantiers.
+ * @param {string} uid Chantier cherché.
+ * @returns {boolean} Vrai s'il est construit.
+ */
+function builtInEvening(progress: ReadonlyMap<number, BuildingProgress>, buildings: ReadonlyMap<number, BuildingRef>, uid: string): boolean {
+    return Array.from(progress.values()).some((state: BuildingProgress): boolean => state.built && buildings.get(state.buildingId)?.uid === uid);
+}
+
+/**
+ * Chantiers qui évolueront cette nuit : le vote du soir, puis le second si le Brasier Sacrificiel est construit, jamais deux fois le
+ * même chantier (`NightlyHandler::stage2_building_effects`).
+ * @param {BuildingPlanContentDTO} content Contenu du plan.
+ * @param {boolean} double_vote Brasier Sacrificiel construit au soir.
+ * @returns {(number | null)[]} Premier et second chantier, nul si aucun.
+ */
+function eveningVoteIds(content: BuildingPlanContentDTO, double_vote: boolean): (number | null)[] {
+    const second: number | null = content.eveningSecondVoteBuildingId ?? null;
+    return [content.eveningVoteBuildingId, double_vote && second !== content.eveningVoteBuildingId ? second : null];
+}
+
+/**
+ * Niveau d'évolution d'un chantier au soir : niveau atteint par un vote du soir, sinon niveau connu.
  * @param {DayInput} input Entrée de la journée.
  * @param {string} uid Chantier.
- * @param {DayEvaluation['vote']} vote Évolution votée.
+ * @param {readonly (EveningVote | null)[]} votes Évolutions votées.
  * @returns {number} Niveau.
  */
-function eveningLevel(input: DayInput, uid: string, vote: DayEvaluation['vote']): number {
-    return vote?.uid === uid ? vote.level : (input.buildingLevels.get(uid) ?? 0);
+function eveningLevel(input: DayInput, uid: string, votes: readonly (EveningVote | null)[]): number {
+    return votes.find((vote: EveningVote | null): boolean => vote?.uid === uid)?.level ?? input.buildingLevels.get(uid) ?? 0;
 }
 
 /**
@@ -224,18 +280,18 @@ function eveningLevel(input: DayInput, uid: string, vote: DayEvaluation['vote'])
  * - chantier détruit : il compte encore cette nuit, puis perd sa défense et son bonus dès le lendemain.
  * @param {DayInput} input Entrée de la journée.
  * @param {ReadonlyMap<number, BuildingProgress>} progress Avancement au soir.
- * @param {DayEvaluation['vote']} vote Évolution votée.
+ * @param {readonly (EveningVote | null)[]} votes Évolutions votées.
  * @param {number} scale Échelle de la défense au soir.
  * @returns {PlannedLoss[]} Pertes évaluées.
  */
-function plannedLosses(input: DayInput, progress: ReadonlyMap<number, BuildingProgress>, vote: DayEvaluation['vote'], scale: number): PlannedLoss[] {
+function plannedLosses(input: DayInput, progress: ReadonlyMap<number, BuildingProgress>, votes: readonly (EveningVote | null)[], scale: number): PlannedLoss[] {
     return (input.content.losses ?? []).flatMap((loss: PlanLossDTO): PlannedLoss[] => {
         const building: BuildingRef | undefined = input.buildings.get(loss.buildingId);
         const state: BuildingProgress | undefined = progress.get(loss.buildingId);
         if (building === undefined || building.temporary || state?.built !== true) {
             return [];
         }
-        const bonus: number = upgradeDefenseBonus(input.upgrades, building.uid, building.defence, eveningLevel(input, building.uid, vote));
+        const bonus: number = upgradeDefenseBonus(input.upgrades, building.uid, building.defence, eveningLevel(input, building.uid, votes));
         const defense: number = loss.kind === 'bonus' ? bonus : state.def + bonus;
         return [{ buildingId: loss.buildingId, kind: loss.kind, defense: Math.round(defense * scale) }];
     });
@@ -255,11 +311,12 @@ function lossTotal(losses: PlannedLoss[], kind: PlanLossKind): number {
  * Évolution votée le soir : le chantier passe au niveau suivant avant l'attaque (`onProcessPreAttackUpgrade` du jeu) ; son
  * bonus de défense (multiple de sa défense propre + défense ajoutée) compte donc pour la nuit même.
  * @param {DayInput} input Entrée de la journée.
+ * @param {number | null} vote_id Chantier voté.
  * @param {number} scale Échelle de la défense au soir.
- * @returns {DayEvaluation['vote']} Niveau atteint et défense gagnée, nul sans vote.
+ * @param {number} item_defense Défense gagnée par les objets de défense (vote sur les Fixations), échelle comprise.
+ * @returns {EveningVote | null} Niveau atteint et défense gagnée, nul sans vote.
  */
-function eveningVote(input: DayInput, scale: number): DayEvaluation['vote'] {
-    const vote_id: number | null = input.content.eveningVoteBuildingId;
+function eveningVote(input: DayInput, vote_id: number | null, scale: number, item_defense: number): EveningVote | null {
     const building: BuildingRef | undefined = vote_id === null ? undefined : input.buildings.get(vote_id);
     if (building === undefined) {
         return null;
@@ -269,7 +326,20 @@ function eveningVote(input: DayInput, scale: number): DayEvaluation['vote'] {
     const level: number = Math.min(current + 1, max_level);
     const gain: number = upgradeDefenseBonus(input.upgrades, building.uid, building.defence, level)
         - upgradeDefenseBonus(input.upgrades, building.uid, building.defence, current);
-    return { uid: building.uid, level, defense: Math.round(gain * scale) };
+    return { uid: building.uid, level, defense: Math.round(gain * scale) + item_defense };
+}
+
+/**
+ * Hausse du multiplicateur des objets de défense par le vote du soir : chaque niveau des Fixations de défenses vaut 0,5 de plus.
+ * @param {DayInput} input Entrée de la journée.
+ * @param {readonly (number | null)[]} vote_ids Chantiers votés.
+ * @returns {number} Hausse, 0 sans vote sur les Fixations ou à leur niveau maximum.
+ */
+function votedItemStep(input: DayInput, vote_ids: readonly (number | null)[]): number {
+    return vote_ids.some((vote_id: number | null): boolean => {
+        const vote: EveningVote | null = eveningVote(input, vote_id, 1, 0);
+        return vote?.uid === DEFENSE_FIXINGS_UID && vote.level > (input.buildingLevels.get(vote.uid) ?? 0);
+    }) ? DEFENSE_FIXINGS_STEP : 0;
 }
 
 /**
@@ -289,20 +359,20 @@ function defenseGainContext(input: DayInput): DefenseGainContext {
 }
 
 /**
- * Défense réelle de chaque chantier pas encore construit, s'il était terminé seul.
+ * Chantiers à construire qui ne sont pas terminés dans la journée.
  * @param {DayInput} input Entrée de la journée.
- * @param {DefenseGainContext} context État de la ville.
- * @returns {Map<number, number>} Gain réel par chantier.
+ * @param {readonly number[]} completed_ids Chantiers terminés dans la journée.
+ * @returns {BuildingRef[]} Chantiers.
  */
-function realDefenseByBuilding(input: DayInput, context: DefenseGainContext): Map<number, number> {
-    const gains: Map<number, number> = new Map<number, number>();
+function pendingBuildings(input: DayInput, completed_ids: readonly number[]): BuildingRef[] {
+    const pending: BuildingRef[] = [];
     input.progress.forEach((progress: BuildingProgress, id: number): void => {
         const building: BuildingRef | undefined = input.buildings.get(id);
-        if (building !== undefined && !progress.built) {
-            gains.set(id, buildingDefenseGain(building, context));
+        if (building !== undefined && !progress.built && !completed_ids.includes(id)) {
+            pending.push(building);
         }
     });
-    return gains;
+    return pending;
 }
 
 /**
@@ -312,20 +382,18 @@ function realDefenseByBuilding(input: DayInput, context: DefenseGainContext): Ma
  * @returns {CarriedState} État de départ du lendemain.
  */
 export function advanceDay(evaluation: DayEvaluation, input: DayInput): CarriedState {
-    const vote_id: number | null = input.content.eveningVoteBuildingId;
-    const voted_workshop: boolean = vote_id !== null && input.buildings.get(vote_id)?.uid === WORKSHOP_UID;
-    const slavery_built: boolean = Array.from(evaluation.progressAfter.values()).some(
-        (progress: BuildingProgress): boolean => progress.built && input.buildings.get(progress.buildingId)?.uid === SLAVERY_UID
-    );
+    const votes: EveningVote[] = [evaluation.vote, evaluation.secondVote].filter((vote: EveningVote | null): vote is EveningVote => vote !== null);
+    const voted_workshop: boolean = votes.some((vote: EveningVote): boolean => vote.uid === WORKSHOP_UID);
+    const slavery_built: boolean = builtInEvening(evaluation.progressAfter, input.buildings, SLAVERY_UID);
     const completed_temporary_def: number = evaluation.completedIds.reduce(
         (sum: number, id: number): number => sum + (input.buildings.get(id)?.temporary === true ? (input.buildings.get(id)?.defence ?? 0) : 0),
         0
     );
     const night: { progress: Map<number, BuildingProgress>; defLost: number } = passNight(evaluation.progressAfter, input.buildings);
     const levels: Map<string, number> = new Map<string, number>(input.buildingLevels);
-    if (evaluation.vote !== null) {
-        levels.set(evaluation.vote.uid, evaluation.vote.level);
-    }
+    votes.forEach((vote: EveningVote): void => {
+        levels.set(vote.uid, vote.level);
+    });
     const destroyed_def: number = destroyBuildings(evaluation.losses, night.progress, levels, input.buildings);
     return {
         progress: night.progress,

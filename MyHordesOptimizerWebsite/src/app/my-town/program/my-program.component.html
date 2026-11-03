@@ -170,11 +170,16 @@
                         </section>
                     }
 
-                    @if (program.voteBuildingId !== null) {
+                    @let vote_names = voteNames(program);
+                    @if (vote_names.length > 0) {
                         <p class="vote">
                             <mat-icon aria-hidden="true">how_to_vote</mat-icon>
-                            <ng-container i18n>Évolution votée ce soir</ng-container>
-                            : {{ buildingName(program.voteBuildingId) }}
+                            @if (vote_names.length > 1) {
+                                <ng-container i18n>Évolutions votées ce soir</ng-container>
+                            } @else {
+                                <ng-container i18n>Évolution votée ce soir</ng-container>
+                            }
+                            : {{ vote_names.join(', ') }}
                         </p>
                     }
 

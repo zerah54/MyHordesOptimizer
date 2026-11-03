@@ -282,18 +282,20 @@ function lossBlock(context: PostContext): string {
 }
 
 /**
- * Ligne du chantier à voter ce soir, vide sans vote.
+ * Ligne des chantiers à voter ce soir (le second seulement avec le Brasier Sacrificiel), vide sans vote.
  * @param {PostContext} context Contexte du post.
  * @param {boolean} bold Titre en gras (post programme) ou simple (bloc Plan).
  * @returns {string} Ligne, ou chaîne vide.
  */
 function voteLine(context: PostContext, bold: boolean): string {
-    const vote: number | null = context.content.eveningVoteBuildingId;
-    if (vote === null) {
+    const second: number | null = context.evaluation.secondVote === null ? null : (context.content.eveningSecondVoteBuildingId ?? null);
+    const votes: number[] = [context.content.eveningVoteBuildingId, second].filter((vote: number | null): vote is number => vote !== null);
+    if (votes.length === 0) {
         return '';
     }
-    const title: string = $localize`Évolution votée ce soir`;
-    return `:fortify: ${bold ? `[b]${title}[/b]` : title} : ${buildingLabel(context, vote)}`;
+    const title: string = votes.length > 1 ? $localize`Évolutions votées ce soir` : $localize`Évolution votée ce soir`;
+    const labels: string = votes.map((vote: number): string => buildingLabel(context, vote)).join(', ');
+    return `:fortify: ${bold ? `[b]${title}[/b]` : title} : ${labels}`;
 }
 
 /** Lignes du bloc « Plan » : vote du soir, puis étapes de chaque poche avec leur coût. */

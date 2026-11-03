@@ -3,9 +3,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { finalize } from 'rxjs';
 
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../../_shared/confirm-dialog/confirm-dialog.component';
@@ -16,9 +16,9 @@ import { PlanningStore } from '../planning.store';
 import { confirmDiscardChanges } from '../unsaved-changes.util';
 
 const components: Imports = [DaySelectorComponent];
-const material_modules: Imports = [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule, MatSlideToggleModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSlideToggleModule, MatTooltipModule];
 
-/** En-tête de la page Chantiers : jour, propositions en puces (menu par proposition), gestion des bannis, enregistrement. */
+/** En-tête de la page Chantiers : jour, propositions en puces (menu par proposition), gestion des bannis, état de l'enregistrement. */
 @Component({
     selector: 'mho-planning-header',
     templateUrl: './planning-header.component.html',
@@ -31,6 +31,8 @@ export class PlanningHeaderComponent {
     protected readonly store: PlanningStore = inject(PlanningStore);
 
     private readonly dialog: MatDialog = inject(MatDialog);
+    /** Départ de la proposition en cours (enregistrement, confirmation) : toute autre demande de changement est ignorée. */
+    private leaving: boolean = false;
 
     /**
      * Vrai pour la proposition affichée.
@@ -122,11 +124,18 @@ export class PlanningHeaderComponent {
     }
 
     /**
-     * Applique une action qui remplace la copie de travail, après confirmation s'il reste des modifications non enregistrées.
+     * Applique une action qui remplace la copie de travail, après enregistrement ; confirmation seulement si celui-ci échoue.
+     * Ignorée tant qu'un départ est en cours.
      * @param {() => void} apply Action à appliquer.
      */
     private afterDiscardConfirmed(apply: () => void): void {
-        confirmDiscardChanges(this.store, this.dialog).subscribe((confirmed: boolean): void => {
+        if (this.leaving) {
+            return;
+        }
+        this.leaving = true;
+        confirmDiscardChanges(this.store, this.dialog).pipe(finalize((): void => {
+            this.leaving = false;
+        })).subscribe((confirmed: boolean): void => {
             if (confirmed) {
                 apply();
             }

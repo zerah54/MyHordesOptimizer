@@ -43,10 +43,9 @@
         gap: 0.4em;
     }
 
-    .dirty-dot {
-        width: 0.5em;
-        height: 0.5em;
-        border-radius: 50%;
-        background: currentColor;
+    .save-state {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4em;
     }
 }

@@ -3,6 +3,7 @@
         <ng-container i18n>Chantiers</ng-container>
         @if (!store.loading() && !store.load_failed()) {
             <mho-planning-share/>
+            <mho-active-citizens [citizenList]="present_citizens()" [completeCitizenList]="store.citizens_full()"/>
         }
     </mat-card-title>
     @if (!store.loading() && !store.load_failed()) {
@@ -34,12 +35,39 @@
             <div class="conflict" role="alert">
                 <mat-icon aria-hidden="true">warning</mat-icon>
                 <span>
-                    <ng-container i18n>Cette proposition a été modifiée par</ng-container>
-                    {{ conflict.author ?? '?' }}.
-                    <ng-container i18n>Vos modifications sont conservées ; enregistrer écrasera la version de cette personne.</ng-container>
+                    @if (conflict.kept) {
+                        <ng-container i18n>Cette proposition a été modifiée par</ng-container>
+                        {{ conflict.author ?? '?' }}.
+                        <ng-container i18n>Vos modifications sont conservées ; enregistrer écrasera la version de cette personne.</ng-container>
+                    } @else if (conflict.author !== null) {
+                        {{ conflict.author }}
+                        <ng-container i18n>a pris la main sur cette proposition : vos dernières modifications n'ont pas pu être enregistrées.</ng-container>
+                    } @else {
+                        <ng-container
+                            i18n>Quelqu'un a pris la main sur cette proposition : vos dernières modifications n'ont pas pu être enregistrées.</ng-container>
+                    }
                 </span>
                 <button mat-button type="button" data-action="dismiss-conflict" (click)="store.dismissConflict()" i18n>Compris</button>
             </div>
+        }
+
+        @if (store.lock(); as lock) {
+            @if (lock.kind === 'other') {
+                <div class="conflict" role="status" data-field="lock-banner">
+                    <mat-icon aria-hidden="true">lock</mat-icon>
+                    <span>
+                        @if (lock.sameUser) {
+                            <ng-container i18n>Tu modifies cette proposition dans un autre onglet</ng-container>
+                        } @else {
+                            {{ citizenName(lock.userId) }}
+                            <ng-container i18n>modifie cette proposition</ng-container>
+                        }
+                    </span>
+                    @if (store.can_write()) {
+                        <button mat-button type="button" data-action="take-lock" (click)="store.takeLock()" i18n>Prendre la main</button>
+                    }
+                </div>
+            }
         }
 
         @if (store.selected_plan() === null) {

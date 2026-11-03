@@ -21,52 +21,11 @@
                         </h3>
                     }
                     @if (pool === 'regular') {
-                        <mat-form-field class="vote" appearance="outline" subscriptSizing="dynamic">
-                            <mat-label>
-                                <span class="icon-label">
-                                    <img class="game-icon" [src]="HORDES_IMG_REPO + 'emotes/fortify.gif'" alt="">
-                                    <ng-container i18n>Chantier voté ce soir</ng-container>
-                                </span>
-                            </mat-label>
-                            <mat-select data-field="vote" [value]="draft.eveningVoteBuildingId" [disabled]="!store.can_edit()"
-                                        (selectionChange)="onVote($event.value)">
-                                @if (draft.eveningVoteBuildingId !== null) {
-                                    <mat-select-trigger>
-                                        <span class="icon-label">
-                                            @if (icon(draft.eveningVoteBuildingId); as src) {
-                                                <img class="building-icon" [src]="src" alt="">
-                                            }
-                                            {{ label(draft.eveningVoteBuildingId) }}
-                                        </span>
-                                    </mat-select-trigger>
-                                }
-                                <mat-option [value]="null" i18n>Aucun</mat-option>
-                                @for (building of voteOptions(); track building.id) {
-                                    <mat-option [value]="building.id">
-                                        <span class="icon-label">
-                                            @if (icon(building.id); as src) {
-                                                <img class="building-icon" [src]="src" alt="">
-                                            }
-                                            {{ building.label }}
-                                        </span>
-                                    </mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
-                        @if (voteGain(); as gain) {
-                            <span class="vote-gain" data-field="vote-gain">
-                                <ng-container i18n>Niveau</ng-container>
-                                {{ gain.level }}
-                                @if (gain.defense !== 0) {
-                                    <span class="def" i18n-matTooltip matTooltip="Défense gagnée dès cette nuit : l'évolution s'applique avant l'attaque">
-                                        {{ gain.defense > 0 ? '+' : '' }}{{ gain.defense }}
-                                        <img class="game-icon" [src]="HORDES_IMG_REPO + 'icons/small_def.gif'" i18n-alt alt="déf">
-                                    </span>
-                                }
-                                @if (gain.text; as text) {
-                                    <span class="vote-text">{{ text }}</span>
-                                }
-                            </span>
+                        <ng-container [ngTemplateOutlet]="voteField"
+                                      [ngTemplateOutletContext]="{ field: 'vote', value: draft.eveningVoteBuildingId, options: voteOptions(), gain: voteGain() }"/>
+                        @if (doubleVote()) {
+                            <ng-container [ngTemplateOutlet]="voteField"
+                                          [ngTemplateOutletContext]="{ field: 'second-vote', value: draft.eveningSecondVoteBuildingId ?? null, options: secondVoteOptions(), gain: secondVoteGain() }"/>
                         }
                     }
                     @if (store.can_edit()) {
@@ -255,4 +214,59 @@
             </button>
         </ng-template>
     </mat-menu>
+
+    <!-- Choix d'un chantier voté le soir (premier vote, ou second avec le Brasier Sacrificiel) et gain de son évolution. -->
+    <ng-template #voteField let-field="field" let-value="value" let-options="options" let-gain="gain">
+        <mat-form-field class="vote" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>
+                <span class="icon-label">
+                    <img class="game-icon" [src]="HORDES_IMG_REPO + 'emotes/fortify.gif'" alt="">
+                    @if (field === 'vote') {
+                        <ng-container i18n>Chantier voté ce soir</ng-container>
+                    } @else {
+                        <ng-container i18n>Second chantier voté ce soir</ng-container>
+                    }
+                </span>
+            </mat-label>
+            <mat-select [attr.data-field]="field" [value]="value" [disabled]="!store.can_edit()"
+                        (selectionChange)="field === 'vote' ? onVote($event.value) : onSecondVote($event.value)">
+                @if (value !== null) {
+                    <mat-select-trigger>
+                        <span class="icon-label">
+                            @if (icon(value); as src) {
+                                <img class="building-icon" [src]="src" alt="">
+                            }
+                            {{ label(value) }}
+                        </span>
+                    </mat-select-trigger>
+                }
+                <mat-option [value]="null" i18n>Aucun</mat-option>
+                @for (building of options; track building.id) {
+                    <mat-option [value]="building.id">
+                        <span class="icon-label">
+                            @if (icon(building.id); as src) {
+                                <img class="building-icon" [src]="src" alt="">
+                            }
+                            {{ building.label }}
+                        </span>
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        @if (gain) {
+            <span class="vote-gain" [attr.data-field]="field + '-gain'">
+                <ng-container i18n>Niveau</ng-container>
+                {{ gain.level }}
+                @if (gain.defense !== 0) {
+                    <span class="def" i18n-matTooltip matTooltip="Défense gagnée dès cette nuit : l'évolution s'applique avant l'attaque">
+                        {{ gain.defense > 0 ? '+' : '' }}{{ gain.defense }}
+                        <img class="game-icon" [src]="HORDES_IMG_REPO + 'icons/small_def.gif'" i18n-alt alt="déf">
+                    </span>
+                }
+                @if (gain.text; as text) {
+                    <span class="vote-text">{{ text }}</span>
+                }
+            </span>
+        }
+    </ng-template>
 }

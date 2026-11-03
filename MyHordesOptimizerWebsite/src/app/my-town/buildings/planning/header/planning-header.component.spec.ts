@@ -6,7 +6,7 @@ import type { Mock } from 'vitest';
 
 import { PlanningNameDialogResult } from '../name-dialog/planning-name-dialog.component';
 import { BuildingPlanDTO, emptyPlanContent } from '../plan.types';
-import { PlanningStore } from '../planning.store';
+import { PlanningStore, PlanSaveState } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, FakePlanningStore } from '../planning.store.fake';
 import { PlanningHeaderComponent } from './planning-header.component';
 
@@ -57,6 +57,7 @@ describe('PlanningHeaderComponent', (): void => {
         expect(root().querySelector('.today')).not.toBeNull();
         expect(button('previous-day')?.disabled).toBe(true);
         button('next-day')?.click();
+        await fixture.whenStable();
         expect(fake.actions['selectDay']).toHaveBeenCalledWith(11);
     });
 
@@ -119,6 +120,7 @@ describe('PlanningHeaderComponent', (): void => {
         expect(chips[0].querySelector('.effective')).not.toBeNull();
         expect(chips[1].querySelector('.effective')).toBeNull();
         chips[1].querySelector<HTMLButtonElement>('button[data-action="select-plan"]')?.click();
+        await fixture.whenStable();
         expect(fake.actions['selectPlan']).toHaveBeenCalledWith(8);
     });
 
@@ -151,11 +153,13 @@ describe('PlanningHeaderComponent', (): void => {
     describe('modifications non enregistrées', (): void => {
         it('changer de proposition ou de jour demande confirmation ; annuler ne change rien', async (): Promise<void> => {
             await render();
-            fake.dirty.set(true);
+            fake.actions['leave'].mockResolvedValue(false);
             open.mockReturnValue({ afterClosed: (): unknown => of(false) });
 
             root().querySelectorAll<HTMLElement>('.plan-chip')[1].querySelector<HTMLButtonElement>('button[data-action="select-plan"]')?.click();
+            await fixture.whenStable();
             button('next-day')?.click();
+            await fixture.whenStable();
 
             expect(open).toHaveBeenCalledTimes(2);
             expect(fake.actions['selectPlan']).not.toHaveBeenCalled();
@@ -164,12 +168,43 @@ describe('PlanningHeaderComponent', (): void => {
 
         it('confirmer abandonne les modifications et change de proposition', async (): Promise<void> => {
             await render();
-            fake.dirty.set(true);
+            fake.actions['leave'].mockResolvedValue(false);
             open.mockReturnValue({ afterClosed: (): unknown => of(true) });
 
             root().querySelectorAll<HTMLElement>('.plan-chip')[1].querySelector<HTMLButtonElement>('button[data-action="select-plan"]')?.click();
+            await fixture.whenStable();
 
             expect(fake.actions['selectPlan']).toHaveBeenCalledWith(8);
+        });
+
+        it('enregistrement réussi : pas de confirmation, on change de proposition', async (): Promise<void> => {
+            await render();
+
+            root().querySelectorAll<HTMLElement>('.plan-chip')[1].querySelector<HTMLButtonElement>('button[data-action="select-plan"]')?.click();
+            await fixture.whenStable();
+
+            expect(fake.actions['leave']).toHaveBeenCalledTimes(1);
+            expect(open).not.toHaveBeenCalled();
+            expect(fake.actions['selectPlan']).toHaveBeenCalledWith(8);
+        });
+
+        it('un second changement pendant l\'enregistrement est ignoré : un seul départ, une seule bascule', async (): Promise<void> => {
+            await render();
+            let finish: (saved: boolean) => void = (): void => undefined;
+            fake.actions['leave'].mockReturnValue(new Promise<boolean>((resolve: (saved: boolean) => void): void => {
+                finish = resolve;
+            }));
+            const chip: HTMLButtonElement | null = root().querySelectorAll<HTMLElement>('.plan-chip')[1].querySelector<HTMLButtonElement>('button[data-action="select-plan"]');
+
+            chip?.click();
+            chip?.click();
+            button('next-day')?.click();
+            finish(true);
+            await fixture.whenStable();
+
+            expect(fake.actions['leave']).toHaveBeenCalledTimes(1);
+            expect(fake.actions['selectPlan']).toHaveBeenCalledTimes(1);
+            expect(fake.actions['selectDay']).not.toHaveBeenCalled();
         });
 
         it('cliquer la proposition déjà affichée ne demande rien', async (): Promise<void> => {
@@ -206,6 +241,7 @@ describe('PlanningHeaderComponent', (): void => {
     it('nouvelle proposition : vide ou copie de la proposition affichée', async (): Promise<void> => {
         await render({ name: 'Plan D', copy: false });
         button('new-plan')?.click();
+        await fixture.whenStable();
         expect(fake.actions['createPlan']).toHaveBeenCalledWith('Plan D');
 
         open.mockReturnValue({ afterClosed: (): unknown => of({ name: 'Plan E', copy: true }) });
@@ -213,20 +249,18 @@ describe('PlanningHeaderComponent', (): void => {
         expect(fake.actions['duplicatePlan']).toHaveBeenCalledWith('Plan E');
     });
 
-    it('enregistrer : désactivé sans modification, signalé et actif sinon, spinner seul pendant l\'envoi', async (): Promise<void> => {
+    it('plus de bouton Enregistrer : un indicateur affiche l\'état de l\'enregistrement', async (): Promise<void> => {
         await render();
-        expect(button('save')?.disabled).toBe(true);
+        const texts: [PlanSaveState, string][] = [['pending', 'Enregistrement…'], ['saving', 'Enregistrement…'], ['saved', 'Enregistré'], ['error', 'Échec de l\'enregistrement']];
 
-        fake.dirty.set(true);
-        fixture.detectChanges();
-        expect(root().querySelector('.dirty-dot')).not.toBeNull();
-        button('save')?.click();
-        expect(fake.actions['save']).toHaveBeenCalledTimes(1);
+        expect(button('save')).toBeNull();
+        expect(root().querySelector('[data-field="save-state"]')?.textContent?.trim() ?? '').toBe('');
+        for (const [state, text] of texts) {
+            fake.save_state.set(state);
+            fixture.detectChanges();
 
-        fake.saving.set(true);
-        fixture.detectChanges();
-        expect(button('save')?.querySelector('mat-spinner')).not.toBeNull();
-        expect(button('save')?.querySelector('.label')).toBeNull();
+            expect(root().querySelector('[data-field="save-state"]')?.textContent).toContain(text);
+        }
     });
 
     it('lecture seule : ni création ni menu de proposition', async (): Promise<void> => {

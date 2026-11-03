@@ -12,10 +12,15 @@ export function errorInterceptor(request: HttpRequest<unknown>, next: HttpHandle
     const authentication_service: AuthenticationService = inject(AuthenticationService);
     return next(request)
         .pipe(
-            catchError((error: HttpErrorResponse) => request.context.get(BYPASS_ERROR) || request.context.get(SILENT_ERROR_STATUS) === error.status
+            catchError((error: HttpErrorResponse) => request.context.get(BYPASS_ERROR) || isSilentStatus(request.context.get(SILENT_ERROR_STATUS), error.status)
                 ? throwError(() => error)
                 : handleError(error, snackbar, authentication_service))
         );
+}
+
+/** Indique si le statut figure parmi les statuts silencieux (un code, une liste ou aucun). */
+function isSilentStatus(silent: number | readonly number[] | null, status: number): boolean {
+    return Array.isArray(silent) ? silent.includes(status) : silent === status;
 }
 
 /**

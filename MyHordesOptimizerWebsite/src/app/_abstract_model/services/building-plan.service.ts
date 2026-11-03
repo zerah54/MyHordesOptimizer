@@ -49,40 +49,56 @@ export class BuildingPlanService extends GlobalService {
     }
 
     /**
-     * Crée (sans `id`) ou modifie une proposition. Le 409 d'une modification est sans message : le store affiche la bannière de conflit.
+     * Crée (sans `id`) ou modifie une proposition. Les 409 et 423 d'une modification sont sans message : le store affiche sa bannière.
      * @param {BuildingPlanRequestDTO} request Proposition ; `version` obligatoire pour une modification.
+     * @param {string | null} connection_id Connexion au hub de l'appelant (verrou, exclusion de la diffusion).
      * @returns {Observable<BuildingPlanDTO>} Proposition enregistrée.
      */
-    public savePlan(request: BuildingPlanRequestDTO): Observable<BuildingPlanDTO> {
-        const silent_status: number | null = request.id !== null && request.id !== undefined ? 409 : null;
-        return this.put<BuildingPlanDTO>(`${this.baseUrl()}/plans`, request, undefined, false, silent_status).pipe(map(BuildingPlanService.body));
+    public savePlan(request: BuildingPlanRequestDTO, connection_id: string | null = null): Observable<BuildingPlanDTO> {
+        const silent_status: readonly number[] | null = request.id !== null && request.id !== undefined ? [409, 423] : null;
+        return this.put<BuildingPlanDTO>(`${this.baseUrl()}/plans`, request, undefined, false, silent_status, BuildingPlanService.connectionHeaders(connection_id))
+            .pipe(map(BuildingPlanService.body));
     }
 
     /**
      * Supprime une proposition.
      * @param {number} plan_id Identifiant de la proposition.
+     * @param {string | null} connection_id Connexion au hub de l'appelant (verrou, exclusion de la diffusion).
      * @returns {Observable<void>} Complète une fois la proposition supprimée.
      */
-    public deletePlan(plan_id: number): Observable<void> {
-        return this.delete<void>(`${this.baseUrl()}/plans/${plan_id}`).pipe(map((): void => undefined));
+    public deletePlan(plan_id: number, connection_id: string | null = null): Observable<void> {
+        return this.delete<void>(`${this.baseUrl()}/plans/${plan_id}`, BuildingPlanService.connectionHeaders(connection_id)).pipe(map((): void => undefined));
     }
 
     /**
      * Rend une proposition effective pour son jour.
      * @param {number} plan_id Identifiant de la proposition.
+     * @param {string | null} connection_id Connexion au hub de l'appelant (exclue de la diffusion).
      * @returns {Observable<BuildingPlanDTO>} Proposition devenue effective.
      */
-    public setEffective(plan_id: number): Observable<BuildingPlanDTO> {
-        return this.put<BuildingPlanDTO>(`${this.baseUrl()}/plans/${plan_id}/effective`, {}).pipe(map(BuildingPlanService.body));
+    public setEffective(plan_id: number, connection_id: string | null = null): Observable<BuildingPlanDTO> {
+        return this.put<BuildingPlanDTO>(`${this.baseUrl()}/plans/${plan_id}/effective`, {}, undefined, false, null, BuildingPlanService.connectionHeaders(connection_id))
+            .pipe(map(BuildingPlanService.body));
     }
 
     /**
      * Enregistre la valeur en PA des objets.
      * @param {BuildingPlanSettingsRequestDTO} request Valeurs et version lue.
+     * @param {string | null} connection_id Connexion au hub de l'appelant (exclue de la diffusion).
      * @returns {Observable<BuildingPlansDTO>} Plans et réglages à jour.
      */
-    public saveSettings(request: BuildingPlanSettingsRequestDTO): Observable<BuildingPlansDTO> {
-        return this.put<BuildingPlansDTO>(`${this.baseUrl()}/settings`, request).pipe(map(BuildingPlanService.body));
+    public saveSettings(request: BuildingPlanSettingsRequestDTO, connection_id: string | null = null): Observable<BuildingPlansDTO> {
+        return this.put<BuildingPlansDTO>(`${this.baseUrl()}/settings`, request, undefined, false, null, BuildingPlanService.connectionHeaders(connection_id))
+            .pipe(map(BuildingPlanService.body));
+    }
+
+    /**
+     * En-tête identifiant la connexion au hub, absent sans connexion.
+     * @param {string | null} connection_id Connexion au hub.
+     * @returns {Record<string, string>} En-têtes à ajouter.
+     */
+    private static connectionHeaders(connection_id: string | null): Record<string, string> {
+        return connection_id !== null && connection_id !== '' ? { 'Mho-Hub-Connection': connection_id } : {};
     }
 
     private baseUrl(): string {

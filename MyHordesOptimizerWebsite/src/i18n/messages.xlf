@@ -11,6 +11,9 @@
             <trans-unit id="7885850772923256232" datatype="html">
                 <source>/faq</source>
             </trans-unit>
+            <trans-unit id="9163396455893071919" datatype="html">
+                <source>Quelqu&apos;un a pris la main sur cette proposition : vos dernières modifications n&apos;ont pas pu être enregistrées.</source>
+            </trans-unit>
             <trans-unit id="9166056573127391797" datatype="html">
                 <source>Serveur occupé, réessayez dans un instant</source>
             </trans-unit>
@@ -2053,6 +2056,9 @@
             <trans-unit id="2054864067473892671" datatype="html">
                 <source>Chantiers</source>
             </trans-unit>
+            <trans-unit id="426994883080077069" datatype="html">
+                <source>Tu as pris la main dans un autre onglet</source>
+            </trans-unit>
             <trans-unit id="4273057282113946093" datatype="html">
                 <source>Dépendant</source>
             </trans-unit>
@@ -2224,12 +2230,10 @@
             <trans-unit id="7901028799739119261" datatype="html">
                 <source>Groupé</source>
             </trans-unit>
-            <trans-unit id="2892258614148420204" datatype="html">
+            <trans-unit id="1075511902879442503" datatype="html">
                 <source>Laisser
                     <x id="label" equiv-text="label"/>
-                    à
-                    <x id="remaining" equiv-text="step.targetRemaining"/>
-                    :ap:
+                    à<x id="remaining" equiv-text="step.targetRemaining"/>:ap:
                 </source>
             </trans-unit>
             <trans-unit id="2896336955237338610" datatype="html">
@@ -2441,6 +2445,9 @@
                     <x id="PH" equiv-text="index + 1"/>
                 </source>
             </trans-unit>
+            <trans-unit id="119694628530161263" datatype="html">
+                <source>Évolutions votées ce soir</source>
+            </trans-unit>
             <trans-unit id="1199075748231436486" datatype="html">
                 <source>Identifiant MyHordes</source>
             </trans-unit>
@@ -2620,6 +2627,9 @@
             </trans-unit>
             <trans-unit id="4125935080176240286" datatype="html">
                 <source>Points de contrôles requis</source>
+            </trans-unit>
+            <trans-unit id="4127384894846398448" datatype="html">
+                <source>Tu modifies cette proposition dans un autre onglet</source>
             </trans-unit>
             <trans-unit id="4128885944450604559" datatype="html">
                 <source>Survivants en moyenne</source>
@@ -3187,6 +3197,9 @@
             <trans-unit id="5772039798624090843" datatype="html">
                 <source>Consommer</source>
             </trans-unit>
+            <trans-unit id="5774600331666856188" datatype="html">
+                <source>Cette proposition a été supprimée</source>
+            </trans-unit>
             <trans-unit id="577664839739965914" datatype="html">
                 <source>Exploration</source>
             </trans-unit>
@@ -3339,8 +3352,8 @@
             <trans-unit id="2682868487071320453" datatype="html">
                 <source>Violet</source>
             </trans-unit>
-            <trans-unit id="2684422002973556559" datatype="html">
-                <source>Les modifications de la proposition affichée ne sont pas enregistrées et seront perdues. Continuer quand même ?</source>
+            <trans-unit id="319408636887380758" datatype="html">
+                <source>Les modifications de la proposition affichée n&apos;ont pas pu être enregistrées et seront perdues. Continuer quand même ?</source>
             </trans-unit>
             <trans-unit id="2688644633550534159" datatype="html">
                 <source>Options du forum</source>
@@ -3490,11 +3503,17 @@
             <trans-unit id="795113065551434631" datatype="html">
                 <source>Répartition des valeurs</source>
             </trans-unit>
+            <trans-unit id="4031413646820776086" datatype="html">
+                <source>Échec de l&apos;enregistrement</source>
+            </trans-unit>
             <trans-unit id="4032218604605059227" datatype="html">
                 <source>Aucune estimation saisie à affiner</source>
             </trans-unit>
             <trans-unit id="4034420321472748193" datatype="html">
                 <source>Renommer et modifier les couleurs</source>
+            </trans-unit>
+            <trans-unit id="4034455525597514950" datatype="html">
+                <source>Prendre la main</source>
             </trans-unit>
             <trans-unit id="7451632765834808757" datatype="html">
                 <source>Ajouter une consigne</source>
@@ -3917,14 +3936,12 @@
                     tas
                 </source>
             </trans-unit>
-            <trans-unit id="8697586560188003468" datatype="html">
+            <trans-unit id="1514264624187743506" datatype="html">
                 <source>Réparer
                     <x id="label" equiv-text="label"/>
                     jusqu&apos;à<x id="life" equiv-text="life"/>/
                     <x id="max" equiv-text="max_life"/>
-                    PV (≈
-                    <x id="cost" equiv-text="cost"/>
-                    :ap:)
+                    PV (≈<x id="cost" equiv-text="cost"/>:ap:)
                 </source>
             </trans-unit>
             <trans-unit id="6806022574374286744" datatype="html">
@@ -4341,6 +4358,9 @@
                     manquantes » apparaît près du bouton : cliquez sur « Afficher toutes les entrées » en bas du registre, puis relancez la mise à jour.&lt;/p&gt;
                 </source>
             </trans-unit>
+            <trans-unit id="7491570996281685809" datatype="html">
+                <source>modifie cette proposition</source>
+            </trans-unit>
             <trans-unit id="6188037361891823447" datatype="html">
                 <source>Zone de rappatriement</source>
             </trans-unit>
@@ -4612,6 +4632,12 @@
             <trans-unit id="3600316095632998024" datatype="html">
                 <source>Le plus direct (en L)</source>
             </trans-unit>
+            <trans-unit id="3603610149048252866" datatype="html">
+                <source>
+                    <x id="pseudo" equiv-text="this.citizenName(known.userId)"/>
+                    a pris la main
+                </source>
+            </trans-unit>
             <trans-unit id="3605978488400419603" datatype="html">
                 <source>Zoomer</source>
             </trans-unit>
@@ -4803,6 +4829,9 @@
             </trans-unit>
             <trans-unit id="6686441515911992911" datatype="html">
                 <source>Points de contrôle</source>
+            </trans-unit>
+            <trans-unit id="7203336193845533401" datatype="html">
+                <source>Second chantier voté ce soir</source>
             </trans-unit>
             <trans-unit id="7207482748149833374" datatype="html">
                 <source>Ville observée</source>
@@ -5323,6 +5352,12 @@
             <trans-unit id="928726635862596808" datatype="html">
                 <source>Centrer</source>
             </trans-unit>
+            <trans-unit id="929052224451282812" datatype="html">
+                <source>
+                    <x id="pseudo" equiv-text="this.citizenName(state.userId)"/>
+                    modifie déjà cette proposition
+                </source>
+            </trans-unit>
             <trans-unit id="936747164743906718" datatype="html">
                 <source>À cocher</source>
             </trans-unit>
@@ -5404,6 +5439,9 @@
                 <source>Place
                     <x id="place" equiv-text="index + 1"/>
                 </source>
+            </trans-unit>
+            <trans-unit id="8718305312804238326" datatype="html">
+                <source>Enregistré</source>
             </trans-unit>
             <trans-unit id="87247766251045848" datatype="html">
                 <source>Réglages mémorisés</source>
@@ -5597,12 +5635,10 @@
             <trans-unit id="4624097725363515773" datatype="html">
                 <source>Ouvre</source>
             </trans-unit>
-            <trans-unit id="4625121266566616556" datatype="html">
+            <trans-unit id="6890236536786684128" datatype="html">
                 <source>Réparer
                     <x id="label" equiv-text="label"/>
-                    pour passer la nuit (≈
-                    <x id="cost" equiv-text="cost"/>
-                    :ap:)
+                    pour passer la nuit (≈<x id="cost" equiv-text="cost"/>:ap:)
                 </source>
             </trans-unit>
             <trans-unit id="4635453384629622126" datatype="html">
@@ -5951,6 +5987,9 @@
             </trans-unit>
             <trans-unit id="4154335047242270585" datatype="html">
                 <source>Défense</source>
+            </trans-unit>
+            <trans-unit id="5478429085270168780" datatype="html">
+                <source>a pris la main sur cette proposition : vos dernières modifications n&apos;ont pas pu être enregistrées.</source>
             </trans-unit>
             <trans-unit id="548628609723380663" datatype="html">
                 <source>Points de vie</source>

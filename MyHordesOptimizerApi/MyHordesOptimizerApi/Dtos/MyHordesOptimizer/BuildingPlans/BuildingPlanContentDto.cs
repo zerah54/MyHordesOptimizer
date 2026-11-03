@@ -10,6 +10,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
         public int AllowedOverflow { get; set; }
         /// <summary><c>Building.IdBuilding</c> du chantier voté le soir, ou null.</summary>
         public int? EveningVoteBuildingId { get; set; }
+        /// <summary>Second chantier voté le soir, compté seulement si le Brasier Sacrificiel est construit ; null sinon.</summary>
+        public int? EveningSecondVoteBuildingId { get; set; }
         /// <summary>Gestion des bannis activée à la main sur cette proposition.</summary>
         public bool ManageBanned { get; set; }
         public int BasePa { get; set; } = 19;

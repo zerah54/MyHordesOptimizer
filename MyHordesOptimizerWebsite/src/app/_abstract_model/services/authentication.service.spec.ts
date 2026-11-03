@@ -1,8 +1,9 @@
-import { provideHttpClient, withXhr } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
 import { environment } from '../../../environments/environment';
+import { BYPASS_LOADING } from '../../_core/services/http-context-tokens';
 import { setExternalAppId, setTokenWithMeWithExpirationDate, setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { TokenWithMeDTO } from '../dto/token-with-me.dto';
 import { TokenWithMe } from '../types/token-with-me.class';
@@ -48,8 +49,16 @@ describe('AuthenticationService', (): void => {
         it('never sends knownUserId (C2 : identité résolue côté serveur depuis le userKey uniquement)', (): void => {
             service.getToken().subscribe();
 
-            const req = httpMock.expectOne((r) => r.url.startsWith(`${environment.api_url}/Authentication/Token`));
+            const req: TestRequest = httpMock.expectOne((r: HttpRequest<unknown>): boolean => r.url.startsWith(`${environment.api_url}/Authentication/Token`));
             expect(req.request.url).not.toContain('knownUserId');
+            req.flush(flushBody);
+        });
+
+        it('peut se faire sans voile de chargement (rafraîchissement en arrière-plan, ex. jeton du hub)', (): void => {
+            service.getToken(true, true).subscribe();
+
+            const req: TestRequest = httpMock.expectOne((r: HttpRequest<unknown>): boolean => r.url.startsWith(`${environment.api_url}/Authentication/Token`));
+            expect(req.request.context.get(BYPASS_LOADING)).toBe(true);
             req.flush(flushBody);
         });
     });
@@ -65,7 +74,7 @@ describe('AuthenticationService', (): void => {
 
             service.getMe().subscribe();
 
-            const req = httpMock.expectOne((r) => r.url.startsWith(`${environment.api_url}/Authentication/Token`));
+            const req: TestRequest = httpMock.expectOne((r: HttpRequest<unknown>): boolean => r.url.startsWith(`${environment.api_url}/Authentication/Token`));
             expect(req.request.method).toBe('GET');
             req.flush(flushBody);
         });
