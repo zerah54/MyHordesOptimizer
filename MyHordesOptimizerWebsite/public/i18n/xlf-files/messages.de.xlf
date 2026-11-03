@@ -3605,6 +3605,10 @@
                 <source>Coéquipiers</source>
                 <target state="translated">Mitstreiter</target>
             </trans-unit>
+            <trans-unit id="458640201868278392" datatype="html">
+                <source>Niveau actuel dans ta ville</source>
+                <target state="translated">Aktuelle Stufe in deiner Stadt</target>
+            </trans-unit>
             <trans-unit id="4596392011247776227" datatype="html" approved="yes">
                 <source>&lt;p&gt;Si vous êtes goule, le pourcentage de voracité s&apos;ajoute au texte de la jauge.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Wenn du ein Ghul bist, wird der Hungerprozentsatz zum Text der Anzeige hinzugefügt.&lt;/p&gt;</target>
@@ -4231,6 +4235,10 @@
                 <source>Compétences disponibles</source>
                 <target state="final">Verfügbare Fähigkeiten</target>
             </trans-unit>
+            <trans-unit id="6089281874522956491" datatype="html">
+                <source>Aucune évolution à afficher.</source>
+                <target state="translated">Keine Aufwertungen anzuzeigen.</target>
+            </trans-unit>
             <trans-unit id="6098898048852753562" datatype="html" approved="yes">
                 <source>&lt;p&gt;Sur Android, l&apos;extension pour Firefox est le plus simple (voir plus haut). Pour le script :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;installez
                     Firefox pour Android ;&lt;/li&gt; &lt;li&gt;dans Firefox, ajoutez le module Tampermonkey ou Violentmonkey ;&lt;/li&gt; &lt;li&gt;cliquez sur
@@ -4478,6 +4486,10 @@
             <trans-unit id="2456477142464580022" datatype="html" approved="yes">
                 <source>Gagnée</source>
                 <target state="final">Gewonnen</target>
+            </trans-unit>
+            <trans-unit id="245793836947821268" datatype="html">
+                <source>Page du wiki des chantiers</source>
+                <target state="translated">Wiki-Seite der Baustellen</target>
             </trans-unit>
             <trans-unit id="246073293028300552" datatype="html">
                 <source>Masquer construits</source>
@@ -4922,6 +4934,10 @@
                     mit der Erweiterung (Option „Private Notizen zu Städten und Spielern“).&lt;/p&gt;
                 </target>
             </trans-unit>
+            <trans-unit id="1597997976750926004" datatype="html">
+                <source>Niveau actuel :</source>
+                <target state="translated">Aktuelle Stufe:</target>
+            </trans-unit>
             <trans-unit id="6355589699962619386" datatype="html" approved="yes">
                 <source>Axe des regénérations</source>
                 <target state="final">Achse der Regeneration</target>
@@ -5109,6 +5125,10 @@
             <trans-unit id="5956461158010502750" datatype="html" approved="yes">
                 <source>Enregistrer dans un fichier Excel</source>
                 <target state="final">In eine Excel-Datei speichern</target>
+            </trans-unit>
+            <trans-unit id="6543454535550731961" datatype="html">
+                <source>Effet</source>
+                <target state="translated">Wirkung</target>
             </trans-unit>
             <trans-unit id="6546581008231791015" datatype="html">
                 <source>PA de base par citoyen</source>
@@ -5391,6 +5411,10 @@
             <trans-unit id="713428125328247599" datatype="html" approved="yes">
                 <source>Dernière mise à jour</source>
                 <target state="final">Letzte Aktualisierung</target>
+            </trans-unit>
+            <trans-unit id="5357314695861190943" datatype="html">
+                <source>Évolutions</source>
+                <target state="translated">Aufwertungen</target>
             </trans-unit>
             <trans-unit id="5357452818210220345" datatype="html" approved="yes">
                 <source>Aucun citoyen ne correspond aux filtres</source>
@@ -7948,6 +7972,10 @@
                 </source>
                 <target state="translated"><x id="passage" equiv-text="passage"/>. Durchgang
                 </target>
+            </trans-unit>
+            <trans-unit id="4960201210074811294" datatype="html">
+                <source>Niveau d&apos;évolution</source>
+                <target state="translated">Aufwertungsstufe</target>
             </trans-unit>
             <trans-unit id="2315492892193612031" datatype="html" approved="yes">
                 <source>Notification à la fin de la fouille</source>

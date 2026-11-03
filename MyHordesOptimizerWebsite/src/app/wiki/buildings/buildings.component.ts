@@ -18,6 +18,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
@@ -54,11 +55,12 @@ import { normalizeString } from '../../_core/utilities/string.utils';
 import { CompactStepperComponent } from '../../_shared/compact-stepper/compact-stepper.component';
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with-string-filter/header-with-string-filter.component';
+import { BuildingUpgradesComponent } from './upgrades/building-upgrades.component';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [CompactStepperComponent, HeaderWithStringFilterComponent, IconApComponent];
+const components: Imports = [BuildingUpgradesComponent, CompactStepperComponent, HeaderWithStringFilterComponent, IconApComponent];
 const directives: Imports = [TypedCellDefDirective];
-const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatIconModule, MatTableModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatIconModule, MatSlideToggleModule, MatTableModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-wiki-buildings',
@@ -100,6 +102,11 @@ export class BuildingsComponent implements OnInit {
     protected get displayed_columns(): string[] {
         return this.columns.map((column: StandardColumn): string => column.id);
     }
+
+    /** Page affichée : le catalogue ou les évolutions. */
+    protected readonly view: WritableSignal<'buildings' | 'upgrades'> = signal('buildings');
+    /** Évolutions limitées aux chantiers construits dans la ville. */
+    protected readonly town_only: WritableSignal<boolean> = signal(false);
 
     /** Lignes affichées (arbre aplati, replis et recherche appliqués). */
     protected readonly rows: WritableSignal<Building[]> = signal([]);
@@ -522,6 +529,7 @@ export class BuildingsComponent implements OnInit {
             this.collapsed.delete(parent_id);
             parent_id = this.by_id.get(parent_id)?.parent_id ?? null;
         }
+        this.view.set('buildings');
         this.targeted_id.set(building.id);
         this.refresh();
         afterNextRender({

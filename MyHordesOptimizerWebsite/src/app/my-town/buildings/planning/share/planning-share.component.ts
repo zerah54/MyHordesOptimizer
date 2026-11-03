@@ -8,11 +8,12 @@ import moment from 'moment';
 import { environment } from '../../../../../environments/environment';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { Item } from '../../../../_abstract_model/types/item.class';
 import { ClipboardService } from '../../../../_core/services/clipboard.service';
 import { budgetPost, PostContext, programPost } from '../forum-post.util';
 import { BuildingPlanDTO } from '../plan.types';
-import { PlanningStore } from '../planning.store';
 import { itemLabel } from '../planning-labels.util';
+import { PlanningStore } from '../planning.store';
 
 const material_modules: Imports = [MatButtonModule, MatIconModule, MatMenuModule, MatTooltipModule];
 
@@ -78,6 +79,10 @@ export class PlanningShareComponent {
             citizens: this.store.citizens(),
             homes: this.store.homes(),
             item_label: (item_id: number): string => itemLabel(this.store.items(), item_id, this.locale),
+            item_emote: (item_id: number): string | undefined => {
+                const uid: string | undefined = this.store.items().find((item: Item): boolean => item.id === item_id)?.uid;
+                return uid === undefined ? undefined : this.store.item_emotes()[uid];
+            },
             website_url: environment.website_url,
             job_emotes: this.jobEmoteMap()
         };

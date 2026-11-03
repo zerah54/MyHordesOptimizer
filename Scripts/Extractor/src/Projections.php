@@ -59,6 +59,8 @@ final class Projections
             new Projection('Items/items-nightwatch.json', 'myhordes.fixtures.actions', 'items_nw'),
             new Projection('Items/meta-results.json', 'myhordes.fixtures.actions', 'meta_results'),
             new Projection('Citizens/status.json', 'myhordes.fixtures.citizen.status'),
+            new Projection('Citizens/home-levels.json', 'myhordes.fixtures.citizen.home.levels'),
+            new Projection('Citizens/home-upgrades.json', 'myhordes.fixtures.citizen.home.upgrades'),
             new Projection('Heroes/specials.json', 'myhordes.fixtures.actions', 'specials'),
 
             new Projection(
@@ -72,6 +74,15 @@ final class Projections
             ),
 
             new Projection('Items/item-properties.json', 'myhordes.fixtures.items.properties'),
+
+            // Les clés de premier niveau sont des uids d'objets, pas des noms de champs.
+            new Projection(
+                'Items/emotes.json',
+                'myhordes.fixtures.items.list',
+                null,
+                static fn(array $objets): array => self::emotesObjets($objets),
+                false
+            ),
 
             new Projection(
                 'CauseOfDeath/cause-of-death.json',
@@ -172,6 +183,19 @@ final class Projections
      * @param array<string, array<mixed>> $brut
      * @return array<mixed>
      */
+    private static function emotesObjets(array $objets): array
+    {
+        // Même balise que HTMLService::get_emotes du jeu.
+        $emotes = [];
+        foreach ($objets as $uid => $objet) {
+            if (($objet['isEmote'] ?? false) === true) {
+                $emotes[$uid] = ":item_{$objet['icon']}:";
+            }
+        }
+
+        return $emotes;
+    }
+
     private static function chaineAuxiliaire(array $brut, string $chaine): array
     {
         if (!isset($brut[$chaine]) || !is_array($brut[$chaine])) {

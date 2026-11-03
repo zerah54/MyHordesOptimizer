@@ -8,6 +8,7 @@ import { Observable, of, Subject } from 'rxjs';
 import type { Mock } from 'vitest';
 
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { BuildingPlanService } from '../../_abstract_model/services/building-plan.service';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Building, BuildingResource } from '../../_abstract_model/types/building.class';
 import { Item } from '../../_abstract_model/types/item.class';
@@ -15,7 +16,9 @@ import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { TownContextService } from '../../_core/services/town-context.service';
+import { setTown } from '../../_core/utilities/localstorage.util';
 import { BuildingsComponent } from './buildings.component';
+import { BuildingUpgradesComponent } from './upgrades/building-upgrades.component';
 
 /** Liste de courses factice : la page ne la lit qu'avec une ville active, absente de ces tests. */
 const WISHLIST_SERVICE_STUB: Partial<WishlistService> = {
@@ -1127,5 +1130,151 @@ describe('BuildingsComponent - lien profond (?building=) et lignes', (): void =>
         expect(cells[0].nativeElement.classList).toContain('mat-mdc-table-sticky');
         expect(cells[1].nativeElement.classList).toContain('mat-mdc-table-sticky');
         expect(cells[2].nativeElement.classList).not.toContain('mat-mdc-table-sticky');
+    });
+});
+
+describe('BuildingsComponent - page Évolutions', (): void => {
+    let fixture: ComponentFixture<BuildingsComponent>;
+
+    /**
+     * Crée la page et attend son rendu.
+     */
+    function render(): void {
+        fixture = TestBed.createComponent(BuildingsComponent);
+        fixture.detectChanges();
+    }
+
+    /**
+     * Libellés des sélecteurs de la barre d'outils.
+     * @returns {string[]} Libellés.
+     */
+    function toolbarLabels(): string[] {
+        return fixture.debugElement.queryAll(By.css('.page-toolbar mat-button-toggle'))
+            .map((toggle: DebugElement): string => (toggle.nativeElement.textContent ?? '').trim());
+    }
+
+    /**
+     * Clique sur un sélecteur de la barre d'outils.
+     * @param {string} label Libellé.
+     */
+    function select(label: string): void {
+        const toggle: DebugElement | undefined = fixture.debugElement.queryAll(By.css('.page-toolbar mat-button-toggle'))
+            .find((candidate: DebugElement): boolean => (candidate.nativeElement.textContent ?? '').trim() === label);
+        toggle?.query(By.css('button')).nativeElement.click();
+        fixture.detectChanges();
+    }
+
+    beforeEach(async (): Promise<void> => {
+        await TestBed.configureTestingModule({
+            imports: [BuildingsComponent],
+            providers: [
+                provideRouter([]),
+                { provide: ApiService, useValue: { getBuildings: (): Observable<Building[]> => of([]) } },
+                { provide: WishlistService, useValue: WISHLIST_SERVICE_STUB },
+                {
+                    provide: BuildingPlanService,
+                    useValue: {
+                        getBuildingUpgrades: (): Observable<object> => of({}),
+                        getState: (): Observable<object> => of({ buildings: [] })
+                    }
+                }
+            ]
+        }).compileComponents();
+    });
+
+    afterEach((): void => setTown(null));
+
+    it('opens on the buildings table', (): void => {
+        render();
+
+        expect(fixture.debugElement.query(By.directive(BuildingUpgradesComponent))).toBeNull();
+        expect(fixture.debugElement.query(By.css('.mho-buildings > .table-scroll')).nativeElement.hidden).toBe(false);
+    });
+
+    it('swaps the table for the upgrades on selection', (): void => {
+        render();
+
+        select('Évolutions');
+
+        expect(fixture.debugElement.query(By.directive(BuildingUpgradesComponent))).not.toBeNull();
+        expect(fixture.debugElement.query(By.css('.mho-buildings > .table-scroll')).nativeElement.hidden).toBe(true);
+    });
+
+    it('offers the game mode on the buildings table only', (): void => {
+        render();
+
+        expect(toolbarLabels()).toContain('Pandémonium');
+
+        select('Évolutions');
+
+        expect(toolbarLabels()).not.toContain('Pandémonium');
+    });
+
+    it('offers the town filter on the upgrades only', (): void => {
+        setTown(new TownDetails());
+        render();
+
+        expect(fixture.debugElement.query(By.css('.page-toolbar mat-slide-toggle'))).toBeNull();
+
+        select('Évolutions');
+
+        expect(fixture.debugElement.query(By.css('.page-toolbar mat-slide-toggle')).nativeElement.textContent).toContain('Dans ma ville');
+    });
+
+    it('hides the town filter without a town', (): void => {
+        render();
+
+        select('Évolutions');
+
+        expect(fixture.debugElement.query(By.css('.page-toolbar mat-slide-toggle'))).toBeNull();
+    });
+
+    /**
+     * Fait porter le catalogue sur un seul chantier.
+     */
+    function provideOneBuilding(): void {
+        const building: Building = new Building();
+        building.id = 7;
+        building.uid = 'b7';
+        building.parent_id = null;
+        building.label = { [moment.locale()]: 'Cible' };
+        building.description = { [moment.locale()]: '' };
+        building.img = 'building.gif';
+        TestBed.overrideProvider(ApiService, { useValue: { getBuildings: (): Observable<Building[]> => of([building]) } });
+    }
+
+    it('hides the selection summary on the upgrades', (): void => {
+        provideOneBuilding();
+        render();
+        fixture.debugElement.query(By.css('tr[mat-row] .select-control')).nativeElement.click();
+        fixture.detectChanges();
+        expect(fixture.debugElement.query(By.css('.selection-summary'))).not.toBeNull();
+
+        select('Évolutions');
+
+        expect(fixture.debugElement.query(By.css('.selection-summary'))).toBeNull();
+    });
+
+    it('comes back to the table when a deep link targets a building', async (): Promise<void> => {
+        provideOneBuilding();
+        render();
+        select('Évolutions');
+
+        await TestBed.inject(Router).navigateByUrl('/?building=7');
+        fixture.detectChanges();
+
+        expect(fixture.debugElement.query(By.directive(BuildingUpgradesComponent))).toBeNull();
+    });
+
+    it('passes the town filter to the upgrades', (): void => {
+        setTown(new TownDetails());
+        render();
+        select('Évolutions');
+
+        fixture.debugElement.query(By.css('.page-toolbar mat-slide-toggle button')).nativeElement.click();
+        fixture.detectChanges();
+
+        const upgrades: BuildingUpgradesComponent = fixture.debugElement.query(By.directive(BuildingUpgradesComponent)).componentInstance;
+        expect(upgrades.townOnly()).toBe(true);
     });
 });

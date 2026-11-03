@@ -1566,6 +1566,11 @@ namespace MyHordesOptimizerApi.Services.Impl
             return MyHordesCodeRepository.GetBuildingUpgrades();
         }
 
+        public Dictionary<string, string> GetItemEmotes()
+        {
+            return MyHordesCodeRepository.GetItemEmotes();
+        }
+
         public IEnumerable<BuildingDto> GetBuildings()
         {
             var models = DbContext.Buildings

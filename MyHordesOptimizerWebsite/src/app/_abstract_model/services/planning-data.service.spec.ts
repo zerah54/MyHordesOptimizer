@@ -5,6 +5,7 @@ import type { Mock } from 'vitest';
 import { BuildingUpgradesDTO } from '../../my-town/buildings/planning/building-upgrades.types';
 import { HomeReferentialDTO } from '../../my-town/buildings/planning/home-referential.types';
 import { BuildingPlansDTO, BuildingPlanStateDTO } from '../../my-town/buildings/planning/plan.types';
+import { ItemEmotesDTO } from '../dto/item.dto';
 import { RefinementViewDTO } from '../dto/refinement.dto';
 import { BankInfo } from '../types/bank-info.class';
 import { Building } from '../types/building.class';
@@ -24,6 +25,7 @@ describe('PlanningDataService', (): void => {
     const state: BuildingPlanStateDTO = { buildings: [], defense: null };
     const homes: HomeReferentialDTO = { levels: [], upgrades: [] };
     const upgrades: BuildingUpgradesDTO = { 'small_gather_#00': { maxLevel: 5 } };
+    const item_emotes: ItemEmotesDTO = { 'wire_#00': ':item_wire:' };
     const item: Item = Object.assign(new Item(), { id: 5, bank_count: 3 });
     const citizen: Citizen = Object.assign(new Citizen(), { id: 1, name: 'A' });
     const expedition: Expedition = new Expedition();
@@ -34,6 +36,7 @@ describe('PlanningDataService', (): void => {
     const get_upgrades: Mock<() => Observable<BuildingUpgradesDTO>> = vi.fn();
     const get_buildings: Mock<() => Observable<Building[]>> = vi.fn();
     const get_items: Mock<() => Observable<Item[]>> = vi.fn();
+    const get_item_emotes: Mock<() => Observable<ItemEmotesDTO>> = vi.fn();
     const get_citizens: Mock<() => Observable<CitizenInfo>> = vi.fn();
     const get_bank: Mock<() => Observable<BankInfo>> = vi.fn();
     const get_expeditions: Mock<(day: number) => Observable<Expedition[]>> = vi.fn();
@@ -48,6 +51,7 @@ describe('PlanningDataService', (): void => {
         get_upgrades.mockReturnValue(of(upgrades));
         get_buildings.mockReturnValue(of([]));
         get_items.mockReturnValue(of([item]));
+        get_item_emotes.mockReturnValue(of(item_emotes));
         get_citizens.mockReturnValue(of(Object.assign(new CitizenInfo(), { citizens: [citizen] })));
         get_bank.mockReturnValue(of(Object.assign(new BankInfo(), { items: [item] })));
         get_expeditions.mockReturnValue(of([expedition]));
@@ -55,7 +59,7 @@ describe('PlanningDataService', (): void => {
         TestBed.configureTestingModule({
             providers: [
                 { provide: BuildingPlanService, useValue: { getPlans: get_plans, getState: get_state, getHomeReferential: get_home_referential, getBuildingUpgrades: get_upgrades } },
-                { provide: ApiService, useValue: { getBuildings: get_buildings, getItems: get_items } },
+                { provide: ApiService, useValue: { getBuildings: get_buildings, getItems: get_items, getItemEmotes: get_item_emotes } },
                 { provide: TownService, useValue: { getCitizens: get_citizens, getBank: get_bank } },
                 { provide: ExpeditionService, useValue: { getExpeditions: get_expeditions } },
                 { provide: TownStatisticsService, useValue: { getRefinement: get_refinement } }
@@ -78,6 +82,7 @@ describe('PlanningDataService', (): void => {
         expect(result?.citizens).toEqual([citizen]);
         expect(result?.bank).toEqual([item]);
         expect(result?.upgrades).toBe(upgrades);
+        expect(result?.item_emotes).toBe(item_emotes);
         expect(get_plans).toHaveBeenCalledTimes(1);
         expect(get_bank).toHaveBeenCalledTimes(1);
     });
@@ -90,6 +95,7 @@ describe('PlanningDataService', (): void => {
         get_upgrades.mockReturnValue(never_completing(upgrades));
         get_buildings.mockReturnValue(never_completing<Building[]>([]));
         get_items.mockReturnValue(never_completing([item]));
+        get_item_emotes.mockReturnValue(never_completing(item_emotes));
         get_citizens.mockReturnValue(never_completing(Object.assign(new CitizenInfo(), { citizens: [citizen] })));
         get_bank.mockReturnValue(never_completing(Object.assign(new BankInfo(), { items: [item] })));
         let result: PlanningStatic | undefined;

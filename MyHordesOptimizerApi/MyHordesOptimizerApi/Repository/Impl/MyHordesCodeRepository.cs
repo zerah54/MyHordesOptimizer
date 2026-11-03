@@ -208,6 +208,12 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dico;
         }
 
+        public Dictionary<string, string> GetItemEmotes()
+        {
+            var json = File.ReadAllText("Data/Items/emotes.json");
+            return json.FromJson<Dictionary<string, string>>();
+        }
+
         public List<HomeLevelCodeModel> GetHomeLevels()
         {
             var json = File.ReadAllText("Data/Citizens/home-levels.json");

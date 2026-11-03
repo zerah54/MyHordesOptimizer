@@ -119,6 +119,7 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
             public Dictionary<string, BuildingCodeModel> GetBuildings() => throw new NotSupportedException();
             public Dictionary<string, BuildingHardResourcesCodeModel> GetBuildingHardResources() => throw new NotSupportedException();
             public Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades() => throw new NotSupportedException();
+            public Dictionary<string, string> GetItemEmotes() => throw new NotSupportedException();
             public Dictionary<string, Dictionary<string, string>> GetBuildingAvailability() => throw new NotSupportedException();
             public Dictionary<string, JobCodeModel> GetJobs() => throw new NotSupportedException();
             public List<HomeLevelCodeModel> GetHomeLevels() => throw new NotSupportedException();

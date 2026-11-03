@@ -61,11 +61,12 @@ export function upgradeDefenseBonus(upgrades: BuildingUpgradesDTO, uid: string, 
  * Texte d'un niveau dans la langue du site (allemand à défaut) ; nul sans texte.
  * @param {BuildingUpgradesDTO} upgrades Évolutions.
  * @param {string} uid Chantier.
- * @param {number} level Niveau (1 au maximum).
+ * @param {number} level Niveau (0 pour le texte de base).
  * @param {string} locale Langue du site.
  * @returns {string | null} Texte.
  */
 export function upgradeLevelText(upgrades: BuildingUpgradesDTO, uid: string, level: number, locale: string): string | null {
-    const text: I18nLabels | undefined = upgrades[uid]?.texts?.levels[level - 1];
-    return text === undefined ? null : (text[locale] ?? text['de'] ?? null);
+    const texts: BuildingUpgradeDTO['texts'] = upgrades[uid]?.texts;
+    const text: I18nLabels | null | undefined = level === 0 ? texts?.base : texts?.levels[level - 1];
+    return text ? (text[locale] ?? text['de'] ?? null) : null;
 }

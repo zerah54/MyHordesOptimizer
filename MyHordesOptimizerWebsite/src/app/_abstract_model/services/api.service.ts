@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import moment from 'moment';
-import { Observable, Subscriber } from 'rxjs';
+import { catchError, map, Observable, of, Subscriber } from 'rxjs';
 
 import {
     getItemsWithExpirationDate,
@@ -12,7 +12,7 @@ import {
 } from '../../_core/utilities/localstorage.util';
 import { BuildingDTO } from '../dto/building.dto';
 import { HeroSkillDTO } from '../dto/hero-skill.dto';
-import { ItemDTO } from '../dto/item.dto';
+import { ItemDTO, ItemEmotesDTO } from '../dto/item.dto';
 import { RecipeDTO } from '../dto/recipe.dto';
 import { RuinDTO } from '../dto/ruin.dto';
 import { dtoToModelArray } from '../types/_common.class';
@@ -28,6 +28,17 @@ export class ApiService extends GlobalService {
 
     /** La locale */
     private readonly locale: string = moment.locale();
+
+    /**
+     * Récupère la balise forum des objets ; vide si l'API ne la fournit pas, les posts restent alors sans emote.
+     * @returns {Observable<ItemEmotesDTO>} Balises par uid.
+     */
+    public getItemEmotes(): Observable<ItemEmotesDTO> {
+        return super.get<ItemEmotesDTO>(`${this.API_URL}/Fetcher/ItemEmotes`, true, undefined, true).pipe(
+            map((response: HttpResponse<ItemEmotesDTO>): ItemEmotesDTO => response.body ?? {}),
+            catchError((): Observable<ItemEmotesDTO> => of({}))
+        );
+    }
 
     /**
      * Récupère la liste des objets existants

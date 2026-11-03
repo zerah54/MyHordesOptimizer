@@ -1,12 +1,13 @@
 import { CdkDrag, CdkDragDrop, CdkDragPreview, CdkDropList } from '@angular/cdk/drag-drop';
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { provideHttpClient, withXhr } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { DebugElement, EventEmitter, WritableSignal } from '@angular/core';
 import { ComponentFixture, DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
 import { MatTableDataSource } from '@angular/material/table';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import moment from 'moment';
 import { of, Subject, throwError } from 'rxjs';
 import type { MockInstance } from 'vitest';
 
@@ -36,6 +37,7 @@ interface TestableComponent {
     auto_save$: Subject<WishlistInfo>;
     triggerSave(): void;
     buildExcelRows(items: WishlistItem[]): Record<string, string | number>[];
+    forumLabel(item: Item): string;
 }
 
 function buildItemDto(overrides: Partial<WishlistItemDTO['item']> = {}): WishlistItemDTO['item'] {
@@ -98,6 +100,19 @@ describe('WishlistComponent', (): void => {
         const row_ids: string[] = Array.from(fixture.nativeElement.querySelectorAll('tbody tr:first-child td') as NodeListOf<HTMLElement>).map(columnClass);
 
         expect(row_ids).toEqual(header_ids);
+    });
+
+    it('précède du tag d\'emote les objets qui en ont un, au format forum', (): void => {
+        const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+        const http: HttpTestingController = TestBed.inject(HttpTestingController);
+        const locale: string = moment.locale();
+        fixture.detectChanges();
+        http.expectOne((request: HttpRequest<unknown>): boolean => request.url.endsWith('/Fetcher/ItemEmotes')).flush({ 'wire_#00': ':item_wire:' });
+
+        const label = (uid: string): string => testable.forumLabel(Object.assign(new Item(), { uid, label: { [locale]: 'Objet' } }));
+
+        expect(label('wire_#00')).toBe(':item_wire: Objet');
+        expect(label('wood2_#00')).toBe('Objet');
     });
 
     it('exporte la quantité souhaitée de chaque ligne, pas le wishlist_count de l\'objet', (): void => {

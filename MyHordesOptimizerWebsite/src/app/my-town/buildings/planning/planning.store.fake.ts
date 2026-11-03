@@ -1,6 +1,7 @@
 import { computed, Signal, signal, WritableSignal } from '@angular/core';
 import type { Mock } from 'vitest';
 
+import { ItemEmotesDTO } from '../../../_abstract_model/dto/item.dto';
 import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
@@ -136,6 +137,7 @@ export interface FakePlanningStore {
     bank: WritableSignal<ReadonlyMap<number, number>>;
     items: WritableSignal<readonly Item[]>;
     upgrades: WritableSignal<BuildingUpgradesDTO>;
+    item_emotes: WritableSignal<ItemEmotesDTO>;
     catalog: WritableSignal<readonly Building[]>;
     selected_day: WritableSignal<number>;
     citizens: WritableSignal<CitizenRef[]>;
@@ -174,6 +176,7 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         bank: signal<ReadonlyMap<number, number>>(new Map<number, number>([[5, 1]])),
         items: signal<readonly Item[]>([Object.assign(new Item(), { id: 5, uid: 'wood', label: { fr: 'Bois' }, img: 'item/item_wood.gif' })]),
         upgrades: signal<BuildingUpgradesDTO>({}),
+        item_emotes: signal<ItemEmotesDTO>({}),
         catalog: signal<readonly Building[]>(fakeCatalog()),
         selected_day: signal(10),
         citizens: signal<CitizenRef[]>(FAKE_CITIZENS),

@@ -181,6 +181,15 @@ namespace MyHordesOptimizerApi.Controllers
                 _ => _myHordesFetcherService.GetBuildingUpgrades())!;
         }
 
+        /// <summary>Balise forum des objets qui en ont une, par uid, statique (fichier de l'extracteur).</summary>
+        [HttpGet]
+        [Route("ItemEmotes")]
+        public ActionResult<Dictionary<string, string>> GetItemEmotes()
+        {
+            return _cache.GetOrCreate(ReferentialCacheKeys.ItemEmotes,
+                _ => _myHordesFetcherService.GetItemEmotes())!;
+        }
+
         [HttpGet]
         [Route("Map")]
         [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.Map, "townId" })]

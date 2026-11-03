@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { computed, DestroyRef, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import moment from 'moment';
 
+import { ItemEmotesDTO } from '../../../_abstract_model/dto/item.dto';
 import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
 import { BuildingPlanService } from '../../../_abstract_model/services/building-plan.service';
 import { PlanningDataService, PlanningDay, PlanningStatic } from '../../../_abstract_model/services/planning-data.service';
@@ -208,6 +209,8 @@ export class PlanningStore {
 
     /** Évolutions des chantiers (niveaux, textes, valeurs par niveau) ; vides si l'API ne les fournit pas. */
     public readonly upgrades: Signal<BuildingUpgradesDTO> = computed((): BuildingUpgradesDTO => this.static_data()?.upgrades ?? {});
+    /** Balises forum des objets, par uid. */
+    public readonly item_emotes: Signal<ItemEmotesDTO> = computed((): ItemEmotesDTO => this.static_data()?.item_emotes ?? {});
 
     /** Évaluation du jour sélectionné, chaînée depuis aujourd'hui ; nulle pour un jour passé ou sans copie de travail. */
     public readonly evaluation: Signal<DayEvaluation | null> = computed((): DayEvaluation | null => {

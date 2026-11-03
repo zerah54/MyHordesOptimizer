@@ -5,7 +5,7 @@
         @if (my_town) {
             <mat-slide-toggle [(ngModel)]="in_town" (ngModelChange)="changeInTownMode()"
                               i18n-matTooltip matTooltip="Reprend le jour, le chaos, la dévastation et l'attaque estimée de votre ville">
-                <ng-container i18n>Ma ville</ng-container>
+                <ng-container i18n>Dans ma ville</ng-container>
             </mat-slide-toggle>
         }
         <mho-tool-presets tool="overflow" [snapshot]="snapshot_provider" (apply)="loadSnapshot($event)"/>

@@ -38,6 +38,7 @@ import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 
 import { environment } from '../../../environments/environment';
 import { HORDES_IMG_REPO, WISHLIST_EDITION_MODE_KEY } from '../../_abstract_model/const';
+import { ItemEmotesDTO } from '../../_abstract_model/dto/item.dto';
 import { WishlistDepot } from '../../_abstract_model/enum/wishlist-depot.enum';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
@@ -77,6 +78,8 @@ export class WishlistComponent implements OnInit {
     protected readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
     protected wishlist_info: WritableSignal<WishlistInfo | null> = signal(null);
     protected items: WritableSignal<Item[]> = signal([]);
+    /** Balises forum des objets, par uid. */
+    private readonly item_emotes: WritableSignal<ItemEmotesDTO> = signal({});
     protected edition_mode: WritableSignal<boolean> = signal(JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false'));
     protected readonly columns: StandardColumn[] = [
         { id: 'sort', header: '', displayed: (): boolean => this.edition_mode() },
@@ -203,6 +206,12 @@ export class WishlistComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((items: Item[]): void => {
                 this.items.set(items);
+            });
+
+        this.api.getItemEmotes()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((item_emotes: ItemEmotesDTO): void => {
+                this.item_emotes.set(item_emotes);
             });
     }
 
@@ -422,7 +431,7 @@ export class WishlistComponent implements OnInit {
             text += `\n[collapse=${$localize`Encombrants`}]\n`;
             heavy.forEach((item: WishlistItem): void => {
                 text += item.should_signal ? '[bad]' : '';
-                text += `:middot:${item.item.label[this.locale]}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                text += `:middot:${this.forumLabel(item.item)}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
                 text += item.should_signal ? '[/bad]:warning:\n' : '\n';
             });
             text += '[/collapse]\n';
@@ -431,7 +440,7 @@ export class WishlistComponent implements OnInit {
             text += `\n[collapse=${$localize`Non-Encombrants`}]\n`;
             light.forEach((item: WishlistItem): void => {
                 text += item.should_signal ? '[bad]' : '';
-                text += `:middot:${item.item.label[this.locale]}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
+                text += `:middot:${this.forumLabel(item.item)}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
                 text += item.should_signal ? '[/bad]:warning:\n' : '\n';
             });
             text += '[/collapse]\n';
@@ -439,7 +448,7 @@ export class WishlistComponent implements OnInit {
         if (do_not_bring_back.length > 0) {
             text += `\n[collapse=${$localize`Ne pas rapporter`}]\n`;
             do_not_bring_back.forEach((item: WishlistItem): void => {
-                text += `:middot:${item.item.label[this.locale]}\n`;
+                text += `:middot:${this.forumLabel(item.item)}\n`;
             });
             text += '[/collapse]\n';
         }
@@ -448,6 +457,17 @@ export class WishlistComponent implements OnInit {
         text += `[aparte]${$localize`Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=${environment.website_url}my-town/wishlist]ce lien[/link]`}[/aparte]`;
 
         this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
+    }
+
+    /**
+     * Nom d'un objet au format forum, précédé de sa balise quand le jeu en a une.
+     * @param {Item} item Objet.
+     * @returns {string} Texte.
+     */
+    private forumLabel(item: Item): string {
+        const emote: string | undefined = this.item_emotes()[item.uid];
+        const label: string = item.label[this.locale];
+        return emote === undefined ? label : `${emote} ${label}`;
     }
 
     protected shareExcel(): void {

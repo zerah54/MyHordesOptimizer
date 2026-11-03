@@ -59,6 +59,17 @@ describe('PlanningShareComponent', (): void => {
         expect(copy.mock.calls[0][0]).toContain(':scav: @Alice:1');
     });
 
+    it('chaque ressource est précédée de l\'emote de son objet', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = { ...emptyPlanContent(), programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0 }] } };
+        const menu: MatMenuHarness = await render(plan);
+        fake.item_emotes.set({ wood: ':item_wood:' });
+        fixture.detectChanges();
+
+        await menu.clickItem({ text: 'Post budget' });
+
+        expect(copy.mock.calls[0][0]).toMatch(/:middot: :item_wood: .+ × \d+/);
+    });
+
     it('un clic copie le post choisi', async (): Promise<void> => {
         const menu: MatMenuHarness = await render();
 

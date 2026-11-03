@@ -4,6 +4,9 @@ import { CategoryDTO } from './category.dto';
 import { ItemSummaryDTO } from './item-summary.dto';
 import { RecipeDTO } from './recipe.dto';
 
+/** Balise forum (`:item_xxx:`) des objets qui en ont une, par uid (`Fetcher/ItemEmotes`). */
+export type ItemEmotesDTO = Record<string, string>;
+
 export interface ItemDTO {
     uid: string;
     img: string;

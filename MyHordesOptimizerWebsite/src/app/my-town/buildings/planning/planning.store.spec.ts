@@ -16,6 +16,7 @@ import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { errorInterceptor } from '../../../_core/services/errors-interceptor.service';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { setTown } from '../../../_core/utilities/localstorage.util';
+import { BuildingRef } from './plan-evaluation.util';
 import {
     BuildingPlanContentDTO,
     BuildingPlanDTO,
@@ -25,7 +26,6 @@ import {
     PlanTaskDTO,
     TownBuildingStateDTO
 } from './plan.types';
-import { BuildingRef } from './plan-evaluation.util';
 import { PlanningStore } from './planning.store';
 import { ToggleContext } from './program-edit.util';
 import { TaskCheckService } from './task-check.service';
@@ -62,7 +62,8 @@ function static_data(plans: BuildingPlansDTO): PlanningStatic {
         homes: { levels: [], upgrades: [] },
         citizens: [Object.assign(new Citizen(), { id: 1, name: 'A', is_dead: false })],
         bank: [],
-        upgrades: {}
+        upgrades: {},
+        item_emotes: {}
     };
 }
 

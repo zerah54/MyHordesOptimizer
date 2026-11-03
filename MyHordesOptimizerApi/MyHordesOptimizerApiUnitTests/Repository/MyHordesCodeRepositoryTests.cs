@@ -24,6 +24,17 @@ namespace MyHordesOptimizerApiUnitTests.Repository
         }
 
         [Fact]
+        public void GetItemEmotes_SurLeFichierReel_DonneLaBaliseDuForumParUid()
+        {
+            var repository = new MyHordesCodeRepository();
+
+            var emotes = repository.GetItemEmotes();
+
+            emotes.Should().HaveCount(87);
+            emotes["wire_#00"].Should().Be(":item_wire:");
+        }
+
+        [Fact]
         public void GetCitizenStatuses_SurLeFichierReel_ContientThirst2()
         {
             var repository = new MyHordesCodeRepository();

@@ -12,6 +12,7 @@ namespace MyHordesOptimizerApi.Services.Caching
         public const string Buildings = "referentiel:buildings";
         public const string HomeReferential = "referentiel:home";
         public const string BuildingUpgrades = "referentiel:building-upgrades";
+        public const string ItemEmotes = "referentiel:item-emotes";
         public const string HeroSkills = "referentiel:heroskills";
         public const string CausesOfDeath = "referentiel:causesofdeath";
         public const string CleanUpTypes = "referentiel:cleanuptypes";

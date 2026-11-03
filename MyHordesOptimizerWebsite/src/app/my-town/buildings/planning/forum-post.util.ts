@@ -1,7 +1,7 @@
 import { bannedPoolShown, CitizenCapacity } from './budget.util';
 import { StepResult } from './building-progress.util';
-import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from './plan.types';
 import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef, PlannedLoss } from './plan-evaluation.util';
+import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from './plan.types';
 import { ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
 
 /** Taille maximale d'un message généré : sous la limite du jeu (16 384 caractères) pour garder de la marge. */
@@ -23,6 +23,8 @@ export interface PostContext {
     citizens: CitizenRef[];
     homes: ReadonlyMap<number, HomeLevelRef>;
     item_label: (item_id: number) => string;
+    /** Balise forum de l'objet, absente si le jeu n'en a pas. */
+    item_emote: (item_id: number) => string | undefined;
     website_url: string;
     /** Emote du métier de chaque joueur (`:scav:`…), placée devant chacun de ses pseudos ; un joueur absent n'en a pas. */
     job_emotes: ReadonlyMap<number, string>;
@@ -355,10 +357,10 @@ function resourceLines(context: PostContext): string[] {
     }
     const gaps: Map<number, number> = new Map<number, number>(evaluation.missing.map((resource: { itemId: number; count: number }): [number, number] => [resource.itemId, resource.count]));
     const lines: string[] = Array.from(evaluation.needs.entries())
-        .map(([item_id, need]: [number, number]): { label: string; need: number; gap: number } => ({ label: context.item_label(item_id), need, gap: gaps.get(item_id) ?? 0 }))
+        .map(([item_id, need]: [number, number]): { label: string; emote: string | undefined; need: number; gap: number } => ({ label: context.item_label(item_id), emote: context.item_emote(item_id), need, gap: gaps.get(item_id) ?? 0 }))
         .sort((a: { label: string }, b: { label: string }): number => a.label.localeCompare(b.label))
-        .map((row: { label: string; need: number; gap: number }): string =>
-            `:middot: ${row.label} × ${row.need}${row.gap > 0 ? ` — ${$localize`manque`} ${row.gap} :warning:` : ''}`);
+        .map((row: { label: string; emote: string | undefined; need: number; gap: number }): string =>
+            `:middot: ${row.emote === undefined ? '' : `${row.emote} `}${row.label} × ${row.need}${row.gap > 0 ? ` — ${$localize`manque`} ${row.gap} :warning:` : ''}`);
     if (evaluation.missing.length === 0) {
         lines.push($localize`La banque couvre tout.`);
     }

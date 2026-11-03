@@ -51,6 +51,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 
         /// <summary>Évolutions des chantiers par uid, statiques (Data/Buildings/upgrades.json de l'extracteur).</summary>
         Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades();
+        Dictionary<string, string> GetItemEmotes();
         MyHordesOptimizerMapDto GetMap(int townId);
         IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId);
         List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int townId, int userId, List<MyHordesOptimizerMapDigDto> requests);

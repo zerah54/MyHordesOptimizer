@@ -38,6 +38,7 @@ function context(overrides: Partial<PlanningContext> = {}, data_overrides: Parti
         citizens: [Object.assign(new Citizen(), { id: 1, name: 'A', is_dead: false })],
         bank: [Object.assign(new Item(), { id: 5, bank_count: 3 })],
         upgrades: {},
+        item_emotes: {},
         ...data_overrides
     };
     const days: Map<number, PlanningDay> = new Map<number, PlanningDay>([[10, { expeditions: [expedition(6, 1)], attack: 1400 }]]);

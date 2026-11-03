@@ -13,6 +13,7 @@ function context(content: BuildingPlanContentDTO, evaluation_overrides: Partial<
         citizens: FAKE_CITIZENS,
         homes: FAKE_HOMES,
         item_label: (item_id: number): string => (item_id === 5 ? 'Bois' : `#${item_id}`),
+        item_emote: (): undefined => undefined,
         website_url: 'https://site.test/',
         job_emotes: new Map<number, string>()
     };
@@ -219,6 +220,16 @@ describe('forum-post.util', (): void => {
 
             const covered: string = joined(budgetPost(context(plan(), { bank: new Map<number, number>([[5, 9]]) })));
             expect(covered).toContain('La banque couvre tout.');
+        });
+
+        it('ressources : l\'emote de l\'objet précède son nom quand le jeu en a une', (): void => {
+            const text: string = joined(budgetPost({ ...context(plan()), item_emote: (item_id: number): string | undefined => (item_id === 5 ? ':item_wood2:' : undefined) }));
+
+            expect(text).toContain(':middot: :item_wood2: Bois × 2');
+        });
+
+        it('ressources : un objet sans emote garde son seul nom', (): void => {
+            expect(joined(budgetPost(context(plan())))).toContain(':middot: Bois × 2');
         });
 
         it('reste négatif ou citoyen sur-engagé : avertissement', (): void => {
