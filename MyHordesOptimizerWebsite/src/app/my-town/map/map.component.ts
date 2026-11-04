@@ -63,6 +63,7 @@ import { TownContextService } from '../../_core/services/town-context.service';
 import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { CompassRoseComponent } from '../../_shared/compass-rose/compass-rose.component';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
+import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { DEFAULT_ITEMS_SORT_MODE, ItemsSortMode, sanitizeItemsSortMode } from '../../_shared/list-elements-add-remove/items-sort-mode';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import {
@@ -130,7 +131,7 @@ const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCa
     changeDetection: ChangeDetectionStrategy.OnPush,
     // Saisie d'un tracé : son état vit le temps de la page.
     providers: [MapRouteEditor],
-    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...directives, ...material_modules, ...pipes, IconApComponent]
 })
 export class MapComponent implements OnInit, AfterViewInit {
 

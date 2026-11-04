@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Building } from '../../../../_abstract_model/types/building.class';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { BuildingProgress } from '../building-progress.util';
 import { BuildingPlanContentDTO, PlanDefenseSourceDTO, PlanLossDTO, PlanLossKind } from '../plan.types';
 import { BuildingRef, PlannedLoss } from '../plan-evaluation.util';
@@ -35,7 +36,7 @@ interface LossCandidate {
     templateUrl: './planning-defense.component.html',
     styleUrls: ['./planning-defense.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...material_modules]
+    imports: [...angular_common, ...material_modules, IconApComponent]
 })
 export class PlanningDefenseComponent {
 

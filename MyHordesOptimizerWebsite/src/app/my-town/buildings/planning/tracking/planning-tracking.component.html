@@ -8,7 +8,10 @@
 @if (store.draft(); as draft) {
     <section class="fields">
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label i18n>PA de base par citoyen</mat-label>
+            <mat-label i18n>
+                <mho-icon-ap/>
+                de base par citoyen
+            </mat-label>
             <input matInput type="number" min="0" data-field="default-pa" [ngModel]="draft.basePa" [disabled]="!store.can_edit()"
                    (ngModelChange)="onDefaultPa($event)">
         </mat-form-field>
@@ -44,7 +47,10 @@
                 <img [src]="HORDES_IMG_REPO + headerIcon(home)" [alt]="home.getLabel()" [matTooltip]="home.getLabel()">
             </th>
         }
-        <th i18n>PA de base</th>
+        <th i18n>
+            <mho-icon-ap/>
+            de base
+        </th>
         <th i18n>Rab d'expé</th>
         <th i18n>Consignes</th>
         <th i18n>Capacité</th>
@@ -62,15 +68,17 @@
                     </td>
                 }
                 <td class="who">
-                    <mho-citizen-chip [citizen]="row.citizen" [day]="store.selected_day()" [actions]="store.displayable_actions()" [homeInColumns]="true"/>
-                    @if (citizenRef(row.citizen.id); as ref) {
-                        @if (ref.banned) {
-                            <span class="badge-banned" i18n>banni</span>
+                    <div>
+                        <mho-citizen-chip [citizen]="row.citizen" [day]="store.selected_day()" [actions]="store.displayable_actions()" [homeInColumns]="true"/>
+                        @if (citizenRef(row.citizen.id); as ref) {
+                            @if (ref.banned) {
+                                <span class="badge-banned" i18n>banni</span>
+                            }
+                            @if (ref.technician) {
+                                <span class="badge-tech" i18n>technicien</span>
+                            }
                         }
-                        @if (ref.technician) {
-                            <span class="badge-tech" i18n>technicien</span>
-                        }
-                    }
+                    </div>
                 </td>
                 @for (home of home_columns; track home.key; let first = $first) {
                     @let entry = homeOf(row.citizen, home);
@@ -136,7 +144,8 @@
                         }
                         @if (store.can_edit()) {
                             <button mat-stroked-button type="button" class="add-task" data-action="add-task" [matMenuTriggerFor]="add_menu"
-                                    [matMenuTriggerData]="{ user_id: row.citizen.id }" i18n>Ajouter une consigne
+                                    [matMenuTriggerData]="{ user_id: row.citizen.id }">
+                                <ng-container i18n>Ajouter une consigne</ng-container>
                             </button>
                         }
                     </div>
@@ -189,7 +198,9 @@
 <mat-menu #add_menu="matMenu">
     <ng-template matMenuContent let-user_id="user_id">
         <button mat-menu-item type="button" data-kind="home" (click)="addTask(user_id, 'home')" i18n>Maison</button>
-        <button mat-menu-item type="button" data-kind="homeUpgrade" (click)="addTask(user_id, 'homeUpgrade')" i18n>Amélioration de maison</button>
+        <button mat-menu-item type="button" data-kind="homeUpgrade" [disabled]="!canAddUpgrade(user_id)" (click)="addTask(user_id, 'homeUpgrade')" i18n>
+            Amélioration de maison
+        </button>
         <button mat-menu-item type="button" data-kind="action" [disabled]="!hasActions()" (click)="addTask(user_id, 'action')" i18n>Action de chantier</button>
         <button mat-menu-item type="button" data-kind="free" (click)="addTask(user_id, 'free')" i18n>Libre</button>
     </ng-template>

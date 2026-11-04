@@ -47,7 +47,11 @@
             <span class="live-dot" aria-hidden="true"></span>
             <span class="banner-text">
                 <b i18n>Tracé en cours</b>
-                <span class="banner-detail" i18n>{{ route_editor.length() }}&nbsp;PA · cliquez une case pour y aller</span>
+                <span class="banner-detail">
+                    <mho-icon-ap [value]="route_editor.length()"/>
+                    &nbsp;·&nbsp;
+                    <ng-container i18n>Cliquez une case pour y aller</ng-container>
+                </span>
             </span>
             <button mat-button type="button" (click)="route_editor.undo()" [disabled]="!route_editor.can_undo()">
                 <mat-icon>undo</mat-icon>
@@ -251,7 +255,8 @@
                             @let summary = spotted_summary();
                             <p class="settings-hint spotted-items-summary" role="status">
                                 @if (summary.cells) {
-                                    <ng-container i18n>{summary.cells, plural, =1 {1 case} other {{{ summary.cells }} cases}} · {summary.quantity, plural, =1 {1 objet au sol} other {{{ summary.quantity }} objets au sol}}</ng-container>
+                                    <ng-container i18n>{summary.cells, plural, =1 {1 case} other {{{ summary.cells }} cases}}
+                                        · {summary.quantity, plural, =1 {1 objet au sol} other {{{ summary.quantity }} objets au sol}}</ng-container>
                                 } @else {
                                     <ng-container i18n>Aucune case connue ne porte ces objets.</ng-container>
                                 }
@@ -328,7 +333,8 @@
                                         <div class="zone-items">
                                             <div class="zone-detail" i18n>Objets à compter</div>
                                             <mho-list-element-add-remove label="" keepOpen [currentList]="distance_items()" [lists]="distance_item_lists()"
-                                                                         [sortMode]="options().items_sort" (sortModeChange)="changeOptions('items_sort', $event)"
+                                                                         [sortMode]="options().items_sort"
+                                                                         (sortModeChange)="changeOptions('items_sort', $event)"
                                                                          addLabel="Ajouter aux objets à compter" i18n-addLabel
                                                                          removeLabel="Retirer des objets à compter" i18n-removeLabel
                                                                          emptyLabel="Retirer tous les objets" i18n-emptyLabel

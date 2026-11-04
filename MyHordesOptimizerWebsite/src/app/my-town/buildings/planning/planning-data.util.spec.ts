@@ -181,9 +181,11 @@ describe('planning-data.util', (): void => {
             expect(citizenRefs([citizen({})])[0].homeLevel).toBeNull();
         });
 
-        it('niveau de maison négatif (non défini) = inconnu', (): void => {
-            const home: Home = Object.assign(new Home(), { content: [{ element: HomeEnum.HOUSE_LEVEL, value: -1 }] });
-            expect(citizenRefs([citizen({ home })])[0].homeLevel).toBeNull();
+        it('niveaux négatifs (non définis) = niveau 0, habitation comme améliorations', (): void => {
+            const home: Home = Object.assign(new Home(), { content: [{ element: HomeEnum.HOUSE_LEVEL, value: -1 }, { element: HomeEnum.KITCHEN_LEVEL, value: -1 }] });
+            const ref: CitizenRef = citizenRefs([citizen({ home })])[0];
+            expect(ref.homeLevel).toBe(0);
+            expect(ref.upgradeLevels?.get(HomeEnum.KITCHEN_LEVEL.key)).toBe(0);
         });
 
         it('lit le niveau des améliorations (booléen = 0 ou 1), null sans données de maison', (): void => {

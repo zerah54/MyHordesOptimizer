@@ -11,7 +11,7 @@ import { dailyActionAp, DailyActionEnum, dailyActionMaxUses } from '../../../../
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { HeroSkillLevels } from '../../../../_abstract_model/types/hero-skill-levels';
-import { cascadeAp, HomeUpgradeRef, reachableHomeLevels } from '../home-upgrades.util';
+import { cascadeAp, HomeUpgradeRef, reachableHomeLevels, upgradesAllowed } from '../home-upgrades.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } from '../plan.types';
 import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
@@ -123,6 +123,16 @@ export class PlanningTaskEditorComponent {
     }
 
     /**
+     * Amélioration permise : habitation au niveau 1 ou plus, actuelle ou visée par un autre agrandissement du jour.
+     * @returns {boolean} Vrai si permise.
+     */
+    protected upgradeAllowed(): boolean {
+        const tasks: PlanTaskDTO[] = this.store.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === this.userId())?.tasks ?? [];
+        const others: PlanTaskDTO[] = tasks.filter((task: PlanTaskDTO): boolean => task !== this.task());
+        return upgradesAllowed(others, currentHomeLevel(this.citizenRef(), null));
+    }
+
+    /**
      * Choix proposés pour le nombre d'utilisations d'une action.
      * @param {number} max_uses Utilisations possibles.
      * @returns {number[]} De 1 au maximum.
@@ -138,6 +148,9 @@ export class PlanningTaskEditorComponent {
     protected setTaskKind(kind: PlanTaskKind): void {
         const current: PlanTaskDTO | undefined = this.task();
         if (kind === 'action' && (current === undefined || this.actionOptions(current).length === 0)) {
+            return;
+        }
+        if (kind === 'homeUpgrade' && !this.upgradeAllowed()) {
             return;
         }
         this.edit((task: PlanTaskDTO): void => {

@@ -207,13 +207,21 @@ describe('PlanningTaskEditorComponent', (): void => {
     });
 
     it('une amélioration : choisie au référentiel, niveau suivant celui du citoyen, PA des niveaux manquants', async (): Promise<void> => {
-        await render();
+        await render({ ...emptyPlanContent(), citizens: [{ userId: 3, tasks: [{ kind: 'free', label: 'RDE', pa: 3 }] }] }, 3);
 
         internals().setTaskKind('homeUpgrade');
         expect(task()).toEqual({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 1, pa: 6 });
 
         internals().setTaskUpgradeLevel(2);
         expect(task()).toEqual({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 9 });
+    });
+
+    it('habitation sous le niveau 1 : le type « Amélioration de maison » n\'est pas applicable', async (): Promise<void> => {
+        await render();
+
+        internals().setTaskKind('homeUpgrade');
+
+        expect(task()?.kind).toBe('free');
     });
 
     it('une amélioration au format libre reste modifiable par son libellé', async (): Promise<void> => {

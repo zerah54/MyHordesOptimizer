@@ -1,4 +1,4 @@
-import { cascadeAp, cascadeLevels, homeTaskIndex, nextHomeTarget, reachableHomeLevels } from './home-upgrades.util';
+import { cascadeAp, cascadeLevels, homeTaskIndex, nextHomeTarget, reachableHomeLevels, upgradesAllowed } from './home-upgrades.util';
 import { PlanTaskDTO } from './plan.types';
 
 describe('home-upgrades.util', (): void => {
@@ -72,6 +72,23 @@ describe('home-upgrades.util', (): void => {
             expect(nextHomeTarget([], null, 1, 5, false)).toBe(2);
             expect(nextHomeTarget([house], null, 1, 5, false)).toBeNull();
             expect(nextHomeTarget([house], null, 1, 5, true)).toBe(3);
+        });
+    });
+
+    describe('upgradesAllowed', (): void => {
+        it('habitation au niveau 1 ou plus : améliorations permises', (): void => {
+            expect(upgradesAllowed([], 1)).toBe(true);
+            expect(upgradesAllowed([], 3)).toBe(true);
+        });
+
+        it('habitation au niveau 0 ou inconnue : améliorations interdites', (): void => {
+            expect(upgradesAllowed([], 0)).toBe(false);
+            expect(upgradesAllowed([], null)).toBe(false);
+        });
+
+        it('agrandissement du jour au niveau 1 ou plus : améliorations permises', (): void => {
+            expect(upgradesAllowed([{ id: 'h', kind: 'home', level: 1, pa: 2 }], 0)).toBe(true);
+            expect(upgradesAllowed([{ id: 'h', kind: 'home', pa: 0 }], 0)).toBe(false);
         });
     });
 });

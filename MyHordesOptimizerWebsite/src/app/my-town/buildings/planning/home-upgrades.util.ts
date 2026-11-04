@@ -95,6 +95,16 @@ export function homeTaskIndex(tasks: readonly PlanTaskDTO[], key: string | null)
 }
 
 /**
+ * Améliorations constructibles : habitation au niveau 1 ou plus, actuelle ou visée par l'agrandissement du jour.
+ * @param {readonly PlanTaskDTO[]} tasks Consignes du citoyen.
+ * @param {number | null} house_level Niveau actuel de l'habitation, nul s'il est inconnu.
+ * @returns {boolean} Vrai si les améliorations sont permises.
+ */
+export function upgradesAllowed(tasks: readonly PlanTaskDTO[], house_level: number | null): boolean {
+    return Math.max(house_level ?? 0, tasks[homeTaskIndex(tasks, null)]?.level ?? 0) >= 1;
+}
+
+/**
  * Niveau que vise le « + » d'un élément de maison : le suivant de la consigne existante, sinon celui du citoyen. Un seul
  * agrandissement par jour hors chaos et Pandémonium.
  * @param {readonly PlanTaskDTO[]} tasks Consignes du citoyen.

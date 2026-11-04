@@ -149,13 +149,13 @@
                             <mat-icon aria-hidden="true">warning</mat-icon>
                             @switch (notice) {
                                 @case ('pairs') {
-                                    <span i18n>Investissez vos PA par paires de PA pour ne rien perdre.</span>
+                                    <span i18n>Investissez vos <mho-icon-ap/> par paires pour ne rien perdre.</span>
                                 }
                                 @case ('banned-forbidden') {
                                     <span i18n>Chantiers interdits aux bannis.</span>
                                 }
                                 @case ('over-committed') {
-                                    <span i18n>Consignes individuelles et expédition au-delà de vos PA de base.</span>
+                                    <span i18n>Consignes individuelles et expédition au-delà de vos <mho-icon-ap/> de base.</span>
                                 }
                             }
                         </p>
@@ -234,8 +234,9 @@
                 @let status = task_statuses()[index];
                 @if (future()) {
                     <li>{{ taskText(task) }}@if (task.pa > 0) {
-                        ({{ task.pa }}
-                        <ng-container i18n>PA</ng-container>)
+                        (
+                        <mho-icon-ap [value]="task.pa"/>
+                        )
                     }</li>
                 } @else {
                     <li [class.done]="status.done">
@@ -243,8 +244,9 @@
                                       [disabled]="!store.can_track() || store.isPending(userId, task) || locked(task, status)"
                                       (change)="onToggle($event, userId, task, status)">
                             {{ taskText(task) }}@if (task.pa > 0) {
-                            ({{ task.pa }}
-                            <ng-container i18n>PA</ng-container>)
+                            (
+                            <mho-icon-ap [value]="task.pa"/>
+                            )
                         }
                         </mat-checkbox>
                         @if (status.source === 'data') {

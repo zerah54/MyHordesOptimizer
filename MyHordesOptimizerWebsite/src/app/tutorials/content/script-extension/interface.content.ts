@@ -54,8 +54,8 @@ export const SCRIPT_EXTENSION_INTERFACE: TutorialPage = {
             title: $localize`Ville`,
             items: [
                 {
-                    title: $localize`PA manquants pour réparer les chantiers`,
-                    content: $localize`<p>Sur la page des chantiers, un bâtiment endommagé affiche en plus, dans sa barre de PA, ceux qu'il faut investir pour qu'il passe la nuit : « (dont X pour que le bâtiment passe la nuit) ».</p>
+                    title: $localize`<mho-icon-ap/> manquants pour réparer les chantiers`,
+                    content: $localize`<p>Sur la page des chantiers, un bâtiment endommagé affiche en plus, dans sa barre de <mho-icon-ap/>, ceux qu'il faut investir pour qu'il passe la nuit : « (dont X pour que le bâtiment passe la nuit) ».</p>
                         <p>Sont comptés les dégâts de l'attaque en Pandémonium (70 % des points de vie maximum, arrondis au supérieur) et, dans tous les modes, ceux que certains bâtiments s'infligent eux-mêmes (feux d'artifice, réacteur).</p>`
                 },
                 {

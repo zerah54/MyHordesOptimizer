@@ -29,6 +29,11 @@
 
     .who {
         white-space: nowrap;
+
+        > div {
+            display: flex;
+            flex-direction: row;
+        }
     }
 
     // Petit écran : seule l'habitation reste, le détail passe dans son infobulle.
@@ -107,6 +112,8 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.2em 1em;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .task {

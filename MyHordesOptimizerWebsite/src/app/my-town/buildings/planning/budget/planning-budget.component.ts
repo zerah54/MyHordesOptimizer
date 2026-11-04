@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { DailyActionEnum } from '../../../../_abstract_model/enum/daily-action.enum';
 import { Imports } from '../../../../_abstract_model/types/_types';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { budgetBreakdown, BudgetCategory, BudgetRow } from '../budget-breakdown.util';
 import { BuildingPlanContentDTO, PlanPool, PlanTownLineDTO } from '../plan.types';
 import { DayEvaluation } from '../plan-evaluation.util';
@@ -24,7 +25,7 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
     templateUrl: './planning-budget.component.html',
     styleUrls: ['./planning-budget.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...material_modules]
+    imports: [...angular_common, ...material_modules, IconApComponent]
 })
 export class PlanningBudgetComponent {
 
@@ -49,11 +50,11 @@ export class PlanningBudgetComponent {
         }
         switch (category) {
             case 'basePa':
-                return $localize`PA de base`;
+                return $localize`<mho-icon-ap/> de base`;
             case 'expeditions':
                 return $localize`Expéditions`;
             case 'technicianCp':
-                return $localize`PC du technicien`;
+                return $localize`<mho-icon-ep/> du technicien`;
             case 'program':
                 return $localize`Chantiers du programme`;
             case 'home':

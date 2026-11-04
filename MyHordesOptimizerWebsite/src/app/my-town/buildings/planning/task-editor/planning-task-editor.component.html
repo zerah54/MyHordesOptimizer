@@ -3,7 +3,9 @@
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
             <mat-select [value]="task.kind" [disabled]="!store.can_edit()" (selectionChange)="setTaskKind($event.value)">
                 <mat-option value="home" i18n>Maison</mat-option>
-                <mat-option value="homeUpgrade" i18n>Amélioration de maison</mat-option>
+                <mat-option value="homeUpgrade" [disabled]="task.kind !== 'homeUpgrade' && !upgradeAllowed()">
+                    <ng-container i18n>Amélioration de maison</ng-container>
+                </mat-option>
                 <mat-option value="action" [disabled]="actionOptions(task).length === 0">
                     <ng-container i18n>Action de chantier</ng-container>
                 </mat-option>

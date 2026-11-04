@@ -64,8 +64,12 @@
                                     <dd><span class="coordinates">{{ end.coordinates }}</span><span class="muted">{{ end.place }}</span></dd>
                                 }
                                 <dt i18n>Longueur</dt>
-                                <dd><b class="num">{{ selected.view.length }}&nbsp;<ng-container i18n>PA</ng-container>
-                                </b><span class="muted">{{ detail.length_note }}</span></dd>
+                                <dd>
+                                    <b class="num">
+                                        <mho-icon-ap [value]="selected.view.length"/>
+                                    </b>
+                                    <span class="muted">{{ detail.length_note }}</span>
+                                </dd>
                                 <dt i18n>Visibilité</dt>
                                 <dd>
                                     <mat-icon class="inline-icon">{{ detail.is_private ? 'lock' : 'public' }}</mat-icon>

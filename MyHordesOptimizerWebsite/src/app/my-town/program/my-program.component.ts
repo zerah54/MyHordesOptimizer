@@ -23,6 +23,7 @@ import { isHouseLevelEditable } from '../../_abstract_model/types/town-details.c
 import { TownContextService } from '../../_core/services/town-context.service';
 import { getTown, user } from '../../_core/utilities/localstorage.util';
 import { DaySelectorComponent } from '../../_shared/day-selector/day-selector.component';
+import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { StepResult } from '../buildings/planning/building-progress.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO } from '../buildings/planning/plan.types';
 import { CitizenRef, DayEvaluation } from '../buildings/planning/plan-evaluation.util';
@@ -63,7 +64,7 @@ interface PastProgram {
     styleUrls: ['./my-program.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [PlanningStore],
-    imports: [...angular_common, ...material_modules, ...components]
+    imports: [...angular_common, ...material_modules, ...components, IconApComponent]
 })
 export class MyProgramComponent implements OnInit {
 

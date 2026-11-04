@@ -23,7 +23,7 @@ import { CitizenCapacity } from '../budget.util';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { PlanningCitizenFiltersComponent } from '../citizen-filters/planning-citizen-filters.component';
 import { HOME_COLUMNS, homeDone, homeHeaderIcon, homeOf, homeSummary } from '../home-columns.util';
-import { cascadeAp, homeTaskIndex, HomeUpgradeRef, nextHomeTarget } from '../home-upgrades.util';
+import { cascadeAp, homeTaskIndex, HomeUpgradeRef, nextHomeTarget, upgradesAllowed } from '../home-upgrades.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } from '../plan.types';
 import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
@@ -262,7 +262,7 @@ export class PlanningTrackingComponent {
      * @param {number} user_id Identifiant du citoyen.
      * @param {HomeEnum} home Élément.
      * @returns {number | null} Niveau visé, nul s'il n'y a rien à ajouter (niveau inconnu ou maximal, agrandissement déjà demandé,
-     * consigne déjà faite).
+     * consigne déjà faite, amélioration sur une habitation sous le niveau 1).
      */
     protected homeTarget(user_id: number, home: HomeEnum): number | null {
         const key: string | null = homeKey(home);
@@ -270,12 +270,24 @@ export class PlanningTrackingComponent {
         if (max === null) {
             return null;
         }
-        const tasks: PlanTaskDTO[] = this.store.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === user_id)?.tasks ?? [];
+        if (key !== null && !this.canAddUpgrade(user_id)) {
+            return null;
+        }
+        const tasks: PlanTaskDTO[] = this.draftTasks(user_id);
         const existing: TrackingTask | undefined = this.trackingTask(user_id, tasks[homeTaskIndex(tasks, key)]);
         if (existing?.status.done === true) {
             return null;
         }
         return nextHomeTarget(tasks, key, currentHomeLevel(this.citizenRef(user_id), key), max, this.store.unlimited_home_levels());
+    }
+
+    /**
+     * Consigne d'amélioration possible : habitation au niveau 1 ou plus, actuelle ou visée par l'agrandissement du jour.
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {boolean} Vrai si permise.
+     */
+    protected canAddUpgrade(user_id: number): boolean {
+        return upgradesAllowed(this.draftTasks(user_id), currentHomeLevel(this.citizenRef(user_id), null));
     }
 
     /**
@@ -336,9 +348,18 @@ export class PlanningTrackingComponent {
         }
         if (kind === 'homeUpgrade') {
             const upgrade: HomeUpgradeRef | undefined = this.store.home_upgrades()[0];
-            return upgrade === undefined ? null : { id, kind, ...upgradeDefaults(upgrade, currentHomeLevel(this.citizenRef(user_id), upgrade.key)) };
+            return upgrade === undefined || !this.canAddUpgrade(user_id) ? null : { id, kind, ...upgradeDefaults(upgrade, currentHomeLevel(this.citizenRef(user_id), upgrade.key)) };
         }
         return kind === 'home' ? { id, kind, pa: 0 } : { id, kind, label: '', pa: 0 };
+    }
+
+    /**
+     * Consignes d'un citoyen dans la copie de travail.
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {PlanTaskDTO[]} Consignes, vides sans entrée.
+     */
+    private draftTasks(user_id: number): PlanTaskDTO[] {
+        return this.store.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === user_id)?.tasks ?? [];
     }
 
     /**

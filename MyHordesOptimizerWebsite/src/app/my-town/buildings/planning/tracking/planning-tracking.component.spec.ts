@@ -268,16 +268,32 @@ describe('PlanningTrackingComponent', (): void => {
     describe('saisie des consignes', (): void => {
         it('« + » d\'une amélioration : consigne au niveau suivant, puis un niveau de plus, PA des niveaux manquants', async (): Promise<void> => {
             await render();
-            const kitchen = (): PlanTaskDTO | undefined => tasksOf(1).find((task: PlanTaskDTO): boolean => task.ref === HomeEnum.KITCHEN_LEVEL.key);
+            const kitchen = (): PlanTaskDTO | undefined => tasksOf(3).find((task: PlanTaskDTO): boolean => task.ref === HomeEnum.KITCHEN_LEVEL.key);
 
-            addHome(1, HomeEnum.KITCHEN_LEVEL)?.click();
+            addHome(3, HomeEnum.KITCHEN_LEVEL)?.click();
             fixture.detectChanges();
             expect(kitchen()).toEqual(expect.objectContaining({ kind: 'homeUpgrade', level: 1, pa: 6 }));
 
-            addHome(1, HomeEnum.KITCHEN_LEVEL)?.click();
+            addHome(3, HomeEnum.KITCHEN_LEVEL)?.click();
             fixture.detectChanges();
             expect(kitchen()).toEqual(expect.objectContaining({ level: 2, pa: 9 }));
-            expect(tasksOf(1).length).toBe(3);
+            expect(tasksOf(3).length).toBe(1);
+        });
+
+        it('habitation sous le niveau 1 : ni « + » ni menu d\'amélioration, sauf agrandissement du jour au niveau 1', async (): Promise<void> => {
+            await render();
+            expect(addHome(1, HomeEnum.KITCHEN_LEVEL)).toBeNull();
+
+            row(1).querySelector<HTMLButtonElement>('button[data-action="add-task"]')?.click();
+            fixture.detectChanges();
+            const entry: HTMLButtonElement | null = document.querySelector<HTMLButtonElement>('.mat-mdc-menu-panel [data-kind="homeUpgrade"]');
+            expect(entry?.disabled).toBe(true);
+            entry?.click();
+            expect(tasksOf(1).some((task: PlanTaskDTO): boolean => task.kind === 'homeUpgrade')).toBe(false);
+
+            fake.draft.set({ ...content(), citizens: [{ userId: 1, tasks: [{ id: 'h', kind: 'home', level: 1, pa: 2 }] }] });
+            fixture.detectChanges();
+            expect(addHome(1, HomeEnum.KITCHEN_LEVEL)).not.toBeNull();
         });
 
         it('« + » de l\'habitation : niveau suivant, une seule fois hors chaos ; absent si le niveau est inconnu ; crée l\'entrée du citoyen', async (): Promise<void> => {

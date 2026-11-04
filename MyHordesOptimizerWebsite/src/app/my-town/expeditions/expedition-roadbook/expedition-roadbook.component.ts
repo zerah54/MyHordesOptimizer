@@ -16,6 +16,7 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { mapRouteColorVar, MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
+import { IconApComponent } from '../../../_shared/icon-ap/icon-ap.component';
 import { MapRoutesLayerComponent } from '../../map/draw-map/map-routes-layer/map-routes-layer.component';
 import { cellsByCoordinates, describePlace, MapRouteContext, MapRoutePlace } from '../../map/map-routes/map-route-detail';
 import { MapRouteDrawing } from '../../map/map-routes/map-route-views';
@@ -98,7 +99,7 @@ interface MiniMap {
     templateUrl: './expedition-roadbook.component.html',
     styleUrls: ['./expedition-roadbook.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...components, ...material_modules]
+    imports: [...components, ...material_modules, IconApComponent]
 })
 export class ExpeditionRoadbookComponent {
     public readonly part: InputSignal<ExpeditionPart> = input.required();

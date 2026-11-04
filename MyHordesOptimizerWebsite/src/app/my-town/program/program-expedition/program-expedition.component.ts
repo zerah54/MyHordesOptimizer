@@ -19,6 +19,8 @@ import { Town } from '../../../_abstract_model/types/town.class';
 import { ItemImgPipe } from '../../../_core/pipes/item-img.pipe';
 import { localizedLabel } from '../../../_core/utilities/string.utils';
 import { CitizenChipComponent } from '../../../_shared/citizen-chip/citizen-chip.component';
+import { IconApComponent } from '../../../_shared/icon-ap/icon-ap.component';
+import { IconEpComponent } from '../../../_shared/icon-ep/icon-ep.component';
 import { ExpeditionOrderComponent } from '../../expeditions/expedition-order/expedition-order.component';
 import { ExpeditionOrderEditorService } from '../../expeditions/expedition-orders/expedition-order-editor.service';
 import { generalOrders, sortOrdersByRoute } from '../../expeditions/expedition-orders/expedition-orders.util';
@@ -62,7 +64,7 @@ interface TeamRow extends Member {
     templateUrl: './program-expedition.component.html',
     styleUrls: ['./program-expedition.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...imports_list]
+    imports: [...imports_list, IconApComponent, IconEpComponent]
 })
 export class ProgramExpeditionComponent {
     public readonly expedition: InputSignal<MyExpedition> = input.required();

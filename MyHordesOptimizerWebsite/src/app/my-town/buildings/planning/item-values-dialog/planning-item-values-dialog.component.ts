@@ -7,6 +7,7 @@ import moment from 'moment';
 
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Item } from '../../../../_abstract_model/types/item.class';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
 import { itemLabel } from '../planning-labels.util';
@@ -26,7 +27,7 @@ interface ValueRow {
     templateUrl: './planning-item-values-dialog.component.html',
     styleUrls: ['./planning-item-values-dialog.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...material_modules]
+    imports: [...material_modules, IconApComponent]
 })
 export class PlanningItemValuesDialogComponent {
 

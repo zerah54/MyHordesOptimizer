@@ -50,7 +50,7 @@
 
             <div class="summary">
                 <span class="total">{{ editor.length() }}</span>
-                <span class="unit" i18n>PA</span>
+                <span class="unit"><mho-icon-ap/></span>
                 <span class="summary-notes">
                     <span>
                         @if (editor.fresh() > 1) {
@@ -61,7 +61,8 @@
                     </span>
                     @if (editor.has_spotted_items()) {
                         <span class="spotted-on-route">
-                            <ng-container i18n>{editor.spotted_on_route(), plural, =0 {Aucun objet repéré} =1 {1 objet repéré} other {{{ editor.spotted_on_route() }} objets repérés}}</ng-container>
+                            <ng-container
+                                i18n>{editor.spotted_on_route(), plural, =0 {Aucun objet repéré} =1 {1 objet repéré} other {{{ editor.spotted_on_route() }} objets repérés}}</ng-container>
                         </span>
                     }
                     @if (editor.length() > 0) {
@@ -69,7 +70,9 @@
                             @if (editor.return_ap() === 0) {
                                 <ng-container i18n>Retour en ville compris</ng-container>
                             } @else {
-                                <ng-container i18n>Retour en ville&nbsp;: +{{ editor.return_ap() }}&nbsp;PA</ng-container>
+                                <ng-container i18n>Retour en ville&nbsp;:&nbsp;</ng-container>
+                                +
+                                <mho-icon-ap [value]="editor.return_ap()"/>
                             }
                         </span>
                     }
@@ -119,7 +122,7 @@
                         @if (step.off) {
                             <span class="off-pill" i18n>Hors tracé</span>
                         } @else {
-                            <span class="ap">{{ step.ap }}<small i18n>PA</small></span>
+                            <span class="ap"><mho-icon-ap [value]="step.ap"/></span>
                         }
                     </li>
                 }

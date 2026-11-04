@@ -80,7 +80,7 @@
                                     @if (isLeave(step)) {
                                         @if (step.kind === 'build') {
                                             <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
-                                                <mat-label i18n>PA restants</mat-label>
+                                                <mat-label i18n><mho-icon-ap/> restants</mat-label>
                                                 <input matInput type="number" min="0" data-field="target" [ngModel]="step.targetRemaining"
                                                        [disabled]="!store.can_edit()" (ngModelChange)="onTarget(pool, index, $event)">
                                             </mat-form-field>
@@ -92,7 +92,7 @@
                                             </mat-form-field>
                                             <mat-icon class="link" aria-hidden="true">sync_alt</mat-icon>
                                             <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
-                                                <mat-label i18n>PA</mat-label>
+                                                <mat-label><mho-icon-ap/></mat-label>
                                                 <input matInput type="number" min="0" data-field="target-pa" [ngModel]="targetPa(step, res)"
                                                        [disabled]="!store.can_edit() || res === undefined"
                                                        (ngModelChange)="onTargetPa(pool, index, step, res, $event)">
@@ -127,7 +127,7 @@
                                                 {{ lives.before }} → {{ lives.after }} / {{ lives.max }}
                                             </span>
                                             <span class="rate">{{ hpPerAp() }}
-                                                <ng-container i18n>PV/PA</ng-container></span>
+                                                <ng-container>PV</ng-container>/<mho-icon-ap/></span>
                                         }
                                     }
                                     @for (issue of res.issues; track issue) {

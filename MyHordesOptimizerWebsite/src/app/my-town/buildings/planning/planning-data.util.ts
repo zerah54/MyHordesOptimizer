@@ -198,7 +198,7 @@ export function townDefenseFactors(defense: TownDefenseStateDTO | null, citizens
 }
 
 /**
- * Citoyens vivants de la ville, avec leur statut de banni, leur métier et leur niveau de maison connu.
+ * Citoyens vivants de la ville, avec leur statut de banni, leur métier et leur niveau de maison connu (négatif = 0).
  * @param {Citizen[]} citizens Citoyens de la ville.
  * @returns {CitizenRef[]} Citoyens pris en compte dans le budget.
  */
@@ -212,14 +212,14 @@ export function citizenRefs(citizens: Citizen[]): CitizenRef[] {
                 name: citizen.name,
                 banned: citizen.is_shunned === true,
                 technician: citizen.job?.key === JobEnum.TECHNICIAN.key,
-                homeLevel: typeof house?.value === 'number' && house.value >= 0 ? house.value : null,
+                homeLevel: typeof house?.value === 'number' ? Math.max(house.value, 0) : null,
                 upgradeLevels: upgradeLevelsOf(citizen)
             };
         });
 }
 
 /**
- * Niveau de chaque amélioration de maison d'un citoyen (booléen = 0 ou 1), hors niveau d'habitation.
+ * Niveau de chaque amélioration de maison d'un citoyen (booléen = 0 ou 1, négatif = 0), hors niveau d'habitation.
  * @param {Citizen} citizen Citoyen.
  * @returns {Map<string, number> | null} Niveaux par clé `HomeEnum`, nuls sans données de maison.
  */
@@ -231,7 +231,7 @@ function upgradeLevelsOf(citizen: Citizen): Map<string, number> | null {
     const levels: Map<string, number> = new Map<string, number>();
     for (const entry of content) {
         if (entry.element.key !== HomeEnum.HOUSE_LEVEL.key) {
-            levels.set(entry.element.key, typeof entry.value === 'boolean' ? (entry.value ? 1 : 0) : entry.value);
+            levels.set(entry.element.key, typeof entry.value === 'boolean' ? (entry.value ? 1 : 0) : Math.max(entry.value, 0));
         }
     }
     return levels;

@@ -69,6 +69,13 @@
             <trans-unit id="739360280600269035" datatype="html">
                 <source>Aucun chantier ne correspond.</source>
             </trans-unit>
+            <trans-unit id="5265009546543742591" datatype="html">
+                <source>
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    restants
+                </source>
+            </trans-unit>
             <trans-unit id="5265432085520184033" datatype="html">
                 <source>Peut être rechargé avec une pile</source>
             </trans-unit>
@@ -547,6 +554,9 @@
             <trans-unit id="6239752302360900837" datatype="html">
                 <source>Liste d&apos;objets</source>
             </trans-unit>
+            <trans-unit id="6513360416306826135" datatype="html">
+                <source>&lt;mho-icon-ep/&gt; du technicien</source>
+            </trans-unit>
             <trans-unit id="6518032478600962138" datatype="html">
                 <source>Titre</source>
             </trans-unit>
@@ -905,9 +915,6 @@
             <trans-unit id="5126997801267803550" datatype="html">
                 <source>La fouille a bien été mise à jour</source>
             </trans-unit>
-            <trans-unit id="5127852869390190101" datatype="html">
-                <source>PA manquants pour réparer les chantiers</source>
-            </trans-unit>
             <trans-unit id="370917987951639261" datatype="html">
                 <source>Dupliquer les consignes générales</source>
             </trans-unit>
@@ -1132,6 +1139,13 @@
             <trans-unit id="4981764130395872783" datatype="html">
                 <source>Cartographier le désert</source>
             </trans-unit>
+            <trans-unit id="498248526992500843" datatype="html">
+                <source>Investissez vos
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    par paires pour ne rien perdre.
+                </source>
+            </trans-unit>
             <trans-unit id="3420757244733292611" datatype="html">
                 <source>Fouilles réussies</source>
             </trans-unit>
@@ -1179,6 +1193,9 @@
             </trans-unit>
             <trans-unit id="673430564078029527" datatype="html">
                 <source>Filtrer</source>
+            </trans-unit>
+            <trans-unit id="6735969268651332017" datatype="html">
+                <source>Consignes individuelles et expédition dépassent les &lt;mho-icon-ap/&gt; de base</source>
             </trans-unit>
             <trans-unit id="7575458120113095745" datatype="html">
                 <source>Cassé</source>
@@ -1682,9 +1699,6 @@
             <trans-unit id="6195547188381373675" datatype="html">
                 <source>Aucune entrée trouvée</source>
             </trans-unit>
-            <trans-unit id="6197267913467259026" datatype="html">
-                <source>Investir par paires de PA : le rendement est réduit</source>
-            </trans-unit>
             <trans-unit id="6362020661118681224" datatype="html">
                 <source>Poche</source>
             </trans-unit>
@@ -1702,6 +1716,9 @@
             </trans-unit>
             <trans-unit id="5987572317992662165" datatype="html">
                 <source>Meilleure survie</source>
+            </trans-unit>
+            <trans-unit id="5996532318582244309" datatype="html">
+                <source>Cliquez une case pour y aller</source>
             </trans-unit>
             <trans-unit id="5996920886739228753" datatype="html">
                 <source>rien ne manque</source>
@@ -1910,11 +1927,11 @@
                     <x id="names" equiv-text="shared"/>
                 </source>
             </trans-unit>
-            <trans-unit id="8204726189933023513" datatype="html">
-                <source>&lt;p&gt;Sur la page des chantiers, un bâtiment endommagé affiche en plus, dans sa barre de PA, ceux qu&apos;il faut investir pour qu&apos;il
-                    passe la nuit : « (dont X pour que le bâtiment passe la nuit) ».&lt;/p&gt; &lt;p&gt;Sont comptés les dégâts de l&apos;attaque en Pandémonium
-                    (70 % des points de vie maximum, arrondis au supérieur) et, dans tous les modes, ceux que certains bâtiments s&apos;infligent eux-mêmes
-                    (feux d&apos;artifice, réacteur).&lt;/p&gt;
+            <trans-unit id="2622514745115169030" datatype="html">
+                <source>&lt;p&gt;Sur la page des chantiers, un bâtiment endommagé affiche en plus, dans sa barre de &lt;mho-icon-ap/&gt;, ceux qu&apos;il faut
+                    investir pour qu&apos;il passe la nuit : « (dont X pour que le bâtiment passe la nuit) ».&lt;/p&gt; &lt;p&gt;Sont comptés les dégâts de l&apos;attaque
+                    en Pandémonium (70 % des points de vie maximum, arrondis au supérieur) et, dans tous les modes, ceux que certains bâtiments s&apos;infligent
+                    eux-mêmes (feux d&apos;artifice, réacteur).&lt;/p&gt;
                 </source>
             </trans-unit>
             <trans-unit id="82053445268186598" datatype="html">
@@ -2363,6 +2380,13 @@
             <trans-unit id="6864416921116271532" datatype="html">
                 <source>Retirer des états</source>
             </trans-unit>
+            <trans-unit id="6865685675148426670" datatype="html">
+                <source>
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    de base par citoyen
+                </source>
+            </trans-unit>
             <trans-unit id="6014071753888969123" datatype="html">
                 <source>Revenir à la valeur du site</source>
             </trans-unit>
@@ -2419,6 +2443,9 @@
             </trans-unit>
             <trans-unit id="1323495659993438357" datatype="html">
                 <source>Cause de la mort</source>
+            </trans-unit>
+            <trans-unit id="2375521616132607264" datatype="html">
+                <source>Investir par paires de &lt;mho-icon-ap/&gt; : le rendement est réduit</source>
             </trans-unit>
             <trans-unit id="2380602262642441730" datatype="html">
                 <source>Jour passé : le programme des chantiers n&apos;est plus évalué.</source>
@@ -2737,6 +2764,13 @@
             <trans-unit id="7186662439143171626" datatype="html">
                 <source>Abandonnée</source>
             </trans-unit>
+            <trans-unit id="7187576242263998565" datatype="html">
+                <source>Consignes individuelles et expédition au-delà de vos
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    de base.
+                </source>
+            </trans-unit>
             <trans-unit id="4706107632040873825" datatype="html">
                 <source>Êtes-vous sûr de vouloir supprimer ce thème ?</source>
             </trans-unit>
@@ -2840,9 +2874,6 @@
             </trans-unit>
             <trans-unit id="5408671121354947038" datatype="html">
                 <source>Ajouter</source>
-            </trans-unit>
-            <trans-unit id="5413959475627776150" datatype="html">
-                <source>PA (±)</source>
             </trans-unit>
             <trans-unit id="3012908712486845984" datatype="html">
                 <source>Désert</source>
@@ -3151,10 +3182,6 @@
             </trans-unit>
             <trans-unit id="2012623995194870112" datatype="html">
                 <source>Cellule</source>
-            </trans-unit>
-            <trans-unit id="2012860896331482730" datatype="html">
-                <source>Retour en ville : +<x id="INTERPOLATION" equiv-text="{{ editor.return_ap() }}"/> PA
-                </source>
             </trans-unit>
             <trans-unit id="2014244416444326047" datatype="html">
                 <source>
@@ -3516,6 +3543,12 @@
                     privée sur chaque joueur. Un clic ouvre son profil (villes et pictos).&lt;/p&gt;
                 </source>
             </trans-unit>
+            <trans-unit id="4660686038225270640" datatype="html">
+                <source>Valeurs des objets en
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                </source>
+            </trans-unit>
             <trans-unit id="4661756426838507225" datatype="html">
                 <source>Barre de traduction des éléments de MyHordes</source>
             </trans-unit>
@@ -3568,6 +3601,9 @@
             </trans-unit>
             <trans-unit id="6885844978916799621" datatype="html">
                 <source>Budget</source>
+            </trans-unit>
+            <trans-unit id="7661915555462226417" datatype="html">
+                <source>&lt;mho-icon-ap/&gt; de base</source>
             </trans-unit>
             <trans-unit id="7669988743850821823" datatype="html">
                 <source>Les informations</source>
@@ -3887,9 +3923,6 @@
             <trans-unit id="8255850283848708847" datatype="html">
                 <source>Voir sur la carte</source>
             </trans-unit>
-            <trans-unit id="8259039945497314888" datatype="html">
-                <source>PE</source>
-            </trans-unit>
             <trans-unit id="8259533728634348883" datatype="html">
                 <source>&lt;p&gt;Affiche les estimations d&apos;attaque enregistrées dans MyHordes Optimizer pour une ville et un jour : l&apos;attaque
                     calculée, puis les estimations du planificateur (veille) et de la tour de guet (jour J), palier par palier.&lt;/p&gt; &lt;p&gt;Options :
@@ -3902,10 +3935,6 @@
             </trans-unit>
             <trans-unit id="224561442713301160" datatype="html">
                 <source>Ont joué</source>
-            </trans-unit>
-            <trans-unit id="2252525065074251608" datatype="html">
-                <source><x id="INTERPOLATION" equiv-text="{{ route_editor.length() }}"/> PA · cliquez une case pour y aller
-                </source>
             </trans-unit>
             <trans-unit id="2259099841659819243" datatype="html">
                 <source>Défense projetée</source>
@@ -3939,6 +3968,9 @@
             </trans-unit>
             <trans-unit id="695021691588430497" datatype="html">
                 <source>L&apos;enregistrement a échoué. Réessayez dans un instant.</source>
+            </trans-unit>
+            <trans-unit id="6959130656713247199" datatype="html">
+                <source>&lt;mho-icon-ap/&gt; manquants pour réparer les chantiers</source>
             </trans-unit>
             <trans-unit id="7871769022996000968" datatype="html">
                 <source>Options d&apos;escorte par défaut</source>
@@ -4126,9 +4158,6 @@
             <trans-unit id="866656223631702865" datatype="html">
                 <source>Estimations</source>
             </trans-unit>
-            <trans-unit id="8672102775419324481" datatype="html">
-                <source>Consignes individuelles et expédition au-delà de vos PA de base.</source>
-            </trans-unit>
             <trans-unit id="8672934759729899866" datatype="html">
                 <source>Peut être ouvert gratuitement</source>
             </trans-unit>
@@ -4217,9 +4246,6 @@
             <trans-unit id="9083757686923501079" datatype="html">
                 <source>Échap</source>
             </trans-unit>
-            <trans-unit id="9084919652822460700" datatype="html">
-                <source>(1 PA)</source>
-            </trans-unit>
             <trans-unit id="9087772826066712181" datatype="html">
                 <source>Ressources des chantiers terminés et des maisons</source>
             </trans-unit>
@@ -4242,9 +4268,6 @@
             </trans-unit>
             <trans-unit id="6543454535550731961" datatype="html">
                 <source>Effet</source>
-            </trans-unit>
-            <trans-unit id="6546581008231791015" datatype="html">
-                <source>PA de base par citoyen</source>
             </trans-unit>
             <trans-unit id="6566416674718528586" datatype="html">
                 <source>Nouvelle consigne sur
@@ -4490,9 +4513,6 @@
                     le panneau n&apos;affiche qu&apos;un message d&apos;aide. Il est en général récupéré automatiquement : voir « Prise en main ».&lt;/p&gt;
                 </source>
             </trans-unit>
-            <trans-unit id="3403076406393385683" datatype="html">
-                <source>PA restants</source>
-            </trans-unit>
             <trans-unit id="2332866508838027590" datatype="html">
                 <source>Compte</source>
             </trans-unit>
@@ -4530,6 +4550,9 @@
             </trans-unit>
             <trans-unit id="5917251562955456932" datatype="html">
                 <source>ouvrir</source>
+            </trans-unit>
+            <trans-unit id="591762112266739129" datatype="html">
+                <source>Retour en ville : </source>
             </trans-unit>
             <trans-unit id="5919338286237435584" datatype="html">
                 <source>Plus probable</source>
@@ -4714,6 +4737,9 @@
             <trans-unit id="3627195783808556934" datatype="html">
                 <source>Autorisez MyHordes Optimizer</source>
             </trans-unit>
+            <trans-unit id="3627197202513313727" datatype="html">
+                <source>Amélioration de maison</source>
+            </trans-unit>
             <trans-unit id="2287398703048181232" datatype="html">
                 <source>Camping</source>
             </trans-unit>
@@ -4833,9 +4859,6 @@
             </trans-unit>
             <trans-unit id="3798070165070620146" datatype="html">
                 <source>Guide</source>
-            </trans-unit>
-            <trans-unit id="2935828647245265322" datatype="html">
-                <source>Valeurs des objets en PA</source>
             </trans-unit>
             <trans-unit id="3549884673093564156" datatype="html">
                 <source>Pas soif</source>
@@ -5347,9 +5370,6 @@
             <trans-unit id="1830113907649291037" datatype="html">
                 <source>Ouverte (≥ 30 min)</source>
             </trans-unit>
-            <trans-unit id="1830654442385356005" datatype="html">
-                <source>PV/PA</source>
-            </trans-unit>
             <trans-unit id="1839017041551330341" datatype="html">
                 <source>corrélation</source>
             </trans-unit>
@@ -5419,9 +5439,6 @@
             </trans-unit>
             <trans-unit id="6490338623834272063" datatype="html">
                 <source>Mes consignes</source>
-            </trans-unit>
-            <trans-unit id="6491358721781931527" datatype="html">
-                <source>PC du technicien</source>
             </trans-unit>
             <trans-unit id="649484315491112984" datatype="html">
                 <source>&lt;p&gt;La liste est commune à toute la ville. Pour chaque objet : dépôt, zone (distance en PA), quantités en banque, dans les sacs,
@@ -5880,9 +5897,6 @@
                     MyHordes Optimizer » est activé.&lt;/li&gt; &lt;/ul&gt;
                 </source>
             </trans-unit>
-            <trans-unit id="7504142848864181686" datatype="html">
-                <source>Laisser à N PA</source>
-            </trans-unit>
             <trans-unit id="7507912867004115839" datatype="html">
                 <source>Prédictions de camping dans les informations du secteur</source>
             </trans-unit>
@@ -6077,6 +6091,13 @@
             </trans-unit>
             <trans-unit id="8902029436332253262" datatype="html">
                 <source>Langues</source>
+            </trans-unit>
+            <trans-unit id="8904713215406157461" datatype="html">
+                <source>
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    de base
+                </source>
             </trans-unit>
             <trans-unit id="8915113584796105323" datatype="html">
                 <source>Fermer la recherche</source>
@@ -6300,6 +6321,9 @@
             </trans-unit>
             <trans-unit id="6743161373003242548" datatype="html">
                 <source>Atelier</source>
+            </trans-unit>
+            <trans-unit id="6745448203390520881" datatype="html">
+                <source>Laisser à N &lt;mho-icon-ap/&gt;</source>
             </trans-unit>
             <trans-unit id="674855581046452024" datatype="html">
                 <source>Cyan</source>

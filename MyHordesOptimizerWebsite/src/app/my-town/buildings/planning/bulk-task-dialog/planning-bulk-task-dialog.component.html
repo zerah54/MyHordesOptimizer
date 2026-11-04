@@ -77,7 +77,9 @@
                     <input matInput type="text" maxlength="64" data-field="bulk-label" [value]="label()" (input)="label.set($any($event.target).value)">
                 </mat-form-field>
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>PA</mat-label>
+                    <mat-label>
+                        <mho-icon-ap/>
+                    </mat-label>
                     <input matInput type="number" min="0" data-field="bulk-pa" [value]="pa()" (input)="onPa($any($event.target).value)">
                 </mat-form-field>
             }
