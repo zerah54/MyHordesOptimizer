@@ -31,6 +31,25 @@
         white-space: nowrap;
     }
 
+    // Petit écran : seule l'habitation reste, le détail passe dans son infobulle.
+    .home-col {
+        white-space: nowrap;
+
+        &.secondary {
+            display: none;
+
+            @media (min-width: 60rem) {
+                display: table-cell;
+            }
+        }
+    }
+
+    .home {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2em;
+    }
+
     .task-list {
         display: flex;
         flex-wrap: wrap;

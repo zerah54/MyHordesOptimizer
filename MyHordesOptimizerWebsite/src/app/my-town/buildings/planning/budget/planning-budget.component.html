@@ -73,7 +73,7 @@
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic">
                                         <mat-select [value]="task.level" [disabled]="!store.can_edit()"
                                                     (selectionChange)="setTaskLevel(citizen.userId, index, $event.value)">
-                                            @for (home of homeLevels(); track home.level) {
+                                            @for (home of homeLevels(citizen.userId, task); track home.level) {
                                                 <mat-option [value]="home.level">{{ home.label }}</mat-option>
                                             }
                                         </mat-select>

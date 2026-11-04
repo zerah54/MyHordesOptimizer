@@ -54,18 +54,22 @@
                 }
             }
             @case ('home') {
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>Niveau visé</mat-label>
-                    <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
-                        @for (home of home_levels(); track home.level) {
-                            <mat-option [value]="home.level">{{ home.label }}
-                                (
-                                <mho-icon-ap [value]="home.ap"/>
-                                )
-                            </mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
+                @if (store.unlimited_home_levels()) {
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label i18n>Niveau visé</mat-label>
+                        <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
+                            @for (home of home_levels(); track home.level) {
+                                <mat-option [value]="home.level">{{ home.label }}
+                                    (
+                                    <mho-icon-ap [value]="home.ap"/>
+                                    )
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                } @else {
+                    <p class="next-level" data-field="bulk-next-level" i18n>Niveau suivant de chaque citoyen (un agrandissement par jour)</p>
+                }
             }
             @default {
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">

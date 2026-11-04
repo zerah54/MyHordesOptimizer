@@ -15,13 +15,12 @@ import { CitizenChipComponent } from '../../../../_shared/citizen-chip/citizen-c
 import { CitizenCapacity } from '../budget.util';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { PlanningCitizenFiltersComponent } from '../citizen-filters/planning-citizen-filters.component';
-import { HomeUpgradeRef } from '../home-upgrades.util';
+import { cascadeAp, HomeUpgradeRef, reachableHomeLevels } from '../home-upgrades.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanPool, PlanTaskDTO, PlanTaskKind, PlanTownLineDTO } from '../plan.types';
-import { CitizenRef, HomeLevelRef } from '../plan-evaluation.util';
+import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { toInt, toNonNegativeInt } from '../planning-input.util';
 import { newTaskId } from '../task-id.util';
-import { homeLevelOf } from '../task-status.util';
 import { TrackingRow } from '../tracking.util';
 
 const angular_common: Imports = [FormsModule];
@@ -88,9 +87,20 @@ export class PlanningBudgetComponent {
 
 
 
-    /** Niveaux de maison proposés pour une tâche « maison », triés. */
-    protected homeLevels(): HomeLevelRef[] {
-        return Array.from(this.store.homes().values()).filter((home: HomeLevelRef): boolean => home.level >= 1).sort((a: HomeLevelRef, b: HomeLevelRef): number => a.level - b.level);
+    /**
+     * Niveaux de maison proposés pour une tâche « maison » : ceux que le citoyen peut atteindre, plus celui déjà choisi ; triés.
+     * @param {number} user_id Identifiant du citoyen.
+     * @param {PlanTaskDTO} task Consigne.
+     * @returns {HomeLevelRef[]} Niveaux.
+     */
+    protected homeLevels(user_id: number, task: PlanTaskDTO): HomeLevelRef[] {
+        const homes: HomeLevelRef[] = Array.from(this.store.homes().values())
+            .filter((home: HomeLevelRef): boolean => home.level >= 1)
+            .sort((a: HomeLevelRef, b: HomeLevelRef): number => a.level - b.level);
+        const reachable: Set<number> = new Set<number>(reachableHomeLevels(
+            homes.map((home: HomeLevelRef): number => home.level), currentHomeLevel(this.citizenRef(user_id), null), this.store.unlimited_home_levels()
+        ));
+        return homes.filter((home: HomeLevelRef): boolean => reachable.has(home.level) || home.level === task.level);
     }
 
     /**
@@ -159,6 +169,15 @@ export class PlanningBudgetComponent {
      */
     protected fullCitizen(user_id: number): Citizen | undefined {
         return this.store.citizens_full().find((citizen: Citizen): boolean => citizen.id === user_id);
+    }
+
+    /**
+     * Citoyen retenu dans le budget.
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {CitizenRef | undefined} Citoyen, absent s'il est inconnu.
+     */
+    private citizenRef(user_id: number): CitizenRef | undefined {
+        return this.store.citizens().find((citizen: CitizenRef): boolean => citizen.userId === user_id);
     }
 
     /**
@@ -251,7 +270,7 @@ export class PlanningBudgetComponent {
     }
 
     /**
-     * Choisit l'amélioration d'une consigne : niveau suivant celui du citoyen, PA de ce niveau.
+     * Choisit l'amélioration d'une consigne : niveau suivant celui du citoyen, PA des niveaux manquants.
      * @param {number} user_id Identifiant du citoyen.
      * @param {number} index Rang de la consigne.
      * @param {string} key Clé `HomeEnum` de l'amélioration.
@@ -261,20 +280,19 @@ export class PlanningBudgetComponent {
         if (upgrade === undefined) {
             return;
         }
-        const citizen: Citizen | undefined = this.fullCitizen(user_id);
-        const current: number = citizen === undefined ? 0 : homeLevelOf(citizen, key);
-        const level: number = Math.min(current + 1, upgrade.max_level);
+        const current: number | null = currentHomeLevel(this.citizenRef(user_id), key);
+        const level: number = Math.min((current ?? 0) + 1, upgrade.max_level);
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
             const task: PlanTaskDTO = entryFor(content, user_id).tasks[index];
             task.ref = key;
             task.level = level;
-            task.pa = upgradeAp(upgrade, level);
+            task.pa = cascadeAp((value: number): number => upgradeAp(upgrade, value), current, level);
             delete task.label;
         });
     }
 
     /**
-     * Choisit le niveau visé d'une amélioration ; PA de ce niveau.
+     * Choisit le niveau visé d'une amélioration ; PA des niveaux manquants.
      * @param {number} user_id Identifiant du citoyen.
      * @param {number} index Rang de la consigne.
      * @param {number} level Niveau visé.
@@ -285,7 +303,7 @@ export class PlanningBudgetComponent {
             const upgrade: HomeUpgradeRef | undefined = this.upgradeOf(task);
             task.level = level;
             if (upgrade !== undefined) {
-                task.pa = upgradeAp(upgrade, level);
+                task.pa = cascadeAp((value: number): number => upgradeAp(upgrade, value), currentHomeLevel(this.citizenRef(user_id), upgrade.key), level);
             }
         });
     }
@@ -338,18 +356,19 @@ export class PlanningBudgetComponent {
     }
 
     /**
-     * Choisit le niveau de maison visé ; le coût proposé est celui du référentiel.
+     * Choisit le niveau de maison visé ; le coût proposé est celui des niveaux manquants au référentiel.
      * @param {number} user_id Identifiant du citoyen.
      * @param {number} index Rang de la tâche.
      * @param {number} level Niveau de maison.
      */
     protected setTaskLevel(user_id: number, index: number, level: number): void {
-        const home: HomeLevelRef | undefined = this.store.homes().get(level);
+        const homes: ReadonlyMap<number, HomeLevelRef> = this.store.homes();
+        const pa: number = cascadeAp((value: number): number => homes.get(value)?.ap ?? 0, currentHomeLevel(this.citizenRef(user_id), null), level);
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
             const task: PlanTaskDTO = entryFor(content, user_id).tasks[index];
             task.level = level;
-            if (home !== undefined) {
-                task.pa = home.ap;
+            if (homes.has(level)) {
+                task.pa = pa;
             }
         });
     }

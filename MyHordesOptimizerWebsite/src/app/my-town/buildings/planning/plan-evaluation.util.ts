@@ -13,6 +13,7 @@ import {
     TownDefenseFactors
 } from './defense-gain.util';
 import { CIRCULAR_QUARTERS_UID, DEFENSE_FIXINGS_STEP, DEFENSE_FIXINGS_UID } from './defense-rules.const';
+import { cascadeLevels } from './home-upgrades.util';
 import { nightLifeLoss, ownNightLoss } from './night-survival.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanLossDTO, PlanLossKind, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
 import { missingResources, ResourceCount, sumResources } from './resources.util';
@@ -54,6 +55,8 @@ export interface CitizenRef {
     banned: boolean;
     technician: boolean;
     homeLevel: number | null;
+    /** Niveau de chaque amélioration de maison par clé `HomeEnum` (absente = 0) ; nul sans données de maison. */
+    upgradeLevels: ReadonlyMap<string, number> | null;
 }
 
 /** Niveau de maison du référentiel, ressources résolues en identifiants d'objets. */
@@ -123,6 +126,8 @@ export interface DayEvaluation {
     completedIds: number[];
     needs: Map<number, number>;
     missing: ResourceCount[];
+    /** PA des consignes d'agrandissement et d'amélioration de maison. */
+    homeWorkPa: number;
     attack: number | null;
     target: number | null;
     projectedDefense: number;
@@ -167,13 +172,15 @@ export function evaluateDay(input: DayInput): DayEvaluation {
 
     const capacities: CitizenCapacity[] = input.citizens.map((citizen: CitizenRef): CitizenCapacity => {
         const entry: PlanCitizenDTO | undefined = content.citizens.find((candidate: PlanCitizenDTO): boolean => candidate.userId === citizen.userId);
+        const tasks: PlanTaskDTO[] = entry?.tasks ?? [];
         return citizenCapacity({
             userId: citizen.userId,
             banned: citizen.banned,
             technician: citizen.technician,
             basePa: entry?.basePaOverride ?? content.basePa,
             expeditionPa: input.expeditionPa.get(citizen.userId) ?? 0,
-            taskPa: (entry?.tasks ?? []).reduce((sum: number, task: PlanTaskDTO): number => sum + task.pa, 0)
+            taskPa: tasksPa(tasks.filter((task: PlanTaskDTO): boolean => task.kind !== 'home')),
+            apOnlyTaskPa: tasksPa(tasks.filter((task: PlanTaskDTO): boolean => task.kind === 'home'))
         });
     });
     const lines: BudgetLine[] = content.townLines.map((line: PlanTownLineDTO): BudgetLine => ({ pool: line.pool, pa: line.pa }));
@@ -242,7 +249,9 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         vote,
         doubleVote: double_vote,
         secondVote: second_vote,
-        losses
+        losses,
+        homeWorkPa: content.citizens.reduce((sum: number, entry: PlanCitizenDTO): number =>
+            sum + tasksPa(entry.tasks.filter((task: PlanTaskDTO): boolean => task.kind === 'home' || task.kind === 'homeUpgrade')), 0)
     };
 }
 
@@ -516,6 +525,15 @@ function costOf(results: StepResult[], pool: PlanPool): number {
 }
 
 /**
+ * PA cumulés de tâches.
+ * @param {PlanTaskDTO[]} tasks Tâches.
+ * @returns {number} Somme des PA.
+ */
+function tasksPa(tasks: PlanTaskDTO[]): number {
+    return tasks.reduce((sum: number, task: PlanTaskDTO): number => sum + task.pa, 0);
+}
+
+/**
  * Tâches « maison » du plan avec le citoyen concerné.
  * @param {BuildingPlanContentDTO} content Contenu du plan.
  * @param {CitizenRef[]} citizens Citoyens connus.
@@ -548,28 +566,61 @@ export function homeCosts(homes: ReadonlyMap<number, HomeLevelRef>, urbanism: bo
 }
 
 /**
- * Ressources des travaux de maison du plan (agrandissements et améliorations), comptées sur la banque comme les chantiers.
+ * Niveau actuel d'un citoyen pour un élément de maison.
+ * @param {CitizenRef | undefined} citizen Citoyen.
+ * @param {string | null} upgrade_key Clé `HomeEnum` de l'amélioration ; nulle pour le niveau d'habitation.
+ * @returns {number | null} Niveau, nul s'il est inconnu.
+ */
+export function currentHomeLevel(citizen: CitizenRef | undefined, upgrade_key: string | null): number | null {
+    if (citizen === undefined) {
+        return null;
+    }
+    if (upgrade_key === null) {
+        return citizen.homeLevel;
+    }
+    return citizen.upgradeLevels === null ? null : citizen.upgradeLevels.get(upgrade_key) ?? 0;
+}
+
+/**
+ * Ressources des travaux de maison du plan (agrandissements et améliorations), comptées sur la banque comme les chantiers :
+ * tous les niveaux entre le niveau actuel du citoyen et le plus haut niveau visé pour chaque élément.
  * @param {BuildingPlanContentDTO} content Contenu du plan.
  * @param {DayInput} input Entrée de la journée.
  * @param {boolean} urbanism Plan d'urbanisme construit en début de journée.
- * @returns {ResourceCount[][]} Ressources de chaque tâche connue du référentiel.
+ * @returns {ResourceCount[][]} Ressources de chaque niveau à payer, connu du référentiel.
  */
 function homeWorkResources(content: BuildingPlanContentDTO, input: DayInput, urbanism: boolean): ResourceCount[][] {
     const homes: ReadonlyMap<number, HomeLevelRef> = homeCosts(input.homes, urbanism);
     const resources: ResourceCount[][] = [];
     for (const entry of content.citizens) {
+        // Plus haut niveau visé par élément : clé nulle = habitation, sinon clé de l'amélioration.
+        const targets: Map<string | null, number> = new Map<string | null, number>();
         for (const task of entry.tasks) {
-            if (task.level === undefined || task.level === null) {
-                continue;
-            }
-            if (task.kind === 'home') {
-                resources.push(homes.get(task.level)?.resources ?? []);
-            } else if (task.kind === 'homeUpgrade' && typeof task.ref === 'string') {
-                resources.push(input.homeUpgrades.get(task.ref)?.get(task.level) ?? []);
+            const key: string | null | undefined = homeWorkKey(task);
+            if (key !== undefined && task.level !== undefined && task.level !== null) {
+                targets.set(key, Math.max(targets.get(key) ?? 0, task.level));
             }
         }
+        const citizen: CitizenRef | undefined = input.citizens.find((candidate: CitizenRef): boolean => candidate.userId === entry.userId);
+        targets.forEach((target: number, key: string | null): void => {
+            for (const level of cascadeLevels(currentHomeLevel(citizen, key), target)) {
+                resources.push((key === null ? homes.get(level)?.resources : input.homeUpgrades.get(key)?.get(level)) ?? []);
+            }
+        });
     }
     return resources;
+}
+
+/**
+ * Élément de maison visé par une consigne.
+ * @param {PlanTaskDTO} task Consigne.
+ * @returns {string | null | undefined} Nul pour un agrandissement, clé de l'amélioration, absent pour une autre consigne.
+ */
+function homeWorkKey(task: PlanTaskDTO): string | null | undefined {
+    if (task.kind === 'home') {
+        return null;
+    }
+    return task.kind === 'homeUpgrade' && typeof task.ref === 'string' ? task.ref : undefined;
 }
 
 /**

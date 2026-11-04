@@ -1960,6 +1960,9 @@
             <trans-unit id="1548322983678517060" datatype="html">
                 <source>Jeux</source>
             </trans-unit>
+            <trans-unit id="6462755436416515489" datatype="html">
+                <source>Niveau suivant de chaque citoyen (un agrandissement par jour)</source>
+            </trans-unit>
             <trans-unit id="6466167548949900449" datatype="html">
                 <source>Démineur</source>
             </trans-unit>

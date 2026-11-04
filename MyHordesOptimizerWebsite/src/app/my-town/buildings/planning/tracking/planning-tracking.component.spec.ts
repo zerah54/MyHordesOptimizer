@@ -1,8 +1,11 @@
 import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { HomeEnum } from '../../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
+import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../../_abstract_model/types/daily-action.class';
+import { Home } from '../../../../_abstract_model/types/home.class';
 import { CitizenFilterSortStore } from '../../../../_shared/citizen-filters/citizen-filter-sort.store';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent } from '../plan.types';
@@ -69,6 +72,41 @@ describe('PlanningTrackingComponent', (): void => {
         expect(alice.querySelector('.state')?.textContent).toContain('1/2');
         expect(root().querySelector('tr.citizen[data-user="3"] .state')?.textContent?.trim()).toBe('—');
         expect(root().querySelector('.summary')?.textContent).toContain('0');
+    });
+
+    it('colonnes d\'habitation : niveau d\'habitation puis améliorations, masquables sur petit écran', async (): Promise<void> => {
+        await render();
+
+        const headers: HTMLElement[] = Array.from(root().querySelectorAll<HTMLElement>('thead th.home-col'));
+        expect(headers.map((header: HTMLElement): string => header.dataset['home'] ?? '')).toEqual([
+            HomeEnum.HOUSE_LEVEL.key, HomeEnum.KITCHEN_LEVEL.key, HomeEnum.LAB_LEVEL.key, HomeEnum.REST_LEVEL.key, HomeEnum.HOUSE_DEFENSE.key, HomeEnum.HAS_FENCE.key
+        ]);
+        expect(root().querySelectorAll('thead th.home-col.secondary').length).toBe(5);
+        const chloe_house: HTMLImageElement | null = root().querySelector<HTMLImageElement>(`tr.citizen[data-user="3"] td[data-home="${HomeEnum.HOUSE_LEVEL.key}"] img`);
+        expect(chloe_house?.getAttribute('src')).toContain('home_lv1');
+        expect(root().querySelector(`tr.citizen[data-user="1"] td[data-home="${HomeEnum.REST_LEVEL.key}"]`)?.textContent).toContain('1');
+        expect(root().querySelector(`tr.citizen[data-user="1"] td[data-home="${HomeEnum.KITCHEN_LEVEL.key}"]`)?.textContent?.trim()).toBe('—');
+        expect(root().querySelector('tr.citizen td.home-col.secondary')).not.toBeNull();
+    });
+
+    it('détail de la maison au survol de l\'habitation : améliorations faites, sur une ligne', async (): Promise<void> => {
+        await render();
+        const internals: { homeSummary(citizen: Citizen): string } = fixture.componentInstance as unknown as { homeSummary(citizen: Citizen): string };
+
+        expect(internals.homeSummary(fake.citizens_full()[0])).toBe(`${HomeEnum.REST_LEVEL.getLabel()} 1`);
+        expect(internals.homeSummary(new Citizen())).toBe('');
+    });
+
+    it('habitation de niveau négatif (non défini) : tiret, sans icône', async (): Promise<void> => {
+        await render();
+        const chloe: Citizen = fake.citizens_full()[2];
+        chloe.home = Object.assign(new Home(), { content: [{ element: HomeEnum.HOUSE_LEVEL, value: -1 }] });
+        fake.citizens_full.set([...fake.citizens_full()]);
+        fixture.detectChanges();
+
+        const cell: HTMLElement | null = root().querySelector<HTMLElement>(`tr.citizen[data-user="3"] td[data-home="${HomeEnum.HOUSE_LEVEL.key}"]`);
+        expect(cell?.querySelector('img')).toBeNull();
+        expect(cell?.textContent?.trim()).toBe('—');
     });
 
     it('cases de sélection : une par citoyen, l\'en-tête coche tous les affichés', async (): Promise<void> => {

@@ -29,6 +29,11 @@
             </th>
         }
         <th i18n>Citoyen</th>
+        @for (home of home_columns; track home.key; let first = $first) {
+            <th class="home-col" [class.secondary]="!first" [attr.data-home]="home.key">
+                <img [src]="HORDES_IMG_REPO + headerIcon(home)" [alt]="home.getLabel()" [matTooltip]="home.getLabel()">
+            </th>
+        }
         <th i18n>Consignes</th>
         <th i18n>État</th>
     </tr>
@@ -46,6 +51,22 @@
                 <td class="who">
                     <mho-citizen-chip [citizen]="row.citizen" [day]="store.selected_day()" [actions]="store.displayable_actions()"/>
                 </td>
+                @for (home of home_columns; track home.key; let first = $first) {
+                    @let entry = homeOf(row.citizen, home);
+                    <td class="home-col" [class.secondary]="!first" [attr.data-home]="home.key"
+                        [matTooltip]="first ? homeSummary(row.citizen) : ''">
+                        @if (entry !== undefined && homeDone(entry)) {
+                            <span class="home">
+                                <img [src]="HORDES_IMG_REPO + homeIcon(entry)" [alt]="home.getLabel()">
+                                @if (entry.element.value.max_lvl > 1) {
+                                    {{ entry.value }}
+                                }
+                            </span>
+                        } @else {
+                            —
+                        }
+                    </td>
+                }
                 <td class="tasks">
                     <div class="task-list">
                         @for (entry of row.tasks; track entry.task.id ?? $index) {
@@ -99,7 +120,7 @@
             </tr>
         } @empty {
             <tr>
-                <td colspan="3" class="empty" i18n>Aucun citoyen ne correspond aux filtres</td>
+                <td [attr.colspan]="column_count()" class="empty" i18n>Aucun citoyen ne correspond aux filtres</td>
             </tr>
         }
     </tbody>

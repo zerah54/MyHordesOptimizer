@@ -74,6 +74,8 @@ interface TreeRow {
     maxLife: number;
     remaining: number | null;
     pa: number | null;
+    /** Défense réellement gagnée par la ville (celle du programme) ; défense propre sans évaluation ou une fois construit. */
+    defence: number;
     ratio: number | null;
     tier: { value: number; max: number; icon: string } | null;
     resources: ResourceView[];
@@ -98,6 +100,7 @@ export class PlanningTreeDrawerComponent {
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly ratioLabel: (ratio: number | null) => string = ratioLabel;
     protected readonly hard_mode: boolean = getTown()?.town_type === 'PANDE';
+    protected readonly defenceTooltip: string = $localize`Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense propre :`;
 
     protected readonly search: WritableSignal<string> = signal('');
     /** Débloqués seulement par défaut, sauf en Pandémonium où l'on règle le niveau de plan des chantiers non débloqués. */
@@ -234,9 +237,10 @@ export class PlanningTreeDrawerComponent {
         const resources: ResourceCount[] = synced && ref !== undefined
             ? ref.resources
             : cost.resources.map((resource: BuildingResource): ResourceCount => ({ itemId: resource.item_id, count: resource.count }));
-        const ratio: number | null = built || building.defence <= 0
+        const defence: number = (built ? undefined : this.store.evaluation()?.realDefense.get(id)) ?? building.defence;
+        const ratio: number | null = built || defence <= 0
             ? null
-            : rankByDefPerPa([{ label: '', kind: 'building', def: building.defence, pa: pa ?? 0, resources }], this.store.item_values())[0].ratio;
+            : rankByDefPerPa([{ label: '', kind: 'building', def: defence, pa: pa ?? 0, resources }], this.store.item_values())[0].ratio;
         const useful: 0 | 1 | 2 = usefulPlanReadings(building);
         const parent: Building | undefined = building.parent_id === null ? undefined : this.tree().by_id.get(building.parent_id);
 
@@ -251,6 +255,7 @@ export class PlanningTreeDrawerComponent {
             maxLife: progress?.maxLife ?? building.max_life,
             remaining,
             pa,
+            defence,
             ratio,
             tier: this.hard_mode && !synced && useful > 0 && hasReachablePlanLevel(building)
                 ? { value: tier, max: useful, icon: planStepperIcon(building) }

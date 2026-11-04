@@ -14,6 +14,48 @@ export const UPGRADE_KEY_BY_NAME: Readonly<Record<string, string>> = {
     rest: HomeEnum.REST_LEVEL.key
 };
 
+/**
+ * Niveaux à payer pour passer du niveau actuel au niveau visé, enchaînés ; seulement le niveau visé si le niveau actuel est inconnu.
+ * @param {number | null} from Niveau actuel, nul s'il est inconnu.
+ * @param {number} to Niveau visé.
+ * @returns {number[]} Niveaux à payer, croissants (vide si le niveau visé est déjà atteint).
+ */
+export function cascadeLevels(from: number | null, to: number): number[] {
+    if (from === null) {
+        return [to];
+    }
+    const levels: number[] = [];
+    for (let level: number = from + 1; level <= to; level++) {
+        levels.push(level);
+    }
+    return levels;
+}
+
+/**
+ * PA cumulés des niveaux à payer pour passer du niveau actuel au niveau visé.
+ * @param {(level: number) => number} ap_of PA d'un niveau.
+ * @param {number | null} from Niveau actuel, nul s'il est inconnu.
+ * @param {number} to Niveau visé.
+ * @returns {number} PA.
+ */
+export function cascadeAp(ap_of: (level: number) => number, from: number | null, to: number): number {
+    return cascadeLevels(from, to).reduce((sum: number, level: number): number => sum + ap_of(level), 0);
+}
+
+/**
+ * Niveaux d'habitation atteignables : un agrandissement par jour, sans limite en chaos ou en Pandémonium ; tous si le niveau actuel est inconnu.
+ * @param {number[]} levels Niveaux du référentiel, croissants.
+ * @param {number | null} current Niveau actuel, nul s'il est inconnu.
+ * @param {boolean} unlimited Ville en chaos ou en Pandémonium.
+ * @returns {number[]} Niveaux proposables.
+ */
+export function reachableHomeLevels(levels: number[], current: number | null, unlimited: boolean): number[] {
+    if (current === null) {
+        return levels;
+    }
+    return levels.filter((level: number): boolean => (unlimited ? level > current : level === current + 1));
+}
+
 /** Amélioration de maison proposable dans une consigne, avec le coût en PA de chaque niveau. */
 export interface HomeUpgradeRef {
     key: string;

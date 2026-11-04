@@ -2,17 +2,17 @@ import { BuildingDTO } from '../../../_abstract_model/dto/building.dto';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { Building } from '../../../_abstract_model/types/building.class';
-import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
+import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { Home } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { ExpeditionPartPa } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { HomeReferentialDTO } from './home-referential.types';
-import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
 import { TownBuildingStateDTO } from './plan.types';
+import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
 import {
     bankMap,
     buildingProgressMap,
@@ -179,6 +179,22 @@ describe('planning-data.util', (): void => {
             const home: Home = Object.assign(new Home(), { content: [{ element: HomeEnum.HOUSE_LEVEL, value: 3 }] });
             expect(citizenRefs([citizen({ home })])[0].homeLevel).toBe(3);
             expect(citizenRefs([citizen({})])[0].homeLevel).toBeNull();
+        });
+
+        it('niveau de maison négatif (non défini) = inconnu', (): void => {
+            const home: Home = Object.assign(new Home(), { content: [{ element: HomeEnum.HOUSE_LEVEL, value: -1 }] });
+            expect(citizenRefs([citizen({ home })])[0].homeLevel).toBeNull();
+        });
+
+        it('lit le niveau des améliorations (booléen = 0 ou 1), null sans données de maison', (): void => {
+            const home: Home = Object.assign(new Home(), {
+                content: [{ element: HomeEnum.HOUSE_LEVEL, value: 3 }, { element: HomeEnum.LAB_LEVEL, value: 2 }, { element: HomeEnum.HAS_FENCE, value: true }]
+            });
+            const levels: ReadonlyMap<string, number> | null = citizenRefs([citizen({ home })])[0].upgradeLevels;
+            expect(levels?.get(HomeEnum.LAB_LEVEL.key)).toBe(2);
+            expect(levels?.get(HomeEnum.HAS_FENCE.key)).toBe(1);
+            expect(levels?.has(HomeEnum.HOUSE_LEVEL.key)).toBe(false);
+            expect(citizenRefs([citizen({})])[0].upgradeLevels).toBeNull();
         });
     });
 

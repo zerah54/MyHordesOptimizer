@@ -212,9 +212,29 @@ export function citizenRefs(citizens: Citizen[]): CitizenRef[] {
                 name: citizen.name,
                 banned: citizen.is_shunned === true,
                 technician: citizen.job?.key === JobEnum.TECHNICIAN.key,
-                homeLevel: typeof house?.value === 'number' ? house.value : null
+                homeLevel: typeof house?.value === 'number' && house.value >= 0 ? house.value : null,
+                upgradeLevels: upgradeLevelsOf(citizen)
             };
         });
+}
+
+/**
+ * Niveau de chaque amélioration de maison d'un citoyen (booléen = 0 ou 1), hors niveau d'habitation.
+ * @param {Citizen} citizen Citoyen.
+ * @returns {Map<string, number> | null} Niveaux par clé `HomeEnum`, nuls sans données de maison.
+ */
+function upgradeLevelsOf(citizen: Citizen): Map<string, number> | null {
+    const content: HomeWithValue[] | undefined = citizen.home?.content;
+    if (content === undefined || content.length === 0) {
+        return null;
+    }
+    const levels: Map<string, number> = new Map<string, number>();
+    for (const entry of content) {
+        if (entry.element.key !== HomeEnum.HOUSE_LEVEL.key) {
+            levels.set(entry.element.key, typeof entry.value === 'boolean' ? (entry.value ? 1 : 0) : entry.value);
+        }
+    }
+    return levels;
 }
 
 /**

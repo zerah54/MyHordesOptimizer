@@ -35,7 +35,10 @@ export interface BudgetCitizen {
     technician: boolean;
     basePa: number;
     expeditionPa: number;
+    /** PA des tâches que les PC peuvent payer. */
     taskPa: number;
+    /** PA des tâches payables en PA seulement (agrandissement de maison). */
+    apOnlyTaskPa: number;
 }
 
 /** Capacité de travail d'un citoyen sur les chantiers. */
@@ -71,14 +74,14 @@ export interface ExpeditionPartPa {
 }
 
 /**
- * Capacité d'un citoyen : les tâches consomment les PC avant les PA ; jamais négative.
+ * Capacité d'un citoyen : les tâches consomment les PC avant les PA, sauf celles payables en PA seulement ; jamais négative.
  * @param {BudgetCitizen} citizen Données du citoyen.
  * @returns {CitizenCapacity} PA, PC et capacité totale utilisables sur les chantiers.
  */
 export function citizenCapacity(citizen: BudgetCitizen): CitizenCapacity {
     const cp: number = citizen.technician ? TECHNICIAN_CP : 0;
     const cp_used: number = Math.min(cp, citizen.taskPa);
-    const pa_used_by_tasks: number = citizen.taskPa - cp_used;
+    const pa_used_by_tasks: number = citizen.taskPa - cp_used + citizen.apOnlyTaskPa;
     const pa_left: number = citizen.basePa - citizen.expeditionPa - pa_used_by_tasks;
     const pa_capacity: number = Math.max(0, pa_left);
     const cp_capacity: number = cp - cp_used;

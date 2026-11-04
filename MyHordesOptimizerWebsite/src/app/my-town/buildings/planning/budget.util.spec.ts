@@ -11,7 +11,7 @@ import {
 import { BuildingPlanContentDTO, emptyPlanContent } from './plan.types';
 
 function citizen(overrides: Partial<BudgetCitizen> = {}): BudgetCitizen {
-    return { userId: 1, banned: false, technician: false, basePa: 19, expeditionPa: 0, taskPa: 0, ...overrides };
+    return { userId: 1, banned: false, technician: false, basePa: 19, expeditionPa: 0, taskPa: 0, apOnlyTaskPa: 0, ...overrides };
 }
 
 describe('budget.util', (): void => {
@@ -79,6 +79,13 @@ describe('budget.util', (): void => {
             const capacity: CitizenCapacity = citizenCapacity(citizen({ technician: true, taskPa: 9 }));
             expect(capacity.cpCapacity).toBe(0);
             expect(capacity.paCapacity).toBe(16);
+        });
+
+        it('les PC d\'un technicien ne paient pas les tâches payables en PA seulement (agrandissement)', (): void => {
+            const capacity: CitizenCapacity = citizenCapacity(citizen({ technician: true, taskPa: 2, apOnlyTaskPa: 5 }));
+            expect(capacity.cpCapacity).toBe(4);
+            expect(capacity.paCapacity).toBe(14);
+            expect(capacity.capacity).toBe(18);
         });
 
         it('un citoyen sur-engagé a une capacité nulle, jamais négative', (): void => {

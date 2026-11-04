@@ -75,6 +75,13 @@ describe('PlanningCardsComponent', (): void => {
         expect(card('program').querySelector('.pa')?.textContent).toMatch(/\d+/);
     });
 
+    it('Programme : les PA prévus comptent les travaux de maison des consignes', async (): Promise<void> => {
+        await render({ ...emptyPlanContent(), citizens: [{ userId: 1, tasks: [{ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 1, pa: 6 }, { kind: 'free', label: 'Eau', pa: 2 }] }] });
+
+        expect(card('program').querySelector('.pa')?.textContent?.replace(/\s/g, '')).toContain('6');
+        expect(card('program').querySelector('.pa')?.textContent?.replace(/\s/g, '')).not.toContain('8');
+    });
+
     it('Suivi : additionne les consignes faites de tous les citoyens', async (): Promise<void> => {
         await render();
         rows.set([trackingRow(1, 2), trackingRow(2, 3)]);

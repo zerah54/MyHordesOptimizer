@@ -49,6 +49,18 @@ describe('bulkAddTask', (): void => {
         expect(tasksOf(value, 1).length).toBe(1);
     });
 
+    it('niveau propre à chaque citoyen : un citoyen sans niveau ne reçoit rien, le doublon se juge sur son niveau', (): void => {
+        const value: BuildingPlanContentDTO = { ...emptyPlanContent(), citizens: [{ userId: 3, tasks: [{ id: 'h', kind: 'home', level: 3, pa: 6 }] }] };
+        const levels: Map<number, number | null> = new Map<number, number | null>([[1, null], [2, 2], [3, 3]]);
+
+        const added: number = bulkAddTask(value, [1, 2, 3], { kind: 'home' }, (): number => 4, undefined, (user_id: number): number | null => levels.get(user_id) ?? null);
+
+        expect(added).toBe(1);
+        expect(tasksOf(value, 1)).toEqual([]);
+        expect(tasksOf(value, 2)).toEqual([{ id: expect.any(String), kind: 'home', level: 2, pa: 4 }]);
+        expect(tasksOf(value, 3).length).toBe(1);
+    });
+
     it('consigne libre : le libellé rogné compte pour reconnaître un doublon', (): void => {
         const value: BuildingPlanContentDTO = content();
         bulkAddTask(value, [2], { kind: 'free', label: ' Puits ' }, (): number => 0);

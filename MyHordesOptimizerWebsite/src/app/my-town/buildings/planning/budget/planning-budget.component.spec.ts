@@ -6,8 +6,9 @@ import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
 import { CitizenFilterSortStore } from '../../../../_shared/citizen-filters/citizen-filter-sort.store';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { BuildingPlanContentDTO, emptyPlanContent, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } from '../plan.types';
+import { CitizenRef, HomeLevelRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
-import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
+import { createFakeStore, FAKE_CITIZENS, FAKE_REGULAR_CITIZENS, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { PlanningBudgetComponent } from './planning-budget.component';
 
 interface BudgetInternals {
@@ -17,6 +18,7 @@ interface BudgetInternals {
     setTaskUpgradeLevel(user_id: number, index: number, level: number): void;
     setTaskCount(user_id: number, index: number, count: number): void;
     actionOptions(task: PlanTaskDTO): DailyActionEnum[];
+    homeLevels(user_id: number, task: PlanTaskDTO): HomeLevelRef[];
 }
 
 function content(): BuildingPlanContentDTO {
@@ -160,6 +162,28 @@ describe('PlanningBudgetComponent', (): void => {
         expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'home', label: 'RDE', pa: 4, level: 2 });
     });
 
+    it('agrandissement : seulement le niveau suivant, sauf en chaos ou Pandémonium ; tous si le niveau est inconnu', async (): Promise<void> => {
+        await render();
+        const internals: BudgetInternals = fixture.componentInstance as unknown as BudgetInternals;
+        fake.citizens.set(FAKE_CITIZENS.map((citizen: CitizenRef): CitizenRef => (citizen.userId === 3 ? { ...citizen, homeLevel: 0 } : citizen)));
+        const levels: (user_id: number) => number[] = (user_id: number): number[] => internals.homeLevels(user_id, { kind: 'home', pa: 0 }).map((home: HomeLevelRef): number => home.level);
+
+        expect(levels(3)).toEqual([1]);
+        expect(levels(1)).toEqual([1, 2]);
+        fake.unlimited_home_levels.set(true);
+        expect(levels(3)).toEqual([1, 2]);
+    });
+
+    it('agrandissement de plusieurs niveaux (chaos) : PA de chaque niveau manquant', async (): Promise<void> => {
+        await render({ ...content(), citizens: [{ userId: 3, tasks: [{ kind: 'home', pa: 0 }] }] });
+        const internals: BudgetInternals = fixture.componentInstance as unknown as BudgetInternals;
+        fake.citizens.set(FAKE_CITIZENS.map((citizen: CitizenRef): CitizenRef => (citizen.userId === 3 ? { ...citizen, homeLevel: 0 } : citizen)));
+
+        internals.setTaskLevel(3, 0, 2);
+
+        expect(fake.draft()?.citizens[0].tasks[0].pa).toBe(6);
+    });
+
     it('filtres partagés avec le Suivi : barre de filtres en tête, lignes restreintes', async (): Promise<void> => {
         await render();
         expect(root().querySelector('mho-planning-citizen-filters')).not.toBeNull();
@@ -237,7 +261,7 @@ describe('PlanningBudgetComponent', (): void => {
         expect(fake.draft()?.citizens[0].tasks[0].kind).toBe('free');
     });
 
-    it('une amélioration : choisie au référentiel, niveau suivant celui du citoyen, PA du niveau', async (): Promise<void> => {
+    it('une amélioration : choisie au référentiel, niveau suivant celui du citoyen, PA des niveaux manquants', async (): Promise<void> => {
         await render();
         const internals: BudgetInternals = fixture.componentInstance as unknown as BudgetInternals;
 
@@ -245,7 +269,7 @@ describe('PlanningBudgetComponent', (): void => {
         expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 1, pa: 6 });
 
         internals.setTaskUpgradeLevel(1, 0, 2);
-        expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 3 });
+        expect(fake.draft()?.citizens[0].tasks[0]).toEqual({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 9 });
     });
 
     it('une amélioration au format libre reste modifiable par son libellé', async (): Promise<void> => {

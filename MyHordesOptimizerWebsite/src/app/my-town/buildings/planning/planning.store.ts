@@ -248,6 +248,9 @@ export class PlanningStore {
         return { parents, progress: evaluation.progressBefore, nightLoss: evaluation.nightLoss };
     });
 
+    /** Agrandissements de maison sans limite d'un par jour : ville en chaos ou en Pandémonium. */
+    public readonly unlimited_home_levels: Signal<boolean> = computed((): boolean => getTown()?.is_chaos === true || this.hardMode());
+
     /** Niveaux de maison du référentiel, indexés par niveau, au coût de la ville d'après l'état synchronisé. */
     public readonly homes: Signal<ReadonlyMap<number, HomeLevelRef>> = computed((): ReadonlyMap<number, HomeLevelRef> => {
         const data: PlanningStatic | null = this.static_data();

@@ -55,7 +55,7 @@ export class PlanningCardsComponent {
 
     /** PA prévus par le programme. */
     protected readonly planned_pa: Signal<number> = computed((): number =>
-        (this.store.evaluation()?.results ?? []).reduce((total: number, result: StepResult): number => total + result.paCost, 0));
+        (this.store.evaluation()?.results ?? []).reduce((total: number, result: StepResult): number => total + result.paCost, this.store.evaluation()?.homeWorkPa ?? 0));
 
     /** Consignes individuelles faites et prévues, indépendamment des filtres du suivi. */
     protected readonly tasks: Signal<{ done: number; total: number }> = computed((): { done: number; total: number } =>

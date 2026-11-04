@@ -105,8 +105,9 @@
                         </td>
                         <td class="center">{{ row.pa ?? '—' }}</td>
                         <td class="center">
-                            @if (row.building.defence > 0) {
-                                {{ row.building.defence }}
+                            @if (row.defence !== 0 || row.building.defence > 0) {
+                                <span class="def" [class.loss]="row.defence < 0"
+                                      [matTooltip]="defenceTooltip + ' ' + row.building.defence">{{ row.defence }}</span>
                             }
                         </td>
                         <td class="center">

@@ -1456,6 +1456,10 @@
                 <source>Jeux</source>
                 <target state="final">Spiele</target>
             </trans-unit>
+            <trans-unit id="6462755436416515489" datatype="html">
+                <source>Niveau suivant de chaque citoyen (un agrandissement par jour)</source>
+                <target state="translated">Nächste Stufe jedes Bürgers (eine Erweiterung pro Tag)</target>
+            </trans-unit>
             <trans-unit id="6466167548949900449" datatype="html" approved="yes">
                 <source>Démineur</source>
                 <target state="final">Minesweeper</target>

@@ -1,13 +1,15 @@
 import { CitizenCapacity } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
+import { RankedCandidate } from './defense.util';
 import { neutralDefenseFactors } from './defense-gain.util';
 import { DEFENSE_FIXINGS_UID } from './defense-rules.const';
-import { RankedCandidate } from './defense.util';
 import { REACTOR_UID } from './night-survival.util';
+import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
 import {
     advanceDay,
     BuildingRef,
     CitizenRef,
+    currentHomeLevel,
     DayEvaluation,
     DayInput,
     evaluateDay,
@@ -17,7 +19,6 @@ import {
     URBANISM_UID,
     WORKSHOP_UID
 } from './plan-evaluation.util';
-import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
 import { ResourceCount } from './resources.util';
 
 function ref(overrides: Partial<BuildingRef>): BuildingRef {
@@ -34,9 +35,9 @@ const GATE: BuildingRef = ref({ id: 3, uid: 'gate', label: 'Porte', pa: 10, defe
 const TEMP: BuildingRef = ref({ id: 4, uid: 'temp', label: 'Temporaire', pa: 10, defence: 50, maxLife: 5, temporary: true });
 
 const CITIZENS: CitizenRef[] = [
-    { userId: 1, name: 'A', banned: false, technician: false, homeLevel: null },
-    { userId: 2, name: 'B', banned: true, technician: false, homeLevel: null },
-    { userId: 3, name: 'C', banned: false, technician: true, homeLevel: null }
+    { userId: 1, name: 'A', banned: false, technician: false, homeLevel: null, upgradeLevels: null },
+    { userId: 2, name: 'B', banned: true, technician: false, homeLevel: null, upgradeLevels: null },
+    { userId: 3, name: 'C', banned: false, technician: true, homeLevel: null, upgradeLevels: null }
 ];
 
 function baseProgress(): Map<number, BuildingProgress> {
@@ -173,7 +174,7 @@ describe('plan-evaluation.util', (): void => {
                 [1, { level: 1, label: 'Zelt', def: 1, ap: 2, apUrbanism: 2, resources: [], resourcesUrbanism: [] }],
                 [2, { level: 2, label: 'Baracke', def: 4, ap: 4, apUrbanism: 4, resources: [{ itemId: 5, count: 1 }], resourcesUrbanism: [] }]
             ]);
-            const citizens: CitizenRef[] = [{ userId: 1, name: 'A', banned: false, technician: false, homeLevel: 1 }];
+            const citizens: CitizenRef[] = [{ userId: 1, name: 'A', banned: false, technician: false, homeLevel: 1, upgradeLevels: null }];
 
             const evaluation: DayEvaluation = evaluateDay(input(
                 { citizens: [{ userId: 1, tasks: [{ kind: 'home', level: 2, pa: 4 }] }] },
@@ -220,6 +221,85 @@ describe('plan-evaluation.util', (): void => {
             ));
 
             expect(evaluation.needs.get(5)).toBe(3);
+        });
+
+        it('currentHomeLevel : habitation sans clé, amélioration par clé (0 si absente), null si inconnu', (): void => {
+            const known: CitizenRef = { userId: 1, name: 'A', banned: false, technician: false, homeLevel: 2, upgradeLevels: new Map<string, number>([['LAB', 3]]) };
+            expect(currentHomeLevel(known, null)).toBe(2);
+            expect(currentHomeLevel(known, 'LAB')).toBe(3);
+            expect(currentHomeLevel(known, 'REST')).toBe(0);
+            expect(currentHomeLevel(CITIZENS[0], 'LAB')).toBeNull();
+            expect(currentHomeLevel(undefined, null)).toBeNull();
+        });
+
+        describe('cascade des travaux de maison', (): void => {
+            const LAB: ReadonlyMap<string, ReadonlyMap<number, ResourceCount[]>> = new Map<string, ReadonlyMap<number, ResourceCount[]>>([['LAB', new Map<number, ResourceCount[]>([
+                [1, [{ itemId: 5, count: 1 }]], [2, [{ itemId: 5, count: 2 }]], [3, [{ itemId: 5, count: 4 }]], [4, [{ itemId: 5, count: 8 }]]
+            ])]]);
+
+            function labCitizen(level: number): CitizenRef[] {
+                return [{ userId: 1, name: 'A', banned: false, technician: false, homeLevel: 1, upgradeLevels: new Map<string, number>([['LAB', level]]) }];
+            }
+
+            it('une amélioration au-delà du niveau suivant ajoute les ressources des niveaux manquants', (): void => {
+                const evaluation: DayEvaluation = evaluateDay(input(
+                    { citizens: [{ userId: 1, tasks: [{ kind: 'homeUpgrade', ref: 'LAB', level: 4, pa: 20 }] }] },
+                    { citizens: labCitizen(1), homeUpgrades: LAB }
+                ));
+
+                expect(evaluation.needs.get(5)).toBe(14);
+            });
+
+            it('deux consignes sur la même amélioration ne comptent les niveaux qu\'une fois', (): void => {
+                const evaluation: DayEvaluation = evaluateDay(input(
+                    { citizens: [{ userId: 1, tasks: [{ kind: 'homeUpgrade', ref: 'LAB', level: 2, pa: 6 }, { kind: 'homeUpgrade', ref: 'LAB', level: 4, pa: 20 }] }] },
+                    { citizens: labCitizen(0), homeUpgrades: LAB }
+                ));
+
+                expect(evaluation.needs.get(5)).toBe(15);
+            });
+
+            it('une amélioration déjà atteinte ne coûte plus rien', (): void => {
+                const evaluation: DayEvaluation = evaluateDay(input(
+                    { citizens: [{ userId: 1, tasks: [{ kind: 'homeUpgrade', ref: 'LAB', level: 3, pa: 8 }] }] },
+                    { citizens: labCitizen(3), homeUpgrades: LAB }
+                ));
+
+                expect(evaluation.needs.has(5)).toBe(false);
+            });
+
+            it('un agrandissement de plusieurs niveaux ajoute les ressources de chaque niveau', (): void => {
+                const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([
+                    [2, { level: 2, label: 'B', def: 4, ap: 4, apUrbanism: 4, resources: [{ itemId: 5, count: 1 }], resourcesUrbanism: [] }],
+                    [3, { level: 3, label: 'C', def: 6, ap: 6, apUrbanism: 6, resources: [{ itemId: 5, count: 2 }], resourcesUrbanism: [] }]
+                ]);
+
+                const evaluation: DayEvaluation = evaluateDay(input(
+                    { citizens: [{ userId: 1, tasks: [{ kind: 'home', level: 3, pa: 10 }] }] },
+                    { citizens: labCitizen(0), homes }
+                ));
+
+                expect(evaluation.needs.get(5)).toBe(3);
+            });
+        });
+
+        it('PA des travaux de maison : somme des consignes d\'agrandissement et d\'amélioration', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({
+                citizens: [
+                    { userId: 1, tasks: [{ kind: 'home', level: 2, pa: 4 }, { kind: 'free', label: 'Eau', pa: 1 }] },
+                    { userId: 3, tasks: [{ kind: 'homeUpgrade', ref: 'LAB', level: 1, pa: 6 }] }
+                ]
+            }));
+
+            expect(evaluation.homeWorkPa).toBe(10);
+        });
+
+        it('les PC du technicien ne paient pas un agrandissement', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ citizens: [{ userId: 3, tasks: [{ kind: 'home', level: 2, pa: 4 }] }] }));
+            const capacity: CitizenCapacity | undefined = evaluation.capacities.find((c: CitizenCapacity): boolean => c.userId === 3);
+
+            expect(capacity?.cpCapacity).toBe(6);
+            expect(capacity?.paCapacity).toBe(15);
         });
 
         it('seuil gratuit : PA à laisser sur les chantiers non construits', (): void => {

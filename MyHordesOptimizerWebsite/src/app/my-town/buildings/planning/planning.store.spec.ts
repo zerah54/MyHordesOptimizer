@@ -21,7 +21,6 @@ import { errorInterceptor } from '../../../_core/services/errors-interceptor.ser
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { setTown, setUser } from '../../../_core/utilities/localstorage.util';
-import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
 import {
     BuildingPlanContentDTO,
     BuildingPlanDTO,
@@ -31,6 +30,7 @@ import {
     PlanTaskDTO,
     TownBuildingStateDTO
 } from './plan.types';
+import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
 import { AUTOSAVE_DELAY_MS, AUTOSAVE_MAX_WAIT_MS, PlanningStore } from './planning.store';
 import { ToggleContext } from './program-edit.util';
 import { TaskCheckService } from './task-check.service';
@@ -562,6 +562,17 @@ describe('PlanningStore', (): void => {
 
         expect(loaded.homes().get(2)?.ap).toBe(4);
         expect(loaded.homes().get(2)?.resources).toEqual([{ itemId: 5, count: 1 }]);
+    });
+
+    it('unlimited_home_levels : vrai en chaos ou en Pandémonium seulement', (): void => {
+        store = create();
+        expect(store.unlimited_home_levels()).toBe(false);
+
+        setTown(Object.assign(new TownDetails(), { town_id: 42, day: TODAY, town_type: 'RNE', is_chaos: true }));
+        expect(store.unlimited_home_levels()).toBe(true);
+
+        setTown(Object.assign(new TownDetails(), { town_id: 42, day: TODAY, town_type: 'PANDE', is_chaos: false }));
+        expect(store.unlimited_home_levels()).toBe(true);
     });
 
     it('homes : avec le Plan d\'urbanisme construit, les niveaux de maison portent les PA et ressources Urbanisme', (): void => {

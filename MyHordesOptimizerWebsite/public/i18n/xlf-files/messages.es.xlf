@@ -1451,6 +1451,10 @@
                 <source>Jeux</source>
                 <target state="final">Juegos</target>
             </trans-unit>
+            <trans-unit id="6462755436416515489" datatype="html">
+                <source>Niveau suivant de chaque citoyen (un agrandissement par jour)</source>
+                <target state="translated">Siguiente nivel de cada ciudadano (una ampliación por día)</target>
+            </trans-unit>
             <trans-unit id="6466167548949900449" datatype="html" approved="yes">
                 <source>Démineur</source>
                 <target state="final">Buscaminas</target>
