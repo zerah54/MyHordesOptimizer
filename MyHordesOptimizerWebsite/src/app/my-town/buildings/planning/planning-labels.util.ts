@@ -1,3 +1,4 @@
+import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -15,6 +16,17 @@ import { HomeLevelRef } from './plan-evaluation.util';
 export function itemLabel(items: readonly Item[], item_id: number, locale: string): string {
     const item: Item | undefined = items.find((candidate: Item): boolean => candidate.id === item_id);
     return item === undefined ? `#${item_id}` : (item.label?.[locale] ?? item.uid);
+}
+
+/**
+ * Chemin complet de l'icône d'un objet.
+ * @param {readonly Item[]} items Objets connus.
+ * @param {number} item_id Identifiant de l'objet.
+ * @returns {string} Chemin de l'icône, vide pour un objet inconnu ou sans image.
+ */
+export function itemIcon(items: readonly Item[], item_id: number): string {
+    const img: string = items.find((candidate: Item): boolean => candidate.id === item_id)?.img ?? '';
+    return img === '' ? '' : HORDES_IMG_REPO + img;
 }
 
 /**

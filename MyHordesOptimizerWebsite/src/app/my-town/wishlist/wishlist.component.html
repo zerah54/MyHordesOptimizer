@@ -153,7 +153,11 @@
                                             </span>
                                         }
                                         @case ('map_cell_item_count') {
-                                            {{ row.map_cell_item_count }}
+                                            @if (row.map_cell_item_count > 0) {
+                                                <mho-item-map [map]="map()" [itemId]="row.item.id">{{ row.map_cell_item_count }}</mho-item-map>
+                                            } @else {
+                                                {{ row.map_cell_item_count }}
+                                            }
                                         }
                                         @case ('count') {
                                             @if (row.depot.value.count >= -1) {

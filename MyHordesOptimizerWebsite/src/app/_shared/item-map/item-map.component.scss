@@ -1,0 +1,77 @@
+:host {
+    display: block;
+}
+
+.origin {
+    display: block;
+    cursor: help;
+}
+
+// Rendue dans l'overlay CDK, hors de :host. Codes de la carte principale : ville pleine, cases repérées cerclées, les autres effacées.
+.item-map {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+    border: 1px solid var(--mho-line);
+    border-radius: var(--mho-radius-s);
+    background: var(--mho-surface);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 35%);
+    pointer-events: none;
+
+    // 18 px par case, réduites pour que la carte entière (marges et légende comprises) tienne dans la fenêtre.
+    .grid {
+        --mho-mini-cell: min(18px, calc((100vw - 64px) / var(--mho-map-columns) - 1px), calc((100vh - 96px) / var(--mho-map-rows) - 1px));
+        display: grid;
+        grid-template-columns: repeat(var(--mho-map-columns), var(--mho-mini-cell));
+        gap: 1px;
+    }
+
+    .mini-cell {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--mho-mini-cell);
+        height: var(--mho-mini-cell);
+        background: var(--mho-surface-3);
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+
+        &:not(.spot, .town) {
+            opacity: 0.35;
+        }
+
+        &.spot {
+            box-shadow: inset 0 0 0 2px var(--mho-text);
+        }
+
+        &.town {
+            background: var(--mho-accent);
+        }
+
+        &.broken::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            border-style: solid;
+            border-width: 0 7px 7px 0;
+            border-color: transparent var(--mho-danger) transparent transparent;
+        }
+    }
+
+    .legend {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.8em;
+    }
+
+    .broken-sample {
+        border-style: solid;
+        border-width: 0 7px 7px 0;
+        border-color: transparent var(--mho-danger) transparent transparent;
+    }
+}

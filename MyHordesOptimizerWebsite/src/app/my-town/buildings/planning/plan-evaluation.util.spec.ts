@@ -1,10 +1,9 @@
 import { CitizenCapacity } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
-import { RankedCandidate } from './defense.util';
 import { neutralDefenseFactors } from './defense-gain.util';
 import { DEFENSE_FIXINGS_UID } from './defense-rules.const';
+import { RankedCandidate } from './defense.util';
 import { REACTOR_UID } from './night-survival.util';
-import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
 import {
     advanceDay,
     BuildingRef,
@@ -15,8 +14,11 @@ import {
     evaluateDays,
     HomeLevelRef,
     PYRE_UID,
+    URBANISM_UID,
     WORKSHOP_UID
 } from './plan-evaluation.util';
+import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
+import { ResourceCount } from './resources.util';
 
 function ref(overrides: Partial<BuildingRef>): BuildingRef {
     return { id: 0, uid: 'x', label: 'X', pa: 10, defence: 0, maxLife: 0, temporary: false, breakable: true, parentId: null, resources: [], ...overrides };
@@ -64,6 +66,7 @@ function input(content: Partial<BuildingPlanContentDTO>, overrides: Partial<DayI
         baseDefense: 1000,
         temporaryDefense: 0,
         homes: new Map<number, HomeLevelRef>(),
+        homeUpgrades: new Map<string, ReadonlyMap<number, ResourceCount[]>>(),
         hardMode: false,
         defenseFactors: neutralDefenseFactors(),
         defenseItemIds: new Set<number>(),
@@ -167,8 +170,8 @@ describe('plan-evaluation.util', (): void => {
 
         it('une tâche de maison ajoute sa défense (comptée à 40 % par la ville) et ses ressources et réduit la capacité du citoyen', (): void => {
             const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([
-                [1, { level: 1, label: 'Zelt', def: 1, ap: 2, apUrbanism: 2, resources: [] }],
-                [2, { level: 2, label: 'Baracke', def: 4, ap: 4, apUrbanism: 4, resources: [{ itemId: 5, count: 1 }] }]
+                [1, { level: 1, label: 'Zelt', def: 1, ap: 2, apUrbanism: 2, resources: [], resourcesUrbanism: [] }],
+                [2, { level: 2, label: 'Baracke', def: 4, ap: 4, apUrbanism: 4, resources: [{ itemId: 5, count: 1 }], resourcesUrbanism: [] }]
             ]);
             const citizens: CitizenRef[] = [{ userId: 1, name: 'A', banned: false, technician: false, homeLevel: 1 }];
 
@@ -184,11 +187,39 @@ describe('plan-evaluation.util', (): void => {
         });
 
         it('une tâche de maison sans niveau actuel connu n\'invente aucune défense', (): void => {
-            const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([[2, { level: 2, label: 'B', def: 4, ap: 4, apUrbanism: 4, resources: [] }]]);
+            const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([[2, { level: 2, label: 'B', def: 4, ap: 4, apUrbanism: 4, resources: [], resourcesUrbanism: [] }]]);
 
             const evaluation: DayEvaluation = evaluateDay(input({ citizens: [{ userId: 1, tasks: [{ kind: 'home', level: 2, pa: 4 }] }] }, { homes }));
 
             expect(evaluation.projectedDefense).toBe(1000);
+        });
+
+        it('Urbanisme construit en début de journée : un agrandissement coûte les ressources Urbanisme', (): void => {
+            const urbanism: BuildingRef = ref({ id: 6, uid: URBANISM_UID, label: 'Urbanisme' });
+            const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([
+                [2, { level: 2, label: 'B', def: 4, ap: 4, apUrbanism: 3, resources: [{ itemId: 5, count: 1 }], resourcesUrbanism: [{ itemId: 7, count: 2 }] }]
+            ]);
+
+            const evaluation: DayEvaluation = evaluateDay(input(
+                { citizens: [{ userId: 1, tasks: [{ kind: 'home', level: 2, pa: 3 }] }] },
+                {
+                    homes,
+                    buildings: new Map<number, BuildingRef>([[1, WALL], [2, WORKSHOP], [3, GATE], [6, urbanism]]),
+                    progress: new Map<number, BuildingProgress>([...baseProgress(), [6, progress({ buildingId: 6, built: true })]])
+                }
+            ));
+
+            expect(evaluation.needs.get(7)).toBe(2);
+            expect(evaluation.needs.has(5)).toBe(false);
+        });
+
+        it('une amélioration de maison ajoute les ressources de son niveau au besoin', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input(
+                { citizens: [{ userId: 1, tasks: [{ kind: 'homeUpgrade', ref: 'LOCK', level: 2, pa: 3 }, { kind: 'homeUpgrade', ref: 'INCONNUE', level: 1, pa: 1 }] }] },
+                { homeUpgrades: new Map<string, ReadonlyMap<number, ResourceCount[]>>([['LOCK', new Map<number, ResourceCount[]>([[1, [{ itemId: 5, count: 9 }]], [2, [{ itemId: 5, count: 3 }]]])]]) }
+            ));
+
+            expect(evaluation.needs.get(5)).toBe(3);
         });
 
         it('seuil gratuit : PA à laisser sur les chantiers non construits', (): void => {
@@ -202,6 +233,24 @@ describe('plan-evaluation.util', (): void => {
             const labels: string[] = evaluation.ranking.map((candidate: RankedCandidate): string => candidate.label);
             expect(labels[0]).toBe('OD');
             expect(labels).toContain('Mur');
+        });
+
+        it('classement : avec le Plan d\'urbanisme construit, un niveau de maison coûte ses PA et ressources Urbanisme', (): void => {
+            const urbanism: BuildingRef = ref({ id: 6, uid: URBANISM_UID, label: 'Urbanisme' });
+            const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([
+                [1, { level: 1, label: 'A', def: 0, ap: 1, apUrbanism: 1, resources: [], resourcesUrbanism: [] }],
+                [2, { level: 2, label: 'B', def: 4, ap: 4, apUrbanism: 3, resources: [{ itemId: 5, count: 1 }], resourcesUrbanism: [{ itemId: 7, count: 2 }] }]
+            ]);
+
+            const evaluation: DayEvaluation = evaluateDay(input({}, {
+                homes,
+                buildings: new Map<number, BuildingRef>([[1, WALL], [2, WORKSHOP], [3, GATE], [6, urbanism]]),
+                progress: new Map<number, BuildingProgress>([...baseProgress(), [6, progress({ buildingId: 6, built: true })]])
+            }));
+
+            const home: RankedCandidate | undefined = evaluation.ranking.find((candidate: RankedCandidate): boolean => candidate.label === 'B');
+            expect(home?.pa).toBe(3);
+            expect(home?.resources).toEqual([{ itemId: 7, count: 2 }]);
         });
     });
 

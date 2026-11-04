@@ -34,9 +34,9 @@ import {
     TownBuildingStateDTO
 } from './plan.types';
 import { PlanAlert, planAlerts } from './plan-alerts.util';
-import { BuildingRef, CitizenRef, DayEvaluation, evaluateDays, HomeLevelRef } from './plan-evaluation.util';
+import { BuildingRef, CitizenRef, DayEvaluation, evaluateDays, homeCosts, HomeLevelRef, URBANISM_UID } from './plan-evaluation.util';
 import { buildDayInputs } from './plan-inputs.util';
-import { bankMap, buildingRefs, citizenRefs, hasSlaveryOf, homeLevelRefs, itemValueMap } from './planning-data.util';
+import { bankMap, buildingRefs, builtUidsOf, citizenRefs, hasSlaveryOf, homeLevelRefs, itemValueMap } from './planning-data.util';
 import { sanitizeContent, ToggleContext } from './program-edit.util';
 import { TaskCheckService } from './task-check.service';
 import { withTaskIds } from './task-id.util';
@@ -248,13 +248,16 @@ export class PlanningStore {
         return { parents, progress: evaluation.progressBefore, nightLoss: evaluation.nightLoss };
     });
 
-    /** Niveaux de maison du référentiel, indexés par niveau. */
+    /** Niveaux de maison du référentiel, indexés par niveau, au coût de la ville d'après l'état synchronisé. */
     public readonly homes: Signal<ReadonlyMap<number, HomeLevelRef>> = computed((): ReadonlyMap<number, HomeLevelRef> => {
         const data: PlanningStatic | null = this.static_data();
         if (data === null) {
             return new Map<number, HomeLevelRef>();
         }
-        return homeLevelRefs(data.homes, new Map<string, number>(data.items.map((item: Item): [string, number] => [item.uid, item.id])), moment.locale());
+        return homeCosts(
+            homeLevelRefs(data.homes, new Map<string, number>(data.items.map((item: Item): [string, number] => [item.uid, item.id])), moment.locale()),
+            builtUidsOf(data.buildings, data.state.buildings).has(URBANISM_UID)
+        );
     });
 
     public readonly citizens: Signal<CitizenRef[]> = computed((): CitizenRef[] => citizenRefs(this.static_data()?.citizens ?? []));

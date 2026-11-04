@@ -15,7 +15,7 @@ import {
     viewChild,
     WritableSignal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -32,7 +32,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { Observable, Subject } from 'rxjs';
+import { catchError, Observable, of, Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 
@@ -42,9 +42,11 @@ import { ItemEmotesDTO } from '../../_abstract_model/dto/item.dto';
 import { WishlistDepot } from '../../_abstract_model/enum/wishlist-depot.enum';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Imports, ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
+import { Town } from '../../_abstract_model/types/town.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
@@ -53,13 +55,14 @@ import { ClipboardService } from '../../_core/services/clipboard.service';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
+import { ItemMapComponent } from '../../_shared/item-map/item-map.component';
 import { LastUpdateComponent } from '../../_shared/last-update/last-update.component';
 import { MenuAddComponent } from '../../_shared/list-elements-add-remove/menu-add/menu-add.component';
 import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with-string-filter/header-with-string-filter.component';
 import { ItemAlreadyInListPipe } from './item-already-in-list.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [DeferredCellComponent, HeaderWithStringFilterComponent, LastUpdateComponent, MenuAddComponent];
+const components: Imports = [DeferredCellComponent, HeaderWithStringFilterComponent, ItemMapComponent, LastUpdateComponent, MenuAddComponent];
 const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSlideToggleModule, MatTableModule, MatTooltipModule];
@@ -99,6 +102,9 @@ export class WishlistComponent implements OnInit {
     ];
     /** Mode observateur : lecture seule, l'édition est désactivée. */
     protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
+    /** Carte de la ville pour la colonne Carte ; nulle tant qu'elle n'est pas chargée ou si elle est indisponible. */
+    protected readonly map: Signal<Town | null> = toSignal(
+        inject(TownService).getMap().pipe(catchError((): Observable<null> => of(null))), { initialValue: null });
     protected wishlist_filters: WritableSignal<WishlistFilters> = signal({ items: '', depot: [] });
     protected current_zone_xp_pa_add_item: WritableSignal<number> = signal(0);
     protected readonly add_label: string = $localize`Ajouter à la liste de courses`;

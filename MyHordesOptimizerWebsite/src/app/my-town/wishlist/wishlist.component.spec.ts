@@ -20,6 +20,7 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
+import { ItemMapComponent } from '../../_shared/item-map/item-map.component';
 import { WishlistComponent } from './wishlist.component';
 
 interface TestableComponent {
@@ -387,6 +388,36 @@ describe('WishlistComponent', (): void => {
             testable.addItemToWishlist(3);
 
             expect(proposedIds()).toEqual([2, 3]);
+        });
+    });
+
+    describe('colonne Carte', (): void => {
+        beforeEach(async (): Promise<void> => {
+            const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+            testable.wishlist_info.set(new WishlistInfo({ wishList: [{ ...buildRowDto(1, 0, 1), mapCellItemCount: 3 }, buildRowDto(2, 0, 1)], lastUpdateInfo: null }));
+            fixture.detectChanges();
+            for (const block of await fixture.getDeferBlocks()) {
+                await block.render(DeferBlockState.Complete);
+            }
+            fixture.detectChanges();
+        });
+
+        function mapCells(): HTMLElement[] {
+            return Array.from((fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('tbody td.mat-column-map_cell_item_count'));
+        }
+
+        it('garde le nombre du serveur et ouvre au survol la carte de la ville quand des objets sont au sol', (): void => {
+            TestBed.inject(HttpTestingController).expectOne((request: HttpRequest<unknown>): boolean => request.url.includes('/Fetcher/map?'))
+                .flush({ townId: 1, townX: 1, townY: 0, mapHeight: 1, mapWidth: 3, isChaos: false, isDevasted: false, isDoorOpen: true, waterWell: 0, day: 1, cells: [] });
+            fixture.detectChanges();
+
+            const [with_items, without_items]: HTMLElement[] = mapCells();
+            expect(with_items.textContent?.trim()).toBe('3');
+            const item_map: ItemMapComponent = fixture.debugElement.query(By.directive(ItemMapComponent)).componentInstance as ItemMapComponent;
+            expect(item_map.itemId()).toBe(1);
+            expect(item_map.map()?.map_width).toBe(3);
+            expect(without_items.textContent?.trim()).toBe('0');
+            expect(without_items.querySelector('mho-item-map')).toBeNull();
         });
     });
 });

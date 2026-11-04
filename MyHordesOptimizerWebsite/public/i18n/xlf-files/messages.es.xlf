@@ -1637,6 +1637,10 @@
                     en este pueblo
                 </target>
             </trans-unit>
+            <trans-unit id="125095210926844541" datatype="html">
+                <source>{VAR_PLURAL, plural, =0 {objet} =1 {objet} other {objets}}</source>
+                <target state="translated">{VAR_PLURAL, plural, =0 {objeto} =1 {objeto} other {objetos}}</target>
+            </trans-unit>
             <trans-unit id="1256499862458321093" datatype="html" approved="yes">
                 <source>Bas gauche</source>
                 <target state="final">Abajo a la izquierda</target>
@@ -1708,10 +1712,6 @@
             <trans-unit id="8277726543076335173" datatype="html" approved="yes">
                 <source>Général</source>
                 <target state="final">General</target>
-            </trans-unit>
-            <trans-unit id="7935497221291583950" datatype="html">
-                <source>{VAR_PLURAL, plural, =0 {objet manquant} =1 {objet manquant} other {objets manquants}}</source>
-                <target state="translated">{VAR_PLURAL, plural, =0 {objeto que falta} =1 {objeto que falta} other {objetos que faltan}}</target>
             </trans-unit>
             <trans-unit id="7940703119007747886" datatype="html">
                 <source>faites</source>
@@ -2029,6 +2029,10 @@
             <trans-unit id="5987572317992662165" datatype="html" approved="yes">
                 <source>Meilleure survie</source>
                 <target state="final">Mejor supervivencia</target>
+            </trans-unit>
+            <trans-unit id="5996920886739228753" datatype="html">
+                <source>rien ne manque</source>
+                <target state="translated">no falta nada</target>
             </trans-unit>
             <trans-unit id="1190504220509127147" datatype="html" approved="yes">
                 <source>Citoyen
@@ -2995,6 +2999,16 @@
             <trans-unit id="4242937041384260306" datatype="html" approved="yes">
                 <source>Classement</source>
                 <target state="final">Clasificación</target>
+            </trans-unit>
+            <trans-unit id="4243645501440104276" datatype="html">
+                <source>(
+                    <x id="count" equiv-text="broken"/>
+                    cassés)
+                </source>
+                <target state="translated">(
+                    <x id="count" equiv-text="broken"/>
+                    rotos)
+                </target>
             </trans-unit>
             <trans-unit id="4247263368529700262" datatype="html" approved="yes">
                 <source>Confirmer</source>
@@ -4208,6 +4222,10 @@
                     <x id="PH" equiv-text="moment.duration(eta_s, &apos;seconds&apos;).humanize()"/>
                     restante(s)
                 </target>
+            </trans-unit>
+            <trans-unit id="1533819348540160994" datatype="html">
+                <source>(1 cassé)</source>
+                <target state="translated">(1 roto)</target>
             </trans-unit>
             <trans-unit id="1534155701917252037" datatype="html" approved="yes">
                 <source>ou</source>
@@ -5727,6 +5745,10 @@
                 <source>Issue la plus probable</source>
                 <target state="final">Resultado más probable</target>
             </trans-unit>
+            <trans-unit id="3256691155828952991" datatype="html">
+                <source>au moins un exemplaire cassé</source>
+                <target state="translated">al menos un ejemplar roto</target>
+            </trans-unit>
             <trans-unit id="3269901088829908084" datatype="html" approved="yes">
                 <source>Extension de navigateur (recommandé)</source>
                 <target state="final">Extensión de navegador (recomendado)</target>
@@ -6718,6 +6740,10 @@
             <trans-unit id="3975323863652376792" datatype="html" approved="yes">
                 <source>attendu</source>
                 <target state="final">esperado</target>
+            </trans-unit>
+            <trans-unit id="3041728042542305057" datatype="html">
+                <source>il manque :</source>
+                <target state="translated">falta:</target>
             </trans-unit>
             <trans-unit id="3052621220241641308" datatype="html" approved="yes">
                 <source>Effacer</source>

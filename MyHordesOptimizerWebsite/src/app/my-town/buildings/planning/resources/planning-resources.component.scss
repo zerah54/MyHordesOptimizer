@@ -12,6 +12,14 @@
             text-align: left;
         }
 
+        tbody tr:nth-child(even) {
+            background: var(--mho-surface-2);
+        }
+
+        tbody tr:hover {
+            background: var(--mho-surface-3);
+        }
+
         tr.missing .gap {
             color: var(--mho-accent);
             font-weight: 600;

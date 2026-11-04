@@ -21,6 +21,7 @@ import { errorInterceptor } from '../../../_core/services/errors-interceptor.ser
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { setTown, setUser } from '../../../_core/utilities/localstorage.util';
+import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
 import {
     BuildingPlanContentDTO,
     BuildingPlanDTO,
@@ -30,7 +31,6 @@ import {
     PlanTaskDTO,
     TownBuildingStateDTO
 } from './plan.types';
-import { BuildingRef } from './plan-evaluation.util';
 import { AUTOSAVE_DELAY_MS, AUTOSAVE_MAX_WAIT_MS, PlanningStore } from './planning.store';
 import { ToggleContext } from './program-edit.util';
 import { TaskCheckService } from './task-check.service';
@@ -562,6 +562,35 @@ describe('PlanningStore', (): void => {
 
         expect(loaded.homes().get(2)?.ap).toBe(4);
         expect(loaded.homes().get(2)?.resources).toEqual([{ itemId: 5, count: 1 }]);
+    });
+
+    it('homes : avec le Plan d\'urbanisme construit, les niveaux de maison portent les PA et ressources Urbanisme', (): void => {
+        const urbanism: Building = new Building({
+            id: 6, uid: URBANISM_UID, img: '', label: { fr: 'Plan d\'urbanisme' }, description: { fr: '' }, parentId: null, displayOrder: 0,
+            pa: 40, defence: 0, maxLife: 0, breakable: false, temporary: false, hasUpgrade: false, rarity: 0,
+            resources: [], hasHardMode: false, tier0Ap: null, tier1Ap: null, tier2Ap: null, tier0Resources: [], tier1Resources: [],
+            hardBlueprintLevel: null, availability: {}
+        });
+        load_static.mockReturnValue(of({
+            ...static_data(plans_dto([plan()])),
+            buildings: [wall(), urbanism],
+            state: { buildings: [{ buildingId: 6, isBuilt: true, paCurrent: null, apRemaining: null, life: null, maxLife: null, def: null, level: null, difficulty: null, resources: [] }], defense: null },
+            homes: { levels: [{ level: 2, label: 'Baracke', icon: '', def: 4, ap: 4, apUrbanism: 3, resources: [{ itemUid: 'wood', count: 1 }], resourcesUrbanism: [{ itemUid: 'wood', count: 2 }], buildingUid: null, allowsUpgrades: true, theft: false }], upgrades: [] }
+        }));
+        TestBed.configureTestingModule({
+            providers: [
+                PlanningStore,
+                ...fakes(),
+                { provide: PlanningDataService, useValue: { loadStatic: load_static, loadDay: load_day } },
+                { provide: BuildingPlanService, useValue: {} }
+            ]
+        });
+        const loaded: PlanningStore = TestBed.inject(PlanningStore);
+
+        loaded.load();
+
+        expect(loaded.homes().get(2)?.ap).toBe(3);
+        expect(loaded.homes().get(2)?.resources).toEqual([{ itemId: 5, count: 2 }]);
     });
 
     it('load en échec : load_failed, sans exception', (): void => {

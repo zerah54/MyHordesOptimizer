@@ -2,7 +2,7 @@ import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { HomeReferentialDTO, HomeUpgradeDTO, HomeUpgradeLevelDTO } from './home-referential.types';
 
 /** Clé `HomeEnum` de chaque amélioration du référentiel du jeu (nom de l'amélioration). */
-const UPGRADE_KEY_BY_NAME: Readonly<Record<string, string>> = {
+export const UPGRADE_KEY_BY_NAME: Readonly<Record<string, string>> = {
     alarm: HomeEnum.HAS_ALARM.key,
     chest: HomeEnum.CHEST_LEVEL.key,
     curtain: HomeEnum.HAS_CURTAIN.key,

@@ -2,17 +2,17 @@ import { BuildingDTO } from '../../../_abstract_model/dto/building.dto';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { Building } from '../../../_abstract_model/types/building.class';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
-import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { Home } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { ExpeditionPartPa } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { HomeReferentialDTO } from './home-referential.types';
-import { TownBuildingStateDTO } from './plan.types';
 import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
+import { TownBuildingStateDTO } from './plan.types';
 import {
     bankMap,
     buildingProgressMap,
@@ -21,11 +21,13 @@ import {
     expeditionParts,
     hasSlaveryOf,
     homeLevelRefs,
+    homeUpgradeResources,
     itemValueMap,
     PlanTier,
     planTierMap,
     workshopLevelOf
 } from './planning-data.util';
+import { ResourceCount } from './resources.util';
 
 function building(overrides: Partial<BuildingDTO> = {}): Building {
     return new Building({
@@ -220,6 +222,23 @@ describe('planning-data.util', (): void => {
         });
     });
 
+    describe('homeUpgradeResources', (): void => {
+        it('indexe par clé HomeEnum puis par niveau, en ignorant les améliorations et uid inconnus', (): void => {
+            const referential: HomeReferentialDTO = {
+                levels: [],
+                upgrades: [
+                    { name: 'lock', label: 'Schloss', description: '', levels: [{ level: 1, ap: 3, resources: [{ itemUid: 'wood_bad_#00', count: 2 }, { itemUid: 'inconnu', count: 9 }] }] },
+                    { name: 'inconnue', label: '?', description: '', levels: [{ level: 1, ap: 1, resources: [{ itemUid: 'wood_bad_#00', count: 1 }] }] }
+                ]
+            };
+
+            const resources: Map<string, ReadonlyMap<number, ResourceCount[]>> = homeUpgradeResources(referential, new Map<string, number>([['wood_bad_#00', 12]]));
+
+            expect(Array.from(resources.keys())).toEqual([HomeEnum.HAS_LOCK.key]);
+            expect(resources.get(HomeEnum.HAS_LOCK.key)?.get(1)).toEqual([{ itemId: 12, count: 2 }]);
+        });
+    });
+
     describe('homeLevelRefs', (): void => {
         it('indexe par niveau et résout les ressources, en ignorant les uid inconnus', (): void => {
             const referential: HomeReferentialDTO = {
@@ -227,7 +246,7 @@ describe('planning-data.util', (): void => {
                     { level: 0, label: 'Feldbett', icon: '', def: 0, ap: 0, apUrbanism: 0, resources: [], resourcesUrbanism: [], buildingUid: null, allowsUpgrades: false, theft: false },
                     {
                         level: 2, label: 'Baracke', icon: '', def: 4, ap: 4, apUrbanism: 3, buildingUid: null, allowsUpgrades: true, theft: false,
-                        resources: [{ itemUid: 'wood_bad_#00', count: 1 }, { itemUid: 'inconnu', count: 9 }], resourcesUrbanism: []
+                        resources: [{ itemUid: 'wood_bad_#00', count: 1 }, { itemUid: 'inconnu', count: 9 }], resourcesUrbanism: [{ itemUid: 'wood_bad_#00', count: 2 }]
                     }
                 ],
                 upgrades: []
@@ -238,6 +257,7 @@ describe('planning-data.util', (): void => {
             expect(refs.get(2)?.resources).toEqual([{ itemId: 12, count: 1 }]);
             expect(refs.get(2)?.def).toBe(4);
             expect(refs.get(2)?.apUrbanism).toBe(3);
+            expect(refs.get(2)?.resourcesUrbanism).toEqual([{ itemId: 12, count: 2 }]);
             expect(refs.get(0)?.resources).toEqual([]);
         });
 

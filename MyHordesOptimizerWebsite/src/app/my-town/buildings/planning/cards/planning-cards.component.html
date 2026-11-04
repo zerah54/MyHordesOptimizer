@@ -76,9 +76,35 @@
     <button type="button" class="card" data-card="resources" [class.selected]="selected() === 'resources'" [attr.aria-pressed]="selected() === 'resources'"
             (click)="selected.set('resources')">
         <span class="title" i18n>Ressources</span>
-        @let missing = missing_count();
-        <span class="value" [class.ko]="missing !== null && missing > 0">{{ missing ?? '—' }}</span>
-        <span class="caption"><ng-container i18n>{missing ?? 0, plural, =0 {objet manquant} =1 {objet manquant} other {objets manquants}}</ng-container></span>
+        @if (evaluation === null) {
+            <span class="value">—</span>
+        } @else {
+            @let kinds = evaluation.needs.size;
+            <span class="line">
+                <span class="value">{{ kinds }}</span>
+                <span class="caption"><ng-container i18n>{kinds, plural, =0 {objet} =1 {objet} other {objets}}</ng-container> ·
+                    @if (missing_items().length === 0) {
+                        <ng-container i18n>rien ne manque</ng-container>
+                    } @else {
+                        <ng-container i18n>il manque :</ng-container>
+                    }
+                </span>
+            </span>
+            @if (missing_items().length > 0) {
+                <span class="missing-items">
+                    @for (chip of missing_items(); track chip.itemId) {
+                        <span class="missing-item" [attr.data-item]="chip.itemId" [matTooltip]="chip.label">
+                            @if (chip.icon !== '') {
+                                <img [src]="chip.icon" [alt]="chip.label">
+                            } @else {
+                                {{ chip.label }}
+                            }
+                            <span class="ko">−{{ chip.count }}</span>
+                        </span>
+                    }
+                </span>
+            }
+        }
         <mat-icon class="chevron" aria-hidden="true">{{ selected() === 'resources' ? 'expand_less' : 'expand_more' }}</mat-icon>
     </button>
 

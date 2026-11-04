@@ -16,11 +16,12 @@ import { BuildingUpgradesDTO } from './building-upgrades.types';
 import { neutralDefenseFactors } from './defense-gain.util';
 import { HomeUpgradeRef } from './home-upgrades.util';
 import { KeyedDebounce } from './keyed-debounce.util';
-import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanPool, PlanTaskDTO } from './plan.types';
 import { PlanAlert, planAlerts } from './plan-alerts.util';
 import { BuildingRef, CitizenRef, DayEvaluation, DayInput, evaluateDay, HomeLevelRef, WORKSHOP_UID } from './plan-evaluation.util';
+import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanPool, PlanTaskDTO } from './plan.types';
 import { PlanConflict, PlanLockState, PlanningStore, PlanSaveState } from './planning.store';
 import { ToggleContext } from './program-edit.util';
+import { ResourceCount } from './resources.util';
 import { taskLockKey } from './task-status.util';
 
 /** Chantiers de test : mur (reste à construire), atelier, porte construite et abîmée. */
@@ -78,8 +79,8 @@ export const FAKE_UPGRADES: HomeUpgradeRef[] = [
 
 /** Niveaux de maison de test. */
 export const FAKE_HOMES: ReadonlyMap<number, HomeLevelRef> = new Map<number, HomeLevelRef>([
-    [1, { level: 1, label: 'Zelt', def: 1, ap: 2, apUrbanism: 2, resources: [] }],
-    [2, { level: 2, label: 'Baracke', def: 4, ap: 4, apUrbanism: 3, resources: [{ itemId: 5, count: 1 }] }]
+    [1, { level: 1, label: 'Zelt', def: 1, ap: 2, apUrbanism: 2, resources: [], resourcesUrbanism: [] }],
+    [2, { level: 2, label: 'Baracke', def: 4, ap: 4, apUrbanism: 3, resources: [{ itemId: 5, count: 1 }], resourcesUrbanism: [] }]
 ]);
 
 /**
@@ -108,6 +109,7 @@ export function fakeEvaluation(content: BuildingPlanContentDTO, overrides: Parti
         baseDefense: 1000,
         temporaryDefense: 0,
         homes: FAKE_HOMES,
+        homeUpgrades: new Map<string, ReadonlyMap<number, ResourceCount[]>>(),
         hardMode: false,
         defenseFactors: neutralDefenseFactors(),
         defenseItemIds: new Set<number>(),

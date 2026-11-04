@@ -5,7 +5,7 @@ import { CitizenFiltersStore } from '../citizen-filters.store';
 import { BuildingPlanContentDTO, emptyPlanContent } from '../plan.types';
 import { DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
-import { createFakeStore, FAKE_REGULAR_CITIZENS, FakePlanningStore } from '../planning.store.fake';
+import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { TrackingRow } from '../tracking.util';
 import { PlanningCardsComponent } from './planning-cards.component';
 
@@ -152,18 +152,24 @@ describe('PlanningCardsComponent', (): void => {
         });
     });
 
-    it('Ressources : additionne les objets manquants, en évidence', async (): Promise<void> => {
+    it('Ressources : nombre d\'objets consommés, puis une pastille par objet manquant', async (): Promise<void> => {
         await render(wallProgram());
 
         expect(card('resources').querySelector('.value')?.textContent?.trim()).toBe('1');
-        expect(card('resources').querySelector('.value')?.classList.contains('ko')).toBe(true);
+        expect(card('resources').querySelector('.caption')?.textContent).toContain('il manque');
+        const chip: HTMLElement | null = card('resources').querySelector<HTMLElement>('.missing-item[data-item="5"]');
+        expect(chip?.querySelector('img')?.getAttribute('src')).toContain('item/item_wood.gif');
+        expect(chip?.querySelector('.ko')?.textContent?.trim()).toBe('−1');
     });
 
-    it('Ressources sans manque : pas de mise en évidence', async (): Promise<void> => {
-        await render();
+    it('Ressources sans manque : « rien ne manque », sans pastille', async (): Promise<void> => {
+        await render(wallProgram());
+        fake.evaluation.set(fakeEvaluation(wallProgram(), { bank: new Map<number, number>([[5, 9]]) }));
+        fixture.detectChanges();
 
-        expect(card('resources').querySelector('.value')?.textContent?.trim()).toBe('0');
-        expect(card('resources').querySelector('.value')?.classList.contains('ko')).toBe(false);
+        expect(card('resources').querySelector('.value')?.textContent?.trim()).toBe('1');
+        expect(card('resources').querySelector('.caption')?.textContent).toContain('rien ne manque');
+        expect(card('resources').querySelector('.missing-item')).toBeNull();
     });
 
     it('Défense hors chantiers : total des sources libres', async (): Promise<void> => {

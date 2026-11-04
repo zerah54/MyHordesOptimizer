@@ -27,6 +27,9 @@ export const SLAVERY_UID: string = 'small_slave_#00';
 /** Uid du chantier « Brasier Sacrificiel » : construit, la nuit applique deux évolutions. */
 export const PYRE_UID: string = 'small_pyre_#00';
 
+/** Uid du chantier « Plan d'urbanisme » : construit, les agrandissements de maison prennent leur coût Urbanisme. */
+export const URBANISM_UID: string = 'small_urban_#00';
+
 /** Niveau maximal de l'atelier. */
 const WORKSHOP_MAX_LEVEL: number = 5;
 
@@ -61,6 +64,7 @@ export interface HomeLevelRef {
     ap: number;
     apUrbanism: number;
     resources: ResourceCount[];
+    resourcesUrbanism: ResourceCount[];
 }
 
 /** Tout ce qu'il faut pour évaluer une journée de plan. */
@@ -78,6 +82,8 @@ export interface DayInput {
     baseDefense: number;
     temporaryDefense: number;
     homes: ReadonlyMap<number, HomeLevelRef>;
+    /** Ressources de chaque niveau des améliorations de maison, par clé `HomeEnum`. */
+    homeUpgrades: ReadonlyMap<string, ReadonlyMap<number, ResourceCount[]>>;
     hardMode: boolean;
     /** Composantes de la défense que touchent les chantiers à effet indirect (objets de défense, maisons, morts, échelle). */
     defenseFactors: TownDefenseFactors;
@@ -180,12 +186,12 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         .filter((result: StepResult): boolean => result.completes && result.step.kind === 'build')
         .map((result: StepResult): number => result.step.buildingId);
     const home_tasks: { citizen: CitizenRef | undefined; level: number }[] = homeTasks(content, input.citizens);
+    const gain_context: DefenseGainContext = defenseGainContext(input);
     const needs: Map<number, number> = sumResources([
         ...completed_ids.map((id: number): ResourceCount[] => input.buildings.get(id)?.resources ?? []),
-        ...home_tasks.map((task: { citizen: CitizenRef | undefined; level: number }): ResourceCount[] => input.homes.get(task.level)?.resources ?? [])
+        ...homeWorkResources(content, input, gain_context.builtBefore.has(URBANISM_UID))
     ]);
 
-    const gain_context: DefenseGainContext = defenseGainContext(input);
     const completed_refs: BuildingRef[] = completed_ids
         .map((id: number): BuildingRef | undefined => input.buildings.get(id))
         .filter((building: BuildingRef | undefined): building is BuildingRef => building !== undefined);
@@ -528,6 +534,45 @@ function homeTasks(content: BuildingPlanContentDTO, citizens: CitizenRef[]): { c
 }
 
 /**
+ * Niveaux de maison au coût de la ville : PA et ressources Urbanisme quand le Plan d'urbanisme est construit.
+ * @param {ReadonlyMap<number, HomeLevelRef>} homes Niveaux du référentiel.
+ * @param {boolean} urbanism Plan d'urbanisme construit.
+ * @returns {ReadonlyMap<number, HomeLevelRef>} Niveaux dont `ap` et `resources` sont ceux à payer.
+ */
+export function homeCosts(homes: ReadonlyMap<number, HomeLevelRef>, urbanism: boolean): ReadonlyMap<number, HomeLevelRef> {
+    if (!urbanism) {
+        return homes;
+    }
+    return new Map<number, HomeLevelRef>(Array.from(homes, ([level, home]: [number, HomeLevelRef]): [number, HomeLevelRef] =>
+        [level, { ...home, ap: home.apUrbanism, resources: home.resourcesUrbanism }]));
+}
+
+/**
+ * Ressources des travaux de maison du plan (agrandissements et améliorations), comptées sur la banque comme les chantiers.
+ * @param {BuildingPlanContentDTO} content Contenu du plan.
+ * @param {DayInput} input Entrée de la journée.
+ * @param {boolean} urbanism Plan d'urbanisme construit en début de journée.
+ * @returns {ResourceCount[][]} Ressources de chaque tâche connue du référentiel.
+ */
+function homeWorkResources(content: BuildingPlanContentDTO, input: DayInput, urbanism: boolean): ResourceCount[][] {
+    const homes: ReadonlyMap<number, HomeLevelRef> = homeCosts(input.homes, urbanism);
+    const resources: ResourceCount[][] = [];
+    for (const entry of content.citizens) {
+        for (const task of entry.tasks) {
+            if (task.level === undefined || task.level === null) {
+                continue;
+            }
+            if (task.kind === 'home') {
+                resources.push(homes.get(task.level)?.resources ?? []);
+            } else if (task.kind === 'homeUpgrade' && typeof task.ref === 'string') {
+                resources.push(input.homeUpgrades.get(task.ref)?.get(task.level) ?? []);
+            }
+        }
+    }
+    return resources;
+}
+
+/**
  * Défense de maison brute gagnée par les montées de niveau (avant le pourcentage compté par la ville) ; 0 quand le niveau actuel
  * du citoyen est inconnu.
  * @param {{ citizen: CitizenRef | undefined; level: number }[]} tasks Tâches de maison.
@@ -597,7 +642,7 @@ function rankCandidates(input: DayInput, context: DefenseGainContext): RankCandi
         }
     });
     const home_factor: number = homeDefenseFactor(context.builtBefore.has(CIRCULAR_QUARTERS_UID)) * input.defenseFactors.scale;
-    input.homes.forEach((home: HomeLevelRef): void => {
+    homeCosts(input.homes, context.builtBefore.has(URBANISM_UID)).forEach((home: HomeLevelRef): void => {
         const gain: number = (home.def - (input.homes.get(home.level - 1)?.def ?? 0)) * home_factor;
         if (home.level >= 1 && gain > 0) {
             candidates.push({ label: home.label, kind: 'home', def: gain, pa: home.ap, resources: home.resources });

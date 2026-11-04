@@ -2,15 +2,21 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { StepResult } from './building-progress.util';
 import { PlanStepDTO } from './plan.types';
 import { HomeLevelRef } from './plan-evaluation.util';
-import { itemLabel, ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
+import { itemIcon, itemLabel, ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
 
 describe('planning-labels.util', (): void => {
-    const items: Item[] = [Object.assign(new Item(), { id: 5, uid: 'wood', label: { fr: 'Bois', en: 'Wood' } })];
+    const items: Item[] = [Object.assign(new Item(), { id: 5, uid: 'wood', label: { fr: 'Bois', en: 'Wood' }, img: 'item/item_wood.gif' })];
 
     it('itemLabel : libellé dans la langue, sinon uid, sinon identifiant', (): void => {
         expect(itemLabel(items, 5, 'fr')).toBe('Bois');
         expect(itemLabel(items, 5, 'de')).toBe('wood');
         expect(itemLabel(items, 99, 'fr')).toBe('#99');
+    });
+
+    it('itemIcon : chemin complet de l\'icône, vide pour un objet inconnu ou sans image', (): void => {
+        expect(itemIcon(items, 5)).toBe('img/hordes_img/item/item_wood.gif');
+        expect(itemIcon(items, 99)).toBe('');
+        expect(itemIcon([Object.assign(new Item(), { id: 6, img: '' })], 6)).toBe('');
     });
 
     function result(step: PlanStepDTO, pa_cost: number = 0): StepResult {
@@ -38,7 +44,7 @@ describe('planning-labels.util', (): void => {
 });
 
 describe('taskLabel', (): void => {
-    const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([[3, { level: 3, label: 'Taudis', def: 0, ap: 0, apUrbanism: 0, resources: [] }]]);
+    const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([[3, { level: 3, label: 'Taudis', def: 0, ap: 0, apUrbanism: 0, resources: [], resourcesUrbanism: [] }]]);
 
     it('action de chantier : libellé officiel de l\'action', (): void => {
         expect(taskLabel({ kind: 'action', ref: 'home_crows', pa: 1 }, homes)).toBe('Cartographier le désert');

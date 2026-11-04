@@ -13,7 +13,8 @@ import { ExpeditionPartPa } from './budget.util';
 import { BuildingProgress, initialProgress } from './building-progress.util';
 import { homeDefenseFactor, TownDefenseFactors } from './defense-gain.util';
 import { CIRCULAR_QUARTERS_UID } from './defense-rules.const';
-import { HomeLevelDTO, HomeReferentialDTO } from './home-referential.types';
+import { HomeReferentialDTO, HomeResourceDTO, HomeUpgradeLevelDTO } from './home-referential.types';
+import { UPGRADE_KEY_BY_NAME } from './home-upgrades.util';
 import { TownBuildingResourceDTO, TownBuildingStateDTO, TownDefenseStateDTO } from './plan.types';
 import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
 import { ResourceCount } from './resources.util';
@@ -293,21 +294,40 @@ export function homeLevelRefs(referential: HomeReferentialDTO, item_id_by_uid: R
             def: level.def,
             ap: level.ap,
             apUrbanism: level.apUrbanism,
-            resources: homeResources(level, item_id_by_uid)
+            resources: homeResources(level.resources, item_id_by_uid),
+            resourcesUrbanism: homeResources(level.resourcesUrbanism, item_id_by_uid)
         });
     }
     return refs;
 }
 
 /**
- * Ressources d'un niveau de maison dont l'uid est connu.
- * @param {HomeLevelDTO} level Niveau de maison.
+ * Ressources de chaque niveau des améliorations de maison connues du site, par clé `HomeEnum`.
+ * @param {HomeReferentialDTO} referential Référentiel des maisons.
+ * @param {ReadonlyMap<string, number>} item_id_by_uid Identifiant d'objet par uid.
+ * @returns {Map<string, ReadonlyMap<number, ResourceCount[]>>} Ressources résolues, indexées par clé puis par niveau.
+ */
+export function homeUpgradeResources(referential: HomeReferentialDTO, item_id_by_uid: ReadonlyMap<string, number>): Map<string, ReadonlyMap<number, ResourceCount[]>> {
+    const refs: Map<string, ReadonlyMap<number, ResourceCount[]>> = new Map<string, ReadonlyMap<number, ResourceCount[]>>();
+    for (const upgrade of referential.upgrades) {
+        const key: string | undefined = UPGRADE_KEY_BY_NAME[upgrade.name];
+        if (key !== undefined) {
+            refs.set(key, new Map<number, ResourceCount[]>(upgrade.levels.map((level: HomeUpgradeLevelDTO): [number, ResourceCount[]] =>
+                [level.level, homeResources(level.resources, item_id_by_uid)])));
+        }
+    }
+    return refs;
+}
+
+/**
+ * Ressources de maison dont l'uid est connu.
+ * @param {HomeResourceDTO[]} resources Ressources du référentiel.
  * @param {ReadonlyMap<string, number>} item_id_by_uid Identifiant d'objet par uid.
  * @returns {ResourceCount[]} Ressources résolues.
  */
-function homeResources(level: HomeLevelDTO, item_id_by_uid: ReadonlyMap<string, number>): ResourceCount[] {
+function homeResources(resources: HomeResourceDTO[], item_id_by_uid: ReadonlyMap<string, number>): ResourceCount[] {
     const resolved: ResourceCount[] = [];
-    for (const resource of level.resources) {
+    for (const resource of resources) {
         const item_id: number | undefined = item_id_by_uid.get(resource.itemUid);
         if (item_id !== undefined) {
             resolved.push({ itemId: item_id, count: resource.count });

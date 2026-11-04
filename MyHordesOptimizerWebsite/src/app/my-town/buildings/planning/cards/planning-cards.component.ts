@@ -1,18 +1,30 @@
 import { ChangeDetectionStrategy, Component, computed, inject, model, ModelSignal, Signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import moment from 'moment';
 
 import { Imports } from '../../../../_abstract_model/types/_types';
+import { Item } from '../../../../_abstract_model/types/item.class';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { StepResult } from '../building-progress.util';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { BuildingPlanContentDTO, isBuildingStep, PlanDefenseSourceDTO } from '../plan.types';
 import { alertCard, PlanAlert } from '../plan-alerts.util';
-import { DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
+import { itemIcon, itemLabel } from '../planning-labels.util';
 import { ResourceCount } from '../resources.util';
 import { TrackingRow } from '../tracking.util';
 
-const material_modules: Imports = [MatIconModule];
+const material_modules: Imports = [MatIconModule, MatTooltipModule];
+
+/** Pastille d'un objet manquant. */
+interface MissingChip {
+    itemId: number;
+    label: string;
+    /** Chemin complet de l'icône, vide si l'objet est inconnu. */
+    icon: string;
+    count: number;
+}
 
 /** Sujet de la page Chantiers. */
 export type PlanningCard = 'program' | 'tracking' | 'budget' | 'resources' | 'defense';
@@ -50,10 +62,15 @@ export class PlanningCardsComponent {
         this.filters.rows().reduce((sum: { done: number; total: number }, row: TrackingRow): { done: number; total: number } =>
             ({ done: sum.done + row.done_count, total: sum.total + row.tasks.length }), { done: 0, total: 0 }));
 
-    /** Objets manquants, nul sans évaluation. */
-    protected readonly missing_count: Signal<number | null> = computed((): number | null => {
-        const evaluation: DayEvaluation | null = this.store.evaluation();
-        return evaluation === null ? null : evaluation.missing.reduce((total: number, resource: ResourceCount): number => total + resource.count, 0);
+    /** Objets manquants, vide sans évaluation. */
+    protected readonly missing_items: Signal<MissingChip[]> = computed((): MissingChip[] => {
+        const items: readonly Item[] = this.store.items();
+        return (this.store.evaluation()?.missing ?? []).map((resource: ResourceCount): MissingChip => ({
+            itemId: resource.itemId,
+            label: itemLabel(items, resource.itemId, this.locale),
+            icon: itemIcon(items, resource.itemId),
+            count: resource.count
+        }));
     });
 
     /** Défense apportée par les sources libres. */
@@ -67,6 +84,7 @@ export class PlanningCardsComponent {
     protected readonly budget_alerts: Signal<number> = computed((): number => this.countAlerts('budget'));
 
     private readonly filters: CitizenFiltersStore = inject(CitizenFiltersStore);
+    private readonly locale: string = moment.locale();
 
     /**
      * Compte les alertes d'une carte.
