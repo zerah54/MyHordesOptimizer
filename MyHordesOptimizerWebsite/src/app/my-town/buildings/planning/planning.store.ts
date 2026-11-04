@@ -5,7 +5,7 @@ import moment from 'moment';
 import { filter, Observable } from 'rxjs';
 
 import { ItemEmotesDTO } from '../../../_abstract_model/dto/item.dto';
-import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
+import { DailyActionEnum, planningDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
 import { PlanLockDTO, RealtimeBuildingPlansService } from '../../../_abstract_model/realtime-services/realtime-building-plans.service';
 import { BuildingPlanService } from '../../../_abstract_model/services/building-plan.service';
 import { PlanningDataService, PlanningDay, PlanningStatic } from '../../../_abstract_model/services/planning-data.service';
@@ -281,12 +281,12 @@ export class PlanningStore {
         const refs: ReadonlyMap<number, BuildingRef> = this.buildings();
         if ((this.static_data()?.state.buildings ?? []).length === 0) {
             // Aucun chantier synchronisé : chantiers construits inconnus, supposés non construits.
-            return displayableDailyActions(null);
+            return planningDailyActions(null);
         }
         const built_ids: number[] = evaluation === null
             ? (this.static_data()?.state.buildings ?? []).filter((state: TownBuildingStateDTO): boolean => state.isBuilt).map((state: TownBuildingStateDTO): number => state.buildingId)
             : Array.from(evaluation.progressAfter.values()).filter((progress: BuildingProgress): boolean => progress.built).map((progress: BuildingProgress): number => progress.buildingId);
-        return displayableDailyActions(new Set<string>(built_ids
+        return planningDailyActions(new Set<string>(built_ids
             .map((id: number): string | undefined => refs.get(id)?.uid)
             .filter((uid: string | undefined): uid is string => uid !== undefined)));
     });

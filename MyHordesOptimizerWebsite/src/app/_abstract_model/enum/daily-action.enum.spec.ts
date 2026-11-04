@@ -1,4 +1,13 @@
-import { dailyActionAp, DailyActionEnum, dailyActionMaxUses, displayableDailyActions } from './daily-action.enum';
+import { HeroSkillLevels, UNKNOWN_HERO_SKILL_LEVELS } from '../types/hero-skill-levels';
+import {
+    dailyActionAp,
+    dailyActionDefaultUses,
+    DailyActionEnum,
+    dailyActionMaxUses,
+    displayableDailyActions,
+    isPlannableAction,
+    planningDailyActions
+} from './daily-action.enum';
 import { JobEnum } from './job.enum';
 
 describe('DailyActionEnum', (): void => {
@@ -13,7 +22,7 @@ describe('DailyActionEnum', (): void => {
     it('liste les actions de maison puis les actions de chantier', (): void => {
         expect(DailyActionEnum.getAllValues<DailyActionEnum>().map((action: DailyActionEnum): string => action.key)).toEqual([
             'home_pool', 'home_shower', 'home_clean', 'home_rest',
-            'home_defbuff', 'home_crows', 'home_survivalist', 'home_contemplate', 'home_scavenge'
+            'home_defbuff', 'home_crows', 'home_survivalist', 'home_contemplate', 'home_scavenge', 'trash', 'home_heal'
         ]);
     });
 
@@ -34,7 +43,8 @@ describe('DailyActionEnum', (): void => {
     it('reprend les libellés officiels du jeu', (): void => {
         expect(DailyActionEnum.getAllValues<DailyActionEnum>().map((action: DailyActionEnum): string => action.getLabel())).toEqual([
             'Prendre un bain', 'Se doucher', 'Ranger mon habitat', 'Faire une sieste',
-            'Organiser les défenses', 'Cartographier le désert', 'Trouver de l’eau', 'Se recueillir', 'Creuser dans les galeries'
+            'Organiser les défenses', 'Cartographier le désert', 'Trouver de l’eau', 'Se recueillir', 'Creuser dans les galeries',
+            'Fouiller les déchets', 'Se soigner'
         ]);
     });
 
@@ -75,6 +85,13 @@ describe('displayableDailyActions', (): void => {
         expect(displayableDailyActions(new Set<string>(['small_gallery_#00'])).map((action: DailyActionEnum): string => action.key))
             .toEqual(['home_clean', 'home_rest', 'home_scavenge']);
     });
+
+    it('Fouiller les déchets et Se soigner : seulement pour l\'outil Chantiers, Se soigner avec l\'Infirmerie', (): void => {
+        const built: Set<string> = new Set<string>(['small_infirmary_#00']);
+        expect(displayableDailyActions(built).map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest']);
+        expect(planningDailyActions(built).map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest', 'trash', 'home_heal']);
+        expect(planningDailyActions(null).map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest', 'trash']);
+    });
 });
 
 describe('dailyActionMaxUses', (): void => {
@@ -90,5 +107,36 @@ describe('dailyActionMaxUses', (): void => {
         expect(dailyActionAp(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCAVENGER.key, 5)).toBe(3);
         expect(dailyActionAp(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCAVENGER.key, 0)).toBe(1);
         expect(dailyActionAp(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCOUT.key, 3)).toBe(2);
+    });
+});
+
+describe('Fouiller les déchets et Se soigner', (): void => {
+    const levels = (r: number | null): HeroSkillLevels => ({ ...UNKNOWN_HERO_SKILL_LEVELS, r });
+
+    it('Fouiller les déchets : 3 par jour, +1 Fouineur, +1 au niveau Expert du groupe R, ou s\'il est inconnu', (): void => {
+        expect(dailyActionMaxUses(DailyActionEnum.TRASH, null, levels(0))).toBe(3);
+        expect(dailyActionMaxUses(DailyActionEnum.TRASH, JobEnum.SCAVENGER.key, levels(2))).toBe(4);
+        expect(dailyActionMaxUses(DailyActionEnum.TRASH, null, levels(3))).toBe(4);
+        expect(dailyActionMaxUses(DailyActionEnum.TRASH, JobEnum.SCAVENGER.key, levels(null))).toBe(5);
+        expect(dailyActionAp(DailyActionEnum.TRASH, null, 2, levels(0))).toBe(2);
+    });
+
+    it('Se soigner : 5 PA, 2 au plus, 1 proposée', (): void => {
+        expect(dailyActionMaxUses(DailyActionEnum.HOME_HEAL, null)).toBe(2);
+        expect(dailyActionDefaultUses(DailyActionEnum.HOME_HEAL, null)).toBe(1);
+        expect(dailyActionAp(DailyActionEnum.HOME_HEAL, null, 1)).toBe(5);
+        expect(DailyActionEnum.HOME_HEAL.value.building).toBe('small_infirmary_#00');
+    });
+
+    it('utilisations proposées : toutes sans valeur par défaut', (): void => {
+        expect(dailyActionDefaultUses(DailyActionEnum.HOME_SCAVENGE, JobEnum.SCAVENGER.key)).toBe(3);
+        expect(dailyActionDefaultUses(DailyActionEnum.TRASH, null, levels(0))).toBe(3);
+    });
+
+    it('actions planifiables : avec chantier ou PA', (): void => {
+        expect(isPlannableAction(DailyActionEnum.TRASH)).toBe(true);
+        expect(isPlannableAction(DailyActionEnum.HOME_POOL)).toBe(true);
+        expect(isPlannableAction(DailyActionEnum.HOME_CLEAN)).toBe(false);
+        expect(isPlannableAction(DailyActionEnum.HOME_REST)).toBe(false);
     });
 });

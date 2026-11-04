@@ -52,3 +52,12 @@ export const CEMETERY_UID: string = 'small_cemetery_#00';
 
 /** Ajustement défensif : échelle de toute la défense selon son niveau, donnée d'évolution (`OverallTownDefenseScale`). */
 export const DEFENSE_ADJUSTMENT_UID: string = 'item_shield_#00';
+
+/**
+ * Chantiers dont l'effet s'applique à d'autres chantiers. Un enfant ne se construisant qu'après ses ancêtres, son gain affiché
+ * suppose construits ceux de ses ancêtres qui figurent ici (Cercueils sous le Cimetière, Quartiers circulaires sous
+ * Habitations fortifiées).
+ */
+export const CASCADE_EFFECT_UIDS: ReadonlySet<string> = new Set<string>([
+    CEMETERY_UID, DEFENSE_ADJUSTMENT_UID, DEFENSE_FIXINGS_UID, FORTIFIED_HOMES_UID, CIRCULAR_QUARTERS_UID
+]);

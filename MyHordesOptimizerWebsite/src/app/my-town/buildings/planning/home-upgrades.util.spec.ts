@@ -1,4 +1,5 @@
-import { cascadeAp, cascadeLevels, reachableHomeLevels } from './home-upgrades.util';
+import { cascadeAp, cascadeLevels, homeTaskIndex, nextHomeTarget, reachableHomeLevels } from './home-upgrades.util';
+import { PlanTaskDTO } from './plan.types';
 
 describe('home-upgrades.util', (): void => {
     describe('cascadeLevels', (): void => {
@@ -42,6 +43,35 @@ describe('home-upgrades.util', (): void => {
 
         it('niveau maximal atteint : aucun', (): void => {
             expect(reachableHomeLevels(LEVELS, 5, false)).toEqual([]);
+        });
+    });
+
+    describe('consigne de maison ajoutée par « + »', (): void => {
+        const kitchen: PlanTaskDTO = { id: 'k', kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 3 };
+        const house: PlanTaskDTO = { id: 'h', kind: 'home', level: 2, pa: 4 };
+
+        it('retrouve la consigne de l\'élément : habitation ou amélioration de même clé', (): void => {
+            expect(homeTaskIndex([kitchen, house], null)).toBe(1);
+            expect(homeTaskIndex([kitchen, house], 'kitchenLevel')).toBe(0);
+            expect(homeTaskIndex([kitchen, house], 'laboLevel')).toBe(-1);
+        });
+
+        it('sans consigne : niveau suivant du citoyen ; avec : un niveau de plus que la consigne', (): void => {
+            expect(nextHomeTarget([], 'kitchenLevel', 1, 4, false)).toBe(2);
+            expect(nextHomeTarget([kitchen], 'kitchenLevel', 1, 4, false)).toBe(3);
+            expect(nextHomeTarget([kitchen], 'kitchenLevel', 3, 4, false)).toBe(4);
+        });
+
+        it('niveau maximal atteint ou niveau inconnu : rien à ajouter', (): void => {
+            expect(nextHomeTarget([], 'kitchenLevel', 4, 4, false)).toBeNull();
+            expect(nextHomeTarget([{ ...kitchen, level: 4 }], 'kitchenLevel', 1, 4, false)).toBeNull();
+            expect(nextHomeTarget([], null, null, 5, true)).toBeNull();
+        });
+
+        it('habitation : un seul agrandissement par jour, sauf en chaos ou en Pandémonium', (): void => {
+            expect(nextHomeTarget([], null, 1, 5, false)).toBe(2);
+            expect(nextHomeTarget([house], null, 1, 5, false)).toBeNull();
+            expect(nextHomeTarget([house], null, 1, 5, true)).toBe(3);
         });
     });
 });

@@ -208,7 +208,7 @@ export function evaluateDay(input: DayInput): DayEvaluation {
     const voted_item_step: number = votedItemStep(input, vote_ids);
     const gain: DefenseGainResult = defenseGain(completed_refs, home_raw_gain, gain_context, voted_item_step);
     const homes_gain: number = defenseGain([], home_raw_gain, gain_context).total;
-    const planned: PlannedDefense = plannedDefenseGains(completed_refs, pendingBuildings(input, completed_ids), home_raw_gain, gain_context, voted_item_step);
+    const planned: PlannedDefense = plannedDefenseGains(completed_refs, pendingBuildings(input, completed_ids), home_raw_gain, gain_context, voted_item_step, input.buildings);
     const [vote, second_vote]: (EveningVote | null)[] = vote_ids.map((vote_id: number | null): EveningVote | null => {
         const item_defense: number = vote_id !== null && input.buildings.get(vote_id)?.uid === DEFENSE_FIXINGS_UID ? planned.vote : 0;
         return eveningVote(input, vote_id, gain.factorsAfter.scale, item_defense);
@@ -687,7 +687,7 @@ function rankCandidates(input: DayInput, context: DefenseGainContext): RankCandi
     const candidates: RankCandidate[] = [];
     input.progress.forEach((progress: BuildingProgress, id: number): void => {
         const building: BuildingRef | undefined = input.buildings.get(id);
-        const gain: number = building === undefined || progress.built ? 0 : buildingDefenseGain(building, context);
+        const gain: number = building === undefined || progress.built ? 0 : buildingDefenseGain(building, context, input.buildings);
         if (building !== undefined && gain > 0) {
             candidates.push({ label: building.label, kind: 'building', def: gain, pa: remainingAp(progress, input.workshopLevel), resources: building.resources });
         }

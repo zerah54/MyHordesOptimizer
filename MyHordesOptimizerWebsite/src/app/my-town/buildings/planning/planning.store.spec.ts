@@ -21,6 +21,7 @@ import { errorInterceptor } from '../../../_core/services/errors-interceptor.ser
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { setTown, setUser } from '../../../_core/utilities/localstorage.util';
+import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
 import {
     BuildingPlanContentDTO,
     BuildingPlanDTO,
@@ -30,7 +31,6 @@ import {
     PlanTaskDTO,
     TownBuildingStateDTO
 } from './plan.types';
-import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
 import { AUTOSAVE_DELAY_MS, AUTOSAVE_MAX_WAIT_MS, PlanningStore } from './planning.store';
 import { ToggleContext } from './program-edit.util';
 import { TaskCheckService } from './task-check.service';
@@ -913,7 +913,7 @@ describe('PlanningStore', (): void => {
             store = TestBed.inject(PlanningStore);
             store.load();
 
-            expect(store.displayable_actions().map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest']);
+            expect(store.displayable_actions().map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest', 'trash']);
         });
 
         it('displayable_actions : chantier terminé par le programme du jour', (): void => {

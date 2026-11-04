@@ -4,8 +4,7 @@
         <mat-icon>chevron_left</mat-icon>
     </button>
     <button mat-button type="button" class="day" data-action="pick-day" [matMenuTriggerFor]="days_menu" [disabled]="days().length <= 1">
-        <ng-container i18n>J</ng-container>
-        {{ value() }}
+        {{ label(value()) }}
         @if (value() === today()) {
             <span class="today" i18n>aujourd'hui</span>
         }
@@ -20,8 +19,7 @@
     <ng-template matMenuContent>
         @for (day of days(); track day) {
             <button mat-menu-item type="button" data-action="select-day" [class.selected]="day === value()" (click)="select(day)">
-                <ng-container i18n>J</ng-container>
-                {{ day }}
+                {{ label(day) }}
                 @if (day === today()) {
                     <span class="today" i18n>aujourd'hui</span>
                 }

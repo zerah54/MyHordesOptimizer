@@ -2,7 +2,7 @@ import { computed, Signal, signal, WritableSignal } from '@angular/core';
 import type { Mock } from 'vitest';
 
 import { ItemEmotesDTO } from '../../../_abstract_model/dto/item.dto';
-import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
+import { DailyActionEnum, planningDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { Building } from '../../../_abstract_model/types/building.class';
@@ -16,9 +16,9 @@ import { BuildingUpgradesDTO } from './building-upgrades.types';
 import { neutralDefenseFactors } from './defense-gain.util';
 import { HomeUpgradeRef } from './home-upgrades.util';
 import { KeyedDebounce } from './keyed-debounce.util';
-import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanPool, PlanTaskDTO } from './plan.types';
 import { PlanAlert, planAlerts } from './plan-alerts.util';
 import { BuildingRef, CitizenRef, DayEvaluation, DayInput, evaluateDay, HomeLevelRef, WORKSHOP_UID } from './plan-evaluation.util';
+import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanPool, PlanTaskDTO } from './plan.types';
 import { PlanConflict, PlanLockState, PlanningStore, PlanSaveState } from './planning.store';
 import { ToggleContext } from './program-edit.util';
 import { ResourceCount } from './resources.util';
@@ -192,7 +192,7 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         citizens_full: signal<Citizen[]>(fakeFullCitizens()),
         can_track: signal(true),
         pending_checks: signal<ReadonlySet<string>>(new Set<string>()),
-        displayable_actions: signal<DailyActionEnum[]>(displayableDailyActions(new Set<string>(['small_gallery_#00', 'small_watchmen_#01']))),
+        displayable_actions: signal<DailyActionEnum[]>(planningDailyActions(new Set<string>(['small_gallery_#00', 'small_watchmen_#01']))),
         home_upgrades: signal<HomeUpgradeRef[]>(FAKE_UPGRADES),
         unlimited_home_levels: signal(false),
         lock: signal<PlanLockState>({ kind: 'free' }),

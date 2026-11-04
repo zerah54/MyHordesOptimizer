@@ -212,7 +212,17 @@ describe('planning-data.util', (): void => {
 
             const parts: ExpeditionPartPa[] = expeditionParts([expedition]);
 
-            expect(parts).toEqual([{ routeLength: 6, citizenIds: [1] }, { routeLength: null, citizenIds: [1] }]);
+            expect(parts).toEqual([{ routeLength: 6, seats: [{ citizenId: 1, startPe: 0 }] }, { routeLength: null, seats: [{ citizenId: 1, startPe: 0 }] }]);
+        });
+
+        it('parties d\'expédition : PE de départ de chaque place, 0 sans PE exigés', (): void => {
+            const with_pe: CitizenExpedition = Object.assign(new CitizenExpedition(), { citizen_id: 1, required_sp: 3, required_sp_operator: 'max' });
+            const without_pe: CitizenExpedition = Object.assign(new CitizenExpedition(), { citizen_id: 2 });
+            const expedition: Expedition = Object.assign(new Expedition(), {
+                parts: [Object.assign(new ExpeditionPart(), { map_route: { length: 8 } as ExpeditionPartRoute, citizens: [with_pe, without_pe] })]
+            });
+
+            expect(expeditionParts([expedition])).toEqual([{ routeLength: 8, seats: [{ citizenId: 1, startPe: 3 }, { citizenId: 2, startPe: 0 }] }]);
         });
     });
 

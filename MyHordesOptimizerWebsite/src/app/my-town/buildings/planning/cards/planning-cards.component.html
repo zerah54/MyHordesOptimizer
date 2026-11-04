@@ -19,7 +19,7 @@
 
     <button type="button" class="card" data-card="tracking" [class.selected]="selected() === 'tracking'" [attr.aria-pressed]="selected() === 'tracking'"
             (click)="selected.set('tracking')">
-        <span class="title" i18n>Suivi des consignes individuelles</span>
+        <span class="title" i18n>Consignes</span>
         @if (future()) {
             <span class="value">{{ tasks().total }}</span>
             <span class="caption"><ng-container i18n>{tasks().total, plural, =0 {consigne prévue} =1 {consigne prévue} other {consignes prévues}}</ng-container></span>
@@ -33,7 +33,7 @@
 
     <button type="button" class="card" data-card="budget" [class.selected]="selected() === 'budget'" [attr.aria-pressed]="selected() === 'budget'"
             (click)="selected.set('budget')">
-        <span class="title" i18n>Citoyens et budget</span>
+        <span class="title" i18n>Budget</span>
         <span class="columns">
             <span class="column">
                 <span class="value">{{ store.citizens().length }}</span>

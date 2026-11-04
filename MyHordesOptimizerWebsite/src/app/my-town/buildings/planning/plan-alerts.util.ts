@@ -37,7 +37,7 @@ export function stepIssueLabel(issue: StepIssue): string {
 /**
  * Carte de la page qui porte une alerte.
  * @param {PlanAlert} alert Alerte.
- * @returns {'program' | 'budget'} Citoyens et budget hors programme, sinon Programme.
+ * @returns {'program' | 'budget'} Budget hors programme, sinon Programme.
  */
 export function alertCard(alert: PlanAlert): 'program' | 'budget' {
     return alert.pool === null ? 'budget' : 'program';

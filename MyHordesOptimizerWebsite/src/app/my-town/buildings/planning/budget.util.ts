@@ -67,10 +67,16 @@ export interface PoolBudget {
     remaining: number;
 }
 
-/** Partie d'expédition : longueur du tracé (nulle si aucun tracé) et citoyens inscrits. */
+/** Place d'un citoyen dans une partie d'expédition, avec les PE qu'il a au départ (dépensés avant les PA). */
+export interface ExpeditionSeatPa {
+    citizenId: number;
+    startPe: number;
+}
+
+/** Partie d'expédition : longueur du tracé (nulle si aucun tracé) et places des citoyens inscrits. */
 export interface ExpeditionPartPa {
     routeLength: number | null;
-    citizenIds: number[];
+    seats: ExpeditionSeatPa[];
 }
 
 /**
@@ -117,7 +123,8 @@ export function poolBudgets(capacities: CitizenCapacity[], lines: BudgetLine[], 
 }
 
 /**
- * PA d'expédition de chaque citoyen : Σ longueur du tracé (un retour éventuel est déjà dans la boucle) sur les parties où il est inscrit.
+ * PA d'expédition de chaque citoyen : Σ (longueur du tracé − PE de départ, jamais négatif) sur les parties où il est inscrit ; un
+ * retour éventuel est déjà dans la boucle.
  * @param {ExpeditionPartPa[]} parts Parties d'expédition du jour.
  * @returns {{ pa: Map<number, number>; partsWithoutRoute: number }} PA par citoyen et nombre de parties sans tracé.
  */
@@ -129,8 +136,8 @@ export function expeditionPaByCitizen(parts: ExpeditionPartPa[]): { pa: Map<numb
             parts_without_route++;
             continue;
         }
-        for (const id of part.citizenIds) {
-            pa.set(id, (pa.get(id) ?? 0) + part.routeLength);
+        for (const seat of part.seats) {
+            pa.set(seat.citizenId, (pa.get(seat.citizenId) ?? 0) + Math.max(0, part.routeLength - seat.startPe));
         }
     }
     return { pa, partsWithoutRoute: parts_without_route };

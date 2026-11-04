@@ -178,6 +178,11 @@ export class MyProgramComponent implements OnInit {
 
     /** Jour à venir : consignes sans case (rien ne peut encore être fait). */
     protected readonly future: Signal<boolean> = computed((): boolean => this.store.selected_day() > this.store.current_day);
+    // Bandeaux des blocs masqués : numéro du jour collé à la lettre, traduits d'un bloc (le gabarit y glisserait une espace).
+    /** Bandeau de l'expédition masquée. */
+    protected readonly hidden_expedition_label: Signal<string> = computed((): string => $localize`Expédition masquée pour J${this.store.selected_day()}:day:`);
+    /** Bandeau des chantiers masqués. */
+    protected readonly hidden_buildings_label: Signal<string> = computed((): string => $localize`Chantiers masqués pour J${this.store.selected_day()}:day:`);
 
     public constructor() {
         effect((): void => {

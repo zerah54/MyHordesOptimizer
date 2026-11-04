@@ -377,6 +377,13 @@
             <trans-unit id="349574492903631397" datatype="html">
                 <source>Passage en Force</source>
             </trans-unit>
+            <trans-unit id="3495827345194332174" datatype="html">
+                <source>Consigne :
+                    <x id="upgrade" equiv-text="upgrade"/>
+                    niv.
+                    <x id="level" equiv-text="level"/>
+                </source>
+            </trans-unit>
             <trans-unit id="8087870012850236055" datatype="html">
                 <source>Envoyer les manques à la liste de courses</source>
             </trans-unit>
@@ -936,6 +943,11 @@
             <trans-unit id="5152296189255202067" datatype="html">
                 <source>PE exigés</source>
             </trans-unit>
+            <trans-unit id="5153119564546881290" datatype="html">
+                <source>Expédition masquée pour J
+                    <x id="day" equiv-text="this.store.selected_day()"/>
+                </source>
+            </trans-unit>
             <trans-unit id="5161390510505382530" datatype="html">
                 <source>L&apos;objet
                     <x id="PH" equiv-text="item.label[this.locale]"/>
@@ -1008,9 +1020,6 @@
             </trans-unit>
             <trans-unit id="2556596709534546149" datatype="html">
                 <source>Chances de survie individuelles</source>
-            </trans-unit>
-            <trans-unit id="2560606435455590829" datatype="html">
-                <source>Citoyens et budget</source>
             </trans-unit>
             <trans-unit id="3246925786078706808" datatype="html">
                 <source>&lt;p&gt;Un clic sur une case ouvre son détail ; « Consulter et mettre à jour la zone » ouvre la fenêtre complète de la zone, pour lire
@@ -1320,9 +1329,6 @@
             <trans-unit id="5939392791181422027" datatype="html">
                 <source>Importe tous les référentiels depuis l&apos;API MyHordes en une seule opération.</source>
             </trans-unit>
-            <trans-unit id="7260521277718114906" datatype="html">
-                <source>Lignes ville</source>
-            </trans-unit>
             <trans-unit id="7266440197449540652" datatype="html">
                 <source>Citoyens vivants</source>
             </trans-unit>
@@ -1401,6 +1407,9 @@
             </trans-unit>
             <trans-unit id="2603426898451246707" datatype="html">
                 <source>Libre</source>
+            </trans-unit>
+            <trans-unit id="2605138465430014558" datatype="html">
+                <source>Se soigner</source>
             </trans-unit>
             <trans-unit id="261355464839247686" datatype="html">
                 <source>Case</source>
@@ -1491,9 +1500,6 @@
             </trans-unit>
             <trans-unit id="5234742419849902975" datatype="html">
                 <source>Statistiques des joueurs</source>
-            </trans-unit>
-            <trans-unit id="3201791936776379019" datatype="html">
-                <source>Chantiers masqués pour J</source>
             </trans-unit>
             <trans-unit id="3204845904551943382" datatype="html">
                 <source>+1 amélioration</source>
@@ -1651,6 +1657,11 @@
                     &lt;li&gt;le détail de la zone (clic) les liste toutes : les vôtres se cochent, chacune se modifie, et « Ajouter une consigne ici » propose
                     les expéditions du jour, celles dont le tracé passe par la case en tête ;&lt;/li&gt; &lt;li&gt;la fiche d&apos;un tracé indique le nombre de
                     consignes posées sur ses cases.&lt;/li&gt; &lt;/ul&gt;
+                </source>
+            </trans-unit>
+            <trans-unit id="7224323358969869740" datatype="html">
+                <source>J
+                    <x id="day" equiv-text="day"/>
                 </source>
             </trans-unit>
             <trans-unit id="723802104549555213" datatype="html">
@@ -1870,9 +1881,6 @@
             <trans-unit id="3489547225033327920" datatype="html">
                 <source>Dupliquer la proposition</source>
             </trans-unit>
-            <trans-unit id="3190274048190984600" datatype="html">
-                <source>Expédition masquée pour J</source>
-            </trans-unit>
             <trans-unit id="3193976279273491157" datatype="html">
                 <source>Actions</source>
             </trans-unit>
@@ -2064,6 +2072,11 @@
             </trans-unit>
             <trans-unit id="5333122727224525647" datatype="html">
                 <source>Chercher des objets par propriétés</source>
+            </trans-unit>
+            <trans-unit id="5337499444002286533" datatype="html">
+                <source>Chantiers masqués pour J
+                    <x id="day" equiv-text="this.store.selected_day()"/>
+                </source>
             </trans-unit>
             <trans-unit id="5339692311370096715" datatype="html">
                 <source>Corps de la requête</source>
@@ -2563,9 +2576,6 @@
             <trans-unit id="3717603792840045364" datatype="html">
                 <source>Valeur</source>
             </trans-unit>
-            <trans-unit id="3730321638406496617" datatype="html">
-                <source>Coût du programme</source>
-            </trans-unit>
             <trans-unit id="3731664538864720328" datatype="html">
                 <source>&lt;p&gt;Ajoute une section « Liste de courses », repliée par défaut, dans le désert et dans l&apos;atelier. Colonnes : objet, dépôt, en
                     banque, en sacs, en coffres, sur la carte, souhaité et manquant (souhaité moins banque et sacs). Le bouton « Rafraîchir la liste » la
@@ -2977,9 +2987,6 @@
                     pour les autres langues).&lt;/p&gt;
                 </source>
             </trans-unit>
-            <trans-unit id="425793890428638123" datatype="html">
-                <source>Suivi des consignes individuelles</source>
-            </trans-unit>
             <trans-unit id="1228702617719670272" datatype="html">
                 <source>Les relevés ci-dessous décrivent les cases voisines, telles que vues depuis cette case.</source>
             </trans-unit>
@@ -3245,6 +3252,9 @@
                     pas relâché votre escorte à ce moment-là.&lt;/p&gt;
                 </source>
             </trans-unit>
+            <trans-unit id="4183392532160369513" datatype="html">
+                <source>PA d&apos;expédition :</source>
+            </trans-unit>
             <trans-unit id="4195140570561189703" datatype="html">
                 <source>Débordement autorisé</source>
             </trans-unit>
@@ -3299,6 +3309,9 @@
                     actions, recettes, traductions…).&lt;/p&gt; &lt;p&gt;Si vous êtes incarné, les objets absents de la liste de courses sont suivis d&apos;un
                     bouton caddie : un clic les y ajoute.&lt;/p&gt;
                 </source>
+            </trans-unit>
+            <trans-unit id="9128561600499527021" datatype="html">
+                <source>Agrandissements</source>
             </trans-unit>
             <trans-unit id="2046490270137592735" datatype="html">
                 <source>Afficher les zones en distance</source>
@@ -3530,11 +3543,11 @@
             <trans-unit id="4034455525597514950" datatype="html">
                 <source>Prendre la main</source>
             </trans-unit>
-            <trans-unit id="7451632765834808757" datatype="html">
-                <source>Ajouter une consigne</source>
-            </trans-unit>
             <trans-unit id="7452622585349092259" datatype="html">
                 <source>Affinage annulé</source>
+            </trans-unit>
+            <trans-unit id="7452990804948677064" datatype="html">
+                <source>Chantiers du programme</source>
             </trans-unit>
             <trans-unit id="7456095365727332997" datatype="html">
                 <source>Ce chantier n&apos;est pas encore débloqué dans la ville</source>
@@ -4068,9 +4081,6 @@
             <trans-unit id="3877095303685712752" datatype="html">
                 <source>Taux</source>
             </trans-unit>
-            <trans-unit id="3882645312268423948" datatype="html">
-                <source>Budget par poche</source>
-            </trans-unit>
             <trans-unit id="3882680170400751903" datatype="html">
                 <source>Fonds de cases</source>
             </trans-unit>
@@ -4305,6 +4315,11 @@
             <trans-unit id="2914344385245174522" datatype="html">
                 <source>Tas à déblayer</source>
             </trans-unit>
+            <trans-unit id="2916672351207210591" datatype="html">
+                <source>Consigne :
+                    <x id="house" equiv-text="house"/>
+                </source>
+            </trans-unit>
             <trans-unit id="2917882835220695420" datatype="html">
                 <source>Explorer la ruine</source>
             </trans-unit>
@@ -4519,6 +4534,9 @@
             <trans-unit id="5919338286237435584" datatype="html">
                 <source>Plus probable</source>
             </trans-unit>
+            <trans-unit id="537145196809960370" datatype="html">
+                <source>Améliorations de maison</source>
+            </trans-unit>
             <trans-unit id="5376701657224379451" datatype="html">
                 <source>Observer une ville</source>
             </trans-unit>
@@ -4705,9 +4723,6 @@
             <trans-unit id="2293338065538649958" datatype="html">
                 <source>Tris et filtres</source>
             </trans-unit>
-            <trans-unit id="2295536928947234996" datatype="html">
-                <source>J</source>
-            </trans-unit>
             <trans-unit id="8624567640321872397" datatype="html">
                 <source>Déplacer ou modifier la consigne</source>
             </trans-unit>
@@ -4775,6 +4790,9 @@
             <trans-unit id="7417939706474107542" datatype="html">
                 <source>Attendre</source>
             </trans-unit>
+            <trans-unit id="7418348679868715857" datatype="html">
+                <source>Consignes libres</source>
+            </trans-unit>
             <trans-unit id="7418834632319176717" datatype="html">
                 <source>Chantiers interdits aux bannis.</source>
             </trans-unit>
@@ -4821,6 +4839,9 @@
             </trans-unit>
             <trans-unit id="3549884673093564156" datatype="html">
                 <source>Pas soif</source>
+            </trans-unit>
+            <trans-unit id="3553363394360571893" datatype="html">
+                <source>Dépassements individuels</source>
             </trans-unit>
             <trans-unit id="3556482685302387015" datatype="html">
                 <source>Première utilisation</source>
@@ -5344,6 +5365,9 @@
             <trans-unit id="5431997792330966741" datatype="html">
                 <source>Ajoutez une étape à la séquence pour voir la trace.</source>
             </trans-unit>
+            <trans-unit id="5435975275965738468" datatype="html">
+                <source>Fouiller les déchets</source>
+            </trans-unit>
             <trans-unit id="5436958487194643784" datatype="html">
                 <source>PE exigés : au plus</source>
             </trans-unit>
@@ -5395,6 +5419,9 @@
             </trans-unit>
             <trans-unit id="6490338623834272063" datatype="html">
                 <source>Mes consignes</source>
+            </trans-unit>
+            <trans-unit id="6491358721781931527" datatype="html">
+                <source>PC du technicien</source>
             </trans-unit>
             <trans-unit id="649484315491112984" datatype="html">
                 <source>&lt;p&gt;La liste est commune à toute la ville. Pour chaque objet : dépôt, zone (distance en PA), quantités en banque, dans les sacs,
@@ -5536,6 +5563,9 @@
             </trans-unit>
             <trans-unit id="7415034134196628778" datatype="html">
                 <source>de défense</source>
+            </trans-unit>
+            <trans-unit id="4146951745721996995" datatype="html">
+                <source>Rab d&apos;expé</source>
             </trans-unit>
             <trans-unit id="4152673850690704403" datatype="html">
                 <source>Cette autorisation remplace la saisie manuelle de l&apos;identifiant externe pour les applications, qui se trouvait dans la page de

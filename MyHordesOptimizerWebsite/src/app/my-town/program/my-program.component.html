@@ -38,8 +38,7 @@
             <div class="hidden-bar expedition">
                 <mat-icon aria-hidden="true">explore</mat-icon>
                 <span class="hidden-text">
-                    <ng-container i18n>Expédition masquée pour J</ng-container>
-                    {{ store.selected_day() }}
+                    {{ hidden_expedition_label() }}
                     @if (expedition_totals().total > 0) {
                         · {{ expedition_totals().done }}/{{ expedition_totals().total }}
                         <ng-container i18n>consignes faites</ng-container>
@@ -95,8 +94,7 @@
         @if (hidden().buildings) {
             <div class="hidden-bar buildings">
                 <mat-icon aria-hidden="true">construction</mat-icon>
-                <span class="hidden-text"><ng-container i18n>Chantiers masqués pour J</ng-container>
-                    {{ store.selected_day() }}</span>
+                <span class="hidden-text">{{ hidden_buildings_label() }}</span>
                 <button mat-button type="button" data-action="show-buildings" (click)="setBlockHidden('buildings', false)" i18n>Réafficher</button>
             </div>
         } @else {

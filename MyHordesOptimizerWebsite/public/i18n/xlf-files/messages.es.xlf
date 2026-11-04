@@ -542,6 +542,18 @@
                 <source>Passage en Force</source>
                 <target state="final">Pasaje en vigor</target>
             </trans-unit>
+            <trans-unit id="3495827345194332174" datatype="html">
+                <source>Consigne :
+                    <x id="upgrade" equiv-text="upgrade"/>
+                    niv.
+                    <x id="level" equiv-text="level"/>
+                </source>
+                <target state="translated">Instrucción:
+                    <x id="upgrade" equiv-text="upgrade"/>
+                    nivel
+                    <x id="level" equiv-text="level"/>
+                </target>
+            </trans-unit>
             <trans-unit id="8087870012850236055" datatype="html">
                 <source>Envoyer les manques à la liste de courses</source>
                 <target state="translated">Enviar lo que falta a la lista de la compra</target>
@@ -1389,6 +1401,14 @@
                 <source>PE exigés</source>
                 <target state="translated">PE exigidos</target>
             </trans-unit>
+            <trans-unit id="5153119564546881290" datatype="html">
+                <source>Expédition masquée pour J
+                    <x id="day" equiv-text="this.store.selected_day()"/>
+                </source>
+                <target state="translated">Expedición oculta para D
+                    <x id="day" equiv-text="this.store.selected_day()"/>
+                </target>
+            </trans-unit>
             <trans-unit id="5161390510505382530" datatype="html" approved="yes">
                 <source>L&apos;objet
                     <x id="PH" equiv-text="item.label[this.locale]"/>
@@ -1606,6 +1626,14 @@
             <trans-unit id="5333122727224525647" datatype="html" approved="yes">
                 <source>Chercher des objets par propriétés</source>
                 <target state="final">Buscar objetos por propiedades</target>
+            </trans-unit>
+            <trans-unit id="5337499444002286533" datatype="html">
+                <source>Chantiers masqués pour J
+                    <x id="day" equiv-text="this.store.selected_day()"/>
+                </source>
+                <target state="translated">Obras ocultas para D
+                    <x id="day" equiv-text="this.store.selected_day()"/>
+                </target>
             </trans-unit>
             <trans-unit id="5339692311370096715" datatype="html" approved="yes">
                 <source>Corps de la requête</source>
@@ -1992,6 +2020,14 @@
                     demás;&lt;/li&gt; &lt;li&gt;el detalle de la zona (clic) las enumera todas: las tuyas se marcan, cada una se puede editar, y «Añadir una
                     instrucción aquí» propone las expediciones del día, primero aquellas cuya ruta pasa por la casilla;&lt;/li&gt; &lt;li&gt;la ficha de una
                     ruta indica el número de instrucciones colocadas en sus casillas.&lt;/li&gt; &lt;/ul&gt;
+                </target>
+            </trans-unit>
+            <trans-unit id="7224323358969869740" datatype="html">
+                <source>J
+                    <x id="day" equiv-text="day"/>
+                </source>
+                <target state="translated">D
+                    <x id="day" equiv-text="day"/>
                 </target>
             </trans-unit>
             <trans-unit id="723802104549555213" datatype="html">
@@ -2450,10 +2486,6 @@
                 <source>Dupliquer la proposition</source>
                 <target state="translated">Duplicar la propuesta</target>
             </trans-unit>
-            <trans-unit id="3190274048190984600" datatype="html">
-                <source>Expédition masquée pour J</source>
-                <target state="translated">Expedición oculta para D</target>
-            </trans-unit>
             <trans-unit id="3193976279273491157" datatype="html" approved="yes">
                 <source>Actions</source>
                 <target state="final">Acciones</target>
@@ -2605,10 +2637,6 @@
             <trans-unit id="3717603792840045364" datatype="html">
                 <source>Valeur</source>
                 <target state="translated">Valor</target>
-            </trans-unit>
-            <trans-unit id="3730321638406496617" datatype="html">
-                <source>Coût du programme</source>
-                <target state="translated">Coste del programa</target>
             </trans-unit>
             <trans-unit id="3731664538864720328" datatype="html" approved="yes">
                 <source>&lt;p&gt;Ajoute une section « Liste de courses », repliée par défaut, dans le désert et dans l&apos;atelier. Colonnes : objet, dépôt, en
@@ -3312,10 +3340,6 @@
                     los demás idiomas).&lt;/p&gt;
                 </target>
             </trans-unit>
-            <trans-unit id="425793890428638123" datatype="html">
-                <source>Suivi des consignes individuelles</source>
-                <target state="translated">Seguimiento de consignas individuales</target>
-            </trans-unit>
             <trans-unit id="1228702617719670272" datatype="html" approved="yes">
                 <source>Les relevés ci-dessous décrivent les cases voisines, telles que vues depuis cette case.</source>
                 <target state="final">Las lecturas siguientes describen las casillas vecinas, tal como se ven desde esta casilla.</target>
@@ -3722,6 +3746,10 @@
                     soltado tu escolta en ese momento.&lt;/p&gt;
                 </target>
             </trans-unit>
+            <trans-unit id="4183392532160369513" datatype="html">
+                <source>PA d&apos;expédition :</source>
+                <target state="translated">PA de expedición:</target>
+            </trans-unit>
             <trans-unit id="4195140570561189703" datatype="html">
                 <source>Débordement autorisé</source>
                 <target state="translated">Desbordamiento permitido</target>
@@ -3788,6 +3816,10 @@
                     detallados (propiedades, acciones, recetas, traducciones…).&lt;/p&gt; &lt;p&gt;Si estás jugando en un pueblo, los objetos que no están en la
                     lista de la compra van seguidos de un botón de carrito: un clic los añade a ella.&lt;/p&gt;
                 </target>
+            </trans-unit>
+            <trans-unit id="9128561600499527021" datatype="html">
+                <source>Agrandissements</source>
+                <target state="translated">Ampliaciones</target>
             </trans-unit>
             <trans-unit id="2046490270137592735" datatype="html" approved="yes">
                 <source>Afficher les zones en distance</source>
@@ -4127,13 +4159,13 @@
                 <source>Prendre la main</source>
                 <target state="translated">Tomar el control</target>
             </trans-unit>
-            <trans-unit id="7451632765834808757" datatype="html">
-                <source>Ajouter une consigne</source>
-                <target state="translated">Añadir una consigna</target>
-            </trans-unit>
             <trans-unit id="7452622585349092259" datatype="html" approved="yes">
                 <source>Affinage annulé</source>
                 <target state="final">Refinamiento cancelado</target>
+            </trans-unit>
+            <trans-unit id="7452990804948677064" datatype="html">
+                <source>Chantiers du programme</source>
+                <target state="translated">Obras del programa</target>
             </trans-unit>
             <trans-unit id="7456095365727332997" datatype="html">
                 <source>Ce chantier n&apos;est pas encore débloqué dans la ville</source>
@@ -4916,10 +4948,6 @@
                 <source>Taux</source>
                 <target state="final">Tasa</target>
             </trans-unit>
-            <trans-unit id="3882645312268423948" datatype="html">
-                <source>Budget par poche</source>
-                <target state="translated">Budget por bolsa</target>
-            </trans-unit>
             <trans-unit id="3882680170400751903" datatype="html">
                 <source>Fonds de cases</source>
                 <target state="translated">Fondos de casillas</target>
@@ -5259,6 +5287,14 @@
             <trans-unit id="2914344385245174522" datatype="html" approved="yes">
                 <source>Tas à déblayer</source>
                 <target state="final">Montones por despejar</target>
+            </trans-unit>
+            <trans-unit id="2916672351207210591" datatype="html">
+                <source>Consigne :
+                    <x id="house" equiv-text="house"/>
+                </source>
+                <target state="translated">Instrucción:
+                    <x id="house" equiv-text="house"/>
+                </target>
             </trans-unit>
             <trans-unit id="2917882835220695420" datatype="html" approved="yes">
                 <source>Explorer la ruine</source>
@@ -5607,6 +5643,10 @@
                 <source>Plus probable</source>
                 <target state="final">Más probable</target>
             </trans-unit>
+            <trans-unit id="537145196809960370" datatype="html">
+                <source>Améliorations de maison</source>
+                <target state="translated">Mejoras de la casa</target>
+            </trans-unit>
             <trans-unit id="5376701657224379451" datatype="html" approved="yes">
                 <source>Observer une ville</source>
                 <target state="final">Observar un pueblo</target>
@@ -5668,10 +5708,6 @@
             <trans-unit id="2556596709534546149" datatype="html" approved="yes">
                 <source>Chances de survie individuelles</source>
                 <target state="final">Probabilidades de supervivencia individuales</target>
-            </trans-unit>
-            <trans-unit id="2560606435455590829" datatype="html">
-                <source>Citoyens et budget</source>
-                <target state="translated">Ciudadanos y presupuesto</target>
             </trans-unit>
             <trans-unit id="3246925786078706808" datatype="html" approved="yes">
                 <source>&lt;p&gt;Un clic sur une case ouvre son détail ; « Consulter et mettre à jour la zone » ouvre la fenêtre complète de la zone, pour lire
@@ -6235,10 +6271,6 @@
                 <source>Importe tous les référentiels depuis l&apos;API MyHordes en une seule opération.</source>
                 <target state="final">Importa todos los datos de referencia desde la API de MyHordes en una sola operación.</target>
             </trans-unit>
-            <trans-unit id="7260521277718114906" datatype="html">
-                <source>Lignes ville</source>
-                <target state="translated">Líneas del pueblo</target>
-            </trans-unit>
             <trans-unit id="7266440197449540652" datatype="html" approved="yes">
                 <source>Citoyens vivants</source>
                 <target state="final">Habitantes vivos</target>
@@ -6361,6 +6393,10 @@
             <trans-unit id="2603426898451246707" datatype="html">
                 <source>Libre</source>
                 <target state="translated">Libre</target>
+            </trans-unit>
+            <trans-unit id="2605138465430014558" datatype="html">
+                <source>Se soigner</source>
+                <target state="translated">Curar</target>
             </trans-unit>
             <trans-unit id="261355464839247686" datatype="html" approved="yes">
                 <source>Case</source>
@@ -6491,10 +6527,6 @@
                 <source>Statistiques des joueurs</source>
                 <target state="final">Estadísticas de los jugadores</target>
             </trans-unit>
-            <trans-unit id="3201791936776379019" datatype="html">
-                <source>Chantiers masqués pour J</source>
-                <target state="translated">Obras ocultas para D</target>
-            </trans-unit>
             <trans-unit id="3204845904551943382" datatype="html">
                 <source>+1 amélioration</source>
                 <target state="translated">+1 mejora</target>
@@ -6566,10 +6598,6 @@
             <trans-unit id="2293338065538649958" datatype="html" approved="yes">
                 <source>Tris et filtres</source>
                 <target state="final">Ordenación y filtros</target>
-            </trans-unit>
-            <trans-unit id="2295536928947234996" datatype="html">
-                <source>J</source>
-                <target state="translated">D</target>
             </trans-unit>
             <trans-unit id="8624567640321872397" datatype="html" approved="yes">
                 <source>Déplacer ou modifier la consigne</source>
@@ -6807,6 +6835,10 @@
                 <source>Attendre</source>
                 <target state="final">Esperar</target>
             </trans-unit>
+            <trans-unit id="7418348679868715857" datatype="html">
+                <source>Consignes libres</source>
+                <target state="translated">Instrucciones libres</target>
+            </trans-unit>
             <trans-unit id="7418834632319176717" datatype="html">
                 <source>Chantiers interdits aux bannis.</source>
                 <target state="translated">Las construcciones están prohibidas a los desterrados.</target>
@@ -6874,6 +6906,10 @@
             <trans-unit id="3549884673093564156" datatype="html" approved="yes">
                 <source>Pas soif</source>
                 <target state="final">Sin sed</target>
+            </trans-unit>
+            <trans-unit id="3553363394360571893" datatype="html">
+                <source>Dépassements individuels</source>
+                <target state="translated">Excesos individuales</target>
             </trans-unit>
             <trans-unit id="3556482685302387015" datatype="html" approved="yes">
                 <source>Première utilisation</source>
@@ -7617,6 +7653,10 @@
                 <source>Ajoutez une étape à la séquence pour voir la trace.</source>
                 <target state="final">Añade un paso a la secuencia para ver el rastro.</target>
             </trans-unit>
+            <trans-unit id="5435975275965738468" datatype="html">
+                <source>Fouiller les déchets</source>
+                <target state="translated">Buscar en los deshechos</target>
+            </trans-unit>
             <trans-unit id="5436958487194643784" datatype="html">
                 <source>PE exigés : au plus</source>
                 <target state="translated">PE exigidos: como máximo</target>
@@ -7690,6 +7730,10 @@
             <trans-unit id="6490338623834272063" datatype="html" approved="yes">
                 <source>Mes consignes</source>
                 <target state="final">Mis instrucciones</target>
+            </trans-unit>
+            <trans-unit id="6491358721781931527" datatype="html">
+                <source>PC du technicien</source>
+                <target state="translated">PC del técnico</target>
             </trans-unit>
             <trans-unit id="649484315491112984" datatype="html" approved="yes">
                 <source>&lt;p&gt;La liste est commune à toute la ville. Pour chaque objet : dépôt, zone (distance en PA), quantités en banque, dans les sacs,
@@ -8699,6 +8743,10 @@
             <trans-unit id="7415034134196628778" datatype="html" approved="yes">
                 <source>de défense</source>
                 <target state="final">de defensa</target>
+            </trans-unit>
+            <trans-unit id="4146951745721996995" datatype="html">
+                <source>Rab d&apos;expé</source>
+                <target state="translated">PA extra de expedición</target>
             </trans-unit>
             <trans-unit id="4152673850690704403" datatype="html" approved="yes">
                 <source>Cette autorisation remplace la saisie manuelle de l&apos;identifiant externe pour les applications, qui se trouvait dans la page de

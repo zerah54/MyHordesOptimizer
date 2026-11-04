@@ -1,5 +1,6 @@
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { HomeReferentialDTO, HomeUpgradeDTO, HomeUpgradeLevelDTO } from './home-referential.types';
+import { PlanTaskDTO } from './plan.types';
 
 /** Clé `HomeEnum` de chaque amélioration du référentiel du jeu (nom de l'amélioration). */
 export const UPGRADE_KEY_BY_NAME: Readonly<Record<string, string>> = {
@@ -81,4 +82,36 @@ export function homeUpgradeRefs(referential: HomeReferentialDTO): HomeUpgradeRef
             };
         })
         .filter((upgrade: HomeUpgradeRef | null): upgrade is HomeUpgradeRef => upgrade !== null);
+}
+
+/**
+ * Rang de la consigne d'un élément de maison : agrandissement (clé nulle) ou amélioration de cette clé.
+ * @param {readonly PlanTaskDTO[]} tasks Consignes du citoyen.
+ * @param {string | null} key Clé `HomeEnum` de l'amélioration, nulle pour l'habitation.
+ * @returns {number} Rang, -1 sans consigne.
+ */
+export function homeTaskIndex(tasks: readonly PlanTaskDTO[], key: string | null): number {
+    return tasks.findIndex((task: PlanTaskDTO): boolean => (key === null ? task.kind === 'home' : task.kind === 'homeUpgrade' && task.ref === key));
+}
+
+/**
+ * Niveau que vise le « + » d'un élément de maison : le suivant de la consigne existante, sinon celui du citoyen. Un seul
+ * agrandissement par jour hors chaos et Pandémonium.
+ * @param {readonly PlanTaskDTO[]} tasks Consignes du citoyen.
+ * @param {string | null} key Clé `HomeEnum` de l'amélioration, nulle pour l'habitation.
+ * @param {number | null} current Niveau actuel, nul s'il est inconnu.
+ * @param {number} max Niveau maximal.
+ * @param {boolean} unlimited Agrandissements sans limite d'un par jour.
+ * @returns {number | null} Niveau visé, nul s'il n'y a rien à ajouter.
+ */
+export function nextHomeTarget(tasks: readonly PlanTaskDTO[], key: string | null, current: number | null, max: number, unlimited: boolean): number | null {
+    if (current === null) {
+        return null;
+    }
+    const existing: PlanTaskDTO | undefined = tasks[homeTaskIndex(tasks, key)];
+    if (existing !== undefined && key === null && !unlimited) {
+        return null;
+    }
+    const target: number = Math.max(current, existing?.level ?? current) + 1;
+    return target <= max ? target : null;
 }

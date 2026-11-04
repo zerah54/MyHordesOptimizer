@@ -100,13 +100,22 @@ describe('PlanningCardsComponent', (): void => {
         expect(card('tracking').querySelector('.caption')?.textContent).toContain('prévues');
     });
 
-    it('Citoyens et budget : nombre de citoyens', async (): Promise<void> => {
+    it('Budget : nombre de citoyens', async (): Promise<void> => {
         await render();
 
         expect(card('budget').querySelector('.value')?.textContent?.trim()).toBe('3');
     });
 
-    describe('budget dans la carte Citoyens et budget', (): void => {
+    it('cartes Consignes et Budget, dans l\'ordre Programme, Consignes, Budget, Ressources, Défense hors chantiers', async (): Promise<void> => {
+        await render();
+
+        expect(card('tracking').querySelector('.title')?.textContent?.trim()).toBe('Consignes');
+        expect(card('budget').querySelector('.title')?.textContent?.trim()).toBe('Budget');
+        expect(Array.from((fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('button.card')).map((button: HTMLElement): string => button.dataset['card'] ?? ''))
+            .toEqual(['program', 'tracking', 'budget', 'resources', 'defense']);
+    });
+
+    describe('budget dans la carte Budget', (): void => {
         function pool(name: string): HTMLElement | null {
             return card('budget').querySelector<HTMLElement>(`.budgets .budget[data-pool="${name}"]`);
         }

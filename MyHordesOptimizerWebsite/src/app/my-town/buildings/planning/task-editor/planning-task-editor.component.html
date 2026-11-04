@@ -1,0 +1,77 @@
+@if (task(); as task) {
+    <div class="task-editor" (click)="onClick($event)" (keydown)="onKeydown($event)">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-select [value]="task.kind" [disabled]="!store.can_edit()" (selectionChange)="setTaskKind($event.value)">
+                <mat-option value="home" i18n>Maison</mat-option>
+                <mat-option value="homeUpgrade" i18n>Amélioration de maison</mat-option>
+                <mat-option value="action" [disabled]="actionOptions(task).length === 0">
+                    <ng-container i18n>Action de chantier</ng-container>
+                </mat-option>
+                <mat-option value="free" i18n>Libre</mat-option>
+            </mat-select>
+        </mat-form-field>
+        @if (task.kind === 'home') {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-select [value]="task.level" [disabled]="!store.can_edit()" (selectionChange)="setTaskLevel($event.value)">
+                    @for (home of homeLevels(task); track home.level) {
+                        <mat-option [value]="home.level">{{ home.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        } @else if (task.kind === 'action') {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-select data-field="task-action" [value]="task.ref" [disabled]="!store.can_edit()" (selectionChange)="setTaskAction($event.value)">
+                    @for (action of actionOptions(task); track action.key) {
+                        <mat-option [value]="action.key">{{ action.getLabel() }}</mat-option>
+                    } @empty {
+                        <mat-option disabled i18n>Aucun chantier qui donne une action n'est construit</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            @let max_uses = actionMaxUses(task);
+            @if (max_uses > 1) {
+                <mat-form-field class="uses" appearance="outline" subscriptSizing="dynamic">
+                    <mat-select data-field="task-count" [value]="task.count ?? 1" [disabled]="!store.can_edit()"
+                                i18n-aria-label aria-label="Nombre d'utilisations dans la journée" (selectionChange)="setTaskCount($event.value)">
+                        @for (uses of useOptions(max_uses); track uses) {
+                            <mat-option [value]="uses">×{{ uses }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+        } @else if (task.kind === 'homeUpgrade' && upgradeOf(task); as upgrade) {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-select data-field="task-upgrade" [value]="task.ref" [disabled]="!store.can_edit()" (selectionChange)="setTaskUpgrade($event.value)">
+                    @for (option of store.home_upgrades(); track option.key) {
+                        <mat-option [value]="option.key">{{ option.label }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            @if (upgrade.max_level > 1) {
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-select data-field="task-upgrade-level" [value]="task.level" [disabled]="!store.can_edit()"
+                                (selectionChange)="setTaskUpgradeLevel($event.value)">
+                        @for (level of upgrade.levels; track level.level) {
+                            <mat-option [value]="level.level">
+                                <ng-container i18n>niv.</ng-container>
+                                {{ level.level }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+        } @else {
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <input matInput type="text" maxlength="64" data-field="task-label" [ngModel]="task.label" [disabled]="!store.can_edit()"
+                       (ngModelChange)="onTaskLabel($event)">
+            </mat-form-field>
+        }
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <input matInput type="number" min="0" data-field="task-pa" [ngModel]="task.pa" [disabled]="!store.can_edit()" (ngModelChange)="onTaskPa($event)">
+        </mat-form-field>
+        <button mat-icon-button type="button" data-action="remove-task" [disabled]="!store.can_edit()" (click)="removeTask()"
+                i18n-matTooltip matTooltip="Supprimer la consigne">
+            <mat-icon>delete</mat-icon>
+        </button>
+    </div>
+}

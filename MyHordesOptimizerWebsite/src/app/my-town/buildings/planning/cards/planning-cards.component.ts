@@ -80,7 +80,7 @@ export class PlanningCardsComponent {
     /** Alertes portées par la carte Programme. */
     protected readonly program_alerts: Signal<number> = computed((): number => this.countAlerts('program'));
 
-    /** Alertes portées par la carte Citoyens et budget. */
+    /** Alertes portées par la carte Budget. */
     protected readonly budget_alerts: Signal<number> = computed((): number => this.countAlerts('budget'));
 
     private readonly filters: CitizenFiltersStore = inject(CitizenFiltersStore);

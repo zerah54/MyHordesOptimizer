@@ -97,6 +97,38 @@ describe('defense-gain.util', (): void => {
         expect(buildingDefenseGain(building(COFFINS_UID, 0), context())).toBe(0);
     });
 
+    describe('ancêtres à effets en cascade, supposés construits pour l\'enfant', (): void => {
+        const cemetery: BuildingRef = { ...building(CEMETERY_UID, 0), id: 1 };
+        const coffins: BuildingRef = { ...building(COFFINS_UID, 0, [{ itemId: PLATE, count: 2 }]), id: 2, parentId: 1 };
+        const fortified: BuildingRef = { ...building(FORTIFIED_HOMES_UID, 0), id: 3 };
+        const circular: BuildingRef = { ...building(CIRCULAR_QUARTERS_UID, 0), id: 4, parentId: 3 };
+        const all: ReadonlyMap<number, BuildingRef> = new Map<number, BuildingRef>([cemetery, coffins, fortified, circular].map((ref: BuildingRef): [number, BuildingRef] => [ref.id, ref]));
+
+        it('Cercueils sur ressorts avec le Cimetière non construit : +10 par mort, moins les objets consommés', (): void => {
+            const planned: PlannedDefense = plannedDefenseGains([], [cemetery, coffins], 0, context({ dead: 1 }), 0, all);
+
+            expect(planned.buildings.get(coffins.id)).toBe(8);
+            expect(planned.buildings.get(cemetery.id)).toBe(3);
+            expect(buildingDefenseGain(coffins, context({ dead: 1 }), all)).toBe(8);
+        });
+
+        it('Quartiers circulaires avec Habitations fortifiées non construites : l\'effet croisé va aux Quartiers circulaires', (): void => {
+            const planned: PlannedDefense = plannedDefenseGains([], [fortified, circular], 0, context(), 0, all);
+
+            expect(planned.buildings.get(circular.id)).toBe(72);
+            expect(planned.buildings.get(fortified.id)).toBe(32);
+            expect(buildingDefenseGain(circular, context(), all)).toBe(72);
+        });
+
+        it('un ancêtre sans effet en cascade n\'est pas supposé construit', (): void => {
+            const parent: BuildingRef = { ...building('parent', 0, [{ itemId: PLATE, count: 10 }]), id: 5 };
+            const child: BuildingRef = { ...building('child', 5, [{ itemId: PLATE, count: 2 }]), id: 6, parentId: 5 };
+            const refs: ReadonlyMap<number, BuildingRef> = new Map<number, BuildingRef>([[5, parent], [6, child]]);
+
+            expect(plannedDefenseGains([], [parent, child], 0, context(), 0, refs).buildings.get(child.id)).toBe(3);
+        });
+    });
+
     it('une montée de maison compte au pourcentage de la ville ; l\'échelle globale s\'applique à tout', (): void => {
         expect(defenseGain([], 10, context()).total).toBe(4);
         expect(buildingDefenseGain(building('wall', 30), context({ scale: 1.1 }))).toBe(33);

@@ -1,5 +1,6 @@
 import { BuildingUpgradesDTO, CEMETERY_RATIO_EFFECT, TOWN_DEFENSE_SCALE_EFFECT, upgradeEffect } from './building-upgrades.types';
 import {
+    CASCADE_EFFECT_UIDS,
     CEMETERY_UID,
     CIRCULAR_QUARTERS_UID,
     COFFINS_BONUS_PER_DEAD,
@@ -128,13 +129,37 @@ export function defenseGain(completed: readonly BuildingRef[], home_raw_gain: nu
 }
 
 /**
- * Défense réellement apportée par un chantier terminé seul, dans l'état de la ville au début de la journée.
+ * Défense réellement apportée par un chantier terminé seul, dans l'état de la ville au début de la journée, ses ancêtres à effets
+ * en cascade supposés construits.
  * @param {BuildingRef} building Chantier.
  * @param {DefenseGainContext} context État de la ville.
+ * @param {ReadonlyMap<number, BuildingRef>} buildings Chantiers par id, pour remonter les parents.
  * @returns {number} Gain réel.
  */
-export function buildingDefenseGain(building: BuildingRef, context: DefenseGainContext): number {
-    return defenseGain([building], 0, context).total;
+export function buildingDefenseGain(building: BuildingRef, context: DefenseGainContext, buildings: ReadonlyMap<number, BuildingRef> = new Map<number, BuildingRef>()): number {
+    const assumed: BuildingRef[] = cascadeAncestors(building, buildings, (uid: string): boolean => context.builtBefore.has(uid));
+    return defenseGain([...assumed, building], 0, context).total - (assumed.length === 0 ? 0 : defenseGain(assumed, 0, context).total);
+}
+
+/**
+ * Ancêtres non construits d'un chantier dont l'effet s'applique aux autres chantiers (`CASCADE_EFFECT_UIDS`).
+ * @param {BuildingRef} building Chantier.
+ * @param {ReadonlyMap<number, BuildingRef>} buildings Chantiers par id.
+ * @param {(uid: string) => boolean} built Vrai si le chantier est construit (ou terminé dans la journée).
+ * @returns {BuildingRef[]} Ancêtres à supposer construits.
+ */
+function cascadeAncestors(building: BuildingRef, buildings: ReadonlyMap<number, BuildingRef>, built: (uid: string) => boolean): BuildingRef[] {
+    const ancestors: BuildingRef[] = [];
+    const seen: Set<number> = new Set<number>([building.id]);
+    let parent: BuildingRef | undefined = building.parentId === null ? undefined : buildings.get(building.parentId);
+    while (parent !== undefined && !seen.has(parent.id)) {
+        seen.add(parent.id);
+        if (CASCADE_EFFECT_UIDS.has(parent.uid) && !built(parent.uid)) {
+            ancestors.push(parent);
+        }
+        parent = parent.parentId === null ? undefined : buildings.get(parent.parentId);
+    }
+    return ancestors;
 }
 
 /** Défense affichée par chantier et gain du vote sur les objets de défense. */
@@ -162,12 +187,14 @@ const DEFAULT_RANK: number = 4;
  * - Ajustement défensif, Fixations de défenses, leur vote et Cimetière cadenassé comptent sur l'état actuel de la ville ; les
  *   autres chantiers comptent à leur échelle, à leur multiplicateur d'objets et avec le cimetière ;
  * - Quartiers circulaires comptent en dernier, avec les maisons ajoutées dans la journée (Habitations fortifiées, montées de maison).
- * Un chantier non terminé dans la journée compte comme s'il s'ajoutait à l'état du soir.
+ * Un chantier non terminé dans la journée compte comme s'il s'ajoutait à l'état du soir, ses ancêtres à effets en cascade
+ * supposés construits.
  * @param {readonly BuildingRef[]} completed Chantiers terminés dans la journée.
  * @param {readonly BuildingRef[]} pending Chantiers à construire non terminés dans la journée.
  * @param {number} home_raw_gain Défense de maison brute gagnée par les montées de niveau du plan.
  * @param {DefenseGainContext} context État de la ville au début de la journée.
  * @param {number} voted_item_step Hausse du multiplicateur des objets de défense par le vote du soir sur les Fixations.
+ * @param {ReadonlyMap<number, BuildingRef>} buildings Chantiers par id, pour remonter les parents.
  * @returns {PlannedDefense} Défense par chantier et gain du vote.
  */
 export function plannedDefenseGains(
@@ -175,7 +202,8 @@ export function plannedDefenseGains(
     pending: readonly BuildingRef[],
     home_raw_gain: number,
     context: DefenseGainContext,
-    voted_item_step: number
+    voted_item_step: number,
+    buildings: ReadonlyMap<number, BuildingRef> = new Map<number, BuildingRef>()
 ): PlannedDefense {
     const total = (buildings: readonly BuildingRef[], voted: boolean): number => defenseGain(buildings, home_raw_gain, context, voted ? voted_item_step : 0).total;
     const rank = (building: BuildingRef): number => GAIN_RANKS.get(building.uid) ?? DEFAULT_RANK;
@@ -203,8 +231,11 @@ export function plannedDefenseGains(
         }
         current = next;
     }
+    const built = (uid: string): boolean => context.builtBefore.has(uid) || done.some((step: BuildingRef): boolean => step.uid === uid);
     for (const building of pending) {
-        gains.set(building.id, total([...done, building], voted) - current);
+        const assumed: BuildingRef[] = cascadeAncestors(building, buildings, built);
+        const base: number = assumed.length === 0 ? current : total([...done, ...assumed], voted);
+        gains.set(building.id, total([...done, ...assumed, building], voted) - base);
     }
     return { buildings: gains, vote };
 }

@@ -75,4 +75,11 @@
     .unknown {
         opacity: 0.6;
     }
+
+    // Même seuil que les colonnes d'améliorations de la carte Consignes.
+    .upgrades.in-columns {
+        @media (min-width: 60rem) {
+            display: none;
+        }
+    }
 }

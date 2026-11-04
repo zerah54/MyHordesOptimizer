@@ -126,16 +126,26 @@ describe('budget.util', (): void => {
     describe('expeditionPaByCitizen', (): void => {
         it('compte la longueur du tracé (boucle comprise) pour chaque citoyen de la partie', (): void => {
             const result: { pa: Map<number, number>; partsWithoutRoute: number } = expeditionPaByCitizen([
-                { routeLength: 6, citizenIds: [1, 2] },
-                { routeLength: 4, citizenIds: [2] }
+                { routeLength: 6, seats: [{ citizenId: 1, startPe: 0 }, { citizenId: 2, startPe: 0 }] },
+                { routeLength: 4, seats: [{ citizenId: 2, startPe: 0 }] }
             ]);
             expect(result.pa.get(1)).toBe(6);
             expect(result.pa.get(2)).toBe(10);
             expect(result.partsWithoutRoute).toBe(0);
         });
 
+        it('PA d\'expédition : longueur du tracé moins les PE de départ, jamais négatif', (): void => {
+            const { pa }: { pa: Map<number, number> } = expeditionPaByCitizen([
+                { routeLength: 10, seats: [{ citizenId: 1, startPe: 4 }, { citizenId: 2, startPe: 0 }, { citizenId: 3, startPe: 12 }] },
+                { routeLength: 5, seats: [{ citizenId: 1, startPe: 0 }] }
+            ]);
+            expect(pa.get(1)).toBe(11);
+            expect(pa.get(2)).toBe(10);
+            expect(pa.get(3)).toBe(0);
+        });
+
         it('une partie sans tracé compte 0 et est signalée', (): void => {
-            const result: { pa: Map<number, number>; partsWithoutRoute: number } = expeditionPaByCitizen([{ routeLength: null, citizenIds: [1] }]);
+            const result: { pa: Map<number, number>; partsWithoutRoute: number } = expeditionPaByCitizen([{ routeLength: null, seats: [{ citizenId: 1, startPe: 0 }] }]);
             expect(result.pa.get(1)).toBeUndefined();
             expect(result.partsWithoutRoute).toBe(1);
         });

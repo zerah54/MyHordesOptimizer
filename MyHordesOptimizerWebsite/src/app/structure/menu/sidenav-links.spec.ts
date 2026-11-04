@@ -11,11 +11,10 @@ describe('buildSidenavLinks', (): void => {
         return links.find((link: SidenavLinks): boolean => link.isTownRoot === true)?.children ?? [];
     }
 
-    it('propose « Mon programme » juste après « Chantiers »', (): void => {
+    it('propose « Mon programme » en dernier dans le menu de la ville', (): void => {
         const suffixes: (string | undefined)[] = townChildren().map((link: SidenavLinks): string | undefined => link.townSuffix);
 
-        expect(suffixes).toContain('program');
-        expect(suffixes.indexOf('program')).toBe(suffixes.indexOf('buildings') + 1);
+        expect(suffixes.at(-1)).toBe('program');
     });
 
     it('cache « Mon programme » quand le service le dit', (): void => {

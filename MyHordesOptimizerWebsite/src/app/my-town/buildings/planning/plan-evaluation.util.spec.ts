@@ -1,10 +1,9 @@
 import { CitizenCapacity } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
-import { RankedCandidate } from './defense.util';
 import { neutralDefenseFactors } from './defense-gain.util';
-import { DEFENSE_FIXINGS_UID } from './defense-rules.const';
+import { CEMETERY_UID, COFFINS_UID, DEFENSE_FIXINGS_UID } from './defense-rules.const';
+import { RankedCandidate } from './defense.util';
 import { REACTOR_UID } from './night-survival.util';
-import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
 import {
     advanceDay,
     BuildingRef,
@@ -19,6 +18,7 @@ import {
     URBANISM_UID,
     WORKSHOP_UID
 } from './plan-evaluation.util';
+import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
 import { ResourceCount } from './resources.util';
 
 function ref(overrides: Partial<BuildingRef>): BuildingRef {
@@ -423,6 +423,22 @@ describe('plan-evaluation.util', (): void => {
             expect(evaluation.secondVote).toBeNull();
             expect(evaluation.projectedDefense).toBe(1030);
         });
+    });
+
+    it('chantier enfant d\'un chantier à effets en cascade non construit : déf affichée et classement le supposent construit', (): void => {
+        const plate: number = 50;
+        const cemetery: BuildingRef = ref({ id: 8, uid: CEMETERY_UID, label: 'Cimetière', pa: 10 });
+        const coffins: BuildingRef = ref({ id: 9, uid: COFFINS_UID, label: 'Cercueils', pa: 10, parentId: 8, resources: [{ itemId: plate, count: 2 }] });
+        const evaluation: DayEvaluation = evaluateDay(input({}, {
+            buildings: new Map<number, BuildingRef>([[1, WALL], [2, WORKSHOP], [3, GATE], [8, cemetery], [9, coffins]]),
+            progress: new Map<number, BuildingProgress>([...baseProgress(), [8, progress({ buildingId: 8 })], [9, progress({ buildingId: 9 })]]),
+            bank: new Map<number, number>([[5, 1], [plate, 2]]),
+            defenseFactors: { ...neutralDefenseFactors(), defenseItems: 2, dead: 1 },
+            defenseItemIds: new Set<number>([plate])
+        }));
+
+        expect(evaluation.realDefense.get(9)).toBe(8);
+        expect(evaluation.ranking.find((candidate: RankedCandidate): boolean => candidate.label === 'Cercueils')?.def).toBe(8);
     });
 
     describe('vote sur les Fixations de défenses', (): void => {

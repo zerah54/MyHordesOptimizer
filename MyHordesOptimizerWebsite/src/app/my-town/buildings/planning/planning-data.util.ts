@@ -9,7 +9,7 @@ import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.c
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { buildingCost } from '../../../_core/utilities/building-cost.util';
-import { ExpeditionPartPa } from './budget.util';
+import { ExpeditionPartPa, ExpeditionSeatPa } from './budget.util';
 import { BuildingProgress, initialProgress } from './building-progress.util';
 import { homeDefenseFactor, TownDefenseFactors } from './defense-gain.util';
 import { CIRCULAR_QUARTERS_UID } from './defense-rules.const';
@@ -238,16 +238,16 @@ function upgradeLevelsOf(citizen: Citizen): Map<string, number> | null {
 }
 
 /**
- * Parties d'expédition avec la longueur de leur tracé et les citoyens inscrits.
+ * Parties d'expédition avec la longueur de leur tracé et la place de chaque citoyen inscrit (PE de départ, 0 sans PE exigés).
  * @param {Expedition[]} expeditions Expéditions du jour.
  * @returns {ExpeditionPartPa[]} Parties à compter dans le budget.
  */
 export function expeditionParts(expeditions: Expedition[]): ExpeditionPartPa[] {
     return expeditions.flatMap((expedition: Expedition): ExpeditionPartPa[] => expedition.parts.map((part: ExpeditionPart): ExpeditionPartPa => ({
         routeLength: part.map_route?.length ?? null,
-        citizenIds: part.citizens
-            .map((citizen: CitizenExpedition): number | undefined => citizen.citizen_id)
-            .filter((id: number | undefined): id is number => id !== undefined)
+        seats: part.citizens
+            .filter((citizen: CitizenExpedition): boolean => citizen.citizen_id !== undefined)
+            .map((citizen: CitizenExpedition): ExpeditionSeatPa => ({ citizenId: citizen.citizen_id as number, startPe: citizen.required_sp ?? 0 }))
     })));
 }
 
