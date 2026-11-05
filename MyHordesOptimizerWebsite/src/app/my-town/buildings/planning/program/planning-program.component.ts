@@ -167,7 +167,7 @@ export class PlanningProgramComponent {
         const built: boolean | undefined = this.store.evaluation()?.progressBefore.get(step.buildingId)?.built;
         const options: ModeOption[] = [];
         if (built !== true || current.startsWith('build:')) {
-            options.push({ value: 'build:finish', label: $localize`Terminer` }, { value: 'build:leave', label: $localize`Laisser à N <mho-icon-ap/>` });
+            options.push({ value: 'build:finish', label: $localize`Terminer` }, { value: 'build:leave', label: $localize`Laisser à N PA` });
         }
         if (built !== false || current.startsWith('repair:')) {
             options.push({ value: 'repair:finish', label: $localize`Réparer entièrement` });

@@ -9,11 +9,11 @@ import { ExpeditionOrderDTO } from '../../../_abstract_model/dto/expedition-orde
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { Cell } from '../../../_abstract_model/types/cell.class';
-import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
+import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
-import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
@@ -148,12 +148,13 @@ describe('ExpeditionRoadbookComponent', (): void => {
         render(part());
 
         expect(steps()).toEqual([
-            'D [0 ; 0] Ville 0PA',
-            '1 [1 ; 0] Bâtiment enseveli 1PA',
-            '2 [2 ; 0] Hôpital 2PA',
-            'A [2 ; 1] Désert 3PA',
+            'D [0 ; 0] Ville 0',
+            '1 [1 ; 0] Bâtiment enseveli 1',
+            '2 [2 ; 0] Hôpital 2',
+            'A [2 ; 1] Désert 3',
             '! [5 ; -5] Hors tracé'
         ]);
+        expect(fixture.nativeElement.querySelector('li.step .ap mho-icon-ap img')).not.toBeNull();
         // Bob visite une ruine : 1 PA de plus que le tracé.
         expect(text(fixture.nativeElement.querySelector('.summary'))).toBe('4 PA (3 + 1) · 3 consigne(s) sur 3 case(s)');
         expect(text(fixture.nativeElement.querySelector('.off-route-alert'))).toContain('1 consigne n\'est plus sur le tracé.');
@@ -183,7 +184,7 @@ describe('ExpeditionRoadbookComponent', (): void => {
         render(part(), { onlyUser: ALICE.id });
 
         // Départ et arrivée du tracé restent ; la case hors tracé de Bob disparaît.
-        expect(steps()).toEqual(['D [0 ; 0] Ville 0PA', '1 [1 ; 0] Bâtiment enseveli 1PA', '2 [2 ; 0] Hôpital 2PA', 'A [2 ; 1] Désert 3PA']);
+        expect(steps()).toEqual(['D [0 ; 0] Ville 0', '1 [1 ; 0] Bâtiment enseveli 1', '2 [2 ; 0] Hôpital 2', 'A [2 ; 1] Désert 3']);
         expect(Array.from<Element>(fixture.nativeElement.querySelectorAll('.scope')).map(text)).toEqual(['Moi', 'N\'importe qui']);
     });
 
@@ -208,7 +209,7 @@ describe('ExpeditionRoadbookComponent', (): void => {
     it('without route, ranks the cells by distance to the town', (): void => {
         render(part(null));
 
-        expect(steps()).toEqual(['1 [1 ; 0] Bâtiment enseveli 1PA', '2 [2 ; 0] Hôpital 2PA', '3 [5 ; -5] 10PA']);
+        expect(steps()).toEqual(['1 [1 ; 0] Bâtiment enseveli 1', '2 [2 ; 0] Hôpital 2', '3 [5 ; -5] 10']);
         expect(text(fixture.nativeElement.querySelector('.summary'))).toBe('3 consigne(s) sur 3 case(s)');
         expect(fixture.nativeElement.querySelector('.off-route-alert')).toBeNull();
     });

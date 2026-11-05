@@ -73,7 +73,7 @@ export function describeOrder(order: ExpeditionOrder, items: readonly Item[], ci
             break;
         }
         case 'explore':
-            rest = '(1 <mho-icon-ap/>)';
+            rest = $localize`(1 PA)`;
             break;
         case 'excavate':
             img = HORDES_IMG_REPO + JobEnum.SCAVENGER.value.img;

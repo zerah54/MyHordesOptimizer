@@ -20,7 +20,25 @@
             <tbody>
                 @for (row of rows(); track row.category) {
                     <tr [attr.data-category]="row.category">
-                        <th scope="row">{{ categoryLabel(row.category) }}</th>
+                        <th scope="row">
+                            @switch (row.category) {
+                                @case ('basePa') {
+                                    <ng-container i18n>
+                                        <mho-icon-ap/>
+                                        de base
+                                    </ng-container>
+                                }
+                                @case ('technicianCp') {
+                                    <ng-container i18n>
+                                        <mho-icon-cp/>
+                                        du technicien
+                                    </ng-container>
+                                }
+                                @default {
+                                    {{ categoryLabel(row.category) }}
+                                }
+                            }
+                        </th>
                         @for (pool of store.visible_pools(); track pool) {
                             <td [attr.data-pool]="pool">{{ row.pa[pool] }}</td>
                         }

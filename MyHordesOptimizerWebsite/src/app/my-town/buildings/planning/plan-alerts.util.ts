@@ -22,7 +22,7 @@ export function stepIssueLabel(issue: StepIssue): string {
         case 'no-progress':
             return $localize`La cible est déjà atteinte : rien à investir`;
         case 'slavery-rounding':
-            return $localize`Investir par paires de <mho-icon-ap/> : le rendement est réduit`;
+            return $localize`Investir par paires de PA : le rendement est réduit`;
         case 'already-built':
             return $localize`Chantier déjà construit`;
         case 'not-built':
@@ -73,7 +73,7 @@ export function planAlerts(evaluation: DayEvaluation, buildings: ReadonlyMap<num
     });
     evaluation.capacities.filter((capacity: CitizenCapacity): boolean => capacity.overCommitted).forEach((capacity: CitizenCapacity): void => {
         const name: string = citizens.find((citizen: CitizenRef): boolean => citizen.userId === capacity.userId)?.name ?? `#${capacity.userId}`;
-        alerts.push({ text: `${name} : ${$localize`Consignes individuelles et expédition dépassent les <mho-icon-ap/> de base`}`, pool: null, index: null });
+        alerts.push({ text: `${name} : ${$localize`Consignes individuelles et expédition dépassent les PA de base`}`, pool: null, index: null });
     });
     const budgets: PoolBudget[] = [evaluation.budgets.regular, evaluation.budgets.banned];
     budgets.filter((budget: PoolBudget): boolean => budget.remaining < 0).forEach((budget: PoolBudget): void => {

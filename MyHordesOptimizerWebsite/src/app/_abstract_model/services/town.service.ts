@@ -193,7 +193,7 @@ export class TownService extends GlobalService {
                 // au lieu d'annuler la requête en cours — sinon elle ne finit jamais et boucle en échec.
                 // Une interrogation en échec (coupure réseau, redémarrage de l'API) est ignorée :
                 // le traitement continue côté serveur, la suivante reprendra le suivi.
-                exhaustMap(() => this.getExternalToolsUpdateStatus().pipe(catchError(() => EMPTY))),
+                exhaustMap(() => this.getExternalToolsUpdateStatus(job_id).pipe(catchError(() => EMPTY))),
                 // Un état sans lancement connu, ou portant un autre identifiant, n'est pas le nôtre :
                 // le prendre pour argent comptant se lirait comme une fin de traitement réussie.
                 filter((state: ExternalToolsUpdateJobStateDTO) => state.jobId === job_id),
@@ -202,9 +202,14 @@ export class TownService extends GlobalService {
             );
     }
 
-    private getExternalToolsUpdateStatus(): Observable<ExternalToolsUpdateJobStateDTO> {
+    /**
+     * État d'un lancement précis : sans son jobId, le serveur renvoie un état vide.
+     * @param {string} job_id Identifiant du lancement suivi.
+     * @returns {Observable<ExternalToolsUpdateJobStateDTO>} État du lancement.
+     */
+    private getExternalToolsUpdateStatus(job_id: string): Observable<ExternalToolsUpdateJobStateDTO> {
         return super.get<ExternalToolsUpdateJobStateDTO>(
-            this.API_URL + `/ExternalTools/Update/Status?userKey=${getExternalAppId()}&userId=${getUserId()}`,
+            this.API_URL + `/ExternalTools/Update/Status?userKey=${getExternalAppId()}&userId=${getUserId()}&jobId=${job_id}`,
             true,
             undefined,
             true)

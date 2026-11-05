@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DailyActionEnum } from '../../../../_abstract_model/enum/daily-action.enum';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
+import { IconCpComponent } from '../../../../_shared/icon-cp/icon-cp.component';
 import { budgetBreakdown, BudgetCategory, BudgetRow } from '../budget-breakdown.util';
 import { BuildingPlanContentDTO, PlanPool, PlanTownLineDTO } from '../plan.types';
 import { DayEvaluation } from '../plan-evaluation.util';
@@ -25,7 +26,7 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
     templateUrl: './planning-budget.component.html',
     styleUrls: ['./planning-budget.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...material_modules, IconApComponent]
+    imports: [...angular_common, ...material_modules, IconApComponent, IconCpComponent]
 })
 export class PlanningBudgetComponent {
 
@@ -39,7 +40,7 @@ export class PlanningBudgetComponent {
     });
 
     /**
-     * Libellé d'une ligne de la ventilation.
+     * Libellé texte d'une ligne de la ventilation ; le gabarit affiche « PA de base » et « PC du technicien » avec leur icône.
      * @param {BudgetCategory} category Catégorie.
      * @returns {string} Libellé.
      */
@@ -50,11 +51,11 @@ export class PlanningBudgetComponent {
         }
         switch (category) {
             case 'basePa':
-                return $localize`<mho-icon-ap/> de base`;
+                return $localize`PA de base`;
             case 'expeditions':
                 return $localize`Expéditions`;
             case 'technicianCp':
-                return $localize`<mho-icon-ep/> du technicien`;
+                return $localize`PC du technicien`;
             case 'program':
                 return $localize`Chantiers du programme`;
             case 'home':

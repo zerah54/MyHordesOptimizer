@@ -2,7 +2,7 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BuildingProgress } from '../building-progress.util';
+import { BuildingProgress, StepResult } from '../building-progress.util';
 import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO } from '../plan.types';
 import { BuildingRef, DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
@@ -157,6 +157,27 @@ describe('PlanningProgramComponent', (): void => {
 
         expect(items('banned')[0].querySelector('[data-issue="banned-cannot-build"]')).not.toBeNull();
         expect(items('regular')[0].querySelector('[data-issue]')).toBeNull();
+    });
+
+    it('l\'arrondi des bannis est libellé avec l\'icône PA', async (): Promise<void> => {
+        await render();
+        const evaluation: DayEvaluation = fake.evaluation() as DayEvaluation;
+        fake.evaluation.set({
+            ...evaluation,
+            results: evaluation.results.map((result: StepResult): StepResult => result.pool === 'banned' && result.index === 0 ? { ...result, issues: ['slavery-rounding'] } : result)
+        });
+        fixture.detectChanges();
+
+        expect(items('banned')[0].querySelector('[data-issue="slavery-rounding"] mho-icon-ap img')).not.toBeNull();
+    });
+
+    it('« Laisser à N » est libellé avec l\'icône PA', async (): Promise<void> => {
+        await render();
+
+        items('regular')[0].querySelector<HTMLElement>('mat-select[data-field="mode"] .mat-mdc-select-trigger')?.click();
+        fixture.detectChanges();
+        expect(document.querySelector('mat-option[data-mode="build:leave"] mho-icon-ap img')).not.toBeNull();
+        document.querySelector<HTMLElement>('mat-option[data-mode="build:finish"]')?.click();
     });
 
     it('marque « non débloqué » un chantier absent de l\'état synchronisé', async (): Promise<void> => {

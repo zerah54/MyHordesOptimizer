@@ -36,7 +36,11 @@ describe('plan-alerts.util', (): void => {
             citizens: [{ userId: 1, tasks: [{ kind: 'free', label: 'x', pa: 30 }] }]
         }));
         const alerts: PlanAlert[] = planAlerts(evaluation, FAKE_BUILDINGS, FAKE_CITIZENS);
-        expect(alerts.some((alert: PlanAlert): boolean => alert.text.startsWith('Alice') && alert.pool === null)).toBe(true);
+        expect(alerts.some((alert: PlanAlert): boolean => alert.text === 'Alice : Consignes individuelles et expédition dépassent les PA de base' && alert.pool === null)).toBe(true);
+    });
+
+    it('les libellés sont du texte brut, sans balise de composant (affichés en interpolation)', (): void => {
+        expect(stepIssueLabel('slavery-rounding')).toBe('Investir par paires de PA : le rendement est réduit');
     });
 
     it('signale une poche dont le budget est dépassé', (): void => {

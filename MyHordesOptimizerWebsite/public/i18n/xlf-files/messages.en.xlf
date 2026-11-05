@@ -55,6 +55,18 @@
                     expired during an interruption is sent on return, with a mention of the delay. 20 running counters at most per person.&lt;/p&gt;
                 </target>
             </trans-unit>
+            <trans-unit id="4340310966735402469" datatype="html">
+                <source>Investir par paires de
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    : le rendement est réduit
+                </source>
+                <target state="translated">Invest
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    in pairs: the yield is reduced
+                </target>
+            </trans-unit>
             <trans-unit id="4340458415665660595" datatype="html">
                 <source>Organiser les défenses</source>
                 <target state="translated">Organize defence</target>
@@ -224,6 +236,16 @@
                     ruin (explorable ruin), Camp, Heroic action or Wait, for the whole expedition or for a slot;&lt;/li&gt; &lt;li&gt;an instruction whose zone
                     is no longer on the route is marked &quot;Off route&quot;: move it to a zone on the route, or delete it;&lt;/li&gt; &lt;li&gt;&quot;Import
                     the day&quot; also copies the linked routes: the imported expeditions follow their own copies.&lt;/li&gt; &lt;/ul&gt;
+                </target>
+            </trans-unit>
+            <trans-unit id="650998181942021000" datatype="html">
+                <source>Laisser à N
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                </source>
+                <target state="translated">Leave at N
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
                 </target>
             </trans-unit>
             <trans-unit id="3114678244561206125" datatype="html" approved="yes">
@@ -795,10 +817,6 @@
                 <source>Liste d&apos;objets</source>
                 <target state="translated">List of items</target>
             </trans-unit>
-            <trans-unit id="6513360416306826135" datatype="html">
-                <source>&lt;mho-icon-ep/&gt; du technicien</source>
-                <target state="translated">Technician's &lt;mho-icon-ep/&gt;</target>
-            </trans-unit>
             <trans-unit id="6518032478600962138" datatype="html" approved="yes">
                 <source>Titre</source>
                 <target state="final">Title</target>
@@ -1032,6 +1050,17 @@
             <trans-unit id="671486430006220164" datatype="html" approved="yes">
                 <source>Cliquer pour renommer</source>
                 <target state="final">Click to rename</target>
+            </trans-unit>
+            <trans-unit id="6716206656740285492" datatype="html">
+                <source>
+                    <x id="START_TAG_MHO_ICON_CP" ctype="x-mho_icon_cp" equiv-text="&lt;mho-icon-cp/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_CP" ctype="x-mho_icon_cp" equiv-text="&lt;mho-icon-cp/&gt;"/>
+                    du technicien
+                </source>
+                <target state="translated">Technician&apos;s
+                    <x id="START_TAG_MHO_ICON_CP" ctype="x-mho_icon_cp" equiv-text="&lt;mho-icon-cp/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_CP" ctype="x-mho_icon_cp" equiv-text="&lt;mho-icon-cp/&gt;"/>
+                </target>
             </trans-unit>
             <trans-unit id="6719664690711186501" datatype="html" approved="yes">
                 <source>Tracés</source>
@@ -1355,6 +1384,10 @@
             <trans-unit id="5126997801267803550" datatype="html" approved="yes">
                 <source>La fouille a bien été mise à jour</source>
                 <target state="final">Search was updated successfully</target>
+            </trans-unit>
+            <trans-unit id="5127852869390190101" datatype="html">
+                <source>PA manquants pour réparer les chantiers</source>
+                <target state="translated">Missing AP to repair construction sites</target>
             </trans-unit>
             <trans-unit id="370917987951639261" datatype="html">
                 <source>Dupliquer les consignes générales</source>
@@ -1969,9 +2002,7 @@
                 </source>
                 <target state="translated">Leave
                     <x id="label" equiv-text="label"/>
-                    at
-                    <x id="remaining" equiv-text="step.targetRemaining"/>
-                    :ap:
+                    at<x id="remaining" equiv-text="step.targetRemaining"/>:ap:
                 </target>
             </trans-unit>
             <trans-unit id="2896336955237338610" datatype="html" approved="yes">
@@ -2069,6 +2100,10 @@
             <trans-unit id="6195547188381373675" datatype="html" approved="yes">
                 <source>Aucune entrée trouvée</source>
                 <target state="final">No entries found</target>
+            </trans-unit>
+            <trans-unit id="6197267913467259026" datatype="html">
+                <source>Investir par paires de PA : le rendement est réduit</source>
+                <target state="translated">Invest AP in pairs: the yield is reduced</target>
             </trans-unit>
             <trans-unit id="3905442054565325972" datatype="html" approved="yes">
                 <source>Visibilité</source>
@@ -2562,11 +2597,11 @@
                     <x id="names" equiv-text="shared"/>
                 </target>
             </trans-unit>
-            <trans-unit id="2622514745115169030" datatype="html" approved="yes">
-                <source>&lt;p&gt;Sur la page des chantiers, un bâtiment endommagé affiche en plus, dans sa barre de &lt;mho-icon-ap/&gt;, ceux qu&apos;il faut
-                    investir pour qu&apos;il passe la nuit : « (dont X pour que le bâtiment passe la nuit) ».&lt;/p&gt; &lt;p&gt;Sont comptés les dégâts de l&apos;attaque
-                    en Pandémonium (70 % des points de vie maximum, arrondis au supérieur) et, dans tous les modes, ceux que certains bâtiments s&apos;infligent
-                    eux-mêmes (feux d&apos;artifice, réacteur).&lt;/p&gt;
+            <trans-unit id="8204726189933023513" datatype="html" approved="yes">
+                <source>&lt;p&gt;Sur la page des chantiers, un bâtiment endommagé affiche en plus, dans sa barre de PA, ceux qu&apos;il faut investir pour qu&apos;il
+                    passe la nuit : « (dont X pour que le bâtiment passe la nuit) ».&lt;/p&gt; &lt;p&gt;Sont comptés les dégâts de l&apos;attaque en Pandémonium
+                    (70 % des points de vie maximum, arrondis au supérieur) et, dans tous les modes, ceux que certains bâtiments s&apos;infligent eux-mêmes
+                    (feux d&apos;artifice, réacteur).&lt;/p&gt;
                 </source>
                 <target state="translated">&lt;p&gt;On the construction sites page, a damaged building also displays, in its AP bar, the AP that must be
                     invested for it to survive the night: &quot;(of which X for the building to survive the night)&quot;.&lt;/p&gt; &lt;p&gt;The damage from the
@@ -2884,10 +2919,6 @@
             <trans-unit id="1323495659993438357" datatype="html" approved="yes">
                 <source>Cause de la mort</source>
                 <target state="final">Cause of death</target>
-            </trans-unit>
-            <trans-unit id="2375521616132607264" datatype="html">
-                <source>Investir par paires de &lt;mho-icon-ap/&gt; : le rendement est réduit</source>
-                <target state="translated">Invest in pairs of &lt;mho-icon-ap/&gt;: the yield is reduced</target>
             </trans-unit>
             <trans-unit id="2380602262642441730" datatype="html">
                 <source>Jour passé : le programme des chantiers n&apos;est plus évalué.</source>
@@ -4233,10 +4264,6 @@
                 <source>Budget</source>
                 <target state="translated">Budget</target>
             </trans-unit>
-            <trans-unit id="7661915555462226417" datatype="html">
-                <source>&lt;mho-icon-ap/&gt; de base</source>
-                <target state="translated">Base &lt;mho-icon-ap/&gt;</target>
-            </trans-unit>
             <trans-unit id="7669988743850821823" datatype="html" approved="yes">
                 <source>Les informations</source>
                 <target state="final">The information</target>
@@ -4766,10 +4793,6 @@
                 <source>L&apos;enregistrement a échoué. Réessayez dans un instant.</source>
                 <target state="final">Saving failed. Please try again in a moment.</target>
             </trans-unit>
-            <trans-unit id="6959130656713247199" datatype="html">
-                <source>&lt;mho-icon-ap/&gt; manquants pour réparer les chantiers</source>
-                <target state="translated">&lt;mho-icon-ap/&gt; missing to repair the constructions</target>
-            </trans-unit>
             <trans-unit id="7871769022996000968" datatype="html" approved="yes">
                 <source>Options d&apos;escorte par défaut</source>
                 <target state="final">Default escort options</target>
@@ -4819,9 +4842,7 @@
                     <x id="label" equiv-text="label"/>
                     up to<x id="life" equiv-text="life"/>/
                     <x id="max" equiv-text="max_life"/>
-                    HP (≈
-                    <x id="cost" equiv-text="cost"/>
-                    :ap:)
+                    HP (≈<x id="cost" equiv-text="cost"/>:ap:)
                 </target>
             </trans-unit>
             <trans-unit id="6806022574374286744" datatype="html" approved="yes">
@@ -5175,6 +5196,10 @@
             <trans-unit id="9083757686923501079" datatype="html" approved="yes">
                 <source>Échap</source>
                 <target state="final">Esc</target>
+            </trans-unit>
+            <trans-unit id="9084919652822460700" datatype="html">
+                <source>(1 PA)</source>
+                <target state="translated">(1 AP)</target>
             </trans-unit>
             <trans-unit id="9087772826066712181" datatype="html">
                 <source>Ressources des chantiers terminés et des maisons</source>
@@ -5575,7 +5600,8 @@
                     my-town/wishlist]ce lien[/link]
                 </source>
                 <target state="translated">This list was generated from the MyHordes Optimizer website. You can find it by following [link=
-                    <x id="PH" equiv-text="environment.website_url"/>
+                    <x id="PH"
+                       equiv-text="environment.website_url"/>
                     my-town/wishlist]this link[/link]
                 </target>
             </trans-unit>
@@ -5879,10 +5905,6 @@
             <trans-unit id="673430564078029527" datatype="html" approved="yes">
                 <source>Filtrer</source>
                 <target state="final">Filter</target>
-            </trans-unit>
-            <trans-unit id="6735969268651332017" datatype="html">
-                <source>Consignes individuelles et expédition dépassent les &lt;mho-icon-ap/&gt; de base</source>
-                <target state="translated">Individual instructions and expedition exceed the base &lt;mho-icon-ap/&gt;</target>
             </trans-unit>
             <trans-unit id="7575458120113095745" datatype="html" approved="yes">
                 <source>Cassé</source>
@@ -7150,6 +7172,17 @@
                 <source>Afficher le détail</source>
                 <target state="final">Show details</target>
             </trans-unit>
+            <trans-unit id="4532832196776816744" datatype="html">
+                <source>
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    de base
+                </source>
+                <target state="translated">Base
+                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
+                </target>
+            </trans-unit>
             <trans-unit id="4540401638459620535" datatype="html" approved="yes">
                 <source>/timer (/minuteur)</source>
                 <target state="final">/timer</target>
@@ -7748,6 +7781,10 @@
                 <source>Mes consignes</source>
                 <target state="final">My instructions</target>
             </trans-unit>
+            <trans-unit id="6491358721781931527" datatype="html">
+                <source>PC du technicien</source>
+                <target state="translated">Technician&apos;s CP</target>
+            </trans-unit>
             <trans-unit id="649484315491112984" datatype="html" approved="yes">
                 <source>&lt;p&gt;La liste est commune à toute la ville. Pour chaque objet : dépôt, zone (distance en PA), quantités en banque, dans les sacs,
                     dans les coffres (le survol donne les citoyens) et sur la carte, stock souhaité (∞ possible) et quantité manquante (souhaitée moins banque
@@ -7917,9 +7954,7 @@
                 </source>
                 <target state="translated">Repair
                     <x id="label" equiv-text="label"/>
-                    to survive the night (≈
-                    <x id="cost" equiv-text="cost"/>
-                    :ap:)
+                    to survive the night (≈<x id="cost" equiv-text="cost"/>:ap:)
                 </target>
             </trans-unit>
             <trans-unit id="4635453384629622126" datatype="html" approved="yes">
@@ -8212,6 +8247,10 @@
                     and enable &quot;Userscripts&quot;;&lt;/li&gt; &lt;li&gt;tap &quot;Aa&quot; again, then &quot;Userscripts&quot;, and check that &quot;MyHordes
                     Optimizer&quot; is enabled.&lt;/li&gt; &lt;/ul&gt;
                 </target>
+            </trans-unit>
+            <trans-unit id="7504142848864181686" datatype="html">
+                <source>Laisser à N PA</source>
+                <target state="translated">Leave at N AP</target>
             </trans-unit>
             <trans-unit id="7507912867004115839" datatype="html" approved="yes">
                 <source>Prédictions de camping dans les informations du secteur</source>
@@ -9021,10 +9060,6 @@
             <trans-unit id="6743161373003242548" datatype="html" approved="yes">
                 <source>Atelier</source>
                 <target state="final">Workshop</target>
-            </trans-unit>
-            <trans-unit id="6745448203390520881" datatype="html">
-                <source>Laisser à N &lt;mho-icon-ap/&gt;</source>
-                <target state="translated">Leave at N &lt;mho-icon-ap/&gt;</target>
             </trans-unit>
             <trans-unit id="674855581046452024" datatype="html" approved="yes">
                 <source>Cyan</source>

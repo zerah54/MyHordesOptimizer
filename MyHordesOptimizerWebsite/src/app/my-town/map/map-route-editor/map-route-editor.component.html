@@ -71,8 +71,7 @@
                                 <ng-container i18n>Retour en ville compris</ng-container>
                             } @else {
                                 <ng-container i18n>Retour en ville&nbsp;:&nbsp;</ng-container>
-                                +
-                                <mho-icon-ap [value]="editor.return_ap()"/>
+                                <mho-icon-ap [value]="'+' + editor.return_ap()"/>
                             }
                         </span>
                     }

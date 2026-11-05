@@ -73,7 +73,13 @@
                                         <mat-select data-field="mode" [value]="modeValue(step)" [disabled]="!store.can_edit()"
                                                     (selectionChange)="setMode(pool, index, $event.value)">
                                             @for (option of modeOptions(step); track option.value) {
-                                                <mat-option [value]="option.value" [attr.data-mode]="option.value">{{ option.label }}</mat-option>
+                                                <mat-option [value]="option.value" [attr.data-mode]="option.value">
+                                                    @if (option.value === 'build:leave') {
+                                                        <ng-container i18n>Laisser à N <mho-icon-ap/></ng-container>
+                                                    } @else {
+                                                        {{ option.label }}
+                                                    }
+                                                </mat-option>
                                             }
                                         </mat-select>
                                     </mat-form-field>
@@ -133,7 +139,11 @@
                                     @for (issue of res.issues; track issue) {
                                         <span class="issue" [attr.data-issue]="issue">
                                             <mat-icon>warning</mat-icon>
-                                            {{ issueLabel(issue) }}
+                                            @if (issue === 'slavery-rounding') {
+                                                <ng-container i18n>Investir par paires de <mho-icon-ap/> : le rendement est réduit</ng-container>
+                                            } @else {
+                                                {{ issueLabel(issue) }}
+                                            }
                                         </span>
                                     }
                                 }

@@ -57,4 +57,23 @@ describe('TownService', (): void => {
             request.flush({});
         });
     });
+
+    describe('updateExternalTools', (): void => {
+        afterEach((): void => {
+            vi.useRealTimers();
+        });
+
+        it('interroge l\'avancement du lancement démarré, par son jobId', async (): Promise<void> => {
+            vi.useFakeTimers();
+            const job_id: string = 'b6f1c0de-0000-4000-8000-000000000001';
+
+            service.updateExternalTools().subscribe();
+            http_mock.expectOne((candidate: { url: string }): boolean => candidate.url.includes('/ExternalTools/Update/Start'))
+                .flush({ jobId: job_id, isRunning: true, startedAt: null, finishedAt: null, tools: [] });
+            await vi.advanceTimersByTimeAsync(800);
+
+            http_mock.expectOne((candidate: { url: string }): boolean => candidate.url.includes('/ExternalTools/Update/Status') && candidate.url.includes(`jobId=${job_id}`))
+                .flush({ jobId: job_id, isRunning: false, startedAt: null, finishedAt: null, tools: [] });
+        });
+    });
 });

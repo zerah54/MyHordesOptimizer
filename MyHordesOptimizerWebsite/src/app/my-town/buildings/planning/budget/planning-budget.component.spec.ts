@@ -71,6 +71,13 @@ describe('PlanningBudgetComponent', (): void => {
         expect(cell('remaining', 'regular')).toBe(`${fake.evaluation()?.budgets.regular.remaining}`);
     });
 
+    it('les PA de base et les PC du technicien sont libellés par leur icône', async (): Promise<void> => {
+        await render();
+
+        expect(root().querySelector('table.breakdown tr[data-category="basePa"] th mho-icon-ap img')).not.toBeNull();
+        expect(root().querySelector('table.breakdown tr[data-category="technicianCp"] th mho-icon-cp img')).not.toBeNull();
+    });
+
     it('les bannis avant les non-bannis', async (): Promise<void> => {
         await render();
 
