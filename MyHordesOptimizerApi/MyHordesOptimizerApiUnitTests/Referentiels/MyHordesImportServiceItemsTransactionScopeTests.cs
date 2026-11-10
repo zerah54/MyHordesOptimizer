@@ -126,6 +126,10 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
             public List<HomeUpgradeCodeModel> GetHomeUpgrades() => throw new NotSupportedException();
             public Dictionary<string, MyHordesCitizenStatusCodeModel> GetCitizenStatuses() => throw new NotSupportedException();
             public Dictionary<string, MyHordesMetaResultCodeModel> GetMetaResults() => throw new NotSupportedException();
+            public Dictionary<string, MyHordesItemExtrasCodeModel> GetItemExtras() => throw new NotSupportedException();
+            public Dictionary<string, Newtonsoft.Json.Linq.JArray> GetResultGroups() => throw new NotSupportedException();
+            public Dictionary<string, MyHordesMetaResultCodeModel> GetMetaRequirements() => throw new NotSupportedException();
+            public Dictionary<string, string> GetItemsNightwatch() => throw new NotSupportedException();
         }
 
         private sealed class SpyTranslationService : ITranslationService

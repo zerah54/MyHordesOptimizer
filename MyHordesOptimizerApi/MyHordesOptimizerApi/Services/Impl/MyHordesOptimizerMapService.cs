@@ -112,6 +112,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 updateRequest.Y,
                 updateRequest.ScavZoneLevel != previousScavZoneLevel ? updateRequest.ScavZoneLevel : null,
                 updateRequest.ScoutZoneLevel,
+                updateRequest.ScoutVisits,
+                scoutVisitsEntered: true,
                 updateRequest.ScavNextCells,
                 updateRequest.ScoutNextCells,
                 newLastUpdate.IdLastUpdateInfo);

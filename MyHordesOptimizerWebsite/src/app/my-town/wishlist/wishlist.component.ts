@@ -59,10 +59,11 @@ import { ItemMapComponent } from '../../_shared/item-map/item-map.component';
 import { LastUpdateComponent } from '../../_shared/last-update/last-update.component';
 import { MenuAddComponent } from '../../_shared/list-elements-add-remove/menu-add/menu-add.component';
 import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with-string-filter/header-with-string-filter.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { ItemAlreadyInListPipe } from './item-already-in-list.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [DeferredCellComponent, HeaderWithStringFilterComponent, ItemMapComponent, LastUpdateComponent, MenuAddComponent];
+const components: Imports = [DeferredCellComponent, HeaderWithStringFilterComponent, ItemMapComponent, LastUpdateComponent, MenuAddComponent, PageTitleComponent];
 const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSlideToggleModule, MatTableModule, MatTooltipModule];
@@ -433,21 +434,28 @@ export class WishlistComponent implements OnInit {
         const light: WishlistItem[] = info.wishlist_items.filter((item: WishlistItem): boolean => !item.item.is_heaver && item.priority >= 0);
         const do_not_bring_back: WishlistItem[] = info.wishlist_items.filter((item: WishlistItem): boolean => item.priority < 0);
 
+        const to_bring_back: WishlistItem[] = [...heavy, ...light];
+        const legend: string[] = [];
+        if (to_bring_back.some((item: WishlistItem): boolean => item.depot.value.count === WishlistDepot.TELEPORT.value.count)) {
+            legend.push(`[i]${WishlistDepot.TELEPORT.value.label}[/i]`);
+        }
+        if (to_bring_back.some((item: WishlistItem): boolean => item.should_signal)) {
+            legend.push(`[bad]${$localize`Objet à signaler`}[/bad]:warning:`);
+        }
+        if (legend.length > 0) {
+            text += `${$localize`Légende`} : ${legend.join(' · ')}\n`;
+        }
         if (heavy.length > 0) {
             text += `\n[collapse=${$localize`Encombrants`}]\n`;
             heavy.forEach((item: WishlistItem): void => {
-                text += item.should_signal ? '[bad]' : '';
-                text += `:middot:${this.forumLabel(item.item)}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
-                text += item.should_signal ? '[/bad]:warning:\n' : '\n';
+                text += this.forumLine(item);
             });
             text += '[/collapse]\n';
         }
         if (light.length > 0) {
             text += `\n[collapse=${$localize`Non-Encombrants`}]\n`;
             light.forEach((item: WishlistItem): void => {
-                text += item.should_signal ? '[bad]' : '';
-                text += `:middot:${this.forumLabel(item.item)}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
-                text += item.should_signal ? '[/bad]:warning:\n' : '\n';
+                text += this.forumLine(item);
             });
             text += '[/collapse]\n';
         }
@@ -463,6 +471,21 @@ export class WishlistComponent implements OnInit {
         text += `[aparte]${$localize`Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=${environment.website_url}my-town/wishlist]ce lien[/link]`}[/aparte]`;
 
         this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
+    }
+
+    /**
+     * Ligne d'un objet à rapporter au format forum, terminée par sa zone si elle n'est pas infinie,
+     * en italique si à déposer dans la zone de rapatriement.
+     * @param {WishlistItem} item Ligne de la liste.
+     * @returns {string} Texte, retour à la ligne compris.
+     */
+    private forumLine(item: WishlistItem): string {
+        let label: string = this.forumLabel(item.item) + (item.count >= 0 ? ` (x${item.count})` : '')
+            + (item.zone_x_pa > 0 ? ` – ${$localize`zone`} ${item.zone_x_pa}:ap:` : '');
+        if (item.depot.value.count === WishlistDepot.TELEPORT.value.count) {
+            label = `[i]${label}[/i]`;
+        }
+        return item.should_signal ? `[bad]:middot:${label}[/bad]:warning:\n` : `:middot:${label}\n`;
     }
 
     /**

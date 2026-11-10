@@ -13,6 +13,7 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { ActiveCitizensComponent } from '../../_shared/active-citizens/active-citizens.component';
 import { CitizenFilterSortStore } from '../../_shared/citizen-filters/citizen-filter-sort.store';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { PlanningBudgetComponent } from './planning/budget/planning-budget.component';
 import { PlanningCard, PlanningCardsComponent } from './planning/cards/planning-cards.component';
 import { CitizenFiltersStore } from './planning/citizen-filters.store';
@@ -33,7 +34,7 @@ import { confirmDiscardChanges } from './planning/unsaved-changes.util';
 
 const components: Imports = [
     ActiveCitizensComponent, PlanningBudgetComponent, PlanningCardsComponent, PlanningDefenseComponent, PlanningHeaderComponent, PlanningKpisComponent, PlanningProgramComponent,
-    PlanningResourcesComponent, PlanningShareComponent, PlanningTrackingComponent
+    PlanningResourcesComponent, PlanningShareComponent, PlanningTrackingComponent, PageTitleComponent
 ];
 const cdk_modules: Imports = [CdkScrollable];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule];

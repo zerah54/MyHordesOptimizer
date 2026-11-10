@@ -89,6 +89,12 @@ describe('PlanningTrackingComponent', (): void => {
         return Array.from(root().querySelectorAll<HTMLElement>('tr.citizen')).map((row: HTMLElement): string => row.dataset['user'] ?? '');
     }
 
+    it('colle les PA d\'une consigne à ses parenthèses', async (): Promise<void> => {
+        await render({ ...emptyPlanContent(), citizens: [{ userId: 2, tasks: [{ id: 'p', kind: 'free', label: 'Puits', pa: 3 }] }] });
+
+        expect(editButtons(2)[0].textContent?.replace(/\s+/g, ' ').trim()).toBe('Puits (3)');
+    });
+
     it('une ligne par citoyen avec sa fiche, ses consignes cochées si faites et son état', async (): Promise<void> => {
         await render();
 

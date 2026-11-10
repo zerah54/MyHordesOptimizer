@@ -1,5 +1,7 @@
 <mat-card-header class="mho-state-manager-header">
-    <mat-card-title i18n>Gestionnaire d'état</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="toolsStateManager"/>
+    </mat-card-title>
 </mat-card-header>
 
 <mat-card-content class="mho-state-manager">
@@ -8,17 +10,17 @@
         <div class="states-cards-origine">
             <div class="states-cards-origine-content">
                 <mho-list-element-add-remove withQuantity
-                    (add)="addToBag(+$event)"
-                    (empty)="emptyBagContent()"
-                    (remove)="removeFromBag(+$event)"
-                    [currentList]="starting_bag"
-                    [lists]="bag_lists()"
-                    addLabel="Ajouter au sac" i18n-addLabel
-                    emptyLabel="Vider le sac" i18n-emptyLabel
-                    i18n-label
-                    i18n-removeLabel
-                    label="Sac"
-                    removeLabel="Retirer du sac"/>
+                                             (add)="addToBag(+$event)"
+                                             (empty)="emptyBagContent()"
+                                             (remove)="removeFromBag(+$event)"
+                                             [currentList]="starting_bag"
+                                             [lists]="bag_lists()"
+                                             addLabel="Ajouter au sac" i18n-addLabel
+                                             emptyLabel="Vider le sac" i18n-emptyLabel
+                                             i18n-label
+                                             i18n-removeLabel
+                                             label="Sac"
+                                             removeLabel="Retirer du sac"/>
             </div>
             <div class="states-cards-origine-content">
                 <mho-compact-stepper

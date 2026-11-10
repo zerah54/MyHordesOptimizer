@@ -99,6 +99,9 @@
                 @if (route.children && route.children.length > 0) {
                     <mat-icon>{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
                 }
+                @if (route.icon) {
+                    <img class="page-icon" [src]="HORDES_IMG_REPO + route.icon" alt="">
+                }
                 {{ resolveLabel(route) }}
                 @if (route.spoil) {
                     <span class="spoil" matTooltip="Cette page peut contenir des spoils de la saison 19" i18n-matTooltip>Spoil S19</span>

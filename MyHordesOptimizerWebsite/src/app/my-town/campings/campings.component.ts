@@ -2,9 +2,10 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 
 import { Imports } from '../../_abstract_model/types/_types';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 
 const angular_common: Imports = [];
-const components: Imports = [];
+const components: Imports = [PageTitleComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatCardModule];
 

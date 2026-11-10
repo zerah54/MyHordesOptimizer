@@ -30,11 +30,12 @@ import { FilterRuinsByKmPipe } from '../../_core/pipes/filter-ruins-by-km.pipe';
 import { ClipboardService } from '../../_core/services/clipboard.service';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { getBuriedRuinCapacity } from '../../_core/utilities/ruin.util';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { SelectComponent } from '../../_shared/select/select.component';
 import { CampingDisplayBonusPipe } from './camping-display-bonus.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, NgTemplateOutlet, ReactiveFormsModule];
-const components: Imports = [SelectComponent];
+const components: Imports = [SelectComponent, PageTitleComponent];
 const pipes: Imports = [CampingDisplayBonusPipe, DecimalPipe, FilterRuinsByKmPipe];
 const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSlideToggleModule, MatTooltipModule];
 

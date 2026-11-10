@@ -40,11 +40,18 @@
                     <mat-label i18n>Exploration (éclaireur)</mat-label>
                     <mat-select formControlName="scout_zone_level">
                         <mat-option [value]="null" i18n>Non renseignée</mat-option>
-                        <mat-option [value]="0" i18n>0 – Zone peu explorée</mat-option>
-                        <mat-option [value]="1" i18n>1 – Zone partiellement explorée</mat-option>
-                        <mat-option [value]="2" i18n>2 – Zone explorée</mat-option>
-                        <mat-option [value]="3" i18n>3 – Zone entièrement cartographiée</mat-option>
+                        <mat-option [value]="0" i18n>0 – Secteur peu connu</mat-option>
+                        <mat-option [value]="1" i18n>1 – Secteur partiellement repéré</mat-option>
+                        <mat-option [value]="2" i18n>2 – Secteur connu</mat-option>
+                        <mat-option [value]="3" i18n>3 – Secteur totalement balisé</mat-option>
                     </mat-select>
+                </mat-form-field>
+                <mat-form-field class="scout-visits">
+                    <mat-label i18n>Passages (éclaireur)</mat-label>
+                    <input matInput type="number" min="0" [max]="MAX_SCOUT_VISITS" step="1" formControlName="scout_visits">
+                    @if (scout_visits_warning(); as warning) {
+                        <mat-icon matSuffix class="scout-visits-warning" [matTooltip]="warning">warning</mat-icon>
+                    }
                 </mat-form-field>
             </div>
 

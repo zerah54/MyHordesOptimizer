@@ -1,5 +1,7 @@
 <mat-card-header class="mho-minesweeper-header">
-    <mat-card-title i18n>Démineur</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="gamesMinesweeper"/>
+    </mat-card-title>
     @if (is_guest()) {
         <span class="guest-warning" i18n>Vous n'êtes pas connecté(e) — vos scores ne seront pas enregistrés.</span>
     }

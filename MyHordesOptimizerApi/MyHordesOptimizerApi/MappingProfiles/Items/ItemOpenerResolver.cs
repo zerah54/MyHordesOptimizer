@@ -116,7 +116,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
         /// vérifiée exhaustivement sans faux positif sur le référentiel actuel — à revoir si un
         /// jour une action mal nommée s'y glisse.
         /// </summary>
-        private static bool IsOpeningAction(string actionName)
+        internal static bool IsOpeningAction(string actionName)
         {
             return actionName.StartsWith("open_", StringComparison.Ordinal)
                 || actionName == "can"

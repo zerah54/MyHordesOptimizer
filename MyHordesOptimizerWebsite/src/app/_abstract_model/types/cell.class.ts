@@ -5,6 +5,37 @@ import { Citizen } from './citizen.class';
 import { ItemCountShort } from './item-count-short.class';
 import { UpdateInfo } from './update-info.class';
 
+/** Passages d'éclaireur par niveau d'exploration (MyHordes `Zone::getScoutLevel` : min(3, floor(passages / 5))) */
+export const SCOUT_VISITS_PER_LEVEL: number = 5;
+/** Passages au-delà desquels le niveau d'exploration, plafonné à 3, ne bouge plus */
+export const MAX_SCOUT_VISITS: number = 3 * SCOUT_VISITS_PER_LEVEL;
+
+/**
+ * Niveau d'exploration atteint avec ce nombre de passages d'éclaireur.
+ *
+ * @param {number} visits nombre de passages, entre 0 et MAX_SCOUT_VISITS
+ * @returns {number} niveau d'exploration, de 0 à 3
+ */
+export function scoutLevelFromVisits(visits: number): number {
+    return Math.floor(visits / SCOUT_VISITS_PER_LEVEL);
+}
+
+/**
+ * Plage de passages d'éclaireur qui donne ce niveau d'exploration.
+ *
+ * @param {number} level niveau d'exploration, de 0 à 3
+ * @returns {ScoutVisitsRange} bornes incluses ; le niveau 3 correspond à MAX_SCOUT_VISITS seul
+ */
+export function scoutVisitsRange(level: number): ScoutVisitsRange {
+    const min: number = level * SCOUT_VISITS_PER_LEVEL;
+    return { min, max: Math.min(min + SCOUT_VISITS_PER_LEVEL - 1, MAX_SCOUT_VISITS) };
+}
+
+export interface ScoutVisitsRange {
+    min: number;
+    max: number;
+}
+
 export class Cell extends CommonModel<CellDTO> {
     public cell_id!: number;
     public x!: number;
@@ -43,6 +74,8 @@ export class Cell extends CommonModel<CellDTO> {
     public scav_zone_level!: number | null;
     /** Niveau d'exploration de la zone relevé par un éclaireur, de 0 à 3 */
     public scout_zone_level!: number | null;
+    /** Nombre de passages d'éclaireur sur la zone, de 0 à 15, dans la plage de scout_zone_level ; null s'il n'a pas été saisi */
+    public scout_visits: number | null = null;
     /** Estimation bruitée du nombre de zombies, issue du radar d'un éclaireur voisin */
     public scout_estimation_zombie!: number | null;
     /** Borne basse du nombre réel de zombies déduite de l'estimation */
@@ -88,6 +121,7 @@ export class Cell extends CommonModel<CellDTO> {
             isExcavated: this.is_excavated,
             scavZoneLevel: this.scav_zone_level,
             scoutZoneLevel: this.scout_zone_level,
+            scoutVisits: this.scout_visits,
             scoutEstimationZombie: this.scout_estimation_zombie,
             scoutEstimationMin: this.scout_estimation_min,
             scoutEstimationMax: this.scout_estimation_max,
@@ -134,6 +168,16 @@ export class Cell extends CommonModel<CellDTO> {
         return this.scout_estimation_update_info.update_time.isAfter(this.update_info.update_time);
     }
 
+    /**
+     * Le niveau d'exploration prime sur le nombre de passages : un nombre hors de sa plage est une erreur de saisie.
+     *
+     * @returns {boolean} vrai si l'un des deux est inconnu ou si le nombre donne bien ce niveau
+     */
+    public isScoutVisitsConsistent(): boolean {
+        if (this.scout_visits === null || this.scout_zone_level === null || this.scout_zone_level === undefined) return true;
+        return scoutLevelFromVisits(this.scout_visits) === this.scout_zone_level;
+    }
+
     public toSaveCellDTO(): SaveCellDTO {
         return {
             x: this.x,
@@ -141,6 +185,7 @@ export class Cell extends CommonModel<CellDTO> {
             isDryed: this.is_dryed,
             scavZoneLevel: this.scav_zone_level,
             scoutZoneLevel: this.scout_zone_level,
+            scoutVisits: this.scout_visits,
             scavNextCells: this.scav_next_cells,
             scoutNextCells: this.scout_next_cells,
             nbZombie: this.nb_zombie || 0,
@@ -181,6 +226,7 @@ export class Cell extends CommonModel<CellDTO> {
             this.is_excavated = dto.isExcavated ?? null;
             this.scav_zone_level = dto.scavZoneLevel;
             this.scout_zone_level = dto.scoutZoneLevel;
+            this.scout_visits = dto.scoutVisits ?? null;
             this.scout_estimation_zombie = dto.scoutEstimationZombie;
             this.scout_estimation_min = dto.scoutEstimationMin;
             this.scout_estimation_max = dto.scoutEstimationMax;

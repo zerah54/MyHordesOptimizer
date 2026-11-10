@@ -19,6 +19,7 @@ import { ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
+import { ClipboardService } from '../../_core/services/clipboard.service';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
 import { ItemMapComponent } from '../../_shared/item-map/item-map.component';
 import { WishlistComponent } from './wishlist.component';
@@ -39,6 +40,7 @@ interface TestableComponent {
     triggerSave(): void;
     buildExcelRows(items: WishlistItem[]): Record<string, string | number>[];
     forumLabel(item: Item): string;
+    shareWishlistForum(): void;
 }
 
 function buildItemDto(overrides: Partial<WishlistItemDTO['item']> = {}): WishlistItemDTO['item'] {
@@ -50,6 +52,7 @@ function buildItemDto(overrides: Partial<WishlistItemDTO['item']> = {}): Wishlis
         openedWith: null, opens: [],
         openApCost: null, openSuccessRate: null, technicianOpenCpCost: null,
         catapultEffect: null,
+        actionEffects: [], reloadCharges: null, watchImpact: 0, bagCapacityBonus: null, bagExclusiveGroup: null,
         bankCount: 0, wishListCount: 0, dropRateNotPraf: 0, dropRatePraf: 0,
         ...overrides
     };
@@ -114,6 +117,50 @@ describe('WishlistComponent', (): void => {
 
         expect(label('wire_#00')).toBe(':item_wire: Objet');
         expect(label('wood2_#00')).toBe('Objet');
+    });
+
+    describe('copie au format forum', (): void => {
+        /** Texte copié pour une liste contenant les lignes données. */
+        function copiedText(rows: WishlistItemDTO[]): string {
+            const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+            const copy_spy: MockInstance<ClipboardService['copy']> = vi.spyOn(TestBed.inject(ClipboardService), 'copy').mockImplementation((): void => undefined);
+            testable.wishlist_info.set(new WishlistInfo({
+                wishList: rows,
+                lastUpdateInfo: { updateTime: new Date(), userId: '1', userName: 'Bob', userKey: 'k' }
+            }));
+            testable.shareWishlistForum();
+            return copy_spy.mock.calls[0][0];
+        }
+
+        it('met en italique les objets à déposer dans la zone de rapatriement et l\'explique en légende', (): void => {
+            const text: string = copiedText([{ ...buildRowDto(1, 0, 5), depot: 1 }, buildRowDto(2, 0, 1)]);
+
+            expect(text).toContain(':middot:[i]Objet 1 (x5)[/i]\n');
+            expect(text).toContain(':middot:Objet 2 (x1)\n');
+            expect(text).not.toContain('Zone de rappatriement');
+            expect(text).toContain('Légende : [i]Zone de rapatriement[/i]');
+        });
+
+        it('ajoute à la légende les objets à signaler, seulement s\'il y en a', (): void => {
+            expect(copiedText([{ ...buildRowDto(1, 0, 5), shouldSignal: true }]))
+                .toContain('Légende : [bad]Objet à signaler[/bad]:warning:\n');
+        });
+
+        it('réunit les deux légendes sur une ligne', (): void => {
+            expect(copiedText([{ ...buildRowDto(1, 0, 5), depot: 1 }, { ...buildRowDto(2, 0, 1), shouldSignal: true }]))
+                .toContain('Légende : [i]Zone de rapatriement[/i] · [bad]Objet à signaler[/bad]:warning:\n');
+        });
+
+        it('termine la ligne par sa zone en PA, sauf pour la zone infinie', (): void => {
+            const text: string = copiedText([buildRowDto(1, 0, 10), { ...buildRowDto(1, 2, 3), depot: 1 }]);
+
+            expect(text).toContain(':middot:Objet 1 (x10)\n');
+            expect(text).toContain(':middot:[i]Objet 1 (x3) – zone 2:ap:[/i]\n');
+        });
+
+        it('n\'ajoute pas de légende sans objet à déposer dans la zone de rapatriement ni à signaler', (): void => {
+            expect(copiedText([buildRowDto(1, 0, 5)])).not.toContain('Légende');
+        });
     });
 
     it('exporte la quantité souhaitée de chaque ligne, pas le wishlist_count de l\'objet', (): void => {
@@ -389,6 +436,20 @@ describe('WishlistComponent', (): void => {
 
             expect(proposedIds()).toEqual([2, 3]);
         });
+    });
+
+    it('affiche ∞ pour la zone infinie hors mode édition', async (): Promise<void> => {
+        const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+        testable.wishlist_info.set(new WishlistInfo({ wishList: [buildRowDto(1, 0, 1), buildRowDto(2, 2, 1)], lastUpdateInfo: null }));
+        fixture.detectChanges();
+        for (const block of await fixture.getDeferBlocks()) {
+            await block.render(DeferBlockState.Complete);
+        }
+        fixture.detectChanges();
+
+        const zones: string[] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('tbody td.mat-column-zone_x_pa'))
+            .map((cell: HTMLElement): string => cell.textContent?.trim() ?? '');
+        expect(zones).toEqual(['∞', '2']);
     });
 
     describe('colonne Carte', (): void => {

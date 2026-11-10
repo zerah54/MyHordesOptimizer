@@ -1,5 +1,7 @@
 <mat-card-header class="mho-camping-header">
-    <mat-card-title i18n>Camping</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="toolsCamping"/>
+    </mat-card-title>
     <div class="actions">
         @if (town) {
             <mat-slide-toggle [(ngModel)]="in_town_camping" (ngModelChange)="changeInTownMode()">

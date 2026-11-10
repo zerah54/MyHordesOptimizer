@@ -48,9 +48,10 @@ import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
 import { NoteDialogComponent, NoteDialogData } from '../../_shared/note-dialog/note-dialog.component';
 import { NoteIconComponent } from '../../_shared/note-icon/note-icon.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
-const components: Imports = [DeferredCellComponent, NoteIconComponent];
+const components: Imports = [DeferredCellComponent, NoteIconComponent, PageTitleComponent];
 const directives: Imports = [MiddleClickLinkDirective, TypedCellDefDirective];
 const pipes: Imports = [];
 const material_modules: Imports = [

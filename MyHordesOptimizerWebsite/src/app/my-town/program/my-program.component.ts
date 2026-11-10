@@ -24,6 +24,7 @@ import { TownContextService } from '../../_core/services/town-context.service';
 import { getTown, user } from '../../_core/utilities/localstorage.util';
 import { DaySelectorComponent } from '../../_shared/day-selector/day-selector.component';
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { StepResult } from '../buildings/planning/building-progress.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO } from '../buildings/planning/plan.types';
 import { CitizenRef, DayEvaluation } from '../buildings/planning/plan-evaluation.util';
@@ -41,7 +42,7 @@ import { hiddenKey, isHidden, ProgramBlock, safeStorage, setHidden } from './pro
 
 const angular_common: Imports = [NgTemplateOutlet, RouterLink];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatIconModule, MatProgressSpinnerModule, MatTooltipModule];
-const components: Imports = [DaySelectorComponent, ProgramExpeditionComponent];
+const components: Imports = [DaySelectorComponent, ProgramExpeditionComponent, PageTitleComponent];
 
 /** Mes consignes d'expédition du jour, toutes expéditions, et présence d'une expédition en préparation. */
 interface ExpeditionTotals {

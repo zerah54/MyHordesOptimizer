@@ -40,6 +40,9 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         /// <summary>Niveau d'exploration de la zone (0-3) relevé par un Éclaireur.</summary>
         public int? ScoutZoneLevel { get; set; }
 
+        /// <summary>Nombre de passages d'éclaireur sur la zone (0-15) ; <c>null</c> s'il n'a pas été saisi.</summary>
+        public int? ScoutVisits { get; set; }
+
         /// <summary>Estimation bruitée du nombre de zombies, issue du radar d'un Éclaireur voisin.</summary>
         public int? ScoutEstimationZombie { get; set; }
 

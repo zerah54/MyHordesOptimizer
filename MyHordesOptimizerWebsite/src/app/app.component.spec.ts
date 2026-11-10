@@ -5,6 +5,7 @@ import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component, input, Input
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSidenavContainer } from '@angular/material/sidenav';
 import { provideRouter } from '@angular/router';
+import moment from 'moment';
 import type { Mock } from 'vitest';
 
 import { LoadingOverlayService } from './_core/services/loading-overlay.service';
@@ -29,8 +30,12 @@ class MenuStubComponent {
 describe('AppComponent', (): void => {
     let fixture: ComponentFixture<AppComponent>;
     let breakpointObserver: BreakpointObserver;
+    let original_locale: string;
 
     beforeEach(async (): Promise<void> => {
+        // Le composant règle la langue globale de moment sur LOCALE_ID : rétablie après chaque test, sinon elle fuit vers
+        // les fichiers suivants (Vitest non isolé), dont les libellés attendus changent de langue.
+        original_locale = moment.locale();
         await TestBed.configureTestingModule({
             imports: [AppComponent],
             providers: [provideRouter([]), provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
@@ -47,6 +52,7 @@ describe('AppComponent', (): void => {
 
     afterEach((): void => {
         vi.useRealTimers();
+        moment.locale(original_locale);
     });
 
     function create(is_gt_xs: boolean = true): void {

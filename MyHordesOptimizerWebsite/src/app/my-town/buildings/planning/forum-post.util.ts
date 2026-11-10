@@ -1,4 +1,5 @@
 import { bannedPoolShown, CitizenCapacity } from './budget.util';
+import { BUILDING_EMOTES } from './building-emotes.const';
 import { StepResult } from './building-progress.util';
 import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from './plan.types';
 import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef, PlannedLoss } from './plan-evaluation.util';
@@ -187,9 +188,14 @@ function withJobEmote(context: PostContext, user_id: number, text: string): stri
     return job_emote === undefined ? text : `${job_emote} ${text}`;
 }
 
-/** Libellé d'un chantier ; `#id` s'il est introuvable. */
+/** Libellé d'un chantier précédé de son emote quand il en a une ; `#id` s'il est introuvable. */
 function buildingLabel(context: PostContext, building_id: number): string {
-    return context.buildings.get(building_id)?.label ?? `#${building_id}`;
+    const building: BuildingRef | undefined = context.buildings.get(building_id);
+    if (building === undefined) {
+        return `#${building_id}`;
+    }
+    const emote: string | undefined = BUILDING_EMOTES[building.uid];
+    return emote === undefined ? building.label : `${emote} ${building.label}`;
 }
 
 /** Nombre signé : `+40`, `-2`, `0`. */
@@ -345,7 +351,7 @@ function defenseLines(context: PostContext): string[] {
     if (evaluation.ranking.length > 0) {
         lines.push(`[b]${$localize`Meilleurs rapports défense / coût`}[/b]`);
         for (const candidate of evaluation.ranking.slice(0, RANKING_LINES)) {
-            lines.push(`:middot: ${candidate.label} : ${ratioLabel(candidate.ratio)}`);
+            lines.push(`:middot: ${candidate.buildingId === undefined ? candidate.label : buildingLabel(context, candidate.buildingId)} : ${ratioLabel(candidate.ratio)}`);
         }
     }
     return lines;

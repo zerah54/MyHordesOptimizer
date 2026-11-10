@@ -44,9 +44,9 @@
                                 <mat-option [value]="option.level">
                                     <ng-container i18n>niv.</ng-container>
                                     {{ option.level }}
-                                    (
-                                    <mho-icon-ap [value]="option.ap"/>
-                                    )
+                                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                                    (<mho-icon-ap [value]="option.ap"/>)
+                                    <!-- @formatter:on -->
                                 </mat-option>
                             }
                         </mat-select>
@@ -60,9 +60,9 @@
                         <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
                             @for (home of home_levels(); track home.level) {
                                 <mat-option [value]="home.level">{{ home.label }}
-                                    (
-                                    <mho-icon-ap [value]="home.ap"/>
-                                    )
+                                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                                    (<mho-icon-ap [value]="home.ap"/>)
+                                    <!-- @formatter:on -->
                                 </mat-option>
                             }
                         </mat-select>

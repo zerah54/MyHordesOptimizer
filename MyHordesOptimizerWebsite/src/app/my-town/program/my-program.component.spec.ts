@@ -321,6 +321,12 @@ describe('MyProgramComponent', (): void => {
         expect(root().querySelector('.block.expedition .steps')).toBeNull();
     });
 
+    it('colle les PA d\'une consigne à ses parenthèses', async (): Promise<void> => {
+        await render(content({ citizens: [{ userId: 1, tasks: [{ kind: 'free', label: 'Puits', pa: 3 }] }] }));
+
+        expect(flat('.block.buildings .tasks')).toContain('Puits (3)');
+    });
+
     it('lance le chargement et affiche le titre', async (): Promise<void> => {
         await render();
 

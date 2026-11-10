@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Interactions;
@@ -187,11 +188,12 @@ namespace MyHordesOptimizerApi.DiscordBot.Modules
         private static Embed BuildPageEmbed(TranslationSearch search, int page)
         {
             TranslationDto translation = search.Translations[page].Value;
+            // Une langue peut être vide : chaîne allemande pas encore traduite.
             string description =
-                $":flag_de: {FormatTranslation(translation.De[0])}\n" +
-                $":flag_gb: {FormatTranslation(translation.En[0])}\n" +
-                $":flag_es: {FormatTranslation(translation.Es[0])}\n" +
-                $":flag_fr: {FormatTranslation(translation.Fr[0])}\n";
+                $":flag_de: {FormatTranslation(translation.De.FirstOrDefault() ?? "—")}\n" +
+                $":flag_gb: {FormatTranslation(translation.En.FirstOrDefault() ?? "—")}\n" +
+                $":flag_es: {FormatTranslation(translation.Es.FirstOrDefault() ?? "—")}\n" +
+                $":flag_fr: {FormatTranslation(translation.Fr.FirstOrDefault() ?? "—")}\n";
 
             return new EmbedBuilder()
                 .WithTitle($"{search.Header} ({page + 1} / {search.Translations.Count})")

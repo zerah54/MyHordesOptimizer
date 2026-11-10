@@ -1,6 +1,7 @@
+import { BUILDING_EMOTES } from './building-emotes.const';
 import { budgetPost, FORUM_POST_LIMIT, mention, PostContext, programPost, splitForum } from './forum-post.util';
 import { BuildingPlanContentDTO, emptyPlanContent } from './plan.types';
-import { DayInput } from './plan-evaluation.util';
+import { BuildingRef, DayInput } from './plan-evaluation.util';
 import { FAKE_BUILDINGS, FAKE_CITIZENS, FAKE_HOMES, FAKE_REGULAR_CITIZENS, fakeEvaluation } from './planning.store.fake';
 
 function context(content: BuildingPlanContentDTO, evaluation_overrides: Partial<DayInput> = {}): PostContext {
@@ -169,7 +170,7 @@ describe('forum-post.util', (): void => {
         });
 
         it('le bloc Plan annonce le chantier à voter ce soir', (): void => {
-            expect(joined(budgetPost(context({ ...plan(), eveningVoteBuildingId: 2 })))).toContain(':fortify: Évolution votée ce soir : Atelier');
+            expect(joined(budgetPost(context({ ...plan(), eveningVoteBuildingId: 2 })))).toContain(':fortify: Évolution votée ce soir : :refine: Atelier');
         });
 
         it('le bloc Plan reprend les notes d\'étape', (): void => {
@@ -243,6 +244,57 @@ describe('forum-post.util', (): void => {
 
             expect(text).toContain('[aparte]');
             expect(text).toContain('[link=https://site.test/my-town/buildings]');
+        });
+    });
+
+    describe('emote des chantiers', (): void => {
+        /** Contexte où Mur a l'icône de la pompe (`small_water_#00`) et Porte n'a aucune entrée. */
+        function iconContext(content: BuildingPlanContentDTO): PostContext {
+            const buildings: ReadonlyMap<number, BuildingRef> = new Map<number, BuildingRef>(Array.from(FAKE_BUILDINGS.entries())
+                .map(([id, ref]: [number, BuildingRef]): [number, BuildingRef] => [id, id === 1 ? { ...ref, uid: 'small_water_#00', label: 'Pompe' } : ref]));
+            return { ...context(content), buildings };
+        }
+        const base: BuildingPlanContentDTO = {
+            ...emptyPlanContent(),
+            programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', targetRemaining: 0 }, { buildingId: 3, kind: 'repair', mode: 'finish', targetRemaining: 0 }] }
+        };
+
+        it('précède le nom d\'un chantier du programme, pas celui d\'un chantier sans entrée', (): void => {
+            const text: string = joined(programPost(iconContext(base)));
+
+            expect(text).toContain(':middot: :water: Pompe');
+            expect(text).toContain('Réparer entièrement Porte');
+            expect(text).not.toContain(':gate: Porte');
+        });
+
+        it('précède le chantier voté', (): void => {
+            const text: string = joined(programPost(iconContext({ ...base, eveningVoteBuildingId: 1 })));
+
+            expect(text).toContain('Évolution votée ce soir[/b] : :water: Pompe');
+        });
+
+        it('précède le chantier d\'une perte prévue', (): void => {
+            const text: string = joined(programPost(iconContext({ ...base, losses: [{ buildingId: 1, kind: 'destroyed' }] })));
+
+            expect(text).toContain(':middot: :water: Pompe : laissé détruire');
+        });
+
+        it('précède le chantier du classement défense / coût, pas une source de défense', (): void => {
+            const text: string = joined(budgetPost(iconContext({ ...base, defenseSources: [{ label: 'OD', pa: 1, def: 2, qty: 10 }] })));
+
+            expect(text).toMatch(/:middot: :water: Pompe : /);
+            expect(text).toMatch(/:middot: OD : /);
+        });
+
+        it('chaque balise de la table a la forme :nom:', (): void => {
+            for (const tag of Object.values(BUILDING_EMOTES)) {
+                expect(tag).toMatch(/^:[a-z_]+:$/);
+            }
+        });
+
+        it('Grande roue et Château de sable ont leur icône', (): void => {
+            expect(BUILDING_EMOTES['small_wheel_#00']).toBe(':wheel:');
+            expect(BUILDING_EMOTES['small_castle_#00']).toBe(':castle:');
         });
     });
 
@@ -380,7 +432,7 @@ describe('forum-post.util', (): void => {
         it('annonce le chantier à voter ce soir', (): void => {
             const text: string = joined(programPost(context({ ...plan(), eveningVoteBuildingId: 2 })));
 
-            expect(text).toContain(':fortify: [b]Évolution votée ce soir[/b] : Atelier');
+            expect(text).toContain(':fortify: [b]Évolution votée ce soir[/b] : :refine: Atelier');
         });
 
         it('sans vote prévu, pas de ligne de vote', (): void => {
@@ -391,14 +443,14 @@ describe('forum-post.util', (): void => {
             const base: PostContext = context({ ...plan(), eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
             const text: string = joined(programPost({ ...base, evaluation: { ...base.evaluation, doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0 } } }));
 
-            expect(text).toContain(':fortify: [b]Évolutions votées ce soir[/b] : Atelier, Porte');
+            expect(text).toContain(':fortify: [b]Évolutions votées ce soir[/b] : :refine: Atelier, Porte');
         });
 
         it('sans Brasier, le second vote n\'est pas annoncé', (): void => {
             const text: string = joined(programPost(context({ ...plan(), eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 })));
 
-            expect(text).toContain(':fortify: [b]Évolution votée ce soir[/b] : Atelier');
-            expect(text).not.toContain('Atelier, Porte');
+            expect(text).toContain(':fortify: [b]Évolution votée ce soir[/b] : :refine: Atelier');
+            expect(text).not.toContain(', Porte');
         });
 
         it('pertes prévues : défense du chantier au soir (Porte réparée par le plan), aussi dans le bloc Défense du budget', (): void => {

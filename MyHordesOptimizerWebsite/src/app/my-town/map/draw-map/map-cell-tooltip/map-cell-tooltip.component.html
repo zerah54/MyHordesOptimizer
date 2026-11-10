@@ -34,7 +34,7 @@
                 <img [ngSrc]="HORDES_IMG_REPO + 'emotes/human.gif'" width="16" height="16">
                 {{ cell().nb_hero || 0 }}&nbsp;<ng-container i18n>points</ng-container>
             </div>
-            @if (cell().scout_estimation_zombie !== null || cell().scav_zone_level !== null || cell().scout_zone_level !== null || cell().is_excavated === true) {
+            @if (cell().scout_estimation_zombie !== null || cell().scav_zone_level !== null || cell().scout_zone_level !== null || cell().scout_visits !== null || cell().is_excavated === true) {
                 <mat-divider></mat-divider>
                 <div class="job-radar">
                     @if (cell().scout_estimation_zombie !== null) {
@@ -61,6 +61,12 @@
                         <div class="scout-zone-level">
                             <img [ngSrc]="HORDES_IMG_REPO + 'professions/vest.gif'" width="16" height="16">
                             <ng-container i18n>Exploration&nbsp;:</ng-container>&nbsp;{{ cell().scout_zone_level }}/3
+                        </div>
+                    }
+                    @if (cell().scout_visits !== null) {
+                        <div class="scout-visits">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'professions/vest.gif'" width="16" height="16">
+                            <ng-container i18n>Passages&nbsp;:</ng-container>&nbsp;{{ cell().scout_visits }}/{{ MAX_SCOUT_VISITS }}
                         </div>
                     }
                 </div>

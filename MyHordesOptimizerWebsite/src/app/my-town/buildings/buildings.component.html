@@ -1,6 +1,6 @@
 <mat-card-header class="mho-buildings-header">
     <mat-card-title>
-        <ng-container i18n>Chantiers</ng-container>
+        <mho-page-title page="townBuildings"/>
         @if (!store.loading() && !store.load_failed()) {
             <mho-planning-share/>
             <mho-active-citizens [citizenList]="present_citizens()" [completeCitizenList]="store.citizens_full()"/>

@@ -41,12 +41,13 @@ import { Imports } from '../../_abstract_model/types/_types';
 import { CounterFromDatePipe, DiffBetweenDatesPipe } from '../../_core/utilities/date.util';
 import { createDelayedLoadingController, DelayedLoadingController } from '../../_core/utilities/delayed-loading.util';
 import { user } from '../../_core/utilities/localstorage.util';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { MinesweeperHistoryComponent } from './game-history/minesweeper-history.component';
 import { MinesweeperLeaderboardComponent } from './leaderboard/minesweeper-leaderboard.component';
 import { MinesweeperLeaderboardDialogComponent, MinesweeperLeaderboardDialogData } from './leaderboard-dialog/minesweeper-leaderboard-dialog.component';
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [MinesweeperLeaderboardComponent, MinesweeperHistoryComponent];
+const components: Imports = [MinesweeperLeaderboardComponent, MinesweeperHistoryComponent, PageTitleComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatFormFieldModule, MatInputModule, MatSlideToggleModule, MatMenuModule, MatIconModule, MatTabsModule, MatTooltipModule];
 

@@ -1,0 +1,4326 @@
+{
+  "can_use_friendship": {
+    "identifier": "can_use_friendship",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessFeatureRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\FeatureRequirement",
+        "payload": {
+          "feature": "f_share"
+        }
+      }
+    ]
+  },
+  "hunter_no_followers": {
+    "identifier": "hunter_no_followers",
+    "type": 2,
+    "text": "Du kannst die <strong>Tarnkleidung</strong> nicht benutzen, wenn du {escortCount} Personen im Schlepptau hast...",
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessEscortRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\EscortRequirement",
+        "payload": {
+          "maxFollowers": 0
+        }
+      }
+    ]
+  },
+  "room_for_item": {
+    "identifier": "room_for_item",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessInventorySpaceRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\InventorySpaceRequirement",
+        "payload": []
+      }
+    ]
+  },
+  "room_for_item_no_container": {
+    "identifier": "room_for_item_no_container",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessInventorySpaceRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\InventorySpaceRequirement",
+        "payload": {
+          "container": false
+        }
+      }
+    ]
+  },
+  "room_for_item_in_chest": {
+    "identifier": "room_for_item_in_chest",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessInventorySpaceRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\InventorySpaceRequirement",
+        "payload": {
+          "ignoreInventory": true,
+          "container": false,
+          "ignoreSource": true
+        }
+      }
+    ]
+  },
+  "room_for_item_scavenging": {
+    "identifier": "room_for_item_scavenging",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessInventorySpaceRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\InventorySpaceRequirement",
+        "payload": {
+          "considerTrunk": false,
+          "container": false
+        }
+      }
+    ]
+  },
+  "room_for_heavy_item": {
+    "identifier": "room_for_heavy_item",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessInventorySpaceRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\InventorySpaceRequirement",
+        "payload": {
+          "container": false,
+          "ignoreSource": true,
+          "considerTrunk": false,
+          "heavy": true
+        }
+      }
+    ]
+  },
+  "guard_tower_not_max": {
+    "identifier": "guard_tower_not_max",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\GuardTowerUseIsNotMaxed",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CustomClassRequirement",
+        "payload": {
+          "requirement": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\GuardTowerUseIsNotMaxed"
+        }
+      }
+    ]
+  },
+  "vote_shaman_needed": {
+    "identifier": "vote_shaman_needed",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CustomClassRequirement",
+        "payload": {
+          "requirement": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+          "args": {
+            "needed": "shaman"
+          }
+        }
+      }
+    ]
+  },
+  "vote_shaman_not_given": {
+    "identifier": "vote_shaman_not_given",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CustomClassRequirement",
+        "payload": {
+          "requirement": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+          "args": {
+            "hasNotVoted": "shaman"
+          }
+        }
+      }
+    ]
+  },
+  "vote_guide_needed": {
+    "identifier": "vote_guide_needed",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CustomClassRequirement",
+        "payload": {
+          "requirement": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+          "args": {
+            "needed": "guide"
+          }
+        }
+      }
+    ]
+  },
+  "vote_guide_not_given": {
+    "identifier": "vote_guide_not_given",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CustomClassRequirement",
+        "payload": {
+          "requirement": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+          "args": {
+            "hasNotVoted": "guide"
+          }
+        }
+      }
+    ]
+  },
+  "vote_cata_needed": {
+    "identifier": "vote_cata_needed",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CustomClassRequirement",
+        "payload": {
+          "requirement": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+          "args": {
+            "needed": "cata"
+          }
+        }
+      }
+    ]
+  },
+  "vote_cata_not_given": {
+    "identifier": "vote_cata_not_given",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CustomClassRequirement",
+        "payload": {
+          "requirement": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\Custom\\RoleVote",
+          "args": {
+            "hasNotVoted": "cata"
+          }
+        }
+      }
+    ]
+  },
+  "profession_heroic": {
+    "identifier": "profession_heroic",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "hero": true
+        }
+      }
+    ]
+  },
+  "profession_basic": {
+    "identifier": "profession_basic",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_basic": true
+        }
+      }
+    ]
+  },
+  "profession_collec": {
+    "identifier": "profession_collec",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_collec": true
+        }
+      }
+    ]
+  },
+  "profession_guardian": {
+    "identifier": "profession_guardian",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_guardian": true
+        }
+      }
+    ]
+  },
+  "profession_hunter": {
+    "identifier": "profession_hunter",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_hunter": true
+        }
+      }
+    ]
+  },
+  "profession_tamer": {
+    "identifier": "profession_tamer",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_tamer": true
+        }
+      }
+    ]
+  },
+  "profession_tech": {
+    "identifier": "profession_tech",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_tech": true
+        }
+      }
+    ]
+  },
+  "profession_shaman": {
+    "identifier": "profession_shaman",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_shaman": true
+        }
+      }
+    ]
+  },
+  "profession_survivalist": {
+    "identifier": "profession_survivalist",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_survivalist": true
+        }
+      }
+    ]
+  },
+  "not_profession_tech": {
+    "identifier": "not_profession_tech",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_tech": false
+        }
+      }
+    ]
+  },
+  "role_shaman": {
+    "identifier": "role_shaman",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "role_shaman": true
+        }
+      }
+    ]
+  },
+  "role_ghoul": {
+    "identifier": "role_ghoul",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "role_ghoul": true
+        }
+      }
+    ]
+  },
+  "role_ghoul_serum": {
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "role_ghoul": true
+        }
+      }
+    ],
+    "identifier": "role_ghoul_serum",
+    "text": "Du kannst dieses Serum nicht auf dich selbst anwenden, oder du wirst der beste Freund eines Ghuls..."
+  },
+  "not_role_ghoul": {
+    "identifier": "not_role_ghoul",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "role_ghoul": false
+        }
+      }
+    ]
+  },
+  "not_profession_collec": {
+    "identifier": "not_profession_collec",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_collec": false
+        }
+      }
+    ]
+  },
+  "not_profession_guardian": {
+    "identifier": "not_profession_guardian",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_guardian": false
+        }
+      }
+    ]
+  },
+  "not_profession_survivalist": {
+    "identifier": "not_profession_survivalist",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_survivalist": false
+        }
+      }
+    ]
+  },
+  "not_profession_hunter": {
+    "identifier": "not_profession_hunter",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_hunter": false
+        }
+      }
+    ]
+  },
+  "not_profession_tamer": {
+    "identifier": "not_profession_tamer",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessProfessionRoleRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ProfessionRoleRequirement",
+        "payload": {
+          "job_tamer": false
+        }
+      }
+    ]
+  },
+  "never_cross": {
+    "identifier": "never_cross",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_never": true
+        }
+      }
+    ]
+  },
+  "drink_cross": {
+    "identifier": "drink_cross",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_hasdrunk": false
+        }
+      }
+    ]
+  },
+  "drink_mesg": {
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_hasdrunk": false
+        }
+      }
+    ],
+    "identifier": "drink_mesg",
+    "text": "Du hast <strong>heute bereits getrunken</strong>: weitere Rationen werden nur deinen Durst löschen, deine AP aber nicht erneuern."
+  },
+  "drink_hide": {
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_hasdrunk": false
+        }
+      }
+    ],
+    "identifier": "drink_hide"
+  },
+  "drink_rhide": {
+    "identifier": "drink_rhide",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_hasdrunk": true
+        }
+      }
+    ]
+  },
+  "drink_tl0a": {
+    "identifier": "drink_tl0a",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_thirst1": false
+        }
+      }
+    ]
+  },
+  "drink_tl0b": {
+    "identifier": "drink_tl0b",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_thirst2": false
+        }
+      }
+    ]
+  },
+  "drink_tl1": {
+    "identifier": "drink_tl1",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_thirst1": true
+        }
+      }
+    ]
+  },
+  "drink_tl2": {
+    "identifier": "drink_tl2",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_thirst2": true
+        }
+      }
+    ]
+  },
+  "not_yet_dice": {
+    "identifier": "not_yet_dice",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_dice": false
+        }
+      }
+    ],
+    "text_key": "once_a_day"
+  },
+  "not_yet_card": {
+    "identifier": "not_yet_card",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_cards": false
+        }
+      }
+    ],
+    "text_key": "once_a_day"
+  },
+  "not_yet_teddy": {
+    "identifier": "not_yet_teddy",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_teddy": false
+        }
+      }
+    ],
+    "text_key": "once_a_day"
+  },
+  "not_yet_scary": {
+    "identifier": "not_yet_scary",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_scary_mask": false
+        }
+      }
+    ],
+    "text_key": "once_a_day"
+  },
+  "not_yet_guitar": {
+    "identifier": "not_yet_guitar",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_guitar": false
+        }
+      }
+    ],
+    "text": "Vorsicht, zu viel Musik ist schädlich, und einer deiner Mitbürger hat dieses Instrument heute bereits benutzt. Deine Ohren würden das nicht überleben."
+  },
+  "not_yet_beta": {
+    "identifier": "not_yet_beta",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_betadrug": false
+        }
+      }
+    ]
+  },
+  "not_yet_sbook": {
+    "identifier": "not_yet_sbook",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_sbook": false
+        }
+      }
+    ]
+  },
+  "not_yet_hero": {
+    "identifier": "not_yet_hero",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_hero": false
+        }
+      }
+    ]
+  },
+  "not_yet_home_cleaned": {
+    "identifier": "not_yet_home_cleaned",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_home_clean": false
+        }
+      }
+    ]
+  },
+  "not_yet_home_showered": {
+    "identifier": "not_yet_home_showered",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_home_shower": false
+        }
+      }
+    ]
+  },
+  "not_yet_home_heal_1": {
+    "identifier": "not_yet_home_heal_1",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_home_heal_1": false
+        }
+      }
+    ]
+  },
+  "not_yet_home_heal_2": {
+    "identifier": "not_yet_home_heal_2",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_home_heal_2": false
+        }
+      }
+    ]
+  },
+  "not_yet_home_defbuff": {
+    "identifier": "not_yet_home_defbuff",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_home_defbuff": false
+        }
+      }
+    ]
+  },
+  "not_yet_rested": {
+    "identifier": "not_yet_rested",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_rested": false
+        }
+      }
+    ]
+  },
+  "not_yet_immune": {
+    "identifier": "not_yet_immune",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_shaman_immune": false
+        }
+      }
+    ]
+  },
+  "immune": {
+    "identifier": "immune",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_shaman_immune": true
+        }
+      }
+    ]
+  },
+  "eat_ap": {
+    "identifier": "eat_ap",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_haseaten": false
+        }
+      }
+    ],
+    "text_key": "once_a_day"
+  },
+  "drug_1": {
+    "identifier": "drug_1",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_drugged": false
+        }
+      }
+    ]
+  },
+  "drug_2": {
+    "identifier": "drug_2",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_drugged": true
+        }
+      }
+    ]
+  },
+  "not_tired": {
+    "identifier": "not_tired",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tired": false
+        }
+      }
+    ],
+    "text": "Solange du <strong>erschöpft bist</strong>, kannst du diese Aktion nicht ausführen (da du keine Aktionspunkte mehr hast)... Trink oder iss etwas, oder nimm eine Droge, ansonsten musst du bis <strong>morgen</strong> warten."
+  },
+  "is_wounded": {
+    "identifier": "is_wounded",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_meta_wound": true
+        }
+      }
+    ]
+  },
+  "is_not_wounded": {
+    "identifier": "is_not_wounded",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_meta_wound": false
+        }
+      }
+    ]
+  },
+  "is_not_wounded_hands": {
+    "identifier": "is_not_wounded_hands",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_wound2": false
+        }
+      }
+    ]
+  },
+  "is_not_wounded_hands_repair": {
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_wound2": false
+        }
+      }
+    ],
+    "identifier": "is_not_wounded_hands_repair",
+    "text": "Mit deiner verletzten Hand bist du eigentlich nicht in der Lage, etwas zu halten. Trotzdem versuchst du dich hartnäckig in filigraner Reparaturarbeit, stößt dir dabei aber die Hand, was dir viele unnötige Schmerzen bereitet. Vielleicht solltest du stattdessen nach einem Weg suchen, dich selbst zu heilen."
+  },
+  "is_not_bandaged": {
+    "identifier": "is_not_bandaged",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_healed": false
+        }
+      }
+    ]
+  },
+  "is_wounded_h": {
+    "identifier": "is_wounded_h",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_meta_wound": true
+        }
+      }
+    ]
+  },
+  "is_not_wounded_h": {
+    "identifier": "is_not_wounded_h",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_meta_wound": false
+        }
+      }
+    ]
+  },
+  "is_infected_h": {
+    "identifier": "is_infected_h",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_infection": true
+        }
+      }
+    ]
+  },
+  "is_not_infected_h": {
+    "identifier": "is_not_infected_h",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_infection": false
+        }
+      }
+    ]
+  },
+  "not_drunk": {
+    "identifier": "not_drunk",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_drunk": false
+        }
+      }
+    ]
+  },
+  "not_hungover": {
+    "identifier": "not_hungover",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_hungover": false
+        }
+      }
+    ]
+  },
+  "must_be_terrorized": {
+    "identifier": "must_be_terrorized",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_terror": true
+        }
+      }
+    ],
+    "text": "Das brauchst du gerade nicht ..."
+  },
+  "must_be_terrorized_hd": {
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_terror": true
+        }
+      }
+    ],
+    "text": "Das brauchst du gerade nicht ...",
+    "identifier": "must_be_terrorized_hd"
+  },
+  "must_not_be_terrorized": {
+    "identifier": "must_not_be_terrorized",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_terror": false
+        }
+      }
+    ],
+    "text": "Das brauchst du gerade nicht ..."
+  },
+  "must_not_be_banished": {
+    "identifier": "must_not_be_banished",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "shunned": false
+        }
+      }
+    ]
+  },
+  "must_not_be_banished_w": {
+    "identifier": "must_not_be_banished_w",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "shunned": false
+        }
+      }
+    ],
+    "text_key": "water_purification_impossible"
+  },
+  "must_be_banished": {
+    "identifier": "must_be_banished",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "shunned": true
+        }
+      }
+    ]
+  },
+  "must_not_be_hidden": {
+    "identifier": "must_not_be_hidden",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_hide": false
+        }
+      }
+    ]
+  },
+  "must_not_be_tombed": {
+    "identifier": "must_not_be_tombed",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_tomb": false
+        }
+      }
+    ]
+  },
+  "must_be_hidden": {
+    "identifier": "must_be_hidden",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_hide": true
+        }
+      }
+    ]
+  },
+  "must_be_tombed": {
+    "identifier": "must_be_tombed",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_tomb": true
+        }
+      }
+    ]
+  },
+  "shoe_now": {
+    "identifier": "shoe_now",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_has_shoe": true
+        }
+      }
+    ]
+  },
+  "not_yet_shoe_now": {
+    "identifier": "not_yet_shoe_now",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_has_shoe": false
+        }
+      }
+    ]
+  },
+  "not_yet_shoe_now_c": {
+    "identifier": "not_yet_shoe_now_c",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_has_shoe": false
+        }
+      }
+    ]
+  },
+  "shoe_today": {
+    "identifier": "shoe_today",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_had_shoe": true
+        }
+      }
+    ]
+  },
+  "not_yet_shoe_today": {
+    "identifier": "not_yet_shoe_today",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_had_shoe": false
+        }
+      }
+    ]
+  },
+  "shoe_first": {
+    "identifier": "shoe_first",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_shoe_first": true
+        }
+      }
+    ]
+  },
+  "not_shoe_first": {
+    "identifier": "not_shoe_first",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_shoe_first": false
+        }
+      }
+    ]
+  },
+  "bike_now": {
+    "identifier": "bike_now",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessSourceRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\SourceRequirement",
+        "payload": {
+          "essential": true
+        }
+      }
+    ]
+  },
+  "not_yet_bike_now": {
+    "identifier": "not_yet_bike_now",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_has_bike": false
+        }
+      }
+    ]
+  },
+  "not_yet_bike_now_c": {
+    "identifier": "not_yet_bike_now_c",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_has_bike": false
+        }
+      }
+    ]
+  },
+  "bike_today": {
+    "identifier": "bike_today",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_had_bike": true
+        }
+      }
+    ]
+  },
+  "not_yet_bike_today": {
+    "identifier": "not_yet_bike_today",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_had_bike": false
+        }
+      }
+    ]
+  },
+  "bike_first": {
+    "identifier": "bike_first",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_bike_first": true
+        }
+      }
+    ]
+  },
+  "not_bike_first": {
+    "identifier": "not_bike_first",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_bike_first": false
+        }
+      }
+    ]
+  },
+  "not_yet_soccer": {
+    "identifier": "not_yet_soccer",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_soccer": false
+        }
+      }
+    ],
+    "text_key": "once_a_day"
+  },
+  "not_drunk_hide": {
+    "identifier": "not_drunk_hide",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_drunk": false
+        }
+      }
+    ]
+  },
+  "must_be_drunk": {
+    "identifier": "must_be_drunk",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_drunk": true
+        }
+      }
+    ]
+  },
+  "not_yet_flag": {
+    "identifier": "not_yet_flag",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_flag": false
+        }
+      }
+    ],
+    "text_key": "once_a_day"
+  },
+  "not_yet_home_pooled": {
+    "identifier": "not_yet_home_pooled",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_home_pool": false
+        }
+      }
+    ]
+  },
+  "pool_has_water": {
+    "identifier": "pool_has_water",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_tg_pool_filled": true
+        }
+      }
+    ]
+  },
+  "is_not_wounded_foot": {
+    "identifier": "is_not_wounded_foot",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_wound6": false
+        }
+      }
+    ]
+  },
+  "is_not_wounded_leg": {
+    "identifier": "is_not_wounded_leg",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessStatusRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\StatusRequirement",
+        "payload": {
+          "status_wound4": false
+        }
+      }
+    ]
+  },
+  "no_bonus_ap": {
+    "identifier": "no_bonus_ap",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "max": 0,
+          "fromLimit": true
+        }
+      }
+    ],
+    "text_key": "already_full_ap"
+  },
+  "no_bonus_sp": {
+    "identifier": "no_bonus_sp",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 4,
+          "max": 0,
+          "fromLimit": true
+        }
+      }
+    ],
+    "text_key": "already_full_sp"
+  },
+  "no_full_ap": {
+    "identifier": "no_full_ap",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "max": -1,
+          "fromLimit": true
+        }
+      }
+    ],
+    "text_key": "already_full_ap"
+  },
+  "not_thirsty": {
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "max": -1,
+          "fromLimit": true
+        }
+      }
+    ],
+    "text_key": "already_full_ap_drink",
+    "identifier": "not_thirsty"
+  },
+  "no_full_ap_msg": {
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "max": -1,
+          "fromLimit": true
+        }
+      }
+    ],
+    "text_key": "already_full_ap",
+    "identifier": "no_full_ap_msg",
+    "text": "Das brauchst du gerade nicht ..."
+  },
+  "no_full_ap_msg_food": {
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "max": -1,
+          "fromLimit": true
+        }
+      }
+    ],
+    "text_key": "already_full_ap",
+    "identifier": "no_full_ap_msg_food",
+    "text": "Du brauchst im Moment <strong>nichts zu essen</strong>, da du nicht müde bist und noch alle deine Aktionspunkte hast."
+  },
+  "min_6_ap": {
+    "identifier": "min_6_ap",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "min": 6
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_5_ap": {
+    "identifier": "min_5_ap",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "min": 5
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_2_ap": {
+    "identifier": "min_2_ap",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "min": 2
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_1_ap": {
+    "identifier": "min_1_ap",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "min": 1
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "no_cp": {
+    "identifier": "no_cp",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 2,
+          "max": 0
+        }
+      }
+    ]
+  },
+  "min_1_cp": {
+    "identifier": "min_1_cp",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 2,
+          "min": 1
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_1_cp_hd": {
+    "identifier": "min_1_cp_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 2,
+          "min": 1
+        }
+      }
+    ]
+  },
+  "min_1_pm": {
+    "identifier": "min_1_pm",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 3,
+          "min": 1
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_2_pm": {
+    "identifier": "min_2_pm",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 3,
+          "min": 2
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_3_pm": {
+    "identifier": "min_3_pm",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 3,
+          "min": 3
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_3_ap": {
+    "identifier": "min_3_ap",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "min": 3
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_4_ap": {
+    "identifier": "min_4_ap",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 1,
+          "min": 4
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_2_cp": {
+    "identifier": "min_2_cp",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 2,
+          "min": 2
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "min_3_cp": {
+    "identifier": "min_3_cp",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessPointRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\PointRequirement",
+        "payload": {
+          "require": 2,
+          "min": 3
+        }
+      }
+    ],
+    "text_key": "pt_required"
+  },
+  "not_before_day_2": {
+    "identifier": "not_before_day_2",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessTimeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\TimeRequirement",
+        "payload": {
+          "minDay": 2
+        }
+      }
+    ],
+    "text": "Dies kannst du erst ab <strong>Tag {day_min}</strong> tun."
+  },
+  "must_be_day": {
+    "identifier": "must_be_day",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessTimeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\TimeRequirement",
+        "payload": {
+          "time": "day"
+        }
+      }
+    ]
+  },
+  "must_be_night": {
+    "identifier": "must_be_night",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessTimeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\TimeRequirement",
+        "payload": {
+          "time": "night"
+        }
+      }
+    ]
+  },
+  "lab_counter_below_1": {
+    "identifier": "lab_counter_below_1",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 3,
+          "max": 0
+        }
+      }
+    ]
+  },
+  "lab_counter_below_4": {
+    "identifier": "lab_counter_below_4",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 3,
+          "max": 3
+        }
+      }
+    ]
+  },
+  "lab_counter_below_6": {
+    "identifier": "lab_counter_below_6",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 3,
+          "max": 5
+        }
+      }
+    ]
+  },
+  "lab_counter_below_9": {
+    "identifier": "lab_counter_below_9",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 3,
+          "max": 8
+        }
+      }
+    ]
+  },
+  "kitchen_counter_below_1": {
+    "identifier": "kitchen_counter_below_1",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 2,
+          "max": 0
+        }
+      }
+    ]
+  },
+  "kitchen_counter_below_2": {
+    "identifier": "kitchen_counter_below_2",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 2,
+          "max": 1
+        }
+      }
+    ]
+  },
+  "kitchen_counter_below_3": {
+    "identifier": "kitchen_counter_below_3",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 2,
+          "max": 2
+        }
+      }
+    ]
+  },
+  "kitchen_counter_below_4": {
+    "identifier": "kitchen_counter_below_4",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 2,
+          "max": 3
+        }
+      }
+    ]
+  },
+  "kitchen_counter_below_5": {
+    "identifier": "kitchen_counter_below_5",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 2,
+          "max": 4
+        }
+      }
+    ]
+  },
+  "kitchen_counter_below_6": {
+    "identifier": "kitchen_counter_below_6",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 2,
+          "max": 5
+        }
+      }
+    ]
+  },
+  "scav_counter_below_1": {
+    "identifier": "scav_counter_below_1",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 28,
+          "max": 0
+        }
+      }
+    ],
+    "text": "Du hast heute bereits eine Zone ausgehoben..."
+  },
+  "scav_building_counter_below_1": {
+    "identifier": "scav_building_counter_below_1",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 14,
+          "max": 0
+        }
+      }
+    ]
+  },
+  "scav_building_counter_below_3": {
+    "identifier": "scav_building_counter_below_3",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 14,
+          "max": 2
+        }
+      }
+    ]
+  },
+  "surv_building_counter_below_1": {
+    "identifier": "surv_building_counter_below_1",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 17,
+          "max": 0
+        }
+      }
+    ]
+  },
+  "hunter_building_counter_below_1": {
+    "identifier": "hunter_building_counter_below_1",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 18,
+          "max": 0
+        }
+      }
+    ]
+  },
+  "not_contemplated": {
+    "identifier": "not_contemplated",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessCounterRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\CounterRequirement",
+        "payload": {
+          "counter": 27,
+          "max": 0
+        }
+      }
+    ]
+  },
+  "must_have_purifier": {
+    "identifier": "must_have_purifier",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_item_jerrycan_#00": true
+        }
+      }
+    ]
+  },
+  "must_not_have_purifier": {
+    "identifier": "must_not_have_purifier",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_item_jerrycan_#00": false
+        }
+      }
+    ]
+  },
+  "must_have_filter": {
+    "identifier": "must_have_filter",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_item_jerrycan_#01": true
+        }
+      }
+    ]
+  },
+  "must_not_have_filter": {
+    "identifier": "must_not_have_filter",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_item_jerrycan_#01": false
+        }
+      }
+    ]
+  },
+  "must_have_shower": {
+    "identifier": "must_have_shower",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_shower_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_slaughter": {
+    "identifier": "must_have_slaughter",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_item_meat_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_hospital": {
+    "identifier": "must_have_hospital",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_infirmary_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_guardtower": {
+    "identifier": "must_have_guardtower",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_watchmen_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_crowsnest": {
+    "identifier": "must_have_crowsnest",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_watchmen_#01": true
+        }
+      }
+    ]
+  },
+  "must_have_valve": {
+    "identifier": "must_have_valve",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_valve_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_cinema": {
+    "identifier": "must_have_cinema",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_cinema_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_hammam": {
+    "identifier": "must_have_hammam",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_item_soul_blue_static_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_lab": {
+    "identifier": "must_have_lab",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_item_acid_#00": true
+        }
+      }
+    ]
+  },
+  "must_not_have_lab": {
+    "identifier": "must_not_have_lab",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_item_acid_#00": false
+        }
+      }
+    ],
+    "text": "Vielleicht solltest du stattdessen dein Labor benutzen..."
+  },
+  "must_have_canteen": {
+    "identifier": "must_have_canteen",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_cafet_#01": true
+        }
+      }
+    ]
+  },
+  "must_not_have_canteen": {
+    "identifier": "must_not_have_canteen",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_cafet_#01": false
+        }
+      }
+    ]
+  },
+  "must_not_have_valve": {
+    "identifier": "must_not_have_valve",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_valve_#00": false
+        }
+      }
+    ],
+    "text": "Vielleicht solltest du das mithilfe des Wasserhahns füllen..."
+  },
+  "must_have_pool": {
+    "identifier": "must_have_pool",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_pool_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_scavenger_building": {
+    "identifier": "must_have_scavenger_building",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_gallery_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_surv_building": {
+    "identifier": "must_have_surv_building",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_survarea_#00": true
+        }
+      }
+    ]
+  },
+  "must_have_tamer_building": {
+    "identifier": "must_have_tamer_building",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_pet_#00": true
+        }
+      }
+    ]
+  },
+  "must_not_have_tamer_building": {
+    "identifier": "must_not_have_tamer_building",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_pet_#00": false
+        }
+      }
+    ]
+  },
+  "must_have_sanctuary": {
+    "identifier": "must_have_sanctuary",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessBuildingRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement",
+        "payload": {
+          "building_small_spa4souls_#01": true
+        }
+      }
+    ]
+  },
+  "feature_camping": {
+    "identifier": "feature_camping",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessConfigRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ConfigRequirement",
+        "payload": {
+          "config_features.camping": true
+        }
+      }
+    ]
+  },
+  "during_christmas": {
+    "identifier": "during_christmas",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessConfigRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ConfigRequirement",
+        "payload": {
+          "event": "christmas"
+        }
+      }
+    ],
+    "text_key": "not_in_event"
+  },
+  "during_halloween": {
+    "identifier": "during_halloween",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessConfigRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ConfigRequirement",
+        "payload": {
+          "event": "halloween"
+        }
+      }
+    ],
+    "text_key": "not_in_event"
+  },
+  "h_during_halloween": {
+    "identifier": "h_during_halloween",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessConfigRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ConfigRequirement",
+        "payload": {
+          "event": "halloween"
+        }
+      }
+    ]
+  },
+  "h_not_during_halloween": {
+    "identifier": "h_not_during_halloween",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessConfigRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ConfigRequirement",
+        "payload": {
+          "event": "!halloween"
+        }
+      }
+    ]
+  },
+  "must_be_aprils_fools": {
+    "identifier": "must_be_aprils_fools",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessConfigRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ConfigRequirement",
+        "payload": {
+          "event": "afools"
+        }
+      }
+    ],
+    "text_key": "not_in_event"
+  },
+  "have_can_opener": {
+    "identifier": "have_can_opener",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "can_opener",
+          "store": "item_tool"
+        }
+      }
+    ],
+    "text": "Du hast nichts, mit dem du dieses Ding aufbekommen könntest.."
+  },
+  "have_box_opener": {
+    "identifier": "have_box_opener",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "box_opener",
+          "store": "item_tool"
+        }
+      }
+    ],
+    "text": "Du hast nichts, mit dem du dieses Ding aufbekommen könntest.."
+  },
+  "have_parcel_opener": {
+    "identifier": "have_parcel_opener",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "parcel_opener",
+          "store": "item_tool"
+        }
+      }
+    ],
+    "text": "Du hast nichts, mit dem du dieses Ding aufbekommen könntest.."
+  },
+  "have_can_opener_hd": {
+    "identifier": "have_can_opener_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "can_opener",
+          "store": "item_tool"
+        }
+      }
+    ]
+  },
+  "have_box_opener_hd": {
+    "identifier": "have_box_opener_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "box_opener",
+          "store": "item_tool"
+        }
+      }
+    ]
+  },
+  "have_parcel_opener_hd": {
+    "identifier": "have_parcel_opener_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "parcel_opener",
+          "store": "item_tool"
+        }
+      }
+    ]
+  },
+  "not_have_can_opener_hd": {
+    "identifier": "not_have_can_opener_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "can_opener",
+          "count": 0
+        }
+      }
+    ]
+  },
+  "not_have_box_opener_hd": {
+    "identifier": "not_have_box_opener_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "box_opener",
+          "count": 0
+        }
+      }
+    ]
+  },
+  "not_have_parcel_opener_hd": {
+    "identifier": "not_have_parcel_opener_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "property": "parcel_opener",
+          "count": 0
+        }
+      }
+    ]
+  },
+  "have_water_shaman": {
+    "identifier": "have_water_shaman",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "water_#00"
+        }
+      }
+    ],
+    "text": "Du musst etwas Wasser zum Umwandeln haben, um den Trank vorzubereiten."
+  },
+  "have_water": {
+    "identifier": "have_water",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "water_#00"
+        }
+      }
+    ],
+    "text_key": "item_needed_generic"
+  },
+  "have_canister": {
+    "identifier": "have_canister",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "jerrycan_#00"
+        }
+      }
+    ],
+    "text_key": "item_needed_generic"
+  },
+  "have_battery": {
+    "identifier": "have_battery",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "pile_#00"
+        }
+      }
+    ],
+    "text_key": "item_needed_generic"
+  },
+  "have_matches": {
+    "identifier": "have_matches",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "lights_#00"
+        }
+      }
+    ],
+    "text_key": "item_needed_generic"
+  },
+  "have_2_pharma": {
+    "identifier": "have_2_pharma",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "pharma_#00",
+          "count": 2
+        }
+      }
+    ],
+    "text_key": "item_needed_generic"
+  },
+  "must_have_micropur": {
+    "identifier": "must_have_micropur",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "water_cleaner_#00"
+        }
+      }
+    ],
+    "text_key": "item_needed_generic"
+  },
+  "must_have_micropur_in": {
+    "identifier": "must_have_micropur_in",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "water_cleaner_#00"
+        }
+      }
+    ],
+    "text_key": "water_purification_impossible"
+  },
+  "must_have_drug": {
+    "identifier": "must_have_drug",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "drug_#00"
+        }
+      }
+    ],
+    "text_key": "item_needed_generic"
+  },
+  "must_have_steak": {
+    "identifier": "must_have_steak",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessItemRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\ItemRequirement",
+        "payload": {
+          "item": "meat_#00"
+        }
+      }
+    ],
+    "text_key": "item_needed_generic"
+  },
+  "must_be_outside": {
+    "identifier": "must_be_outside",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true
+        }
+      }
+    ]
+  },
+  "must_be_outside_or_exploring": {
+    "identifier": "must_be_outside_or_exploring",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null
+        }
+      }
+    ]
+  },
+  "must_be_exploring": {
+    "identifier": "must_be_exploring",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": true
+        }
+      }
+    ]
+  },
+  "must_be_inside": {
+    "identifier": "must_be_inside",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "town": true
+        }
+      }
+    ]
+  },
+  "must_be_inside_bp": {
+    "identifier": "must_be_inside_bp",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "town": true
+        }
+      }
+    ],
+    "text": "Wenn du den Plan studieren willst, musst du in die relative Ruhe der Stadt zurückkehren."
+  },
+  "must_be_at_buried_ruin": {
+    "identifier": "must_be_at_buried_ruin",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "atBuriedRuin": true
+        }
+      }
+    ],
+    "text": "Dir fällt kein Grund ein, dies zu tun..."
+  },
+  "must_be_outside_not_at_doors": {
+    "identifier": "must_be_outside_not_at_doors",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "minAp": 1
+        }
+      }
+    ]
+  },
+  "must_be_outside_no_door_no_ex": {
+    "identifier": "must_be_outside_no_door_no_ex",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": false,
+          "minAp": 1
+        }
+      }
+    ]
+  },
+  "must_be_outside_3km": {
+    "identifier": "must_be_outside_3km",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "minKm": 3
+        }
+      }
+    ],
+    "text": "Du musst mindestens 3 Kilometer von der Stadt entfernt sein, um das zu tun."
+  },
+  "must_be_outside_within_hr": {
+    "identifier": "must_be_outside_within_hr",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "maxKm": "cfg://ctp/props.actions.hero_return.range"
+        }
+      }
+    ],
+    "text": "Du bist <strong>zu weit von der Stadt entfernt</strong>, um diese Fähigkeit benutzen zu können! Genauer gesagt bist du {km_from_town} km entfernt. Die maximale Entfernung darf höchstens {cfg_ctp_props_actions_hero_return_range} km betragen."
+  },
+  "must_have_zombies": {
+    "identifier": "must_have_zombies",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "minZombies": 1
+        }
+      }
+    ],
+    "text": "Zum Glück sind hier keine Zombies..."
+  },
+  "must_be_blocked": {
+    "identifier": "must_be_blocked",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "isControlled": false
+        }
+      }
+    ],
+    "text": "Das solltest du nur in einer ausweglosen Situation tun..."
+  },
+  "must_not_be_blocked": {
+    "identifier": "must_not_be_blocked",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "isControlled": true
+        }
+      }
+    ],
+    "text": "Das kannst du nicht tun während du umzingelt bist..."
+  },
+  "must_have_control": {
+    "identifier": "must_have_control",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "isControlledOrTempControlled": true
+        }
+      }
+    ],
+    "text": "Das kannst du nicht tun während du umzingelt bist..."
+  },
+  "must_have_control_hunter": {
+    "identifier": "must_have_control_hunter",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "isControlledOrTempControlled": true
+        }
+      }
+    ],
+    "text": "Das kannst die <strong>Tarnkleidung</strong> nicht verwenden, solange die Zombies diese Zone kontrollieren!"
+  },
+  "zone_is_improvable": {
+    "identifier": "zone_is_improvable",
+    "type": 2,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "maxLevel": 50
+        }
+      }
+    ],
+    "text": "Du bist der Ansicht, dass du diese Zone nicht besser ausbauen kannst, da du schon dein Bestes gegeben hast."
+  },
+  "must_be_anywhere": {
+    "identifier": "must_be_anywhere",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "town": null,
+          "beyond": null,
+          "exploring": null
+        }
+      }
+    ]
+  },
+  "zone_not_force_regenerated": {
+    "identifier": "zone_not_force_regenerated",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "isForceRegenerated": false
+        }
+      }
+    ],
+    "text": "Es sieht wirklich nicht so aus, als würdest du hier noch neue Buddelmöglichkeiten finden können..."
+  },
+  "must_not_have_zombies": {
+    "identifier": "must_not_have_zombies",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "minZombies": 0,
+          "maxZombies": 0
+        }
+      }
+    ]
+  },
+  "must_be_blocked_hd": {
+    "identifier": "must_be_blocked_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "isControlled": false
+        }
+      }
+    ]
+  },
+  "must_not_be_blocked_hd": {
+    "identifier": "must_not_be_blocked_hd",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "exploring": null,
+          "isControlled": true
+        }
+      }
+    ]
+  },
+  "must_have_ruin_with_bp": {
+    "identifier": "must_have_ruin_with_bp",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "atRuin": true,
+          "hasBp": true
+        }
+      }
+    ]
+  },
+  "must_have_ruin_no_bp": {
+    "identifier": "must_have_ruin_no_bp",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "atRuin": true,
+          "hasBp": false
+        }
+      }
+    ]
+  },
+  "must_not_have_ruin": {
+    "identifier": "must_not_have_ruin",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "atRuin": false
+        }
+      }
+    ]
+  },
+  "zone_must_be_empty": {
+    "identifier": "zone_must_be_empty",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessLocationRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\LocationRequirement",
+        "payload": {
+          "beyond": true,
+          "isEmpty": true
+        }
+      }
+    ],
+    "text": "Nach neuen Buddelmöglichkeiten zu suchen macht nur Sinn, wenn es keine offensichtlichen Buddelmöglichkeiten mehr gibt."
+  },
+  "must_have_upgraded_home": {
+    "identifier": "must_have_upgraded_home",
+    "type": 1,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "minLevel": 1
+        }
+      }
+    ]
+  },
+  "must_have_home_lab_v1": {
+    "identifier": "must_have_home_lab_v1",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "lab",
+          "minLevel": 1,
+          "maxLevel": 1
+        }
+      }
+    ]
+  },
+  "must_have_home_lab_v2": {
+    "identifier": "must_have_home_lab_v2",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "lab",
+          "minLevel": 2,
+          "maxLevel": 2
+        }
+      }
+    ]
+  },
+  "must_have_home_lab_v3": {
+    "identifier": "must_have_home_lab_v3",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "lab",
+          "minLevel": 3,
+          "maxLevel": 3
+        }
+      }
+    ]
+  },
+  "must_have_home_lab_v4": {
+    "identifier": "must_have_home_lab_v4",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "lab",
+          "minLevel": 4,
+          "maxLevel": 4
+        }
+      }
+    ]
+  },
+  "must_have_home_kitchen_v1": {
+    "identifier": "must_have_home_kitchen_v1",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "kitchen",
+          "minLevel": 1,
+          "maxLevel": 1
+        }
+      }
+    ]
+  },
+  "must_have_home_kitchen_v2": {
+    "identifier": "must_have_home_kitchen_v2",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "kitchen",
+          "minLevel": 2,
+          "maxLevel": 2
+        }
+      }
+    ]
+  },
+  "must_have_home_kitchen_v3": {
+    "identifier": "must_have_home_kitchen_v3",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "kitchen",
+          "minLevel": 3,
+          "maxLevel": 3
+        }
+      }
+    ]
+  },
+  "must_have_home_kitchen_v4": {
+    "identifier": "must_have_home_kitchen_v4",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "kitchen",
+          "minLevel": 4,
+          "maxLevel": 4
+        }
+      }
+    ]
+  },
+  "must_have_home_rest_v1": {
+    "identifier": "must_have_home_rest_v1",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "rest",
+          "minLevel": 1,
+          "maxLevel": 1
+        }
+      }
+    ]
+  },
+  "must_have_home_rest_v2": {
+    "identifier": "must_have_home_rest_v2",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "rest",
+          "minLevel": 2,
+          "maxLevel": 2
+        }
+      }
+    ]
+  },
+  "must_have_home_rest_v3": {
+    "identifier": "must_have_home_rest_v3",
+    "type": 0,
+    "atomList": [
+      {
+        "sort": [
+          "default",
+          null,
+          0
+        ],
+        "processor": "App\\Service\\Actions\\Game\\AtomProcessors\\Require\\ProcessHomeRequirement",
+        "atom": "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\HomeRequirement",
+        "payload": {
+          "upgrade": "rest",
+          "minLevel": 3,
+          "maxLevel": 3
+        }
+      }
+    ]
+  }
+}

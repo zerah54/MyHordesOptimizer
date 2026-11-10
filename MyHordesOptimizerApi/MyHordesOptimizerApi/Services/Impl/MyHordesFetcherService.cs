@@ -109,8 +109,11 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Logger.LogDebug("GetItem({@townId}) FetchInDb in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
                 sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
-                ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionsByName());
-                ItemCatapultEffectResolver.PopulateCatapultEffects(itemsDto, itemsDto, GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
+                var builtBuildingUids = DbContext.TownBuildings
+                    .Where(townBuilding => townBuilding.IdTown == townId && townBuilding.IsBuilt)
+                    .Join(DbContext.Buildings, townBuilding => townBuilding.IdBuilding, building => building.IdBuilding, (townBuilding, building) => building.Uid)
+                    .ToHashSet(StringComparer.Ordinal);
+                EnrichItems(itemsDto, builtBuildingUids);
                 PopulateBagChestMapCellCounts(itemsDto, townId.Value);
                 Logger.LogDebug("GetItem({@townId}) Mapper in {@ElapsedMilliseconds} ms", townId, sw.ElapsedMilliseconds);
                 sw.Stop();
@@ -142,8 +145,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 Logger.LogDebug("GetItem() FetchInDb in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
                 sw.Restart();
                 var itemsDto = Mapper.Map<List<ItemDto>>(items);
-                ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionsByName());
-                ItemCatapultEffectResolver.PopulateCatapultEffects(itemsDto, itemsDto, GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
+                EnrichItems(itemsDto, null);
                 Logger.LogDebug("GetItem() Mapper in {@ElapsedMilliseconds} ms", sw.ElapsedMilliseconds);
                 sw.Stop();
                 return itemsDto;
@@ -185,6 +187,81 @@ namespace MyHordesOptimizerApi.Services.Impl
         private Dictionary<string, string> GetItemsCatapultByUid()
         {
             return _itemsCatapultByUidCache ??= MyHordesCodeRepository.GetItemsCatapult();
+        }
+
+        private static Dictionary<string, JArray>? _resultGroupsCache;
+        private static Dictionary<string, MyHordesMetaResultCodeModel>? _metaRequirementsCache;
+        private static Dictionary<string, string>? _itemsNightwatchCache;
+        private static Dictionary<string, MyHordesItemExtrasCodeModel>? _itemExtrasCache;
+
+        /// <summary>
+        /// Enrichit le catalogue (ouverture, catapulte, effets d'actions, recharges et leurs recettes, veille et sacs) ;
+        /// un enrichissement récent qui échoue est journalisé et laissé à ses valeurs par défaut
+        /// sans faire échouer la requête.
+        /// </summary>
+        private void EnrichItems(List<ItemDto> itemsDto, IReadOnlySet<string>? builtBuildingUids)
+        {
+            ItemOpenerResolver.PopulateOpenerRelations(itemsDto, itemsDto, GetActionsByName());
+            ItemCatapultEffectResolver.PopulateCatapultEffects(itemsDto, itemsDto, GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
+
+            var actionsOk = false;
+            try
+            {
+                ItemActionEffectsResolver.PopulateActionEffects(itemsDto, itemsDto, GetActionsByName(), GetMetaResultsByName(),
+                    _resultGroupsCache ??= MyHordesCodeRepository.GetResultGroups(),
+                    _metaRequirementsCache ??= MyHordesCodeRepository.GetMetaRequirements(),
+                    _itemsNightwatchCache ??= MyHordesCodeRepository.GetItemsNightwatch(),
+                    builtBuildingUids);
+                actionsOk = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "EnrichItems : échec de PopulateActionEffects, effets d'actions ignorés");
+                itemsDto.ForEach(item => item.ActionEffects = new());
+            }
+
+            if (actionsOk)
+            {
+                try
+                {
+                    ItemWeaponChargesResolver.PopulateReloads(itemsDto, itemsDto, GetActionsByName(), GetMetaResultsByName(),
+                        _resultGroupsCache ??= MyHordesCodeRepository.GetResultGroups());
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "EnrichItems : échec de PopulateReloads, recharges ignorées");
+                    itemsDto.ForEach(item => item.ReloadCharges = null);
+                }
+            }
+
+            try
+            {
+                var reloadRecipes = ItemReloadRecipesResolver.Build(itemsDto, GetActionsByName(), GetMetaResultsByName(),
+                    _resultGroupsCache ??= MyHordesCodeRepository.GetResultGroups());
+                foreach (var item in itemsDto)
+                {
+                    if (item.Uid != null && reloadRecipes.TryGetValue(item.Uid, out var recipes)) item.Recipes.AddRange(recipes);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "EnrichItems : échec de ItemReloadRecipesResolver.Build, recettes de recharge ignorées");
+            }
+
+            try
+            {
+                ItemWatchAndBagResolver.Populate(itemsDto, itemsDto, _itemExtrasCache ??= MyHordesCodeRepository.GetItemExtras());
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "EnrichItems : échec de ItemWatchAndBagResolver.Populate, veille et sacs ignorés");
+                foreach (var item in itemsDto)
+                {
+                    item.WatchImpact = 0;
+                    item.BagCapacityBonus = null;
+                    item.BagExclusiveGroup = null;
+                }
+            }
         }
 
         /// <summary>

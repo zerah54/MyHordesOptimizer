@@ -66,6 +66,38 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
         return fake.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === user_id)?.tasks ?? [];
     }
 
+    /**
+     * Ouvre la liste des niveaux visés.
+     * @returns {string[]} Libellés des niveaux, espaces normalisées.
+     */
+    function levelOptions(): string[] {
+        fixture.detectChanges();
+        (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('mat-select[data-field="bulk-level"] .mat-mdc-select-trigger')?.click();
+        fixture.detectChanges();
+        return Array.from(document.querySelectorAll<HTMLElement>('mat-option'))
+            .map((option: HTMLElement): string => (option.textContent ?? '').replace(/\s+/g, ' ').trim());
+    }
+
+    it('amélioration : PA de chaque niveau collés à leurs parenthèses', async (): Promise<void> => {
+        await render();
+        form().kind.set('homeUpgrade');
+        form().upgrade_key.set('kitchenLevel');
+
+        const options: string[] = levelOptions();
+        expect(options.length).toBeGreaterThan(0);
+        options.forEach((option: string): void => expect(option).toMatch(/^niv\. \d+ \(\d+\)$/));
+    });
+
+    it('maison en chaos : PA de chaque niveau collés à leurs parenthèses', async (): Promise<void> => {
+        await render();
+        fake.unlimited_home_levels.set(true);
+        form().kind.set('home');
+
+        const options: string[] = levelOptions();
+        expect(options.length).toBeGreaterThan(0);
+        options.forEach((option: string): void => expect(option).toMatch(/\S \(\d+\)$/));
+    });
+
     it('annonce le nombre de citoyens visés', async (): Promise<void> => {
         await render();
 

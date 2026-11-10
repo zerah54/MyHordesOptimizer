@@ -1,5 +1,7 @@
 <mat-card-header class="mho-my-program-header">
-    <mat-card-title i18n>Mon programme</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="townProgram"/>
+    </mat-card-title>
 </mat-card-header>
 
 <mat-card-content class="mho-my-program">
@@ -234,9 +236,9 @@
                 @let status = task_statuses()[index];
                 @if (future()) {
                     <li>{{ taskText(task) }}@if (task.pa > 0) {
-                        (
-                        <mho-icon-ap [value]="task.pa"/>
-                        )
+                        <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                        (<mho-icon-ap [value]="task.pa"/>)
+                        <!-- @formatter:on -->
                     }</li>
                 } @else {
                     <li [class.done]="status.done">
@@ -244,9 +246,9 @@
                                       [disabled]="!store.can_track() || store.isPending(userId, task) || locked(task, status)"
                                       (change)="onToggle($event, userId, task, status)">
                             {{ taskText(task) }}@if (task.pa > 0) {
-                            (
-                            <mho-icon-ap [value]="task.pa"/>
-                            )
+                            <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                            (<mho-icon-ap [value]="task.pa"/>)
+                            <!-- @formatter:on -->
                         }
                         </mat-checkbox>
                         @if (status.source === 'data') {

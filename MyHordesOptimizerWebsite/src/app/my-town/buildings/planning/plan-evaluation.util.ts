@@ -689,7 +689,7 @@ function rankCandidates(input: DayInput, context: DefenseGainContext): RankCandi
         const building: BuildingRef | undefined = input.buildings.get(id);
         const gain: number = building === undefined || progress.built ? 0 : buildingDefenseGain(building, context, input.buildings);
         if (building !== undefined && gain > 0) {
-            candidates.push({ label: building.label, kind: 'building', def: gain, pa: remainingAp(progress, input.workshopLevel), resources: building.resources });
+            candidates.push({ label: building.label, buildingId: id, kind: 'building', def: gain, pa: remainingAp(progress, input.workshopLevel), resources: building.resources });
         }
     });
     const home_factor: number = homeDefenseFactor(context.builtBefore.has(CIRCULAR_QUARTERS_UID)) * input.defenseFactors.scale;

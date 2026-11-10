@@ -42,7 +42,7 @@ import { DIG_LEVELS, digLevel, remainingDigs } from './pipes/dig-level.pipe';
 import { DistBorderBottom, DistBorderLeft, DistBorderRight, DistBorderTop } from './pipes/dist-borders.pipe';
 import { ScrutBorderBottom, ScrutBorderLeft, ScrutBorderRight, ScrutBorderTop } from './pipes/scrut-borders.pipe';
 import { trashLevel } from './pipes/trash-level.pipe';
-import { trashValue } from './pipes/trash-value.pipe';
+import { DumpUpgrades, NO_DUMP, trashValue } from './pipes/trash-value.pipe';
 
 const angular_common: Imports = [CommonModule, NgOptimizedImage];
 const components: Imports = [
@@ -115,6 +115,8 @@ export class MapCellComponent {
     public detailed: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
     /** Ids des objets repérés sur la carte : la même instance pour toutes les cases. */
     public spottedItems: InputSignal<ReadonlySet<number>> = input<ReadonlySet<number>>(NO_SPOTTED_ITEMS);
+    /** Évolutions de la Décharge : la même instance pour toutes les cases. */
+    public dump: InputSignal<DumpUpgrades> = input<DumpUpgrades>(NO_DUMP);
 
     public cellSelected: OutputEmitterRef<MapCellSelection> = output();
     public currentHoveredCellChange: OutputEmitterRef<Cell | undefined> = output();
@@ -139,7 +141,7 @@ export class MapCellComponent {
                 classes.push('digs', `dig-${digLevel(cell, options)}`);
                 break;
             case 'trash':
-                classes.push('trash', `trash-${trashLevel(trashValue(cell, options, this.allItems()))}`);
+                classes.push('trash', `trash-${trashLevel(trashValue(cell, options.trash_mode, this.allItems(), this.dump()), options.trash_mode)}`);
                 break;
             case 'scout':
                 classes.push('scout');
@@ -318,7 +320,7 @@ export class MapCellComponent {
                 return corner;
             }
             case 'trash': {
-                const value: number = trashValue(cell, options, this.allItems());
+                const value: number = trashValue(cell, options.trash_mode, this.allItems(), this.dump());
                 if (value === 0) return null;
                 corner.value = String(value);
                 return corner;

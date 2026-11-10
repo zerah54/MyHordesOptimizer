@@ -1,5 +1,7 @@
 <mat-card-header>
-    <mat-card-title>{{ current_label() }}</mat-card-title>
+    <mat-card-title>
+        <mho-page-title [page]="current_page()"/>
+    </mat-card-title>
 </mat-card-header>
 <!-- Pas de barre d'onglets : les sept pages sont déjà dans le menu, qui porte en plus les badges
      « Spoil ». Les deux navigations faisaient doublon. -->

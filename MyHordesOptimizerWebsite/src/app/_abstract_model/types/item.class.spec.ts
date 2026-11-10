@@ -1,4 +1,5 @@
 import { ItemDTO } from '../dto/item.dto';
+import { ItemSummaryDTO } from '../dto/item-summary.dto';
 import { Item } from './item.class';
 
 function buildDto(overrides: Partial<ItemDTO>): ItemDTO {
@@ -10,6 +11,7 @@ function buildDto(overrides: Partial<ItemDTO>): ItemDTO {
         openedWith: null, opens: [],
         openApCost: null, openSuccessRate: null, technicianOpenCpCost: null,
         catapultEffect: null,
+        actionEffects: [], reloadCharges: null, watchImpact: 0, bagCapacityBonus: null, bagExclusiveGroup: null,
         bankCount: 0, wishListCount: 0, dropRateNotPraf: 0, dropRatePraf: 0,
         ...overrides
     };
@@ -78,5 +80,29 @@ describe('Item', (): void => {
         expect(dto.openApCost).toBe(1);
         expect(dto.openSuccessRate).toBe(0.05);
         expect(dto.technicianOpenCpCost).toBe(1);
+    });
+
+    it('relit et réécrit les nouveaux champs', (): void => {
+        const loaded: ItemSummaryDTO = { uid: 'pilegun_#00', img: 'item_pilegun.gif', imgBroken: null, label: { fr: 'Lance-pile' } };
+        const dto: ItemDTO = buildDto({
+            actionEffects: [{
+                actionName: 'Attaquer', kind: 'Attack', apCost: 1, buildingCondition: { buildingUid: 'small_tower_#00', built: true },
+                appliesToTown: null, viaLoadedForm: loaded,
+                outcomes: [{ kind: 'Kill', probability: 0.33, item: null, quantity: null, killMin: 1, killMax: 1 }]
+            }],
+            reloadCharges: [{ charges: 3, probability: 1 }],
+            watchImpact: 5,
+            bagCapacityBonus: 2,
+            bagExclusiveGroup: [loaded]
+        });
+
+        const item: Item = new Item(dto);
+
+        expect(item.action_effects[0].outcomes[0].kill_max).toBe(1);
+        expect(item.action_effects[0].via_loaded_form?.uid).toBe('pilegun_#00');
+        expect(item.reload_charges?.[0].charges).toBe(3);
+        expect(item.watch_impact).toBe(5);
+        expect(item.bag_capacity_bonus).toBe(2);
+        expect(item.modelToDto()).toEqual(dto);
     });
 });

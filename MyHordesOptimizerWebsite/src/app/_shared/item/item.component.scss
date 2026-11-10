@@ -208,6 +208,51 @@
             }
         }
 
+        .watch-impact,
+        .bag-effect,
+        .reload-charges,
+        .watch-effect,
+        .action-effect {
+            font-size: 13px;
+
+            &.not-current {
+                opacity: 0.5;
+            }
+
+            .hint {
+                font-size: 11.5px;
+                color: var(--mho-text-muted);
+            }
+
+            .action-head,
+            .outcome {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 0.5em;
+
+                img {
+                    margin-right: 0;
+                }
+            }
+
+            .outcome {
+                margin-left: 1em;
+
+                .chance {
+                    color: var(--mho-text-muted);
+                    font-variant-numeric: tabular-nums;
+                }
+            }
+        }
+
+        .property-icons {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5em;
+        }
+
         .catapult-effect {
             display: flex;
             align-items: center;
@@ -216,6 +261,10 @@
             .catapult-result.broken img {
                 outline: 1px dashed var(--mho-danger);
                 outline-offset: 1px;
+            }
+
+            .catapult-result.vanished img {
+                opacity: 0.2;
             }
         }
 

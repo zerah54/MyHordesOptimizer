@@ -85,6 +85,18 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dico;
         }
 
+        public Dictionary<string, MyHordesItemExtrasCodeModel> GetItemExtras() =>
+            File.ReadAllText("Data/Items/item-extras.json").FromJson<Dictionary<string, MyHordesItemExtrasCodeModel>>();
+
+        public Dictionary<string, JArray> GetResultGroups() =>
+            File.ReadAllText("Data/Items/result-groups.json").FromJson<Dictionary<string, JArray>>();
+
+        public Dictionary<string, MyHordesMetaResultCodeModel> GetMetaRequirements() =>
+            File.ReadAllText("Data/Items/meta-requirements.json").FromJson<Dictionary<string, MyHordesMetaResultCodeModel>>();
+
+        public Dictionary<string, string> GetItemsNightwatch() =>
+            File.ReadAllText("Data/Items/items-nightwatch.json").FromJson<Dictionary<string, string>>();
+
         public Dictionary<string, Dictionary<string, dynamic[]>> GetItemsDropRates()
         {
             var path = "Data/Items/find.json";

@@ -61,10 +61,9 @@
                     <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
                     : le rendement est réduit
                 </source>
-                <target state="translated">Invest
+                <target state="translated">Investing in pairs of
                     <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                    in pairs: the yield is reduced
+                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>: the yield is reduced
                 </target>
             </trans-unit>
             <trans-unit id="4340458415665660595" datatype="html">
@@ -134,6 +133,10 @@
             <trans-unit id="5268374213704216159" datatype="html">
                 <source>Les places, leurs conditions et leurs sacs sont dupliqués. Les inscrits et préinscrits ne le sont pas.</source>
                 <target state="translated">Slots, their conditions and their bags are duplicated. Registered and pre-registered citizens are not.</target>
+            </trans-unit>
+            <trans-unit id="5269168329324017871" datatype="html">
+                <source>Charges à la recharge</source>
+                <target state="translated">Charges on recharge</target>
             </trans-unit>
             <trans-unit id="549842147914371707" datatype="html" approved="yes">
                 <source>Saisissez au moins une estimation pour obtenir un calcul</source>
@@ -237,6 +240,10 @@
                     is no longer on the route is marked &quot;Off route&quot;: move it to a zone on the route, or delete it;&lt;/li&gt; &lt;li&gt;&quot;Import
                     the day&quot; also copies the linked routes: the imported expeditions follow their own copies.&lt;/li&gt; &lt;/ul&gt;
                 </target>
+            </trans-unit>
+            <trans-unit id="6508140536381023521" datatype="html">
+                <source>cumulable</source>
+                <target state="translated">stackable</target>
             </trans-unit>
             <trans-unit id="650998181942021000" datatype="html">
                 <source>Laisser à N
@@ -723,6 +730,10 @@
                 <source>Verrou</source>
                 <target state="final">Lock</target>
             </trans-unit>
+            <trans-unit id="7359182511958867754" datatype="html">
+                <source>Ouvrir</source>
+                <target state="translated">Open</target>
+            </trans-unit>
             <trans-unit id="7688265553248864164" datatype="html" approved="yes">
                 <source>Clôture</source>
                 <target state="final">Fence</target>
@@ -945,14 +956,6 @@
                 <source>Dupliquer le tracé</source>
                 <target state="translated">Duplicate the route</target>
             </trans-unit>
-            <trans-unit id="8849931921318150989" datatype="html" approved="yes">
-                <source>Compte dans le calcul du bonus de veille donné par l&apos;armurerie</source>
-                <target state="final">Counts in the calculation of the watch bonus given by the Miniature Armory</target>
-            </trans-unit>
-            <trans-unit id="1323581807907830212" datatype="html" approved="yes">
-                <source>Compte dans le calcul du bonus de veille donné par le magasin suédois</source>
-                <target state="final">Counts in the calculation of the watch bonus given by the Swedish Workshop</target>
-            </trans-unit>
             <trans-unit id="8442830226345256856" datatype="html" approved="yes">
                 <source>&lt;p&gt;Activez « Mode édition » :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;« Ajouter un objet », dans la zone choisie (∞ pour toutes) ;&lt;/li&gt;
                     &lt;li&gt;glissez les lignes pour les ordonner, changez dépôt, zone ou stock souhaité, supprimez une ligne ;&lt;/li&gt; &lt;li&gt;chaque
@@ -975,10 +978,6 @@
                     others:}}
                 </target>
             </trans-unit>
-            <trans-unit id="84445083220864178" datatype="html" approved="yes">
-                <source>Compte dans le calcul du bonus de veille donné par le lance-bête</source>
-                <target state="final">Counts in the calculation of the watch bonus given by the Small Trebuchet</target>
-            </trans-unit>
             <trans-unit id="8447540416294042796" datatype="html" approved="yes">
                 <source>&lt;p&gt;Rendez-vous sur la
                     <x id="link" equiv-text="firefox_link"/>
@@ -990,10 +989,6 @@
                     and click &quot;Add to Firefox&quot;.&lt;/p&gt; &lt;p&gt;Firefox for Android also supports extensions: open the same page from Firefox on
                     your phone.&lt;/p&gt;
                 </target>
-            </trans-unit>
-            <trans-unit id="3303333159113749004" datatype="html" approved="yes">
-                <source>Compte dans le calcul du bonus de veille donné par la tourelle lance-eau</source>
-                <target state="final">Counts in the calculation of the watch bonus given by the Shooting Gallery</target>
             </trans-unit>
             <trans-unit id="4811628210824588914" datatype="html">
                 <source>Profil
@@ -1051,7 +1046,7 @@
                 <source>Cliquer pour renommer</source>
                 <target state="final">Click to rename</target>
             </trans-unit>
-            <trans-unit id="6716206656740285492" datatype="html">
+            <trans-unit id="6366839232372572444" datatype="html">
                 <source>
                     <x id="START_TAG_MHO_ICON_CP" ctype="x-mho_icon_cp" equiv-text="&lt;mho-icon-cp/&gt;"/>
                     <x id="CLOSE_TAG_MHO_ICON_CP" ctype="x-mho_icon_cp" equiv-text="&lt;mho-icon-cp/&gt;"/>
@@ -1186,14 +1181,6 @@
                 <source>Ajouter une consigne</source>
                 <target state="translated">Add an instruction</target>
             </trans-unit>
-            <trans-unit id="1619082530729677926" datatype="html" approved="yes">
-                <source>Décharge piégée</source>
-                <target state="final">Weapons Dump</target>
-            </trans-unit>
-            <trans-unit id="2506782854894297765" datatype="html" approved="yes">
-                <source>Décharge blindée</source>
-                <target state="final">Defence Dump</target>
-            </trans-unit>
             <trans-unit id="2515846493317336302" datatype="html" approved="yes">
                 <source>&lt;ul&gt; &lt;li&gt;&lt;strong&gt;Notes de version&lt;/strong&gt; : ce qui a changé dans la version installée, avec un lien vers les
                     versions plus anciennes. Une pastille violette sur le bouton signale des notes pas encore lues ; un bandeau les annonce après chaque mise à
@@ -1218,9 +1205,9 @@
                 <source>Filtres supplémentaires</source>
                 <target state="final">Additional filters</target>
             </trans-unit>
-            <trans-unit id="7651090437124612338" datatype="html" approved="yes">
-                <source>Appâts odorants</source>
-                <target state="final">Smelly bait</target>
+            <trans-unit id="7652455289692439041" datatype="html">
+                <source>Sans Système de Pièges des Apprivoiseurs</source>
+                <target state="translated">Without Tamer&apos;s Trap System</target>
             </trans-unit>
             <trans-unit id="7654288435585352458" datatype="html" approved="yes">
                 <source>Rechercher une page, un objet, un chantier, un bâtiment, un citoyen, un joueur ou une ville</source>
@@ -1246,25 +1233,13 @@
                 <source>Consignes individuelles</source>
                 <target state="translated">Individual instructions</target>
             </trans-unit>
-            <trans-unit id="2537395172119379784" datatype="html" approved="yes">
-                <source>Déchardes de bois</source>
-                <target state="final">Wood Dump</target>
-            </trans-unit>
             <trans-unit id="2539151277282924347" datatype="html">
                 <source>Post budget</source>
                 <target state="translated">Budget post</target>
             </trans-unit>
-            <trans-unit id="4607980340102435580" datatype="html" approved="yes">
-                <source>Ferraillerie</source>
-                <target state="final">Metal Dump</target>
-            </trans-unit>
             <trans-unit id="4611321954093629479" datatype="html">
                 <source>{VAR_PLURAL, plural, =0 {consigne faite} =1 {consigne faite} other {consignes faites}}</source>
                 <target state="translated">{VAR_PLURAL, plural, =0 {completed instruction} =1 {completed instruction} other {completed instructions}}</target>
-            </trans-unit>
-            <trans-unit id="3800212309465725426" datatype="html" approved="yes">
-                <source>Enclos</source>
-                <target state="final">Animal Dump</target>
             </trans-unit>
             <trans-unit id="3802614335560711985" datatype="html" approved="yes">
                 <source>Dans MyHordes uniquement</source>
@@ -1669,7 +1644,7 @@
                 <source>Chantiers masqués pour J
                     <x id="day" equiv-text="this.store.selected_day()"/>
                 </source>
-                <target state="translated">Constructions hidden for D
+                <target state="translated">Construction projects hidden for D
                     <x id="day" equiv-text="this.store.selected_day()"/>
                 </target>
             </trans-unit>
@@ -1739,6 +1714,10 @@
                 <source>La liste est vide</source>
                 <target state="final">List is empty</target>
             </trans-unit>
+            <trans-unit id="8283686607360852750" datatype="html">
+                <source>Passages (éclaireur)</source>
+                <target state="translated">Passes (scout)</target>
+            </trans-unit>
             <trans-unit id="8285027590954206551" datatype="html">
                 <source>Tout le monde</source>
                 <target state="translated">Everyone</target>
@@ -1803,6 +1782,10 @@
                 <source>Alternative Technicien</source>
                 <target state="final">Technician alternative</target>
             </trans-unit>
+            <trans-unit id="4731110158513700954" datatype="html">
+                <source>1 – Secteur partiellement repéré</source>
+                <target state="translated">1 – Partially spotted sector</target>
+            </trans-unit>
             <trans-unit id="4731835886848439200" datatype="html">
                 <source>Vert</source>
                 <target state="translated">Green</target>
@@ -1821,10 +1804,10 @@
                     <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
                     de base par citoyen
                 </source>
-                <target state="translated">
+                <target state="translated">Base
                     <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
                     <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                    base per citizen
+                    per citizen
                 </target>
             </trans-unit>
             <trans-unit id="7332767872103966167" datatype="html" approved="yes">
@@ -1855,6 +1838,10 @@
                 <source>Indigo</source>
                 <target state="final">Indigo</target>
             </trans-unit>
+            <trans-unit id="6019336287346571862" datatype="html">
+                <source>Bonus de veille de l&apos;Animalerie (+30 %)</source>
+                <target state="translated">Watch bonus from the Pet Shop (+30 %)</target>
+            </trans-unit>
             <trans-unit id="6027913026841853866" datatype="html" approved="yes">
                 <source>Pas vue aujourd&apos;hui</source>
                 <target state="final">Not seen today</target>
@@ -1870,6 +1857,10 @@
             <trans-unit id="6195148584287059509" datatype="html" approved="yes">
                 <source>Vider le sac</source>
                 <target state="final">Empty your rucksack</target>
+            </trans-unit>
+            <trans-unit id="1653227668373898364" datatype="html">
+                <source>zone</source>
+                <target state="translated">zone</target>
             </trans-unit>
             <trans-unit id="1654995770303703868" datatype="html" approved="yes">
                 <source>Potions bues</source>
@@ -2289,6 +2280,16 @@
                 <source>Chaussures exigées</source>
                 <target state="translated">Shoes required</target>
             </trans-unit>
+            <trans-unit id="1146649801223955350" datatype="html">
+                <source>Incompatible avec le niveau d&apos;exploration :
+                    <x id="max" equiv-text="range.max"/>
+                    passages
+                </source>
+                <target state="translated">Incompatible with the exploration level:
+                    <x id="max" equiv-text="range.max"/>
+                    passes
+                </target>
+            </trans-unit>
             <trans-unit id="3597555039511505792" datatype="html">
                 <source>Repérer des objets</source>
                 <target state="translated">Spot items</target>
@@ -2348,6 +2349,14 @@
                 </source>
                 <target state="translated">(season<x id="INTERPOLATION" equiv-text="{{ row.lastTownSeason }}"/>)
                 </target>
+            </trans-unit>
+            <trans-unit id="2848739030401347585" datatype="html">
+                <source>2 – Secteur connu</source>
+                <target state="translated">2 – Known sector</target>
+            </trans-unit>
+            <trans-unit id="2850906492242295038" datatype="html">
+                <source>tous les zombies</source>
+                <target state="translated">all zombies</target>
             </trans-unit>
             <trans-unit id="285232876065312407" datatype="html" approved="yes">
                 <source>Distance (km)</source>
@@ -2861,8 +2870,12 @@
             <trans-unit id="6664444658010754432" datatype="html" approved="yes">
                 <source>Partie<x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/> : 
                 </source>
-                <target state="translated">Part<x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/>:
+                <target state="translated">Part<x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/>: 
                 </target>
+            </trans-unit>
+            <trans-unit id="6664763608921383388" datatype="html">
+                <source>Utilisable 1 fois par jour</source>
+                <target state="translated">Usable once per day</target>
             </trans-unit>
             <trans-unit id="6666833560603751554" datatype="html" approved="yes">
                 <source>Drogué(e)</source>
@@ -3027,6 +3040,10 @@
             <trans-unit id="7180575964287205441" datatype="html" approved="yes">
                 <source>Oui</source>
                 <target state="final">Yes</target>
+            </trans-unit>
+            <trans-unit id="7180674639664020264" datatype="html">
+                <source>Bonus de veille de la Meuleuse manuelle (+20 %)</source>
+                <target state="translated">Watch bonus from the Manual grinder (+20 %)</target>
             </trans-unit>
             <trans-unit id="718068350898796239" datatype="html">
                 <source>Compétences</source>
@@ -3195,6 +3212,10 @@
                 <source>Arrivée</source>
                 <target state="final">Arrival</target>
             </trans-unit>
+            <trans-unit id="7163405252647334894" datatype="html">
+                <source>Un seul à la fois parmi</source>
+                <target state="translated">Only one at a time among</target>
+            </trans-unit>
             <trans-unit id="7167236322992449914" datatype="html" approved="yes">
                 <source>Modifier la liste</source>
                 <target state="final">Edit the list</target>
@@ -3346,10 +3367,6 @@
                 <source>Couleur d&apos;origine</source>
                 <target state="translated">Original colour</target>
             </trans-unit>
-            <trans-unit id="5720882951020272000" datatype="html" approved="yes">
-                <source>0 – Zone peu explorée</source>
-                <target state="final">0 – Barely explored zone</target>
-            </trans-unit>
             <trans-unit id="5723536799759201212" datatype="html" approved="yes">
                 <source>Bloc de code</source>
                 <target state="final">Code block</target>
@@ -3357,10 +3374,6 @@
             <trans-unit id="4740081045248720016" datatype="html" approved="yes">
                 <source>Saisies modifiées pendant le scan, relancez l&apos;affinage</source>
                 <target state="final">Entries changed during the scan, restart the refinement</target>
-            </trans-unit>
-            <trans-unit id="4741517700695762920" datatype="html" approved="yes">
-                <source>1 – Zone partiellement explorée</source>
-                <target state="final">1 – Partially explored zone</target>
             </trans-unit>
             <trans-unit id="4752880524312751918" datatype="html">
                 <source>Aucune connue</source>
@@ -3390,14 +3403,6 @@
                     version exists, the panel displays &quot;Update available&quot; and a badge appears on the MyHordes Optimizer button.&lt;/p&gt;
                 </target>
             </trans-unit>
-            <trans-unit id="42397383054553721" datatype="html" approved="yes">
-                <source>2 – Zone explorée</source>
-                <target state="final">2 – Explored zone</target>
-            </trans-unit>
-            <trans-unit id="4250214890859179856" datatype="html" approved="yes">
-                <source>3 – Zone entièrement cartographiée</source>
-                <target state="final">3 – Fully mapped zone</target>
-            </trans-unit>
             <trans-unit id="4254054450644204728" datatype="html">
                 <source>Choisir des chantiers</source>
                 <target state="translated">Choose construction sites</target>
@@ -3417,6 +3422,10 @@
             <trans-unit id="5174692148348158925" datatype="html" approved="yes">
                 <source>Non renseigné</source>
                 <target state="final">Not specified</target>
+            </trans-unit>
+            <trans-unit id="5174923677227348938" datatype="html">
+                <source>Incroyable trouvaille</source>
+                <target state="translated">Incredible find</target>
             </trans-unit>
             <trans-unit id="4230917312458855608" datatype="html" approved="yes">
                 <source>
@@ -3527,6 +3536,10 @@
             <trans-unit id="8538918839705198292" datatype="html" approved="yes">
                 <source>Ville en chaos</source>
                 <target state="final">Town in chaos</target>
+            </trans-unit>
+            <trans-unit id="8542203874152236504" datatype="html">
+                <source>Purifier</source>
+                <target state="translated">Purify</target>
             </trans-unit>
             <trans-unit id="860520604015615548" datatype="html" approved="yes">
                 <source>Fréquence en fouille</source>
@@ -4136,6 +4149,10 @@
                 <source>serveur Discord de MyHordes Optimizer</source>
                 <target state="final">MyHordes Optimizer Discord server</target>
             </trans-unit>
+            <trans-unit id="5177031640736248755" datatype="html">
+                <source>Dans le sac, +1 point de contrôle de zone</source>
+                <target state="translated">In the bag, +1 zone control point</target>
+            </trans-unit>
             <trans-unit id="5177435738614405515" datatype="html" approved="yes">
                 <source>Attaque du lendemain (J<x id="INTERPOLATION" equiv-text="{{ selected_day + 1 }}"/>)
                 </source>
@@ -4361,6 +4378,10 @@
                     the right, the attack calculated from these estimates (day or next day), the most likely value and the average, the theoretical bounds of
                     the day and the attack distribution.&lt;/p&gt;
                 </target>
+            </trans-unit>
+            <trans-unit id="6072017829106888519" datatype="html">
+                <source>Avec Système de Pièges des Apprivoiseurs</source>
+                <target state="translated">With Tamer&apos;s Trap System</target>
             </trans-unit>
             <trans-unit id="6081697647486005114" datatype="html" approved="yes">
                 <source>Chargement…</source>
@@ -4634,6 +4655,10 @@
                 <source>Ont contribué</source>
                 <target state="final">Contributed</target>
             </trans-unit>
+            <trans-unit id="2475763617807812340" datatype="html">
+                <source>En veille</source>
+                <target state="translated">On watch</target>
+            </trans-unit>
             <trans-unit id="2476531440258858476" datatype="html" approved="yes">
                 <source>&lt;p&gt;Ajoute un champ de recherche (sans tenir compte des majuscules ni des accents) aux listes choisies :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Chantiers&lt;/strong&gt;,
                     avec « Masquer les chantiers terminés » (un chantier terminé mais endommagé reste affiché) ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Destinataires&lt;/strong&gt;
@@ -4797,6 +4822,10 @@
                 <source>Options d&apos;escorte par défaut</source>
                 <target state="final">Default escort options</target>
             </trans-unit>
+            <trans-unit id="7875511719404518889" datatype="html">
+                <source>Impressionnante trouvaille</source>
+                <target state="translated">Impressive find</target>
+            </trans-unit>
             <trans-unit id="787782299397948132" datatype="html" approved="yes">
                 <source>État de départ</source>
                 <target state="final">Starting state</target>
@@ -4820,6 +4849,10 @@
             <trans-unit id="868656261528547386" datatype="html" approved="yes">
                 <source>Filtrer sur ce niveau</source>
                 <target state="final">Filter on this level</target>
+            </trans-unit>
+            <trans-unit id="869213916176333095" datatype="html">
+                <source>places</source>
+                <target state="translated">spots</target>
             </trans-unit>
             <trans-unit id="8695019972318995873" datatype="html" approved="yes">
                 <source>
@@ -5462,6 +5495,10 @@
                 <source>Zone de rappatriement</source>
                 <target state="final">Repatriation zone</target>
             </trans-unit>
+            <trans-unit id="6188536521660619605" datatype="html">
+                <source>Chaque exemplaire compte pour les chances de survie en veille</source>
+                <target state="translated">Each copy counts toward watch survival chances</target>
+            </trans-unit>
             <trans-unit id="6373560123262851639" datatype="html" approved="yes">
                 <source>Encombrants</source>
                 <target state="final">Heavy objects</target>
@@ -5561,6 +5598,10 @@
                 <source>Identifiants MyHordes</source>
                 <target state="final">MyHordes identifiers</target>
             </trans-unit>
+            <trans-unit id="8839469399433877944" datatype="html">
+                <source>Détruit</source>
+                <target state="translated">Destroyed</target>
+            </trans-unit>
             <trans-unit id="2205827814755156780" datatype="html" approved="yes">
                 <source>Dernières mises à jour</source>
                 <target state="final">Latest updates</target>
@@ -5624,6 +5665,10 @@
                 <target state="final">&lt;p&gt;MyHordes Optimizer reads your game data with your &lt;strong&gt;external identifier for apps&lt;/strong&gt;.
                     Without it, the panel only displays a help message. It is usually retrieved automatically: see &quot;Getting started&quot;.&lt;/p&gt;
                 </target>
+            </trans-unit>
+            <trans-unit id="3403107816799835693" datatype="html">
+                <source>Bonus de veille du Magasin suédois (+30 %)</source>
+                <target state="translated">Watch bonus from the Swedish Workshop (+30 %)</target>
             </trans-unit>
             <trans-unit id="2332866508838027590" datatype="html" approved="yes">
                 <source>Compte</source>
@@ -5890,6 +5935,10 @@
                 <source>Modifier</source>
                 <target state="final">Edit</target>
             </trans-unit>
+            <trans-unit id="1804944299064211947" datatype="html">
+                <source>Le chien de l&apos;Apprivoiseur peut le rapporter de la banque</source>
+                <target state="translated">The Tamer&apos;s dog can bring it back from the bank</target>
+            </trans-unit>
             <trans-unit id="180879386399550529" datatype="html" approved="yes">
                 <source>Supprimer</source>
                 <target state="final">Remove</target>
@@ -5939,6 +5988,10 @@
                     <x id="ap" equiv-text="ap"/>
                     AP
                 </target>
+            </trans-unit>
+            <trans-unit id="6927864291145573325" datatype="html">
+                <source>Ne peut pas être volé</source>
+                <target state="translated">Cannot be stolen</target>
             </trans-unit>
             <trans-unit id="6929653928890484400" datatype="html">
                 <source>Vous n&apos;êtes pas citoyen de cette ville.</source>
@@ -6911,6 +6964,10 @@
                     not depleted
                 </target>
             </trans-unit>
+            <trans-unit id="7432358326611023934" datatype="html">
+                <source>Découper</source>
+                <target state="translated">Carve</target>
+            </trans-unit>
             <trans-unit id="5540869325268092301" datatype="html" approved="yes">
                 <source>Le plus court chemin qui passe par les cases au plus fort potentiel : une case jamais visitée d&apos;abord, puis les fouilles restantes
                     maximales (régénération comprise), puis les cases les plus loin de la ville. Il ne repasse par une case déjà sur le tracé que s&apos;il n&apos;a
@@ -6944,6 +7001,10 @@
             <trans-unit id="3798070165070620146" datatype="html" approved="yes">
                 <source>Guide</source>
                 <target state="final">Guide</target>
+            </trans-unit>
+            <trans-unit id="3539393564644326302" datatype="html">
+                <source>Purifier (1PA)</source>
+                <target state="translated">Purify (1AP)</target>
             </trans-unit>
             <trans-unit id="3549884673093564156" datatype="html" approved="yes">
                 <source>Pas soif</source>
@@ -7028,6 +7089,10 @@
                     can be found there with their probability. The columns can be sorted; the funnel icon in the headers filters by name, distance or item. With
                     an active town, &quot;In my town&quot; only displays the ruins on your map.&lt;/p&gt;
                 </target>
+            </trans-unit>
+            <trans-unit id="5343529572924432494" datatype="html">
+                <source>Bonus de veille des Gouttières filtrantes (+30 %)</source>
+                <target state="translated">Watch bonus from the Filtering gutters (+30 %)</target>
             </trans-unit>
             <trans-unit id="5344623683730509987" datatype="html" approved="yes">
                 <source>Un grand merci à Renack, sans qui ni le script ni le site n&apos;existeraient puisqu&apos;il a fait tout le backend !</source>
@@ -7171,17 +7236,6 @@
             <trans-unit id="4527053987641321834" datatype="html" approved="yes">
                 <source>Afficher le détail</source>
                 <target state="final">Show details</target>
-            </trans-unit>
-            <trans-unit id="4532832196776816744" datatype="html">
-                <source>
-                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                    de base
-                </source>
-                <target state="translated">Base
-                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                </target>
             </trans-unit>
             <trans-unit id="4540401638459620535" datatype="html" approved="yes">
                 <source>/timer (/minuteur)</source>
@@ -7345,6 +7399,10 @@
             <trans-unit id="3243838789504652996" datatype="html" approved="yes">
                 <source>Départ</source>
                 <target state="final">Departure</target>
+            </trans-unit>
+            <trans-unit id="3245184823025180727" datatype="html">
+                <source>à</source>
+                <target state="translated">to</target>
             </trans-unit>
             <trans-unit id="3246864206079397926" datatype="html" approved="yes">
                 <source>Phare</source>
@@ -7655,6 +7713,10 @@
                 <source>État de la porte</source>
                 <target state="final">Door status</target>
             </trans-unit>
+            <trans-unit id="2762869374924960552" datatype="html">
+                <source>Une fois chargé</source>
+                <target state="translated">Once charged</target>
+            </trans-unit>
             <trans-unit id="2772563260830012467" datatype="html" approved="yes">
                 <source>Repousse les zombies pendant</source>
                 <target state="final">Repels zombies for</target>
@@ -7703,6 +7765,10 @@
                 <source>Ajoutez une étape à la séquence pour voir la trace.</source>
                 <target state="final">Add a step to the sequence to see the trace.</target>
             </trans-unit>
+            <trans-unit id="5435887639284497263" datatype="html">
+                <source>Attaquer avec</source>
+                <target state="translated">Attack with</target>
+            </trans-unit>
             <trans-unit id="5435975275965738468" datatype="html">
                 <source>Fouiller les déchets</source>
                 <target state="translated">Search the refuse</target>
@@ -7714,6 +7780,10 @@
             <trans-unit id="5438409221885173808" datatype="html" approved="yes">
                 <source>Population de la ville</source>
                 <target state="final">Town population</target>
+            </trans-unit>
+            <trans-unit id="5438512350631638907" datatype="html">
+                <source>Bonus de veille</source>
+                <target state="translated">Watch bonus</target>
             </trans-unit>
             <trans-unit id="5778482516557877676" datatype="html" approved="yes">
                 <source>Habitations</source>
@@ -7821,6 +7891,10 @@
                 <source>Cet objet figure deux fois dans la même zone : la liste n&apos;est pas enregistrée tant que le doublon reste.</source>
                 <target state="final">This item appears twice in the same zone: the list is not saved as long as the duplicate remains.</target>
             </trans-unit>
+            <trans-unit id="4646292498905551316" datatype="html">
+                <source>3 – Secteur totalement balisé</source>
+                <target state="translated">3 – Fully marked sector</target>
+            </trans-unit>
             <trans-unit id="1355112096350536441" datatype="html" approved="yes">
                 <source>ignorée (porte ouverte)</source>
                 <target state="final">ignored (door open)</target>
@@ -7890,6 +7964,10 @@
             <trans-unit id="4676192744733657469" datatype="html">
                 <source>Augmente les chances de camping s&apos;il est dans le sac</source>
                 <target state="translated">Increases camping chances if it is in the bag</target>
+            </trans-unit>
+            <trans-unit id="4679835845080326755" datatype="html">
+                <source>Halloween : dans le coffre, empêche les vols et peut terroriser son propriétaire la nuit</source>
+                <target state="translated">Halloween: in the chest, prevents thefts and may terrorize its owner at night</target>
             </trans-unit>
             <trans-unit id="789097210155389951" datatype="html" approved="yes">
                 <source>Nombre de morts</source>
@@ -8140,6 +8218,10 @@
                 <source>Temps</source>
                 <target state="final">Time</target>
             </trans-unit>
+            <trans-unit id="763298676428966633" datatype="html">
+                <source>Sert d&apos;appât dans le Système de Pièges des Apprivoiseurs</source>
+                <target state="translated">Serves as bait in the Tamer&apos;s Trap System</target>
+            </trans-unit>
             <trans-unit id="7633234991118987386" datatype="html" approved="yes">
                 <source>Blessure - Jambe</source>
                 <target state="final">Wounded - Leg</target>
@@ -8151,6 +8233,10 @@
             <trans-unit id="7638538933808134442" datatype="html" approved="yes">
                 <source>Vous revenez ici connecté, et le menu &quot;Ma ville&quot; se débloque.</source>
                 <target state="final">You come back here logged in, and the &quot;My town&quot; menu unlocks.</target>
+            </trans-unit>
+            <trans-unit id="658002876828417422" datatype="html">
+                <source>Ne peut pas être envoyé par message</source>
+                <target state="translated">Cannot be sent by message</target>
             </trans-unit>
             <trans-unit id="6585575229821965752" datatype="html" approved="yes">
                 <source>tracé dans MyHordes</source>
@@ -8336,6 +8422,10 @@
                 <source>Voir la note</source>
                 <target state="final">View the note</target>
             </trans-unit>
+            <trans-unit id="824076330532613671" datatype="html">
+                <source>Outil d&apos;ouverture</source>
+                <target state="translated">Opening tool</target>
+            </trans-unit>
             <trans-unit id="8241892332547250073" datatype="html" approved="yes">
                 <source>&lt;p&gt;« Mon compte » ouvre votre profil : vos villes et vos pictos. « Importer mes données » récupère votre historique depuis
                     MyHordes ; l&apos;import est long, et il n&apos;est pas possible de le relancer juste après.&lt;/p&gt; &lt;p&gt;« Déconnexion » vous
@@ -8428,6 +8518,10 @@
                 <source>Chrome, Edge, Opera, Brave</source>
                 <target state="final">Chrome, Edge, Opera, Brave</target>
             </trans-unit>
+            <trans-unit id="6283063806343779684" datatype="html">
+                <source>Ne compte pas comme nourriture emportée en sortant de la ville</source>
+                <target state="translated">Does not count as food carried when leaving town</target>
+            </trans-unit>
             <trans-unit id="6283269120638948012" datatype="html">
                 <source>Prendre un bain</source>
                 <target state="translated">Take a bath</target>
@@ -8479,6 +8573,20 @@
             <trans-unit id="5478429085270168780" datatype="html">
                 <source>a pris la main sur cette proposition : vos dernières modifications n&apos;ont pas pu être enregistrées.</source>
                 <target state="translated">has taken over this proposal: your latest changes could not be saved.</target>
+            </trans-unit>
+            <trans-unit id="5481024292533409255" datatype="html">
+                <source>Incompatible avec le niveau d&apos;exploration :
+                    <x id="min" equiv-text="range.min"/>
+                    à
+                    <x id="max" equiv-text="range.max"/>
+                    passages
+                </source>
+                <target state="translated">Incompatible with the exploration level:
+                    <x id="min" equiv-text="range.min"/>
+                    to
+                    <x id="max" equiv-text="range.max"/>
+                    passes
+                </target>
             </trans-unit>
             <trans-unit id="548628609723380663" datatype="html" approved="yes">
                 <source>Points de vie</source>
@@ -8541,6 +8649,10 @@
                     <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
                 </target>
             </trans-unit>
+            <trans-unit id="8910499852541357270" datatype="html">
+                <source>0 – Secteur peu connu</source>
+                <target state="translated">0 – Little-known sector</target>
+            </trans-unit>
             <trans-unit id="8915113584796105323" datatype="html" approved="yes">
                 <source>Fermer la recherche</source>
                 <target state="final">Close search</target>
@@ -8579,8 +8691,8 @@
                 <source>&lt;p&gt;Les commandes /suggestion et /bug transmettent vos idées et vos problèmes à l&apos;équipe. Vous pouvez aussi venir en parler
                     sur le<x id="link" equiv-text="support_link"/>.&lt;/p&gt;
                 </source>
-                <target state="translated">&lt;p&gt;The /suggestion and /bug commands send your ideas and problems to the team. You can also come and talk about
-                    it on the<x id="link" equiv-text="support_link"/>.&lt;/p&gt;
+                <target state="translated">&lt;p&gt;The /suggestion and /bug commands send your ideas and problems to the team. You can also come and discuss it
+                    on the<x id="link" equiv-text="support_link"/>.&lt;/p&gt;
                 </target>
             </trans-unit>
             <trans-unit id="4902817035128594900" datatype="html" approved="yes">
@@ -8902,6 +9014,10 @@
                 <source>Jours validés</source>
                 <target state="final">Validated days</target>
             </trans-unit>
+            <trans-unit id="4045757326321263630" datatype="html">
+                <source>Halloween : dans le coffre, 50 % de chances d&apos;infecter son propriétaire la nuit</source>
+                <target state="translated">Halloween: in the chest, 50 % chance to infect its owner at night</target>
+            </trans-unit>
             <trans-unit id="405111989589730898" datatype="html" approved="yes">
                 <source>Prune</source>
                 <target state="final">Plum</target>
@@ -8964,6 +9080,10 @@
             <trans-unit id="8021687558521014030" datatype="html" approved="yes">
                 <source>Option</source>
                 <target state="final">Option</target>
+            </trans-unit>
+            <trans-unit id="8023154384211600757" datatype="html">
+                <source>Passages :</source>
+                <target state="translated">Passes:</target>
             </trans-unit>
             <trans-unit id="8027721657039626152" datatype="html">
                 <source>
@@ -9068,6 +9188,10 @@
             <trans-unit id="6751441754948847748" datatype="html">
                 <source>Autre</source>
                 <target state="translated">Other</target>
+            </trans-unit>
+            <trans-unit id="6759786872532843195" datatype="html">
+                <source>Chances de survie en veille</source>
+                <target state="translated">Survival chances on watch</target>
             </trans-unit>
             <trans-unit id="778297146612954408" datatype="html" approved="yes">
                 <source>Les pages du menu &quot;Ma ville&quot; ne s&apos;ouvrent qu&apos;une fois le site relié à votre compte MyHordes. Cela se fait une seule

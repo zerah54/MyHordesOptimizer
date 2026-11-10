@@ -92,6 +92,10 @@ public partial class MapCell
     [Column("scoutZoneLevel", TypeName = "int(11)")]
     public int? ScoutZoneLevel { get; set; }
 
+    /// <summary>Nombre de passages d'éclaireur sur la zone (0-15), saisi manuellement. Toujours dans la plage de <see cref="ScoutZoneLevel"/>, qui prime.</summary>
+    [Column("scoutVisits", TypeName = "int(11)")]
+    public int? ScoutVisits { get; set; }
+
     /// <summary>Estimation bruitée du nombre de zombies, issue du radar d'un Éclaireur situé sur une case voisine.</summary>
     [Column("scoutEstimationZombie", TypeName = "int(11)")]
     public int? ScoutEstimationZombie { get; set; }

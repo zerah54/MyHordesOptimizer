@@ -130,8 +130,9 @@
                                         [matMenuTriggerFor]="task_menu"
                                         [matMenuTriggerData]="{ user_id: row.citizen.id, index: index, task_id: entry.task.id ?? null }">
                                     {{ entry.label }}@if (entry.task.pa > 0) {
-                                    (
-                                    <mho-icon-ap [value]="entry.task.pa"/>)
+                                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                                    (<mho-icon-ap [value]="entry.task.pa"/>)
+                                    <!-- @formatter:on -->
                                 }
                                 </button>
                                 @if (entry.status.source === 'data') {

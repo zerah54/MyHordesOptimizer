@@ -2,6 +2,7 @@ import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import moment from 'moment';
 import { of } from 'rxjs';
 
@@ -23,6 +24,7 @@ function newCell(overrides: Partial<Cell> = {}): Cell {
         citizens: [],
         scav_zone_level: null,
         scout_zone_level: null,
+        scout_visits: null,
         scav_next_cells: null,
         scout_next_cells: null,
         update_info: undefined
@@ -152,6 +154,78 @@ describe('MapUpdateCellComponent', (): void => {
 
         expect(emitted.length).toBe(1);
         expect(emitted[0].nb_zombie).toBe(7);
+    });
+
+    describe('passages d\'éclaireur', (): void => {
+
+        function scoutLevelControl(): AbstractControl {
+            return <AbstractControl>(<{ cell_form: FormGroup }>(<unknown>fixture.componentInstance)).cell_form.get('scout_zone_level');
+        }
+
+        function typeVisits(value: string): Cell[] {
+            const emitted: Cell[] = [];
+            fixture.componentInstance.cellChange.subscribe((emitted_cell: Cell) => emitted.push(emitted_cell));
+            const input: HTMLInputElement = fixture.nativeElement.querySelector('.scout-visits input');
+            input.value = value;
+            input.dispatchEvent(new Event('input'));
+            return emitted;
+        }
+
+        function warning(): HTMLElement | null {
+            fixture.detectChanges();
+            return fixture.nativeElement.querySelector('.scout-visits .scout-visits-warning');
+        }
+
+        it('sans niveau choisi, déduit le niveau du nombre sans toucher à la liste', (): void => {
+            create();
+            fixture.detectChanges();
+
+            const emitted: Cell[] = typeVisits('7');
+
+            expect(emitted.at(-1)?.scout_visits).toBe(7);
+            expect(emitted.at(-1)?.scout_zone_level).toBe(1);
+            expect(scoutLevelControl().enabled).toBe(true);
+            expect(scoutLevelControl().value).toBeNull();
+            expect(warning()).toBeNull();
+        });
+
+        it('plafonne le nombre saisi à 15', (): void => {
+            create();
+            fixture.detectChanges();
+
+            const emitted: Cell[] = typeVisits('20');
+
+            expect(emitted.at(-1)?.scout_visits).toBe(15);
+            expect(emitted.at(-1)?.scout_zone_level).toBe(3);
+            expect((<HTMLInputElement>fixture.nativeElement.querySelector('.scout-visits input')).value).toBe('15');
+        });
+
+        it('signale un nombre hors de la plage du niveau choisi, qui reste inchangé', (): void => {
+            create();
+            fixture.componentRef.setInput('cell', newCell({ scout_zone_level: 2 }));
+            fixture.detectChanges();
+
+            const emitted: Cell[] = typeVisits('7');
+
+            expect(emitted.at(-1)?.scout_zone_level).toBe(2);
+            expect(emitted.at(-1)?.isScoutVisitsConsistent()).toBe(false);
+            expect(warning()).not.toBeNull();
+
+            const corrected: Cell[] = typeVisits('12');
+            expect(corrected.at(-1)?.isScoutVisitsConsistent()).toBe(true);
+            expect(warning()).toBeNull();
+        });
+
+        it('vider le nombre le rend inconnu sans toucher au niveau', (): void => {
+            create();
+            fixture.componentRef.setInput('cell', newCell({ scout_visits: 12, scout_zone_level: 2 }));
+            fixture.detectChanges();
+
+            const emitted: Cell[] = typeVisits('');
+
+            expect(emitted.at(-1)?.scout_visits).toBeNull();
+            expect(emitted.at(-1)?.scout_zone_level).toBe(2);
+        });
     });
 
     it('shows the citizens\' bag items section only when the cell has citizens', (): void => {

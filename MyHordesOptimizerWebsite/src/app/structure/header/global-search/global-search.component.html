@@ -94,7 +94,7 @@
                                                 <mho-avatar [src]="option.entry.avatar" [size]="28" rounded></mho-avatar>
                                             } @else if (option.entry.img) {
                                                 <img [src]="HORDES_IMG_REPO + option.entry.img" alt="">
-                                            } @else {
+                                            } @else if (option.entry.symbol) {
                                                 <mat-icon>{{ option.entry.symbol }}</mat-icon>
                                             }
                                         </span>

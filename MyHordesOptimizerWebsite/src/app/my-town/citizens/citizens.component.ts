@@ -6,9 +6,10 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { environment } from '../../../environments/environment';
 import { Imports } from '../../_abstract_model/types/_types';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 
 const angular_common: Imports = [CommonModule, RouterLink, RouterLinkActive, RouterOutlet];
-const components: Imports = [];
+const components: Imports = [PageTitleComponent];
 const pipes: Imports = [];
 const material_modules: Imports = [MatCardModule, MatTabsModule];
 

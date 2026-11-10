@@ -5,6 +5,7 @@ using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
 using MyHordesOptimizerApi.Data.Wishlist;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using MyHordesOptimizerApi.Data.Camping;
 using MyHordesOptimizerApi.Data.Building;
 using MyHordesOptimizerApi.Data.Buildings;
@@ -39,5 +40,9 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<HomeUpgradeCodeModel> GetHomeUpgrades();
         Dictionary<string, MyHordesCitizenStatusCodeModel> GetCitizenStatuses();
         Dictionary<string, MyHordesMetaResultCodeModel> GetMetaResults();
+        Dictionary<string, MyHordesItemExtrasCodeModel> GetItemExtras();
+        Dictionary<string, JArray> GetResultGroups();
+        Dictionary<string, MyHordesMetaResultCodeModel> GetMetaRequirements();
+        Dictionary<string, string> GetItemsNightwatch();
     }
 }

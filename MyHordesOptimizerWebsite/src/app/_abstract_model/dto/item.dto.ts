@@ -1,6 +1,7 @@
 import { I18nLabels } from '../types/_types';
 import { CatapultEffectDTO } from './catapult-effect.dto';
 import { CategoryDTO } from './category.dto';
+import { ChargeChanceDTO, ItemActionEffectsDTO } from './item-action-effects.dto';
 import { ItemSummaryDTO } from './item-summary.dto';
 import { RecipeDTO } from './recipe.dto';
 
@@ -34,6 +35,16 @@ export interface ItemDTO {
     technicianOpenCpCost: number | null;
     /** Effet catapulte réel de l'objet. `null` si l'objet n'est pas catapultable. */
     catapultEffect: CatapultEffectDTO | null;
+    /** Effets des actions du jeu liées à l'objet (ouverture, abattage, purification, attaque, veille). */
+    actionEffects: ItemActionEffectsDTO[];
+    /** Charges possibles au rechargement. `null` si l'objet ne se recharge pas. */
+    reloadCharges: ChargeChanceDTO[] | null;
+    /** Impact sur la veille (0 si aucun). */
+    watchImpact: number;
+    /** Capacité supplémentaire apportée en tant que sac. `null` si ce n'est pas un sac. */
+    bagCapacityBonus: number | null;
+    /** Sacs qui ne se cumulent pas avec celui-ci. `null` si aucun groupe d'exclusion. */
+    bagExclusiveGroup: ItemSummaryDTO[] | null;
     bankCount: number;
     wishListCount: number;
     dropRateNotPraf: number;

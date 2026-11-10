@@ -17,8 +17,9 @@
         @if (view().verb; as verb) {
             <b class="verb">{{ verb }}</b>
             @if (order().kind === 'explore') {
-                (
-                <mho-icon-ap [value]="1"/>)
+                <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                (<mho-icon-ap [value]="1"/>)
+                <!-- @formatter:on -->
             } @else {
                 {{ view().rest }}
             }

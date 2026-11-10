@@ -85,6 +85,11 @@
                     color: var(--mho-text-muted);
                 }
 
+                .page-icon {
+                    vertical-align: middle;
+                    margin-inline-end: 0.25em;
+                }
+
                 .mat-icon {
                     vertical-align: middle;
                     flex-shrink: 0;

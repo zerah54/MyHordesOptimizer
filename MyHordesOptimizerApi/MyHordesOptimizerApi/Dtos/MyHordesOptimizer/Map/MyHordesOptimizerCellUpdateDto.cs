@@ -48,6 +48,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map
         [JsonProperty("scoutZoneLevel")]
         public int? ScoutZoneLevel { get; set; }
 
+        /// <summary>Nombre de passages d'éclaireur saisi manuellement ; <c>null</c> = inconnu (le champ a été vidé).</summary>
+        [JsonProperty("scoutVisits")]
+        public int? ScoutVisits { get; set; }
+
         /// <summary>Radar du Fouineur saisi depuis cette case. true = la case voisine est épuisée.</summary>
         [JsonProperty("scavNextCells")]
         public ScavNextCellsDto? ScavNextCells { get; set; }

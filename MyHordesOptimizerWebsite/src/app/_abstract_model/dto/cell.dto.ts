@@ -29,6 +29,8 @@ export interface CellDTO {
     scavZoneLevel: number | null;
     /** Niveau d'exploration de la zone relevé par un éclaireur, de 0 à 3 */
     scoutZoneLevel: number | null;
+    /** Nombre de passages d'éclaireur sur la zone (0 à 15) ; absent ou null s'il n'a pas été saisi */
+    scoutVisits?: number | null;
     /** Estimation bruitée du nombre de zombies, issue du radar d'un éclaireur voisin */
     scoutEstimationZombie: number | null;
     /** Borne basse du nombre réel de zombies déduite de l'estimation */
@@ -76,6 +78,8 @@ export interface SaveCellDTO {
     isDryed: boolean;
     scavZoneLevel: number | null;
     scoutZoneLevel: number | null;
+    /** null = inconnu : l'API efface le nombre enregistré */
+    scoutVisits: number | null;
     scavNextCells: ScavNextCellsDTO | null;
     scoutNextCells: ScoutNextCellsDTO | null;
     nbZombie: number;

@@ -19,6 +19,8 @@ export type RankKind = 'building' | 'home' | 'source';
 /** Élément comparé : un chantier, une amélioration de maison ou une source de défense hors chantiers. */
 export interface RankCandidate {
     label: string;
+    /** Identifiant du chantier, présent quand `kind` vaut `building`. */
+    buildingId?: number;
     kind: RankKind;
     def: number;
     pa: number;

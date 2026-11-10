@@ -92,6 +92,9 @@
             <trans-unit id="5268374213704216159" datatype="html">
                 <source>Les places, leurs conditions et leurs sacs sont dupliqués. Les inscrits et préinscrits ne le sont pas.</source>
             </trans-unit>
+            <trans-unit id="5269168329324017871" datatype="html">
+                <source>Charges à la recharge</source>
+            </trans-unit>
             <trans-unit id="549842147914371707" datatype="html">
                 <source>Saisissez au moins une estimation pour obtenir un calcul</source>
             </trans-unit>
@@ -157,6 +160,9 @@
                     consigne dont la case n&apos;est plus sur le tracé est marquée « Hors tracé » : déplacez-la sur une case du tracé, ou supprimez-la ;&lt;/li&gt;
                     &lt;li&gt;« Importer le jour » recopie aussi les tracés liés : les expéditions importées suivent leurs propres copies.&lt;/li&gt; &lt;/ul&gt;
                 </source>
+            </trans-unit>
+            <trans-unit id="6508140536381023521" datatype="html">
+                <source>cumulable</source>
             </trans-unit>
             <trans-unit id="650998181942021000" datatype="html">
                 <source>Laisser à N
@@ -498,6 +504,9 @@
             <trans-unit id="7352105174300788792" datatype="html">
                 <source>Verrou</source>
             </trans-unit>
+            <trans-unit id="7359182511958867754" datatype="html">
+                <source>Ouvrir</source>
+            </trans-unit>
             <trans-unit id="7688265553248864164" datatype="html">
                 <source>Clôture</source>
             </trans-unit>
@@ -660,12 +669,6 @@
             <trans-unit id="8845816518654854448" datatype="html">
                 <source>Dupliquer le tracé</source>
             </trans-unit>
-            <trans-unit id="8849931921318150989" datatype="html">
-                <source>Compte dans le calcul du bonus de veille donné par l&apos;armurerie</source>
-            </trans-unit>
-            <trans-unit id="1323581807907830212" datatype="html">
-                <source>Compte dans le calcul du bonus de veille donné par le magasin suédois</source>
-            </trans-unit>
             <trans-unit id="8442830226345256856" datatype="html">
                 <source>&lt;p&gt;Activez « Mode édition » :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;« Ajouter un objet », dans la zone choisie (∞ pour toutes) ;&lt;/li&gt;
                     &lt;li&gt;glissez les lignes pour les ordonner, changez dépôt, zone ou stock souhaité, supprimez une ligne ;&lt;/li&gt; &lt;li&gt;chaque
@@ -679,18 +682,12 @@
                     autres :}}
                 </source>
             </trans-unit>
-            <trans-unit id="84445083220864178" datatype="html">
-                <source>Compte dans le calcul du bonus de veille donné par le lance-bête</source>
-            </trans-unit>
             <trans-unit id="8447540416294042796" datatype="html">
                 <source>&lt;p&gt;Rendez-vous sur la
                     <x id="link" equiv-text="firefox_link"/>
                     et cliquez sur « Ajouter à Firefox ».&lt;/p&gt; &lt;p&gt;Firefox pour Android accepte aussi les extensions : ouvrez la même page depuis
                     Firefox sur votre téléphone.&lt;/p&gt;
                 </source>
-            </trans-unit>
-            <trans-unit id="3303333159113749004" datatype="html">
-                <source>Compte dans le calcul du bonus de veille donné par la tourelle lance-eau</source>
             </trans-unit>
             <trans-unit id="4811628210824588914" datatype="html">
                 <source>Profil
@@ -732,7 +729,7 @@
             <trans-unit id="671486430006220164" datatype="html">
                 <source>Cliquer pour renommer</source>
             </trans-unit>
-            <trans-unit id="6716206656740285492" datatype="html">
+            <trans-unit id="6366839232372572444" datatype="html">
                 <source>
                     <x id="START_TAG_MHO_ICON_CP" ctype="x-mho_icon_cp" equiv-text="&lt;mho-icon-cp/&gt;"/>
                     <x id="CLOSE_TAG_MHO_ICON_CP" ctype="x-mho_icon_cp" equiv-text="&lt;mho-icon-cp/&gt;"/>
@@ -828,12 +825,6 @@
             <trans-unit id="1510964858857911507" datatype="html">
                 <source>Ajouter une consigne</source>
             </trans-unit>
-            <trans-unit id="1619082530729677926" datatype="html">
-                <source>Décharge piégée</source>
-            </trans-unit>
-            <trans-unit id="2506782854894297765" datatype="html">
-                <source>Décharge blindée</source>
-            </trans-unit>
             <trans-unit id="2515846493317336302" datatype="html">
                 <source>&lt;ul&gt; &lt;li&gt;&lt;strong&gt;Notes de version&lt;/strong&gt; : ce qui a changé dans la version installée, avec un lien vers les
                     versions plus anciennes. Une pastille violette sur le bouton signale des notes pas encore lues ; un bandeau les annonce après chaque mise à
@@ -849,8 +840,8 @@
             <trans-unit id="7650742156060535549" datatype="html">
                 <source>Filtres supplémentaires</source>
             </trans-unit>
-            <trans-unit id="7651090437124612338" datatype="html">
-                <source>Appâts odorants</source>
+            <trans-unit id="7652455289692439041" datatype="html">
+                <source>Sans Système de Pièges des Apprivoiseurs</source>
             </trans-unit>
             <trans-unit id="7654288435585352458" datatype="html">
                 <source>Rechercher une page, un objet, un chantier, un bâtiment, un citoyen, un joueur ou une ville</source>
@@ -870,20 +861,11 @@
             <trans-unit id="2535246455832259554" datatype="html">
                 <source>Consignes individuelles</source>
             </trans-unit>
-            <trans-unit id="2537395172119379784" datatype="html">
-                <source>Déchardes de bois</source>
-            </trans-unit>
             <trans-unit id="2539151277282924347" datatype="html">
                 <source>Post budget</source>
             </trans-unit>
-            <trans-unit id="4607980340102435580" datatype="html">
-                <source>Ferraillerie</source>
-            </trans-unit>
             <trans-unit id="4611321954093629479" datatype="html">
                 <source>{VAR_PLURAL, plural, =0 {consigne faite} =1 {consigne faite} other {consignes faites}}</source>
-            </trans-unit>
-            <trans-unit id="3800212309465725426" datatype="html">
-                <source>Enclos</source>
             </trans-unit>
             <trans-unit id="3802614335560711985" datatype="html">
                 <source>Dans MyHordes uniquement</source>
@@ -1190,6 +1172,9 @@
             <trans-unit id="1785052497460968940" datatype="html">
                 <source>Modifier</source>
             </trans-unit>
+            <trans-unit id="1804944299064211947" datatype="html">
+                <source>Le chien de l&apos;Apprivoiseur peut le rapporter de la banque</source>
+            </trans-unit>
             <trans-unit id="180879386399550529" datatype="html">
                 <source>Supprimer</source>
             </trans-unit>
@@ -1236,6 +1221,9 @@
                     <x id="ap" equiv-text="ap"/>
                     PA
                 </source>
+            </trans-unit>
+            <trans-unit id="6927864291145573325" datatype="html">
+                <source>Ne peut pas être volé</source>
             </trans-unit>
             <trans-unit id="6929653928890484400" datatype="html">
                 <source>Vous n&apos;êtes pas citoyen de cette ville.</source>
@@ -1784,6 +1772,12 @@
                 <source>(saison<x id="INTERPOLATION" equiv-text="{{ row.lastTownSeason }}"/>)
                 </source>
             </trans-unit>
+            <trans-unit id="2848739030401347585" datatype="html">
+                <source>2 – Secteur connu</source>
+            </trans-unit>
+            <trans-unit id="2850906492242295038" datatype="html">
+                <source>tous les zombies</source>
+            </trans-unit>
             <trans-unit id="285232876065312407" datatype="html">
                 <source>Distance (km)</source>
             </trans-unit>
@@ -2163,6 +2157,9 @@
             <trans-unit id="8265078634979801865" datatype="html">
                 <source>La liste est vide</source>
             </trans-unit>
+            <trans-unit id="8283686607360852750" datatype="html">
+                <source>Passages (éclaireur)</source>
+            </trans-unit>
             <trans-unit id="8285027590954206551" datatype="html">
                 <source>Tout le monde</source>
             </trans-unit>
@@ -2213,6 +2210,9 @@
             </trans-unit>
             <trans-unit id="794846713726296087" datatype="html">
                 <source>Alternative Technicien</source>
+            </trans-unit>
+            <trans-unit id="1653227668373898364" datatype="html">
+                <source>zone</source>
             </trans-unit>
             <trans-unit id="1654995770303703868" datatype="html">
                 <source>Potions bues</source>
@@ -2371,6 +2371,9 @@
             <trans-unit id="8835235456088640736" datatype="html">
                 <source>Identifiants MyHordes</source>
             </trans-unit>
+            <trans-unit id="8839469399433877944" datatype="html">
+                <source>Détruit</source>
+            </trans-unit>
             <trans-unit id="2205827814755156780" datatype="html">
                 <source>Dernières mises à jour</source>
             </trans-unit>
@@ -2387,6 +2390,9 @@
             </trans-unit>
             <trans-unit id="2232754981073069655" datatype="html">
                 <source>Plafond de 99 % (Repos niveau 4)</source>
+            </trans-unit>
+            <trans-unit id="4731110158513700954" datatype="html">
+                <source>1 – Secteur partiellement repéré</source>
             </trans-unit>
             <trans-unit id="4731835886848439200" datatype="html">
                 <source>Vert</source>
@@ -2421,6 +2427,9 @@
             </trans-unit>
             <trans-unit id="6019292516079167066" datatype="html">
                 <source>Indigo</source>
+            </trans-unit>
+            <trans-unit id="6019336287346571862" datatype="html">
+                <source>Bonus de veille de l&apos;Animalerie (+30 %)</source>
             </trans-unit>
             <trans-unit id="6027913026841853866" datatype="html">
                 <source>Pas vue aujourd&apos;hui</source>
@@ -2601,6 +2610,12 @@
             <trans-unit id="1143979727128159956" datatype="html">
                 <source>Chaussures exigées</source>
             </trans-unit>
+            <trans-unit id="1146649801223955350" datatype="html">
+                <source>Incompatible avec le niveau d&apos;exploration :
+                    <x id="max" equiv-text="range.max"/>
+                    passages
+                </source>
+            </trans-unit>
             <trans-unit id="562741246556113481" datatype="html">
                 <source><x id="minutes" equiv-text="minutes"/>m
                 </source>
@@ -2728,6 +2743,9 @@
                 <source>Partie<x id="INTERPOLATION" equiv-text="{{ expedition_part_index + 1 }}"/> : 
                 </source>
             </trans-unit>
+            <trans-unit id="6664763608921383388" datatype="html">
+                <source>Utilisable 1 fois par jour</source>
+            </trans-unit>
             <trans-unit id="6666833560603751554" datatype="html">
                 <source>Drogué(e)</source>
             </trans-unit>
@@ -2774,6 +2792,9 @@
             </trans-unit>
             <trans-unit id="7180575964287205441" datatype="html">
                 <source>Oui</source>
+            </trans-unit>
+            <trans-unit id="7180674639664020264" datatype="html">
+                <source>Bonus de veille de la Meuleuse manuelle (+20 %)</source>
             </trans-unit>
             <trans-unit id="718068350898796239" datatype="html">
                 <source>Compétences</source>
@@ -2879,6 +2900,9 @@
             </trans-unit>
             <trans-unit id="7163148973019066404" datatype="html">
                 <source>Arrivée</source>
+            </trans-unit>
+            <trans-unit id="7163405252647334894" datatype="html">
+                <source>Un seul à la fois parmi</source>
             </trans-unit>
             <trans-unit id="7167236322992449914" datatype="html">
                 <source>Modifier la liste</source>
@@ -2989,17 +3013,11 @@
             <trans-unit id="5720485448206216082" datatype="html">
                 <source>Couleur d&apos;origine</source>
             </trans-unit>
-            <trans-unit id="5720882951020272000" datatype="html">
-                <source>0 – Zone peu explorée</source>
-            </trans-unit>
             <trans-unit id="5723536799759201212" datatype="html">
                 <source>Bloc de code</source>
             </trans-unit>
             <trans-unit id="4740081045248720016" datatype="html">
                 <source>Saisies modifiées pendant le scan, relancez l&apos;affinage</source>
-            </trans-unit>
-            <trans-unit id="4741517700695762920" datatype="html">
-                <source>1 – Zone partiellement explorée</source>
             </trans-unit>
             <trans-unit id="4752880524312751918" datatype="html">
                 <source>Aucune connue</source>
@@ -3021,12 +3039,6 @@
                     nouvelle version existe, le panneau affiche « Mise à jour disponible » et une pastille apparaît sur le bouton MyHordes Optimizer.&lt;/p&gt;
                 </source>
             </trans-unit>
-            <trans-unit id="42397383054553721" datatype="html">
-                <source>2 – Zone explorée</source>
-            </trans-unit>
-            <trans-unit id="4250214890859179856" datatype="html">
-                <source>3 – Zone entièrement cartographiée</source>
-            </trans-unit>
             <trans-unit id="4254054450644204728" datatype="html">
                 <source>Choisir des chantiers</source>
             </trans-unit>
@@ -3040,6 +3052,9 @@
             </trans-unit>
             <trans-unit id="5174692148348158925" datatype="html">
                 <source>Non renseigné</source>
+            </trans-unit>
+            <trans-unit id="5174923677227348938" datatype="html">
+                <source>Incroyable trouvaille</source>
             </trans-unit>
             <trans-unit id="4230917312458855608" datatype="html">
                 <source>
@@ -3115,6 +3130,9 @@
             </trans-unit>
             <trans-unit id="8538918839705198292" datatype="html">
                 <source>Ville en chaos</source>
+            </trans-unit>
+            <trans-unit id="8542203874152236504" datatype="html">
+                <source>Purifier</source>
             </trans-unit>
             <trans-unit id="860520604015615548" datatype="html">
                 <source>Fréquence en fouille</source>
@@ -3528,6 +3546,9 @@
             <trans-unit id="3696553302854150474" datatype="html">
                 <source>serveur Discord de MyHordes Optimizer</source>
             </trans-unit>
+            <trans-unit id="5177031640736248755" datatype="html">
+                <source>Dans le sac, +1 point de contrôle de zone</source>
+            </trans-unit>
             <trans-unit id="5177435738614405515" datatype="html">
                 <source>Attaque du lendemain (J<x id="INTERPOLATION" equiv-text="{{ selected_day + 1 }}"/>)
                 </source>
@@ -3686,6 +3707,9 @@
                     &lt;p&gt;À droite, l&apos;attaque calculée à partir de ces estimations (jour ou lendemain), la valeur la plus probable et la moyenne, les
                     bornes théoriques du jour et la répartition de l&apos;attaque.&lt;/p&gt;
                 </source>
+            </trans-unit>
+            <trans-unit id="6072017829106888519" datatype="html">
+                <source>Avec Système de Pièges des Apprivoiseurs</source>
             </trans-unit>
             <trans-unit id="6081697647486005114" datatype="html">
                 <source>Chargement…</source>
@@ -3872,6 +3896,9 @@
             <trans-unit id="2472506129070031683" datatype="html">
                 <source>Ont contribué</source>
             </trans-unit>
+            <trans-unit id="2475763617807812340" datatype="html">
+                <source>En veille</source>
+            </trans-unit>
             <trans-unit id="2476531440258858476" datatype="html">
                 <source>&lt;p&gt;Ajoute un champ de recherche (sans tenir compte des majuscules ni des accents) aux listes choisies :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Chantiers&lt;/strong&gt;,
                     avec « Masquer les chantiers terminés » (un chantier terminé mais endommagé reste affiché) ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Destinataires&lt;/strong&gt;
@@ -3986,6 +4013,9 @@
             <trans-unit id="7871769022996000968" datatype="html">
                 <source>Options d&apos;escorte par défaut</source>
             </trans-unit>
+            <trans-unit id="7875511719404518889" datatype="html">
+                <source>Impressionnante trouvaille</source>
+            </trans-unit>
             <trans-unit id="787782299397948132" datatype="html">
                 <source>État de départ</source>
             </trans-unit>
@@ -4003,6 +4033,9 @@
             </trans-unit>
             <trans-unit id="868656261528547386" datatype="html">
                 <source>Filtrer sur ce niveau</source>
+            </trans-unit>
+            <trans-unit id="869213916176333095" datatype="html">
+                <source>places</source>
             </trans-unit>
             <trans-unit id="8695019972318995873" datatype="html">
                 <source>
@@ -4434,6 +4467,9 @@
             <trans-unit id="6188037361891823447" datatype="html">
                 <source>Zone de rappatriement</source>
             </trans-unit>
+            <trans-unit id="6188536521660619605" datatype="html">
+                <source>Chaque exemplaire compte pour les chances de survie en veille</source>
+            </trans-unit>
             <trans-unit id="5559756806979544050" datatype="html">
                 <source>Configuration illisible ou d&apos;une version incompatible.</source>
             </trans-unit>
@@ -4526,6 +4562,9 @@
                 <source>&lt;p&gt;MyHordes Optimizer lit vos données de jeu avec votre &lt;strong&gt;identifiant externe pour les apps&lt;/strong&gt;. Sans lui,
                     le panneau n&apos;affiche qu&apos;un message d&apos;aide. Il est en général récupéré automatiquement : voir « Prise en main ».&lt;/p&gt;
                 </source>
+            </trans-unit>
+            <trans-unit id="3403107816799835693" datatype="html">
+                <source>Bonus de veille du Magasin suédois (+30 %)</source>
             </trans-unit>
             <trans-unit id="2332866508838027590" datatype="html">
                 <source>Compte</source>
@@ -4850,6 +4889,9 @@
                     non épuisées
                 </source>
             </trans-unit>
+            <trans-unit id="7432358326611023934" datatype="html">
+                <source>Découper</source>
+            </trans-unit>
             <trans-unit id="5540869325268092301" datatype="html">
                 <source>Le plus court chemin qui passe par les cases au plus fort potentiel : une case jamais visitée d&apos;abord, puis les fouilles restantes
                     maximales (régénération comprise), puis les cases les plus loin de la ville. Il ne repasse par une case déjà sur le tracé que s&apos;il n&apos;a
@@ -4873,6 +4915,9 @@
             </trans-unit>
             <trans-unit id="3798070165070620146" datatype="html">
                 <source>Guide</source>
+            </trans-unit>
+            <trans-unit id="3539393564644326302" datatype="html">
+                <source>Purifier (1PA)</source>
             </trans-unit>
             <trans-unit id="3549884673093564156" datatype="html">
                 <source>Pas soif</source>
@@ -4932,6 +4977,9 @@
                     y trouver avec leur probabilité. Les colonnes se trient ; l&apos;icône d&apos;entonnoir des en-têtes filtre par nom, distance ou objet. Avec
                     une ville active, « Dans ma ville » n&apos;affiche que les bâtiments de votre carte.&lt;/p&gt;
                 </source>
+            </trans-unit>
+            <trans-unit id="5343529572924432494" datatype="html">
+                <source>Bonus de veille des Gouttières filtrantes (+30 %)</source>
             </trans-unit>
             <trans-unit id="5344623683730509987" datatype="html">
                 <source>Un grand merci à Renack, sans qui ni le script ni le site n&apos;existeraient puisqu&apos;il a fait tout le backend !</source>
@@ -5030,13 +5078,6 @@
             </trans-unit>
             <trans-unit id="4527053987641321834" datatype="html">
                 <source>Afficher le détail</source>
-            </trans-unit>
-            <trans-unit id="4532832196776816744" datatype="html">
-                <source>
-                    <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                    <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
-                    de base
-                </source>
             </trans-unit>
             <trans-unit id="4540401638459620535" datatype="html">
                 <source>/timer (/minuteur)</source>
@@ -5146,6 +5187,9 @@
             </trans-unit>
             <trans-unit id="3243838789504652996" datatype="html">
                 <source>Départ</source>
+            </trans-unit>
+            <trans-unit id="3245184823025180727" datatype="html">
+                <source>à</source>
             </trans-unit>
             <trans-unit id="3246864206079397926" datatype="html">
                 <source>Phare</source>
@@ -5370,6 +5414,9 @@
             <trans-unit id="2760056313746467938" datatype="html">
                 <source>État de la porte</source>
             </trans-unit>
+            <trans-unit id="2762869374924960552" datatype="html">
+                <source>Une fois chargé</source>
+            </trans-unit>
             <trans-unit id="2772563260830012467" datatype="html">
                 <source>Repousse les zombies pendant</source>
             </trans-unit>
@@ -5406,6 +5453,9 @@
             <trans-unit id="5431997792330966741" datatype="html">
                 <source>Ajoutez une étape à la séquence pour voir la trace.</source>
             </trans-unit>
+            <trans-unit id="5435887639284497263" datatype="html">
+                <source>Attaquer avec</source>
+            </trans-unit>
             <trans-unit id="5435975275965738468" datatype="html">
                 <source>Fouiller les déchets</source>
             </trans-unit>
@@ -5414,6 +5464,9 @@
             </trans-unit>
             <trans-unit id="5438409221885173808" datatype="html">
                 <source>Population de la ville</source>
+            </trans-unit>
+            <trans-unit id="5438512350631638907" datatype="html">
+                <source>Bonus de veille</source>
             </trans-unit>
             <trans-unit id="5778482516557877676" datatype="html">
                 <source>Habitations</source>
@@ -5487,6 +5540,9 @@
             </trans-unit>
             <trans-unit id="464405392288183930" datatype="html">
                 <source>Cet objet figure deux fois dans la même zone : la liste n&apos;est pas enregistrée tant que le doublon reste.</source>
+            </trans-unit>
+            <trans-unit id="4646292498905551316" datatype="html">
+                <source>3 – Secteur totalement balisé</source>
             </trans-unit>
             <trans-unit id="1355112096350536441" datatype="html">
                 <source>ignorée (porte ouverte)</source>
@@ -5685,6 +5741,9 @@
             <trans-unit id="4676192744733657469" datatype="html">
                 <source>Augmente les chances de camping s&apos;il est dans le sac</source>
             </trans-unit>
+            <trans-unit id="4679835845080326755" datatype="html">
+                <source>Halloween : dans le coffre, empêche les vols et peut terroriser son propriétaire la nuit</source>
+            </trans-unit>
             <trans-unit id="789097210155389951" datatype="html">
                 <source>Nombre de morts</source>
             </trans-unit>
@@ -5856,6 +5915,9 @@
             <trans-unit id="7631405440758027758" datatype="html">
                 <source>Temps</source>
             </trans-unit>
+            <trans-unit id="763298676428966633" datatype="html">
+                <source>Sert d&apos;appât dans le Système de Pièges des Apprivoiseurs</source>
+            </trans-unit>
             <trans-unit id="7633234991118987386" datatype="html">
                 <source>Blessure - Jambe</source>
             </trans-unit>
@@ -5864,6 +5926,9 @@
             </trans-unit>
             <trans-unit id="7638538933808134442" datatype="html">
                 <source>Vous revenez ici connecté, et le menu &quot;Ma ville&quot; se débloque.</source>
+            </trans-unit>
+            <trans-unit id="658002876828417422" datatype="html">
+                <source>Ne peut pas être envoyé par message</source>
             </trans-unit>
             <trans-unit id="6585575229821965752" datatype="html">
                 <source>tracé dans MyHordes</source>
@@ -5983,6 +6048,9 @@
             <trans-unit id="952241786827641678" datatype="html">
                 <source>Voir la note</source>
             </trans-unit>
+            <trans-unit id="824076330532613671" datatype="html">
+                <source>Outil d&apos;ouverture</source>
+            </trans-unit>
             <trans-unit id="8241892332547250073" datatype="html">
                 <source>&lt;p&gt;« Mon compte » ouvre votre profil : vos villes et vos pictos. « Importer mes données » récupère votre historique depuis
                     MyHordes ; l&apos;import est long, et il n&apos;est pas possible de le relancer juste après.&lt;/p&gt; &lt;p&gt;« Déconnexion » vous
@@ -6046,6 +6114,9 @@
             <trans-unit id="62784392667099418" datatype="html">
                 <source>Chrome, Edge, Opera, Brave</source>
             </trans-unit>
+            <trans-unit id="6283063806343779684" datatype="html">
+                <source>Ne compte pas comme nourriture emportée en sortant de la ville</source>
+            </trans-unit>
             <trans-unit id="6283269120638948012" datatype="html">
                 <source>Prendre un bain</source>
             </trans-unit>
@@ -6082,6 +6153,14 @@
             </trans-unit>
             <trans-unit id="5478429085270168780" datatype="html">
                 <source>a pris la main sur cette proposition : vos dernières modifications n&apos;ont pas pu être enregistrées.</source>
+            </trans-unit>
+            <trans-unit id="5481024292533409255" datatype="html">
+                <source>Incompatible avec le niveau d&apos;exploration :
+                    <x id="min" equiv-text="range.min"/>
+                    à
+                    <x id="max" equiv-text="range.max"/>
+                    passages
+                </source>
             </trans-unit>
             <trans-unit id="548628609723380663" datatype="html">
                 <source>Points de vie</source>
@@ -6125,6 +6204,9 @@
                     <x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/>
                     de base
                 </source>
+            </trans-unit>
+            <trans-unit id="8910499852541357270" datatype="html">
+                <source>0 – Secteur peu connu</source>
             </trans-unit>
             <trans-unit id="8915113584796105323" datatype="html">
                 <source>Fermer la recherche</source>
@@ -6234,6 +6316,9 @@
             <trans-unit id="4045290552180803882" datatype="html">
                 <source>Jours validés</source>
             </trans-unit>
+            <trans-unit id="4045757326321263630" datatype="html">
+                <source>Halloween : dans le coffre, 50 % de chances d&apos;infecter son propriétaire la nuit</source>
+            </trans-unit>
             <trans-unit id="405111989589730898" datatype="html">
                 <source>Prune</source>
             </trans-unit>
@@ -6280,6 +6365,9 @@
             </trans-unit>
             <trans-unit id="8021687558521014030" datatype="html">
                 <source>Option</source>
+            </trans-unit>
+            <trans-unit id="8023154384211600757" datatype="html">
+                <source>Passages :</source>
             </trans-unit>
             <trans-unit id="8027721657039626152" datatype="html">
                 <source>
@@ -6354,6 +6442,9 @@
             </trans-unit>
             <trans-unit id="6751441754948847748" datatype="html">
                 <source>Autre</source>
+            </trans-unit>
+            <trans-unit id="6759786872532843195" datatype="html">
+                <source>Chances de survie en veille</source>
             </trans-unit>
             <trans-unit id="778297146612954408" datatype="html">
                 <source>Les pages du menu &quot;Ma ville&quot; ne s&apos;ouvrent qu&apos;une fois le site relié à votre compte MyHordes. Cela se fait une seule

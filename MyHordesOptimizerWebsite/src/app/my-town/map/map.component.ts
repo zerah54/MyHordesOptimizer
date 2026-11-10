@@ -21,7 +21,7 @@ import {
     viewChild,
     WritableSignal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -39,12 +39,13 @@ import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import moment from 'moment';
+import { first, map as rxMap, Observable, switchMap } from 'rxjs';
 
-import { environment } from '../../../environments/environment';
 import { BREAKPOINTS, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { MapThemeDTO } from '../../_abstract_model/dto/map-theme.dto';
 import { isHubConflictError } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Dictionary, Imports, ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Cell } from '../../_abstract_model/types/cell.class';
@@ -66,6 +67,7 @@ import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { DEFAULT_ITEMS_SORT_MODE, ItemsSortMode, sanitizeItemsSortMode } from '../../_shared/list-elements-add-remove/items-sort-mode';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import {
     DISTANCE_BORDER_STYLES,
     DISTANCE_COLORS,
@@ -79,6 +81,7 @@ import {
     ZoneItemsPipe
 } from './distance-zones';
 import { DrawMapComponent, MapCellPick } from './draw-map/draw-map.component';
+import { DumpUpgrades, dumpUpgradesOf, NO_DUMP } from './draw-map/map-cell/pipes/trash-value.pipe';
 import {
     CORNER_INFO_OPTIONS,
     CornerInfo,
@@ -115,7 +118,7 @@ import { MapRouteCommonColor, MapRoutePersonalColor, MapRoutesPanelComponent } f
 import { itemCountsOnMap, NO_SPOTTED_ITEMS, sanitizeSpottedItemUids, SpottedItemsSummary, spottedItemsSummary } from './map-spotted-items';
 
 const angular_common: Imports = [CdkConnectedOverlay, CdkOverlayOrigin, CommonModule, FormsModule, RouterLink];
-const components: Imports = [CompassRoseComponent, DrawMapComponent, ListElementAddRemoveComponent, MapRouteEditorComponent, MapRoutesPanelComponent];
+const components: Imports = [CompassRoseComponent, DrawMapComponent, ListElementAddRemoveComponent, MapRouteEditorComponent, MapRoutesPanelComponent, PageTitleComponent];
 const directives: Imports = [ScrollAuraDirective];
 const pipes: Imports = [DistanceBorderPipe, LocalizedLabelPipe, ZoneItemCountPipe, ZoneItemsPipe];
 const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSidenavModule, MatTooltipModule];
@@ -160,7 +163,6 @@ export class MapComponent implements OnInit, AfterViewInit {
     protected readonly all_items: WritableSignal<Item[] | undefined> = signal(undefined);
     protected readonly all_citizens: WritableSignal<Citizen[] | undefined> = signal(undefined);
 
-    protected readonly is_dev: boolean = !environment.production;
 
     protected readonly zoom_min: number = MapComponent.ZOOM_MIN;
     protected readonly zoom_max: number = MapComponent.ZOOM_MAX;
@@ -262,6 +264,17 @@ export class MapComponent implements OnInit, AfterViewInit {
                 && previous.corners === next.corners;
         }
     });
+
+    private readonly built_buildings: BuiltBuildingsService = inject(BuiltBuildingsService);
+    /** Évolutions de la Décharge, chargées à la première ouverture de la carte « Décharge ». */
+    protected readonly dump: Signal<DumpUpgrades> = toSignal(
+        toObservable(computed((): boolean => this.options().map_type === 'trash')).pipe(
+            first((is_trash: boolean): boolean => is_trash),
+            switchMap((): Observable<ReadonlyMap<string, number> | null> => this.built_buildings.builtLevels()),
+            rxMap(dumpUpgradesOf)
+        ),
+        { initialValue: NO_DUMP }
+    );
 
     /** Légende du type de carte affiché : paliers et libellés du jeu, `null` sans légende. */
     protected readonly legend: Signal<readonly MapLegendEntry[] | null> = computed((): readonly MapLegendEntry[] | null => MAP_LEGENDS[this.options().map_type]);

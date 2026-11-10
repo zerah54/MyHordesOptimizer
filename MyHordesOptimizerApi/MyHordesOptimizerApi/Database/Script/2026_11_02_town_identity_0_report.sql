@@ -4,7 +4,7 @@
 -- Lecture seule : que des SELECT. À lancer après la capture, sur mho comme sur MHO_BETA.
 -- Correspondance Town.phase : 0 = alpha, 1 = beta, 2 = import, 3 = native (enum TownPhase, MapTownPhase).
 -- Comparaison : Town.idTown = TownRankingSnapshot.rankingId, lignes isAbsent = 0, en <=> (NULL ne masque rien),
--- nom et langue comparés en binaire sans padding (espaces finales incluses) (l'instantané est en utf8mb3, Town en utf8mb4).
+-- nom et langue comparés en binaire sans padding (espaces finales incluses).
 -- Les témoins (suspectClass = 'T') sont isolés dans la section 7.
 -- ----------------------------------------------------------------------------
 
@@ -66,7 +66,7 @@ WHERE phase = 1
   AND NOT (season <=> 15);
 
 
--- 3. Divergences d'identité Town / instantané par classe, hors témoins. Attendu : 0 hors ALPHA et C (écrasées, divergence voulue).
+-- 3. Divergences d'identité Town / instantané par classe, hors témoins. Attendu : divergences sur A, A', B et C (lignes écrasées) ; 0 sur D, E et N19.
 SELECT 'divergences_identite_par_classe' AS controle,
        d.suspectClass,
        COUNT(*)                          AS comparees,

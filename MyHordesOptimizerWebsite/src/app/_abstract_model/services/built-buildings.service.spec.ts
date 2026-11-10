@@ -16,8 +16,8 @@ import { BuiltBuildingsService } from './built-buildings.service';
  * @param {boolean} built Construit.
  * @returns {TownBuildingStateDTO} État.
  */
-function state(id: number, built: boolean): TownBuildingStateDTO {
-    return { buildingId: id, isBuilt: built, paCurrent: null, apRemaining: null, life: null, maxLife: null, def: null, level: null, difficulty: null, resources: [] };
+function state(id: number, built: boolean, level: number | null = null): TownBuildingStateDTO {
+    return { buildingId: id, isBuilt: built, paCurrent: null, apRemaining: null, life: null, maxLife: null, def: null, level, difficulty: null, resources: [] };
 }
 
 describe('BuiltBuildingsService', (): void => {
@@ -83,10 +83,39 @@ describe('BuiltBuildingsService', (): void => {
         expect(result).toBeNull();
     });
 
+    it('renvoie le niveau d\'évolution des chantiers construits (0 s\'il est inconnu)', (): void => {
+        const service: BuiltBuildingsService = create(of({ buildings: [state(1, true, 2), state(2, false, 1)], defense: null }));
+        let result: ReadonlyMap<string, number> | null | undefined;
+        service.builtLevels().subscribe((levels: ReadonlyMap<string, number> | null): void => {
+            result = levels;
+        });
+        expect(result).toEqual(new Map<string, number>([['small_gallery_#00', 2]]));
+    });
+
+    it('niveau 0 pour un chantier construit dont le niveau est inconnu', (): void => {
+        const service: BuiltBuildingsService = create(of({ buildings: [state(1, true)], defense: null }));
+        let result: ReadonlyMap<string, number> | null | undefined;
+        service.builtLevels().subscribe((levels: ReadonlyMap<string, number> | null): void => {
+            result = levels;
+        });
+        expect(result).toEqual(new Map<string, number>([['small_gallery_#00', 0]]));
+    });
+
+    it('repli nul des niveaux si l\'état est indisponible', (): void => {
+        const service: BuiltBuildingsService = create(throwError((): Error => new Error('404')));
+        let result: ReadonlyMap<string, number> | null | undefined;
+        service.builtLevels().subscribe((levels: ReadonlyMap<string, number> | null): void => {
+            result = levels;
+        });
+
+        expect(result).toBeNull();
+    });
+
     it('un seul chargement pour plusieurs abonnements rapprochés', (): void => {
         const service: BuiltBuildingsService = create(of({ buildings: [state(1, true)], defense: null }));
         service.builtUids().subscribe();
         service.builtUids().subscribe();
+        service.builtLevels().subscribe();
 
         expect(get_state).toHaveBeenCalledTimes(1);
         expect(get_buildings).toHaveBeenCalledTimes(1);

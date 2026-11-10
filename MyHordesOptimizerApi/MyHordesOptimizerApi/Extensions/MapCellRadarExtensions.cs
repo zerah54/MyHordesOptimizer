@@ -24,6 +24,12 @@ namespace MyHordesOptimizerApi.Extensions
         /// </summary>
         public const int MaxScoutEstimationRange = 2;
 
+        /// <summary>Passages d'éclaireur par niveau d'exploration (MyHordes <c>Zone::getScoutLevel</c> : <c>min(3, floor(passages / 5))</c>).</summary>
+        public const int ScoutVisitsPerLevel = 5;
+
+        /// <summary>Passages au-delà desquels le niveau d'exploration, plafonné à 3, ne bouge plus.</summary>
+        public const int MaxScoutVisits = 3 * ScoutVisitsPerLevel;
+
         /// <summary>
         /// Amplitude du bruit de l'estimation pour un niveau d'exploration donné.
         /// MyHordes calcule <c>range = max(2 - scoutLevel, 0)</c> : une zone entièrement
@@ -46,6 +52,9 @@ namespace MyHordesOptimizerApi.Extensions
         /// <param name="observations">Observations de la mise à jour en cours : les relevés du Fouineur en sont.</param>
         /// <param name="scavZoneLevel">Niveau d'abondance de la case courante : <c>null</c> s'il n'a pas été relevé À L'INSTANT
         /// (une valeur ressaisie à l'identique ramènerait les fouilles restantes dans une fourchette périmée).</param>
+        /// <param name="scoutZoneLevel">Niveau d'exploration de la case : il prime sur <see cref="MapCell.ScoutVisits"/>, ramené dans sa plage.</param>
+        /// <param name="scoutVisits">Passages d'éclaireur saisis dans la popup (<c>null</c> = inconnu).</param>
+        /// <param name="scoutVisitsEntered">La popup envoie toujours les passages ; l'addon ne les relève jamais.</param>
         /// <param name="lastUpdateInfoId">Identifiant de mise à jour à porter sur les estimations d'Éclaireur.</param>
         /// <returns>La fourchette de fouilles restantes imposée à la case courante, <c>null</c> si aucune.</returns>
         public static DigBounds? ApplyJobRadars(this IEnumerable<MapCell> townCells,
@@ -54,6 +63,8 @@ namespace MyHordesOptimizerApi.Extensions
             int y,
             int? scavZoneLevel,
             int? scoutZoneLevel,
+            int? scoutVisits,
+            bool scoutVisitsEntered,
             ScavNextCellsDto? scavNextCells,
             ScoutNextCellsDto? scoutNextCells,
             int lastUpdateInfoId)
@@ -62,7 +73,7 @@ namespace MyHordesOptimizerApi.Extensions
 
             MapCell? FindCell(int cellX, int cellY) => cells.FirstOrDefault(cell => cell.X == cellX && cell.Y == cellY);
 
-            var currentCellBounds = ApplyCurrentCell(observations, FindCell(x, y), scavZoneLevel, scoutZoneLevel);
+            var currentCellBounds = ApplyCurrentCell(observations, FindCell(x, y), scavZoneLevel, scoutZoneLevel, scoutVisits, scoutVisitsEntered);
 
             // Le nord de la carte correspond aux ordonnées décroissantes en base
             // (cf. MapMappingProfile : displayY = town.Y - cell.Y)
@@ -79,7 +90,7 @@ namespace MyHordesOptimizerApi.Extensions
             return currentCellBounds;
         }
 
-        private static DigBounds? ApplyCurrentCell(DigObservations observations, MapCell? cell, int? scavZoneLevel, int? scoutZoneLevel)
+        private static DigBounds? ApplyCurrentCell(DigObservations observations, MapCell? cell, int? scavZoneLevel, int? scoutZoneLevel, int? scoutVisits, bool scoutVisitsEntered)
         {
             if (cell == null)
             {
@@ -98,11 +109,35 @@ namespace MyHordesOptimizerApi.Extensions
                     bounds = scavBounds;
                 }
             }
+            ApplyScoutVisits(cell, scoutZoneLevel, scoutVisits, scoutVisitsEntered);
+            return bounds;
+        }
+
+        /// <summary>
+        /// Passages d'éclaireur et niveau d'exploration de la case courante. Le niveau, valeur réelle lue
+        /// par l'addon, prime : un nombre connu est ramené dans sa plage. Sans niveau, un nombre saisi le donne.
+        /// Un nombre inconnu le reste : un niveau n'en donne qu'une plage.
+        /// </summary>
+        private static void ApplyScoutVisits(MapCell cell, int? scoutZoneLevel, int? scoutVisits, bool scoutVisitsEntered)
+        {
+            if (scoutVisitsEntered)
+            {
+                cell.ScoutVisits = scoutVisits.HasValue ? Math.Clamp(scoutVisits.Value, 0, MaxScoutVisits) : null;
+            }
+
             if (scoutZoneLevel.HasValue)
             {
                 cell.ScoutZoneLevel = scoutZoneLevel.Value;
+                if (cell.ScoutVisits.HasValue)
+                {
+                    var minVisits = scoutZoneLevel.Value * ScoutVisitsPerLevel;
+                    cell.ScoutVisits = Math.Clamp(cell.ScoutVisits.Value, minVisits, Math.Min(minVisits + ScoutVisitsPerLevel - 1, MaxScoutVisits));
+                }
             }
-            return bounds;
+            else if (scoutVisitsEntered && cell.ScoutVisits.HasValue)
+            {
+                cell.ScoutZoneLevel = cell.ScoutVisits.Value / ScoutVisitsPerLevel;
+            }
         }
 
         /// <summary>

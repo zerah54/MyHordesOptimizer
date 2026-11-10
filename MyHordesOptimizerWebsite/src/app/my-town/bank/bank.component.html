@@ -1,5 +1,7 @@
 <mat-card-header class="mho-bank-header">
-    <mat-card-title i18n>Banque</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="townBank"/>
+    </mat-card-title>
     <!-- Choix exclusif : un groupe de bascules, pas un interrupteur. L'état reste le même
          booléen `condensed_display`, persisté à l'identique. -->
     <mat-button-toggle-group [(ngModel)]="condensed_display" (ngModelChange)="changeCondensedDisplay()"
