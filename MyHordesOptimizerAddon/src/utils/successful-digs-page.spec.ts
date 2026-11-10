@@ -7,6 +7,7 @@ import {
     classifyLogText,
     collectSuccessfulDigs,
     computeTownOffsetMinutes,
+    isDayDigLogComplete,
     parseClockMinutes,
     readZoneDiggers,
     readZoneDigLog,
@@ -195,6 +196,12 @@ describe('readZoneDigLog', () => {
         expect(readZoneDigLog(document, null, now_ms, offset_min)?.entries).toHaveLength(13);
     });
 
+    it('ne prend aucune ligne d\'un registre qui n\'est pas celui du jour demandé', () => {
+        document.body.innerHTML = zone_log;
+
+        expect(readZoneDigLog(document, 6, now_ms, offset_min)?.entries).toEqual([]);
+    });
+
     it('ne rend rien d\'un registre absent, en chargement, ou dont une heure est illisible', () => {
         expect(readZoneDigLog(document, 5, now_ms, offset_min)).toBeNull();
 
@@ -203,6 +210,35 @@ describe('readZoneDigLog', () => {
 
         document.body.innerHTML = log(entry('8h00', arrivalFr('Hélène')));
         expect(readZoneDigLog(document, 5, now_ms, offset_min)).toBeNull();
+    });
+});
+
+describe('isDayDigLogComplete', () => {
+    const today_header: string = '<div class="log-day-header">Jour 5 (aujourd\'hui)</div>';
+    const complete_link: string = '<div class="log-complete-link">Afficher toutes les entrées</div>';
+
+    function isComplete(html: string): boolean {
+        document.body.innerHTML = html;
+        return isDayDigLogComplete(document.querySelector('#beyond-log') as Element);
+    }
+
+    it('complet dès que l\'en-tête d\'un jour précédent est affiché, lien ou non', () => {
+        expect(isComplete(zone_log)).toBe(true);
+    });
+
+    it('complet quand le registre a tout chargé', () => {
+        expect(isComplete(log(today_header + entry('8:00', arrivalFr('Hélène'))))).toBe(true);
+        expect(isComplete(log(today_header + '<i>Aucune entrée</i>'))).toBe(true);
+    });
+
+    it('incomplet quand des lignes du jour peuvent rester à charger', () => {
+        expect(isComplete(log(today_header + entry('8:00', arrivalFr('Hélène')) + complete_link))).toBe(false);
+    });
+
+    it('incomplet tant que le registre n\'est pas chargé', () => {
+        expect(isComplete('<hordes-log id="beyond-log"></hordes-log>')).toBe(false);
+        expect(isComplete(log(today_header + complete_link))).toBe(false);
+        expect(isComplete(log(today_header + '<div class="log-spinner"><i class="fa fa-pulse fa-spinner"></i></div>'))).toBe(false);
     });
 });
 

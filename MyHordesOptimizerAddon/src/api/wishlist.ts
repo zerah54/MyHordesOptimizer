@@ -34,9 +34,10 @@ export function getWishlist() {
 
 export function addItemToWishlist(item) {
     return new Promise<any>((resolve, reject) => {
-        fetcher(state.api_url + '/wishlist/add/' + item.id + '?userId=' + state.mh_user.id + '&townId=' + state.mh_user.townDetails?.townId, {
+        /** Route réservée aux citoyens connectés : sans jeton, l'API répond 401 */
+        fetcher(state.api_url + '/wishlist/add/' + item.id + '?townId=' + state.mh_user.townDetails?.townId, {
             method: 'POST'
-        })
+        }, { wait_for_token: true })
             .then((response) => {
                 if (response.status === 200) {
                     return response.text();

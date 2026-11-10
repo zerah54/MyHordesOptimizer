@@ -1,4 +1,14 @@
 export const changelogs: Record<string, string> = {
+    '1.1.64': `
+        [Neu] Mein Programm: neues Fenster mit deiner Expedition, deinen Bauprojekten, den heutigen Anweisungen und den heute Abend gewählten Entwicklungen
+        [Neu] Expeditionen: Routenverfolgung in der Wüste (einzuschlagende Richtung, Anweisungen des Feldes, nächstes Feld mit Anweisungen)
+        [Neu] Zen Hordes: Es ist jetzt möglich, Informationen an ZenHordes zu senden
+
+        [Verbesserung] Verbesserte Tooltips und Wiki: mehr Informationen
+        [Verbesserung] Gest'Hordes: neue Option zum Senden der Jobmarkierungen
+
+        [Korrektur] Die Warnung bei unvollständigem Grabungsprotokoll ist zuverlässiger
+        `,
     '1.1.63': `
         [Neu] Der Wachturm zeigt unter dem berechneten Angriff von heute und morgen die von der Stadt geteilte verfeinerte Angriffsspanne an
         [Neu] Der Camping-Rechner zeigt die Rohchance in Klammern an, wenn Ober- oder Untergrenze sie verändert haben

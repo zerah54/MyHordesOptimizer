@@ -84,6 +84,23 @@ final class Projections
                 false
             ),
 
+            // Clés = uids d'objets / noms de groupes / noms de conditions, pas des champs : pas de schéma surveillé.
+            new Projection(
+                'Items/item-extras.json',
+                'myhordes.fixtures.items.list',
+                null,
+                static fn(array $objets): array => self::extrasObjets($objets),
+                false
+            ),
+            new Projection(
+                'Items/result-groups.json',
+                'myhordes.fixtures.actions',
+                'results',
+                static fn(array $resultats): array => $resultats['group'] ?? [],
+                false
+            ),
+            new Projection('Items/meta-requirements.json', 'myhordes.fixtures.actions', 'meta_requirements', null, false),
+
             new Projection(
                 'CauseOfDeath/cause-of-death.json',
                 'myhordes.fixtures.citizen.deaths',
@@ -194,6 +211,31 @@ final class Projections
         }
 
         return $emotes;
+    }
+
+    /**
+     * Garde par objet le poids de veille et le type d'extension de sac, s'ils existent.
+     *
+     * @param array<string, array<string, mixed>> $objets
+     * @return array<string, array<string, int>>
+     */
+    private static function extrasObjets(array $objets): array
+    {
+        $extras = [];
+        foreach ($objets as $uid => $objet) {
+            $extra = [];
+            if (isset($objet['watchimpact'])) {
+                $extra['watchImpact'] = $objet['watchimpact'];
+            }
+            if (isset($objet['bagExtensionType'])) {
+                $extra['bagExtensionType'] = $objet['bagExtensionType'];
+            }
+            if ($extra !== []) {
+                $extras[$uid] = $extra;
+            }
+        }
+
+        return $extras;
     }
 
     private static function chaineAuxiliaire(array $brut, string $chaine): array

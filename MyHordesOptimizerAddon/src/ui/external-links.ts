@@ -14,6 +14,7 @@ import { state } from '../state';
 import { ensureDashedSeparatorAfter } from '../utils/dom';
 import { getI18N } from '../utils/i18n';
 import { pageIsTownHistory, pageIsWelcome } from '../utils/page';
+import { areTownKeysMigrated, getViewTownKey, isImportedTownPage } from '../utils/town-page-key';
 
 export function addExternalLinksToProfiles() {
     const mho_link_block = document.querySelector('.mho-link-blocks');
@@ -145,8 +146,8 @@ export function addExternalLinksToTowns(): void {
 
     if (mho_block) return;
 
-    const town_id: string | null = view_town.getAttribute('data-town-id');
-    if (!town_id) return;
+    const town_key: number | null = getViewTownKey(view_town, document.URL, areTownKeysMigrated());
+    if (town_key === null) return;
 
     mho_block = document.createElement('div');
     mho_block.id = mho_town_external_links_id;
@@ -177,7 +178,7 @@ export function addExternalLinksToTowns(): void {
     mho_btns_block.style.justifyContent = 'space-between';
     mho_btns_block.style.alignItems = 'center';
 
-    createExternalLinksButtons(town_id).forEach((link: HTMLButtonElement): void => {
+    createExternalLinksButtons(town_key, isImportedTownPage(view_town)).forEach((link: HTMLButtonElement): void => {
         mho_btns_block.appendChild(link);
     });
 }
@@ -185,14 +186,15 @@ export function addExternalLinksToTowns(): void {
 interface ExternalToolLinkDefinition {
     readonly icon_src: string;
     readonly label: string;
-    readonly build_url: (town_id: string) => string;
+    /** @param imported Ville importée : MHO la désigne par l'opposé de son id de classement */
+    readonly build_url: (town_id: string, imported: boolean) => string;
 }
 
 const external_tool_links: readonly ExternalToolLinkDefinition[] = [
     {
         icon_src: mh_optimizer_icon_16x16,
         label: 'MyHordes\nOptimizer',
-        build_url: (town_id: string): string => `${mh_optimizer_site_url}/town/${town_id}`,
+        build_url: (town_id: string, imported: boolean): string => `${mh_optimizer_site_url}/town/${imported ? '-' : ''}${town_id}`,
     },
     // {
     //     icon_src: `${repo_img_url}external-tools/bbh.gif`,
@@ -211,25 +213,28 @@ const external_tool_links: readonly ExternalToolLinkDefinition[] = [
     },
 ];
 
-function createExternalLinksButtons(town_id: string): HTMLButtonElement[] {
-    return external_tool_links.map((tool_link: ExternalToolLinkDefinition): HTMLButtonElement => {
-        const link: HTMLButtonElement = document.createElement('button');
-        link.classList.add('small');
-        link.style.display = 'flex';
-        link.style.alignItems = 'center';
-        link.style.gap = '0.5em';
-        link.onclick = (): Window | null => window.open(tool_link.build_url(town_id), '_blank');
+/** Boutons des outils externes */
+function createExternalLinksButtons(town_key: string | number, imported: boolean): HTMLButtonElement[] {
+    const town_id: string = String(town_key);
+    return external_tool_links
+        .map((tool_link: ExternalToolLinkDefinition): HTMLButtonElement => {
+            const link: HTMLButtonElement = document.createElement('button');
+            link.classList.add('small');
+            link.style.display = 'flex';
+            link.style.alignItems = 'center';
+            link.style.gap = '0.5em';
+            link.onclick = (): Window | null => window.open(tool_link.build_url(town_id, imported), '_blank');
 
-        const img: HTMLImageElement = document.createElement('img');
-        img.src = tool_link.icon_src;
-        link.appendChild(img);
+            const img: HTMLImageElement = document.createElement('img');
+            img.src = tool_link.icon_src;
+            link.appendChild(img);
 
-        const title: HTMLElement = document.createElement('text');
-        title.innerText = tool_link.label;
-        link.appendChild(title);
+            const title: HTMLElement = document.createElement('text');
+            title.innerText = tool_link.label;
+            link.appendChild(title);
 
-        return link;
-    });
+            return link;
+        });
 }
 
 const mho_welcome_link_cell_class: string = 'mho-town-list-link-cell';
@@ -290,7 +295,7 @@ export function addExternalLinksColumnToWelcomeTowns(): void {
 
         const panel: HTMLDivElement = document.createElement('div');
         panel.classList.add(mho_welcome_link_panel_class);
-        createExternalLinksButtons(town_id).forEach((link: HTMLButtonElement): void => {
+        createExternalLinksButtons(town_id, false).forEach((link: HTMLButtonElement): void => {
             panel.appendChild(link);
         });
         link_cell.appendChild(panel);

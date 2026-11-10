@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { mh_optimizer_site_url } from '../config/constants';
+import { mh_optimizer_site_url, mho_town_external_links_id } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
 import { getI18N } from '../utils/i18n';
@@ -151,5 +151,55 @@ describe('addExternalLinksColumnToWelcomeTowns', () => {
 
         buttons[0].click();
         expect(open_spy).toHaveBeenCalledWith(`${mh_optimizer_site_url}/town/321`, '_blank');
+    });
+});
+
+describe('addExternalLinksToTowns, ville importée', () => {
+    /** Page d'une ville terminée, importée ou non, avec la ligne de boutons où s'insère le bloc */
+    const renderTownPage = (imported: boolean): void => {
+        document.body.innerHTML = '<div class="view-town" data-town-id="5">'
+            + (imported ? '<div class="green-note"><img src="/images/badges/twinoid.png"></div>' : '')
+            + '<div><button>x</button></div></div>';
+    };
+
+    /** Bloc de liens MHO de la page ville, null s'il n'a pas été créé */
+    const linksBlock = (): HTMLElement | null => document.getElementById(mho_town_external_links_id);
+
+    beforeEach(() => {
+        state.parameters = [{ name: 'TownKeysMigrated', value: '1' }];
+        window.history.pushState({}, '', '/jx/soul/me/town/129/soul_me');
+    });
+
+    afterEach(() => {
+        state.parameters = undefined;
+    });
+
+    it('ville importée : tous les liens sont créés, le premier (MHO) vers /town/-129', () => {
+        renderTownPage(true);
+        const open_spy = vi.spyOn(window, 'open').mockReturnValue(null);
+
+        addExternalLinksToTowns();
+
+        const buttons: NodeListOf<HTMLButtonElement> = linksBlock()!.querySelectorAll('button');
+        expect(buttons.length).toBe(3);
+        buttons[0].click();
+        expect(open_spy).toHaveBeenCalledWith(`${mh_optimizer_site_url}/town/-129`, '_blank');
+    });
+
+    it('ville importée, clés non migrées : le bloc est créé quand même', () => {
+        renderTownPage(true);
+        state.parameters = undefined;
+
+        addExternalLinksToTowns();
+
+        expect(linksBlock()).not.toBeNull();
+    });
+
+    it('autre ville : les trois liens', () => {
+        renderTownPage(false);
+
+        addExternalLinksToTowns();
+
+        expect(linksBlock()!.querySelectorAll('button').length).toBe(3);
     });
 });

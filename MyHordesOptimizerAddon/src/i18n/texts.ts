@@ -492,10 +492,10 @@ export const texts = {
         es: 'Advertencia: Faltan datos de excavación',
     },
     warn_missing_logs_help: {
-        en: 'This message appears because you checked the option <strong>"Save successful searches"</strong> and not all of the registry entries in your cell are displayed in the page.<br /><br />You must click the <strong>"Show All Entries"</strong> button at the bottom of the registry for the information to be complete.',
-        fr: 'Ce message s\'affiche parce que vous avez coché l\'option <strong>"Enregistrer les fouilles réussies"</strong> et que toutes les entrées du registre de votre case ne sont pas affichées dans la page.<br /><br />Vous devez cliquer sur le bouton <strong>"Afficher toutes les entrées"</strong> en bas du registre pour que les informations soient complètes.',
-        de: 'Diese Meldung wird angezeigt, weil Sie die Option <strong>"Erfolgreiche Ausgrabungen speichern"</strong> aktiviert haben und nicht alle Registrierungseinträge in Ihrer Box auf der Seite angezeigt werden.<br /><br />Sie müssen auf die Schaltfläche <strong >"Alle Einträge anzeigen"</strong> unten in der Registrierung, damit die Informationen vollständig sind.',
-        es: 'Este mensaje aparece porque seleccionó la opción <strong>"Guardar excavaciones exitosas"</strong> y no todas las entradas de registro en su casilla se muestran en la página.<br /><br />Debe hacer clic en <strong >"Mostrar todas las entradas"</strong> en la parte inferior del registro para que la información esté completa.',
+        en: 'This message appears because you checked the option <strong>"Record successful searches"</strong> and not all of today\'s entries of your zone\'s registry (<strong>"Discussions"</strong> block) are displayed.<br /><br />Scroll down to the registry so that it loads. If the <strong>"View all registry entries"</strong> button is still at the bottom of the registry, click it. This message disappears as soon as the information is complete.',
+        fr: 'Ce message s\'affiche parce que vous avez coché l\'option <strong>"Enregistrer les fouilles réussies"</strong> et que les entrées du jour du registre de votre case (bloc <strong>"Discussions"</strong>) ne sont pas toutes affichées.<br /><br />Faites défiler la page jusqu\'au registre pour qu\'il se charge. Si le bouton <strong>"Afficher toutes les entrées"</strong> est toujours présent en bas du registre, cliquez dessus. Ce message disparaît dès que les informations sont complètes.',
+        de: 'Diese Meldung wird angezeigt, weil Sie die Option <strong>"Zeichnen Sie erfolgreiche Ausgrabungen auf"</strong> aktiviert haben und nicht alle heutigen Einträge im <strong>Zonenregister</strong> angezeigt werden.<br /><br />Scrollen Sie bis zum Zonenregister, damit es geladen wird. Wenn die Schaltfläche <strong>"Alle Einträge anzeigen"</strong> unten im Register noch vorhanden ist, klicken Sie darauf. Diese Meldung verschwindet, sobald die Informationen vollständig sind.',
+        es: 'Este mensaje aparece porque seleccionó la opción <strong>"Grabar excavaciones exitosas"</strong> y no se muestran todas las entradas de hoy del <strong>Registro de la Zona</strong>.<br /><br />Desplácese hasta el registro para que se cargue. Si el botón <strong>"Mostrar todas las entradas"</strong> sigue en la parte inferior del registro, haga clic en él. Este mensaje desaparece en cuanto la información esté completa.',
     },
     estim_title: {
         en: 'Today\'s attack',
@@ -887,6 +887,174 @@ export const texts = {
         fr: 'Incroyable trouvaille',
         de: 'Erstaunliches Fundstück',
         es: 'Hallazgo milagroso'
+    },
+    flash_photo: {
+        en: '{chance}% chance of being able to flee for {seconds} seconds',
+        fr: '{chance}% de chances de pouvoir fuir pendant {seconds} secondes',
+        de: '{chance}% Chance, {seconds} Sekunden lang fliehen zu können',
+        es: '{chance}% de probabilidad de poder huir durante {seconds} segundos'
+    },
+    can_cook: {
+        en: 'Can be cooked',
+        fr: 'Peut être cuisiné',
+        de: 'Kann gekocht werden',
+        es: 'Se puede cocinar'
+    },
+    hero_dog_fetch: {
+        en: 'The Tamer\'s dog can fetch it from the Bank',
+        fr: 'Le chien de l\'Apprivoiseur peut le rapporter de la banque',
+        de: 'Der Hund des Dompteurs kann es aus der Bank holen',
+        es: 'El perro del Domador puede traerlo del Almacén'
+    },
+    nosteal: {
+        en: 'Cannot be stolen',
+        fr: 'Ne peut pas être volé',
+        de: 'Kann nicht gestohlen werden',
+        es: 'No se puede robar'
+    },
+    inedible: {
+        en: 'Does not count as food carried when leaving the town',
+        fr: 'Ne compte pas comme nourriture emportée en sortant de la ville',
+        de: 'Zählt nicht als mitgenommene Nahrung beim Verlassen der Stadt',
+        es: 'No cuenta como comida llevada al salir de la ciudad'
+    },
+    haunting_soul: {
+        en: 'Halloween: in the Chest, prevents thefts and can terrorise its owner at night',
+        fr: 'Halloween : dans le coffre, empêche les vols et peut terroriser son propriétaire la nuit',
+        de: 'Halloween: in der Truhe verhindert es Diebstähle und kann den Besitzer nachts in Angststarre versetzen',
+        es: 'Halloween: en el cofre, impide los robos y puede aterrorizar a su propietario por la noche'
+    },
+    angry_soul: {
+        en: 'Halloween: in the Chest, 50% chance of infecting its owner at night',
+        fr: 'Halloween : dans le coffre, 50 % de chances d\'infecter son propriétaire la nuit',
+        de: 'Halloween: in der Truhe infiziert es den Besitzer nachts mit 50 % Wahrscheinlichkeit',
+        es: 'Halloween: en el cofre, 50 % de probabilidades de infectar a su propietario por la noche'
+    },
+    defence_cp: {
+        en: 'In the Backpack, +1 zone control point',
+        fr: 'Dans le sac, +1 point de contrôle de zone',
+        de: 'Im Rucksack: +1 Zonenkontrollpunkt',
+        es: 'En la mochila, +1 punto de control de zona'
+    },
+    watch_bonus: {
+        en: 'Watch bonus:',
+        fr: 'Bonus de veille :',
+        de: 'Wachbonus:',
+        es: 'Bono de vigilancia:'
+    },
+    nw_armory: {
+        en: 'Watch bonus from the Manual grinder (+20%)',
+        fr: 'Bonus de veille de la Meuleuse manuelle (+20 %)',
+        de: 'Wachbonus des Handschleifers (+20 %)',
+        es: 'Bono de vigilancia de la Afiladora manual (+20 %)'
+    },
+    nw_ikea: {
+        en: 'Watch bonus from the Swedish Workshop (+30%)',
+        fr: 'Bonus de veille du Magasin suédois (+30 %)',
+        de: 'Wachbonus der Schwedischen Schreinerei (+30 %)',
+        es: 'Bono de vigilancia del Taller sueco (+30 %)'
+    },
+    nw_trebuchet: {
+        en: 'Watch bonus from the Pet Shop (+30%)',
+        fr: 'Bonus de veille de l\'Animalerie (+30 %)',
+        de: 'Wachbonus der Tierhandlung (+30 %)',
+        es: 'Bono de vigilancia de la Tienda de Mascotas (+30 %)'
+    },
+    nw_shooting: {
+        en: 'Watch bonus from the Filtering gutters (+30%)',
+        fr: 'Bonus de veille des Gouttières filtrantes (+30 %)',
+        de: 'Wachbonus der Filtrierenden Rinnen (+30 %)',
+        es: 'Bono de vigilancia de los Canalones de filtro (+30 %)'
+    },
+    special_guitar: {
+        en: 'Gives 1 AP to every citizen in town, within their maximum AP; 2 AP to drunk or drugged citizens',
+        fr: 'Rend 1 PA à chaque citoyen en ville, dans la limite de son maximum ; 2 PA aux citoyens ivres ou drogués',
+        de: 'Gibt jedem Bürger in der Stadt 1 AP, bis zu seinem Maximum; 2 AP für betrunkene oder unter Drogen stehende Bürger',
+        es: 'Da 1 PA a cada habitante en la ciudad, sin superar su máximo; 2 PA a los habitantes borrachos o drogados'
+    },
+    lock: {
+        en: 'Secures the Chest it is stored in',
+        fr: 'Sécurise le coffre dans lequel il se trouve',
+        de: 'Sichert die Truhe, in der er sich befindet',
+        es: 'Asegura el cofre en el que se encuentra'
+    },
+    prevent_terror: {
+        en: 'Prevents being terrorised because of an item',
+        fr: 'Empêche d\'être terrorisé à cause d\'un objet',
+        de: 'Verhindert die Angststarre durch einen Gegenstand',
+        es: 'Evita quedar aterrorizado por culpa de un objeto'
+    },
+    found_poisoned: {
+        en: 'Can be found poisoned',
+        fr: 'Peut être trouvé empoisonné',
+        de: 'Kann vergiftet gefunden werden',
+        es: 'Se puede encontrar envenenado'
+    },
+    is_water: {
+        en: 'Quenches thirst',
+        fr: 'Désaltère',
+        de: 'Löscht den Durst',
+        es: 'Quita la sed'
+    },
+    can_poison: {
+        en: 'Can be poisoned',
+        fr: 'Peut être empoisonné',
+        de: 'Kann vergiftet werden',
+        es: 'Se puede envenenar'
+    },
+    camp_bonus: {
+        en: 'In the bag, increases camping survival chances by 5%',
+        fr: 'Dans le sac, augmente de 5% les chances de survie en camping',
+        de: 'Im Rucksack: erhöht die Überlebenschancen beim Verstecken um 5%',
+        es: 'En la mochila, aumenta un 5% las probabilidades de supervivencia al acampar'
+    },
+    smokebomb: {
+        en: 'Erases log entries (-3 minutes)<br />Hides your next entry (+1 minute)',
+        fr: 'Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)',
+        de: 'Löscht Einträge im Register (-3 Minuten)<br />Verbirgt deinen nächsten Eintrag (+1 Minute)',
+        es: 'Borra las entradas del registro (-3 minutos)<br />Oculta tu próxima entrada (+1 minuto)'
+    },
+    camp_improve_property: {
+        en: 'Allows you to set up a camp',
+        fr: 'Permet d\'aménager un campement',
+        de: 'Ermöglicht es, ein Lager auszubauen',
+        es: 'Permite acondicionar un campamento'
+    },
+    manual_success: {
+        en: '{chance}% chance of succeeding with the manual',
+        fr: '{chance}% de chances de réussir son manuel',
+        de: '{chance}% Chance, das Handbuch erfolgreich zu nutzen',
+        es: '{chance}% de probabilidad de tener éxito con el manual'
+    },
+    prevent_night: {
+        en: 'Night penalty divided by 4',
+        fr: 'Malus de nuit divisé par 4',
+        de: 'Nacht-Malus durch 4 geteilt',
+        es: 'Penalización nocturna dividida por 4'
+    },
+    no_post: {
+        en: 'Cannot be sent by message',
+        fr: 'Ne peut pas être envoyé par message',
+        de: 'Kann nicht per Nachricht verschickt werden',
+        es: 'No se puede enviar por mensaje'
+    },
+    wagging_flag: {
+        en: 'Attracts 2.5% of the overflow zombies',
+        fr: 'Attire 2.5% des zombies du débordement',
+        de: 'Zieht 2.5% der Zombies des Überlaufs an',
+        es: 'Atrae al 2.5% de los zombis del desborde'
+    },
+    esc_fixed: {
+        en: 'Cannot be dropped by the escort leader',
+        fr: 'Ne peut pas être déposé par le chef d\'escorte',
+        de: 'Kann vom Eskortenführer nicht abgelegt werden',
+        es: 'No puede ser depositado por el jefe de escolta'
+    },
+    impoundable: {
+        en: 'Lost when banished',
+        fr: 'Perdu en cas de bannissement',
+        de: 'Geht bei einer Verbannung verloren',
+        es: 'Se pierde en caso de destierro'
     }
 } satisfies Record<string, I18nLabel>;
 
@@ -1387,5 +1555,547 @@ export const catapult_effect_texts = {
         fr: 'dans un rayon de 3×3 cases',
         de: 'in einem Bereich von 3×3 Feldern',
         es: 'en un área de 3×3 casillas'
+    }
+};
+
+export const item_action_effects_texts = {
+    watch_survival: {
+        en: 'Survival chances while on watch',
+        fr: 'Chances de survie en veille',
+        de: 'Überlebenschancen während der Wache',
+        es: 'Probabilidades de supervivencia mientras estás de guardia'
+    },
+    outcome_all_zombies: {
+        en: 'all zombies',
+        fr: 'tous les zombies',
+        de: 'alle Zombies',
+        es: 'todos los zombis'
+    },
+    watch_cumulative: {
+        en: '(stackable)',
+        fr: '(cumulable)',
+        de: '(kumulierbar)',
+        es: '(acumulable)'
+    },
+    on_watch: {
+        en: 'On watch',
+        fr: 'En veille',
+        de: 'Während der Wache',
+        es: 'De guardia'
+    },
+    bag_slots: {
+        en: '+$n$ slots',
+        fr: '+$n$ places',
+        de: '+$n$ Plätze',
+        es: '+$n$ plazas'
+    },
+    bag_exclusive: {
+        en: 'Only one at a time among:',
+        fr: 'Un seul à la fois parmi :',
+        de: 'Nur einer gleichzeitig von:',
+        es: 'Solo uno a la vez entre:'
+    },
+    action_open: {
+        en: 'Open',
+        fr: 'Ouvrir',
+        de: 'Öffnen',
+        es: 'Abrir'
+    },
+    action_slaughter: {
+        en: 'Carve',
+        fr: 'Découper',
+        de: 'Ausweiden',
+        es: 'Cortar'
+    },
+    action_purify: {
+        en: 'Clean',
+        fr: 'Purifier',
+        de: 'Reinigen (Wasser)',
+        es: 'Purificar'
+    },
+    action_purify_ap: {
+        en: 'Clean (1AP)',
+        fr: 'Purifier (1PA)',
+        de: 'Reinigen (1AP) (Wasser)',
+        es: 'Purificar (1PA)'
+    },
+    action_attack: {
+        en: 'Attack',
+        fr: 'Attaquer avec',
+        de: 'Waffe einsetzen',
+        es: 'Atacar con'
+    },
+    loaded_form: {
+        en: 'Once loaded:',
+        fr: 'Une fois chargé :',
+        de: 'Wenn geladen:',
+        es: 'Una vez cargado:'
+    },
+    outcome_broken: {
+        en: 'Breaks',
+        fr: 'Se casse',
+        de: 'Geht kaputt',
+        es: 'Se rompe'
+    },
+    outcome_consumed: {
+        en: 'Consumed',
+        fr: 'Consommé',
+        de: 'Verbraucht',
+        es: 'Consumido'
+    },
+    reload_charges: {
+        en: 'Charges on reload:',
+        fr: 'Charges à la recharge :',
+        de: 'Ladungen beim Aufladen:',
+        es: 'Cargas al recargar:'
+    },
+    reload_charges_range: {
+        en: '$min$ to $max$',
+        fr: '$min$ à $max$',
+        de: '$min$ bis $max$',
+        es: '$min$ a $max$'
+    },
+    dig_frequency: {
+        en: 'Search frequency:',
+        fr: 'Fréquence en fouille :',
+        de: 'Häufigkeit beim Graben:',
+        es: 'Frecuencia al excavar:'
+    },
+    dig_one: {
+        en: '≈ 1 successful search in $n$',
+        fr: '≈ 1 fouille réussie sur $n$',
+        de: '≈ 1 erfolgreiche Grabung von $n$',
+        es: '≈ 1 excavación exitosa de cada $n$'
+    },
+    dig_many: {
+        en: '≈ $hits$ successful searches in $n$',
+        fr: '≈ $hits$ fouilles réussies sur $n$',
+        de: '≈ $hits$ erfolgreiche Grabungen von $n$',
+        es: '≈ $hits$ excavaciones exitosas de cada $n$'
+    },
+    dig_depleted: {
+        en: '(depleted zone)',
+        fr: '(zone épuisée)',
+        de: '(erschöpfte Zone)',
+        es: '(zona agotada)'
+    },
+    dig_very_common: { en: 'Very common', fr: 'Très courant', de: 'Sehr häufig', es: 'Muy común' },
+    dig_common: { en: 'Common', fr: 'Courant', de: 'Häufig', es: 'Común' },
+    dig_uncommon: { en: 'Uncommon', fr: 'Peu courant', de: 'Gelegentlich', es: 'Poco común' },
+    dig_rare: { en: 'Rare', fr: 'Rare', de: 'Selten', es: 'Raro' },
+    dig_very_rare: { en: 'Very rare', fr: 'Très rare', de: 'Sehr selten', es: 'Muy raro' }
+};
+
+/** Clés des textes de `expedition_texts` */
+type ExpeditionTextKey =
+    | 'my_expedition_title'
+    | 'expedition_part'
+    | 'reload_my_expedition'
+    | 'route_follow'
+    | 'route_back'
+    | 'route_arrived'
+    | 'route_none'
+    | 'route_unknown_position'
+    | 'direction_north'
+    | 'direction_east'
+    | 'direction_south'
+    | 'direction_west'
+    | 'or'
+    | 'ap_short'
+    | 'cell_orders_header'
+    | 'no_cell_orders'
+    | 'other_members_orders'
+    | 'next_orders_cell'
+    | 'order_kind_pick'
+    | 'order_kind_drop'
+    | 'order_kind_use'
+    | 'order_kind_clear'
+    | 'order_kind_explore'
+    | 'order_kind_excavate'
+    | 'order_kind_camp'
+    | 'order_kind_hero'
+    | 'order_kind_wait'
+    | 'order_wait_group'
+    | 'order_wait_expedition'
+    | 'order_clear_piles'
+    | 'route_choice'
+    | 'no_route_followed'
+    | 'my_expeditions_group'
+    | 'routes_without_expedition'
+    | 'passage_first'
+    | 'passage_nth';
+
+/** Mon expédition dans le désert : tracé à suivre et consignes (`ui/expedition-route.ts`, `ui/expedition-order.ts`) */
+export const expedition_texts: Readonly<Record<ExpeditionTextKey, I18nLabel>> = {
+    my_expedition_title: {
+        en: 'My expedition',
+        fr: 'Mon expédition',
+        de: 'Meine Expedition',
+        es: 'Mi expedición'
+    },
+    expedition_part: {
+        en: 'part',
+        fr: 'partie',
+        de: 'Teil',
+        es: 'parte'
+    },
+    reload_my_expedition: {
+        en: 'Reload my expedition',
+        fr: 'Recharger mon expédition',
+        de: 'Meine Expedition neu laden',
+        es: 'Recargar mi expedición'
+    },
+    route_follow: {
+        en: 'Follow the route:',
+        fr: 'Suivez le tracé :',
+        de: 'Folge der Route:',
+        es: 'Sigue la ruta:'
+    },
+    route_back: {
+        en: 'Off the route, go back:',
+        fr: 'Hors du tracé, rejoignez-le :',
+        de: 'Abseits der Route, kehre zurück:',
+        es: 'Fuera de la ruta, vuelve a ella:'
+    },
+    route_arrived: {
+        en: 'End of the route',
+        fr: 'Fin du tracé',
+        de: 'Ende der Route',
+        es: 'Fin de la ruta'
+    },
+    route_none: {
+        en: 'No route linked to this expedition',
+        fr: 'Aucun tracé lié à cette expédition',
+        de: 'Keine Route mit dieser Expedition verknüpft',
+        es: 'Ninguna ruta vinculada a esta expedición'
+    },
+    route_unknown_position: {
+        en: 'Position unknown: no direction',
+        fr: 'Position inconnue : pas de direction',
+        de: 'Position unbekannt: keine Richtung',
+        es: 'Posición desconocida: sin dirección'
+    },
+    direction_north: {
+        en: 'north',
+        fr: 'nord',
+        de: 'Norden',
+        es: 'norte'
+    },
+    direction_east: {
+        en: 'east',
+        fr: 'est',
+        de: 'Osten',
+        es: 'este'
+    },
+    direction_south: {
+        en: 'south',
+        fr: 'sud',
+        de: 'Süden',
+        es: 'sur'
+    },
+    direction_west: {
+        en: 'west',
+        fr: 'ouest',
+        de: 'Westen',
+        es: 'oeste'
+    },
+    or: {
+        en: 'or',
+        fr: 'ou',
+        de: 'oder',
+        es: 'o'
+    },
+    ap_short: {
+        en: 'AP',
+        fr: 'PA',
+        de: 'AP',
+        es: 'PA'
+    },
+    cell_orders_header: {
+        en: 'Instructions for this zone',
+        fr: 'Consignes de la case',
+        de: 'Anweisungen für diese Zone',
+        es: 'Instrucciones de esta zona'
+    },
+    no_cell_orders: {
+        en: 'No instruction for this zone',
+        fr: 'Aucune consigne sur cette case',
+        de: 'Keine Anweisung für diese Zone',
+        es: 'Ninguna instrucción para esta zona'
+    },
+    other_members_orders: {
+        en: 'For other members',
+        fr: 'Pour d\'autres membres',
+        de: 'Für andere Mitglieder',
+        es: 'Para otros miembros'
+    },
+    next_orders_cell: {
+        en: 'Next zone with instructions:',
+        fr: 'Prochaine case à consignes :',
+        de: 'Nächste Zone mit Anweisungen:',
+        es: 'Próxima zona con instrucciones:'
+    },
+    order_kind_pick: {
+        en: 'Pick up',
+        fr: 'Ramasser',
+        de: 'Aufheben',
+        es: 'Recoger'
+    },
+    order_kind_drop: {
+        en: 'Drop',
+        fr: 'Déposer',
+        de: 'Ablegen',
+        es: 'Dejar'
+    },
+    order_kind_use: {
+        en: 'Consume',
+        fr: 'Consommer',
+        de: 'Verbrauchen',
+        es: 'Consumir'
+    },
+    order_kind_clear: {
+        en: 'Clear',
+        fr: 'Déblayer',
+        de: 'Freiräumen',
+        es: 'Despejar'
+    },
+    order_kind_explore: {
+        en: 'Explore the ruin',
+        fr: 'Explorer la ruine',
+        de: 'Die Ruine erkunden',
+        es: 'Explorar la ruina'
+    },
+    order_kind_excavate: {
+        en: 'Excavate the zone',
+        fr: 'Excaver la zone',
+        de: 'Zone ausheben',
+        es: 'Excavar la zona'
+    },
+    order_kind_camp: {
+        en: 'Camp',
+        fr: 'Camper',
+        de: 'Campen',
+        es: 'Acampar'
+    },
+    order_kind_hero: {
+        en: 'Heroic action',
+        fr: 'Action héroïque',
+        de: 'Heldentat',
+        es: 'Acción heroica'
+    },
+    order_kind_wait: {
+        en: 'Wait for',
+        fr: 'Attendre',
+        de: 'Warten auf',
+        es: 'Esperar a'
+    },
+    order_wait_group: {
+        en: 'the group',
+        fr: 'le groupe',
+        de: 'die Gruppe',
+        es: 'al grupo'
+    },
+    order_wait_expedition: {
+        en: 'another expedition',
+        fr: 'une autre expédition',
+        de: 'eine andere Expedition',
+        es: 'otra expedición'
+    },
+    order_clear_piles: {
+        en: 'pile(s)',
+        fr: 'tas',
+        de: 'Haufen',
+        es: 'montón(es)'
+    },
+    route_choice: {
+        en: 'Route to follow in the desert',
+        fr: 'Tracé à suivre dans le désert',
+        de: 'In der Wüste zu folgende Route',
+        es: 'Ruta a seguir en el desierto'
+    },
+    no_route_followed: {
+        en: '— No route —',
+        fr: '— Aucun tracé —',
+        de: '— Keine Route —',
+        es: '— Ninguna ruta —'
+    },
+    my_expeditions_group: {
+        en: 'My expeditions',
+        fr: 'Mes expéditions',
+        de: 'Meine Expeditionen',
+        es: 'Mis expediciones'
+    },
+    routes_without_expedition: {
+        en: 'Routes without expedition',
+        fr: 'Tracés sans expédition',
+        de: 'Routen ohne Expedition',
+        es: 'Rutas sin expedición'
+    },
+    passage_first: {
+        en: 'Pass 1',
+        fr: '1er passage',
+        de: '1. Durchgang',
+        es: 'Paso 1'
+    },
+    passage_nth: {
+        en: 'Pass {n}',
+        fr: '{n}e passage',
+        de: '{n}. Durchgang',
+        es: 'Paso {n}'
+    }
+};
+
+/** Clés des textes de `program_texts` */
+type ProgramTextKey =
+    | 'title'
+    | 'day_label'
+    | 'tab_expedition'
+    | 'tab_buildings'
+    | 'day_instructions'
+    | 'evening_vote'
+    | 'evening_votes'
+    | 'my_tasks'
+    | 'program_steps'
+    | 'detected'
+    | 'refresh'
+    | 'step_leave'
+    | 'repair_survive'
+    | 'repair_until'
+    | 'repair_full'
+    | 'level_short'
+    | 'not_registered'
+    | 'no_cell'
+    | 'not_citizen'
+    | 'no_plan'
+    | 'nothing';
+
+/** Mon programme : expédition et chantiers du jour (`utils/my-program.ts`) */
+export const program_texts: Readonly<Record<ProgramTextKey, I18nLabel>> = {
+    title: {
+        en: 'My program',
+        fr: 'Mon programme',
+        de: 'Mein Programm',
+        es: 'Mi programa'
+    },
+    /** Jour abrégé, comme sur le site */
+    day_label: {
+        en: 'D{day}',
+        fr: 'J{day}',
+        de: 'T{day}',
+        es: 'D{day}'
+    },
+    tab_expedition: {
+        en: 'Expedition',
+        fr: 'Expédition',
+        de: 'Expedition',
+        es: 'Expedición'
+    },
+    tab_buildings: {
+        en: 'Construction sites',
+        fr: 'Chantiers',
+        de: 'Konstruktionen',
+        es: 'Construcciones'
+    },
+    day_instructions: {
+        en: 'Instructions of the day',
+        fr: 'Consignes du jour',
+        de: 'Anweisungen des Tages',
+        es: 'Consignas del día'
+    },
+    evening_vote: {
+        en: 'Upgrade voted tonight',
+        fr: 'Évolution votée ce soir',
+        de: 'Heute Abend gewählte Verbesserung',
+        es: 'Mejora votada esta noche'
+    },
+    evening_votes: {
+        en: 'Upgrades voted tonight',
+        fr: 'Évolutions votées ce soir',
+        de: 'Heute Abend gewählte Ausbaustufen',
+        es: 'Mejoras votadas esta noche'
+    },
+    my_tasks: {
+        en: 'Individual instructions',
+        fr: 'Consignes individuelles',
+        de: 'Persönliche Anweisungen',
+        es: 'Consignas individuales'
+    },
+    program_steps: {
+        en: 'Construction site program, in order',
+        fr: 'Programme chantiers dans l\'ordre',
+        de: 'Konstruktionsprogramm in Reihenfolge',
+        es: 'Programa de construcciones en orden'
+    },
+    detected: {
+        en: 'read in game',
+        fr: 'relevé en jeu',
+        de: 'im Spiel erfasst',
+        es: 'leído en el juego'
+    },
+    refresh: {
+        en: 'Refresh',
+        fr: 'Actualiser',
+        de: 'Aktualisieren',
+        es: 'Actualizar'
+    },
+    step_leave: {
+        en: 'Leave {label} at {n}AP',
+        fr: 'Laisser {label} à {n}PA',
+        de: '{label} bei {n}AP lassen',
+        es: 'Dejar {label} en {n}PA'
+    },
+    repair_survive: {
+        en: 'Repair {label} to survive the night',
+        fr: 'Réparer {label} pour passer la nuit',
+        de: '{label} reparieren, um die Nacht zu überstehen',
+        es: 'Reparar {label} para pasar la noche'
+    },
+    repair_until: {
+        en: 'Repair {label} up to {life}/{max} HP',
+        fr: 'Réparer {label} jusqu\'à {life}/{max} PV',
+        de: '{label} bis {life}/{max} LP reparieren',
+        es: 'Reparar {label} hasta {life}/{max} PV'
+    },
+    repair_full: {
+        en: 'Fully repair {label}',
+        fr: 'Réparer entièrement {label}',
+        de: '{label} vollständig reparieren',
+        es: 'Reparar por completo {label}'
+    },
+    level_short: {
+        en: 'lvl',
+        fr: 'niv.',
+        de: 'Stufe',
+        es: 'niv.'
+    },
+    not_registered: {
+        en: 'You are not registered on any expedition today.',
+        fr: 'Vous n\'êtes inscrit sur aucune expédition aujourd\'hui.',
+        de: 'Du bist heute in keiner Expedition eingetragen.',
+        es: 'No estás inscrito en ninguna expedición hoy.'
+    },
+    no_cell: {
+        en: 'No cell',
+        fr: 'Sans case',
+        de: 'Ohne Feld',
+        es: 'Sin casilla'
+    },
+    not_citizen: {
+        en: 'You are not a citizen of this town.',
+        fr: 'Vous n\'êtes pas citoyen de cette ville.',
+        de: 'Du bist kein Bürger dieser Stadt.',
+        es: 'No eres ciudadano de esta ciudad.'
+    },
+    no_plan: {
+        en: 'No program in effect for this day.',
+        fr: 'Aucun programme effectif pour ce jour.',
+        de: 'Für diesen Tag gilt kein Programm.',
+        es: 'Ningún programa vigente para este día.'
+    },
+    nothing: {
+        en: 'Nothing to do today.',
+        fr: 'Rien à faire aujourd\'hui.',
+        de: 'Heute gibt es nichts zu tun.',
+        es: 'Nada que hacer hoy.'
     }
 };

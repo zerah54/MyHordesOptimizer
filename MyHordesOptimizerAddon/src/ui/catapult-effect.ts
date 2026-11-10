@@ -24,6 +24,23 @@ function resolveResultItem(effect: MhoCatapultEffect, item: MhoItem): ResultItem
     return { img: item.img, title: getI18N(item.label) ?? '', broken: false, vanished: false };
 }
 
+/** Badge de l'objet obtenu après un effet : bordure rouge pointillée s'il est cassé, estompé s'il disparaît. */
+export function createResultBadge(img: string, title: string, broken: boolean, vanished: boolean): HTMLSpanElement {
+    const badge: HTMLSpanElement = document.createElement('span');
+    badge.classList.add('item');
+    const icon: HTMLImageElement = document.createElement('img');
+    icon.src = repo_img_hordes_url + img;
+    icon.title = title;
+    if (broken) {
+        icon.style.border = '1px dashed red';
+    }
+    if (vanished) {
+        icon.style.opacity = '0.2';
+    }
+    badge.appendChild(icon);
+    return badge;
+}
+
 /**
  * Construit l'affichage de l'effet catapulte réel d'un objet, dans le même style que la ligne
  * ouvre-boîte : icône catapulte, flèche, icône (+ `title`) de l'objet qui atterrit (rien si détruit
@@ -51,19 +68,7 @@ export function getCatapultEffectElement(item: MhoItem): HTMLDivElement | null {
 
     const result_item: ResultItem | null = resolveResultItem(effect, item);
     if (result_item) {
-        const badge: HTMLSpanElement = document.createElement('span');
-        badge.classList.add('item');
-        const img: HTMLImageElement = document.createElement('img');
-        img.src = repo_img_hordes_url + result_item.img;
-        img.title = result_item.title;
-        if (result_item.broken) {
-            img.style.border = '1px dashed red';
-        }
-        if (result_item.vanished) {
-            img.style.opacity = '0.2';
-        }
-        badge.appendChild(img);
-        row.appendChild(badge);
+        row.appendChild(createResultBadge(result_item.img, result_item.title, result_item.broken, result_item.vanished));
     }
 
     if (effect.repelSeconds != null) {

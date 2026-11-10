@@ -1,4 +1,14 @@
 export const changelogs: Record<string, string> = {
+    '1.1.64': `
+        [Novedad] Mi programa: nueva ventana con tu expedición, tus obras, las consignas del día y las evoluciones votadas esta noche
+        [Novedad] Expediciones: seguimiento del recorrido en el desierto (dirección a tomar, consignas de la casilla, próxima casilla con consignas)
+        [Novedad] Zen Hordes: ahora es posible enviar información a ZenHordes
+
+        [Mejora] Tooltips mejorados y Wiki: más información
+        [Mejora] Gest'Hordes: nueva opción para enviar los marcadores de trabajo
+
+        [Corrección] La advertencia de registro de excavaciones incompleto es más fiable
+        `,
     '1.1.63': `
         [Novedad] La torre de vigilancia muestra el rango de ataque refinado compartido por la ciudad, bajo el ataque calculado de hoy y de mañana
         [Novedad] La calculadora de camping muestra la probabilidad bruta entre paréntesis cuando el tope o el mínimo la han modificado

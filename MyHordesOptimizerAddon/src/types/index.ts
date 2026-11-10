@@ -17,8 +17,8 @@ export interface MhoItem {
     label: I18nLabel;
     description?: I18nLabel;
     category?: { id: string; label: I18nLabel };
-    properties?: MhoItemProperty[];
-    actions?: MhoItemProperty[];
+    properties?: string[];
+    actions?: string[];
     recipes?: any[];
     drops?: MhoDrop[];
     deco?: number;
@@ -43,8 +43,49 @@ export interface MhoItem {
     chestCount?: number;
     /** Quantité posée sur les cases de la carte (toutes cases de la ville confondues). */
     mapCellItemCount?: number;
+    /** Effets des actions du jeu liées à l'objet (ouvrir, découper, purifier, attaquer, veille). */
+    actionEffects?: MhoItemActionEffects[];
+    /** Distribution du nombre de charges à la recharge. */
+    reloadCharges?: MhoChargeChance[] | null;
+    /** Bonus de survie en veille (0 = aucun). */
+    watchImpact?: number;
+    /** Places supplémentaires d'inventaire (sac). */
+    bagCapacityBonus?: number | null;
+    /** Sacs dont un seul peut être porté à la fois. */
+    bagExclusiveGroup?: MhoItemSummary[] | null;
+    /** Probabilité (0..1) de l'objet par fouille réussie sur une zone épuisée. */
+    dropRatePraf?: number;
+    /** Probabilité (0..1) de l'objet par fouille réussie sur une zone non épuisée. */
+    dropRateNotPraf?: number;
 
     [key: string]: any;
+}
+
+/** Issue possible d'une action. */
+export interface MhoActionOutcome {
+    kind: 'Consumed' | 'Broken' | 'Transformed' | 'Produced' | 'Kill';
+    probability: number;
+    item?: MhoItemSummary | null;
+    quantity?: number | null;
+    killMin?: number | null;
+    killMax?: number | null;
+}
+
+/** Effets d'une action du jeu liée à un objet. */
+export interface MhoItemActionEffects {
+    actionName: string;
+    kind: 'Open' | 'Slaughter' | 'Purify' | 'Attack' | 'Nightwatch';
+    apCost?: number | null;
+    buildingCondition?: { buildingUid: string; built: boolean } | null;
+    appliesToTown?: boolean | null;
+    viaLoadedForm?: MhoItemSummary | null;
+    outcomes: MhoActionOutcome[];
+}
+
+/** Probabilité d'obtenir un nombre de charges à la recharge. */
+export interface MhoChargeChance {
+    charges: number;
+    probability: number;
 }
 
 /** Représentation minimale d'un objet dans une relation objet↔objet (ex. boîtes/ouvre-boîtes). */
@@ -140,8 +181,10 @@ export interface ApiCitizen {
     avatar?: string;
     job?: { id: string; label: I18nLabel };
     heroicActions?: string[];
-    home?: { level?: number };
-    ban?: boolean;
+    dailyActions?: { day: number; actionKey: string }[];
+    home?: { content?: Record<string, number | boolean> };
+    /** Banni de la ville (`CitizenDto.IsShunned`) */
+    isShunned?: boolean;
     out?: boolean;
     dead?: boolean;
 
@@ -214,19 +257,108 @@ export interface ApiMap {
 // ---------------------------------------------------------------------
 // API: expeditions / estimations / camping
 // ---------------------------------------------------------------------
-export interface ExpeditionPart {
-    citizen?: ApiCitizen;
-    orders?: string;
-    position?: number;
+/** Case de la carte en coordonnées absolues (`MapCell.X/Y` côté API : y croît vers le sud). */
+export interface ApiMapPoint {
+    x: number;
+    y: number;
+}
 
-    [key: string]: any;
+/** Consigne typée ; `null` pour un texte libre. */
+export type ApiExpeditionOrderKind = 'pick' | 'drop' | 'use' | 'clear' | 'explore' | 'excavate' | 'camp' | 'hero' | 'wait';
+
+/** `GET expeditions/me/{day}` : une consigne, générale ou posée sur une case. */
+export interface ApiExpeditionOrder {
+    id?: number | null;
+    /** `checkbox` (à cocher) ou `text` (information) */
+    type?: string | null;
+    /** Texte libre mis en forme (HTML de l'éditeur du site) ; vide pour une consigne typée */
+    text?: string | null;
+    isDone?: boolean | null;
+    position?: number | null;
+    /** Case visée, en coordonnées absolues ; `null` (avec `y`) pour une consigne générale */
+    x?: number | null;
+    y?: number | null;
+    kind?: ApiExpeditionOrderKind | null;
+    itemId?: number | null;
+    /** Quantité (Ramasser, Déposer) ou nombre de tas (Déblayer) */
+    quantity?: number | null;
+    /** Action héroïque (`hero_generic_rescue`, `secondwind`, …) */
+    heroSkill?: string | null;
+    /** Citoyen à attendre ; `null` avec `wait` : le groupe */
+    targetUserId?: number | null;
+    /** Autre expédition du jour à attendre, à la place d'un citoyen */
+    targetExpeditionId?: number | null;
+    /** Nom de l'expédition à attendre ; `null` pour une expédition sans nom */
+    targetExpeditionLabel?: string | null;
+    /** Précision libre d'une consigne typée, en texte brut */
+    note?: string | null;
+    /** Passage sur la case, à partir de 1 ; `null` : le premier */
+    passage?: number | null;
+}
+
+export interface ApiExpeditionBagItem {
+    item: MhoItem;
+    count?: number;
+    isBroken?: boolean;
+}
+
+export interface ApiExpeditionCitizen {
+    id?: number | null;
+    /** Citoyen placé ; `null` pour une place encore libre */
+    idUser?: number | null;
+    bag?: { items?: ApiExpeditionBagItem[] | null } | null;
+    orders?: ApiExpeditionOrder[] | null;
+    isThirsty?: boolean | null;
+    nombrePaDepart?: number | null;
+    /** PE de départ exigés ; `null` pour aucune exigence */
+    nombrePeDepart?: number | null;
+    /** Sens de l'exigence de PE ; absent ou `null` = « au moins » */
+    nombrePeDepartOperator?: 'min' | 'max' | 'exact' | null;
+    /** Chaussures : `true` exigées, `false` interdites, `null` indifférent */
+    isPreinscritChaussures?: boolean | null;
+    preinscritJob?: string | null;
+}
+
+/** Tracé lié à une partie d'expédition */
+export interface ApiExpeditionPartRoute {
+    id: number;
+    label: string;
+    /** Clé de palette (`blue`, `violet`, …) */
+    color: string;
+    /** Chemin case par case, en coordonnées absolues */
+    cells: ApiMapPoint[];
+    /** PA du trajet : nombre de cases - 1 */
+    length: number;
+    version: number;
+}
+
+/** `GET MapRoutes/{mapId}` : un tracé de la ville, et les parties d'expédition qui le suivent. */
+export interface ApiMapRoute extends ApiExpeditionPartRoute {
+    linkedParts?: unknown[] | null;
+}
+
+export interface ApiExpeditionPart {
+    id?: number | null;
+    /** Consignes de toute la partie */
+    orders?: ApiExpeditionOrder[] | null;
+    citizens?: ApiExpeditionCitizen[] | null;
+    position?: number;
+    /** Nom du tracé lié (ancien « Nom du tracé ») */
+    path?: string | null;
+    label?: string | null;
+    direction?: string | null;
+    expeditionId?: number;
+    mapRouteId?: number | null;
+    mapRoute?: ApiExpeditionPartRoute | null;
 }
 
 export interface ApiExpedition {
-    id?: number;
-    parts?: ExpeditionPart[];
-
-    [key: string]: any;
+    id?: number | null;
+    state?: string | null;
+    position?: number;
+    label?: string | null;
+    minPdc?: number | null;
+    parts?: ApiExpeditionPart[] | null;
 }
 
 export interface ApiEstimation {
@@ -372,6 +504,10 @@ export interface MhoState {
     map: ApiMap | undefined;
     current_cell: any | undefined;
     my_expeditions: ApiExpedition[] | undefined;
+    /** Ville et jour de `my_expeditions` (`townId:day`), pour les recharger en changeant de jour */
+    my_expeditions_key: string | undefined;
+    /** Horodatage du chargement de `my_expeditions` */
+    my_expeditions_loaded_at: number | undefined;
     /** Notes de ville de l'appelant, indexées par mapId */
     town_notes: Record<number, NoteDto> | undefined;
     /** Notes globales de l'appelant sur des joueurs, indexées par userId */

@@ -18,12 +18,18 @@ import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
 import { getI18N } from '../utils/i18n';
 import { pageIsAmelio, pageIsDoors, pageIsHouse } from '../utils/page';
 import { setStorageItem } from '../utils/storage';
+import { isDayDigLogComplete } from '../utils/successful-digs-page';
 import { getScriptInfo } from '../utils/version';
 import { createHelpButton } from './params';
 
-/** Clés d'attente : une seule attente en vol par cible, quel que soit le nombre de rejeux */
+/** Clé d'attente : une seule attente en vol, quel que soit le nombre de rejeux */
 const wait_key_anchor: string = 'update-button:anchor';
-const wait_key_complete_log: string = 'update-button:complete-log';
+
+/**
+ * Le registre de la case affiche « Afficher toutes les entrées » dès son montage, avant d'avoir
+ * chargé, puis le retire (chargement complet, clic) sans évènement du jeu : on l'observe.
+ */
+let beyond_log_observer: MutationObserver | undefined;
 
 /**
  * Zones d'ancrage possibles du bouton. Toutes sont rendues par le jeu APRÈS
@@ -36,10 +42,14 @@ export function createUpdateExternalToolsButton() {
         isBigBrothHordes: /* mho_parameters && !is_mh_beta ? mho_parameters.update_bbh : */ false,
         isFataMorgana: state.mho_parameters ? state.mho_parameters.update_fata : false,
         isGestHordes: state.mho_parameters ? state.mho_parameters.update_gh : false,
-        isMyHordesOptimizer: state.mho_parameters ? state.mho_parameters.update_mho : false
+        isMyHordesOptimizer: state.mho_parameters ? state.mho_parameters.update_mho : false,
+        isZenHordes: state.mho_parameters ? state.mho_parameters.update_zen : false
     };
 
     const nb_tools_to_update = Object.keys(tools_to_update).map((key) => tools_to_update[key]).filter((tool) => tool).length;
+
+    beyond_log_observer?.disconnect();
+    beyond_log_observer = undefined;
 
     const zone_marker = document.querySelector('#zone-marker');
     const compact_actions_zone = document.querySelector('.actions-box .mdg');
@@ -58,9 +68,11 @@ export function createUpdateExternalToolsButton() {
     const handleMissingLogsWarning = (): void => {
         const btn: HTMLElement | null = document.getElementById(mh_update_external_tools_id);
         let warn_missing_logs = document.getElementById(mho_warn_missing_logs_id);
-        const has_complete_log: boolean = !!document.querySelector('.log-complete-link');
+        // Pas de registre sur la case de la ville
+        const beyond_log: Element | null = document.querySelector('#beyond-log');
+        const day_log_incomplete: boolean = !!beyond_log && !isDayDigLogComplete(beyond_log);
 
-        if (!warn_missing_logs && has_complete_log && external_display_zone && btn && state.mho_parameters.update_mho_digs) {
+        if (!warn_missing_logs && day_log_incomplete && external_display_zone && btn && state.mho_parameters.update_mho_digs) {
             if (window.innerWidth < 480 && compact_actions_zone) {
                 const external_tools_btn_tooltip = document.querySelector('#external-tools-btn-tooltip');
                 if (!external_tools_btn_tooltip) return;
@@ -81,14 +93,13 @@ export function createUpdateExternalToolsButton() {
 
                 btn.parentElement.appendChild(warn_missing_logs);
             }
-        } else if (warn_missing_logs && (!has_complete_log || !state.mho_parameters.update_mho_digs)) {
+        } else if (warn_missing_logs && (!day_log_incomplete || !state.mho_parameters.update_mho_digs)) {
             warn_missing_logs.remove();
         }
     };
 
     if (nb_tools_to_update <= 0 || !state.external_app_id) {
         cancelWaitForElement(wait_key_anchor);
-        cancelWaitForElement(wait_key_complete_log);
         if (update_external_tools_btn) {
             update_external_tools_btn.parentElement.remove();
         }
@@ -117,16 +128,10 @@ export function createUpdateExternalToolsButton() {
             cancelWaitForElement(wait_key_anchor);
             handleMissingLogsWarning();
 
-            /**
-             * Le lien de journal complet peut n'apparaître qu'après le bouton : on
-             * attend son arrivée plutôt que de repasser à intervalle fixe. Si le
-             * traitement a déjà tout réglé, l'attente est simplement remplacée au
-             * rejeu suivant.
-             */
-            if (!document.getElementById(mho_warn_missing_logs_id) && state.mho_parameters.update_mho_digs) {
-                waitForElement(wait_key_complete_log, '.log-complete-link', () => handleMissingLogsWarning());
-            } else {
-                cancelWaitForElement(wait_key_complete_log);
+            const beyond_log: Element | null = document.querySelector('#beyond-log');
+            if (beyond_log && state.mho_parameters.update_mho_digs) {
+                beyond_log_observer = new MutationObserver((): void => handleMissingLogsWarning());
+                beyond_log_observer.observe(beyond_log, { childList: true, subtree: true });
             }
         } else if (update_external_tools_btn && (!(external_display_zone && pageIsHouse()) || !(amelios && pageIsAmelio()))) {
             cancelWaitForElement(wait_key_anchor);
@@ -161,7 +166,8 @@ const external_tools: ToolDisplay[] = [
     { id: 'myHordesOptimizer', name: 'MyHordes Optimizer', icon: mh_optimizer_icon_16x16, storage_key: gm_mho_updated_key },
     { id: 'gestHordes', name: 'Gest\'Hordes', icon: `${repo_img_url}external-tools/gh.gif`, storage_key: gm_gh_updated_key },
     { id: 'fataMorgana', name: 'Fata Morgana', icon: `${repo_img_url}external-tools/fata.gif`, storage_key: gm_fata_updated_key },
-    { id: 'bigBrothHordes', name: 'BigBroth\'Hordes', icon: `${repo_img_url}external-tools/bbh.gif`, storage_key: gm_bbh_updated_key }
+    { id: 'bigBrothHordes', name: 'BigBroth\'Hordes', icon: `${repo_img_url}external-tools/bbh.gif`, storage_key: gm_bbh_updated_key },
+    { id: 'zenHordes', name: 'Zen Hordes', icon: `${repo_img_url}external-tools/zen.png` }
 ];
 
 /**
@@ -304,18 +310,32 @@ export function createLargeUpdateExternalToolsButton(update_external_tools_btn) 
 }
 
 
-export function createSmallUpdateExternalToolsButton(update_external_tools_btn) {
+/** Options du petit bouton : sans elles, c'est le bouton unique des pages du jeu. */
+export interface SmallUpdateButtonOptions {
+    /** Id du bouton, `null` pour n'en poser aucun */
+    readonly id?: string | null;
+    readonly tooltip_id?: string;
+    /** Appelé une fois la mise à jour finie (succès ou erreurs d'outils), pas sur rejet */
+    readonly on_done?: () => void;
+}
+
+/** Petit bouton de mise à jour des outils externes, avec son infobulle d'état. */
+export function createSmallUpdateExternalToolsButton(update_external_tools_btn, options: SmallUpdateButtonOptions = {}) {
+    const button_id: string | null = options.id === undefined ? mh_update_external_tools_id : options.id;
+    const tooltip_id: string = options.tooltip_id ?? 'external-tools-btn-tooltip';
     update_external_tools_btn = document.createElement('button');
 
     update_external_tools_btn.innerHTML = `<img src="${mh_optimizer_icon}" height="16" width="16"><img src="${repo_img_hordes_url}emotes/arrowright.gif" height="16">`;
-    update_external_tools_btn.id = mh_update_external_tools_id;
+    if (button_id !== null) {
+        update_external_tools_btn.id = button_id;
+    }
 
 
     const tooltips_container = document.querySelector('#tooltip_container');
-    let external_tools_btn_tooltip = tooltips_container.querySelector('#external-tools-btn-tooltip');
+    let external_tools_btn_tooltip = tooltips_container.querySelector(`#${tooltip_id}`);
     if (!external_tools_btn_tooltip) {
         external_tools_btn_tooltip = document.createElement('div');
-        external_tools_btn_tooltip.id = 'external-tools-btn-tooltip';
+        external_tools_btn_tooltip.id = tooltip_id;
         external_tools_btn_tooltip.classList.add('tooltip', 'help', 'mho');
         tooltips_container.appendChild(external_tools_btn_tooltip);
     } else {
@@ -366,6 +386,7 @@ export function createSmallUpdateExternalToolsButton(update_external_tools_btn) 
                 if (displayed_state.tools.some((tool: ExternalToolUpdateState) => tool.status === 'error')) {
                     console.error('Erreur lors de la mise à jour de l\'un des outils', displayed_state);
                 }
+                options.on_done?.();
             })
             .catch((error) => {
                 console.error('Erreur lors de la mise à jour de l\'un des outils', error);

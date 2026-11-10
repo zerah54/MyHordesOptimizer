@@ -1,4 +1,14 @@
 export const changelogs: Record<string, string> = {
+    '1.1.64': `
+        [New] My program: new window with your expedition, your constructions, today's instructions and the evolutions voted tonight
+        [New] Expeditions: route tracking in the desert (direction to take, cell instructions, next cell with instructions)
+        [New] Zen Hordes: it is now possible to send information to ZenHordes
+
+        [Improvement] Improved tooltips and Wiki: more information
+        [Improvement] Gest'Hordes: new option to send job markers
+
+        [Fix] The incomplete dig log warning is more reliable
+        `,
     '1.1.63': `
         [New] The watchtower shows the refined attack range shared by the town, below the calculated attack for today and tomorrow
         [New] The camping calculator shows the raw chance in parentheses when the cap or the floor changed it

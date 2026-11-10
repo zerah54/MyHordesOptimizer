@@ -1,10 +1,12 @@
 import { lang, repo_img_hordes_url, supported_languages } from '../config/constants';
 import { opener_relation_texts, status_texts, texts, wishlist_depot, wishlist_headers } from '../i18n/texts';
 import { state } from '../state';
-import type { I18nLabel, WishlistItem } from '../types';
+import type { I18nLabel, MhoRecipe, WishlistItem } from '../types';
+import { getDisplayedRecipes } from '../utils/displayed-recipes';
 import { getI18N } from '../utils/i18n';
 import { getFixedImagePath, getTooltipItem } from '../utils/item-lookup';
 import { getCatapultEffectElement } from './catapult-effect';
+import { getItemExtraSections } from './item-action-effects';
 import { getOpenedWithRowElement, getOpenerRelationElement } from './opener-relation';
 import { getRecipeElement } from './recipes';
 import { getWishlistForZone } from './wishlist';
@@ -344,6 +346,9 @@ export function createAdvancedProperties(content, item, tooltip) {
     const has_opener_relation: boolean = (item.openedWith !== undefined && item.openedWith !== null)
         || (item.opens && item.opens.length > 0);
 
+    const extra_sections: HTMLDivElement[] = state.mho_parameters.enhanced_tooltips_item_properties ? getItemExtraSections(item) : [];
+    const has_extra_data: boolean = extra_sections.length > 0;
+
     if (tooltip && state.mho_parameters.enhanced_tooltips_item_quantities) {
         const stock_div: HTMLDivElement = document.createElement('div');
         content.appendChild(stock_div);
@@ -373,14 +378,14 @@ export function createAdvancedProperties(content, item, tooltip) {
         content.appendChild(item_translations);
     }
 
-    if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation && !item.catapultEffect) return;
+    if ((!item_deco || item.deco === 0) && !item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation && !item.catapultEffect && !has_extra_data) return;
 
     if (item_deco && item.deco > 0) {
         const text = item_deco.innerText.replace(/ \(.*\)*/, '');
         item_deco.innerHTML = `<span>${text} <em>( +${item.deco} )</em></span>`;
     }
 
-    if (!item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation && !item.catapultEffect) return;
+    if (!item.properties && !item.actions && item.recipes.length === 0 && !has_opener_relation && !item.catapultEffect && !has_extra_data) return;
 
     const will_render_opener: boolean = state.mho_parameters.enhanced_tooltips_item_properties && has_opener_relation;
     const will_render_recipes: boolean = state.mho_parameters.enhanced_tooltips_item_recipes && item.recipes.length > 0;
@@ -395,6 +400,9 @@ export function createAdvancedProperties(content, item, tooltip) {
     if (state.mho_parameters.enhanced_tooltips_item_properties && item.properties) {
         const item_properties: HTMLDivElement = document.createElement('div');
         content.appendChild(item_properties);
+        createPropertyTileRows(item.properties).forEach((row: HTMLDivElement): void => {
+            item_properties.appendChild(row);
+        });
         item.properties.forEach((property) => {
             item_properties.appendChild(displayPropertiesOrActions(property, item));
         });
@@ -410,15 +418,20 @@ export function createAdvancedProperties(content, item, tooltip) {
         leading_section = item_actions;
     }
 
-    if (leading_section && (catapult_effect_element || will_render_opener || will_render_recipes)) {
+    if (leading_section && (catapult_effect_element || has_extra_data || will_render_opener || will_render_recipes)) {
         leading_section.classList.add('mho-trailing-section-gap');
     }
 
+    extra_sections.forEach((section: HTMLDivElement): void => {
+        content.appendChild(section);
+    });
+
     if (catapult_effect_element) {
         content.appendChild(catapult_effect_element);
-        if (will_render_opener || will_render_recipes) {
-            content.appendChild(createSectionDivider());
-        }
+    }
+
+    if ((catapult_effect_element || has_extra_data) && (will_render_opener || will_render_recipes)) {
+        content.appendChild(createSectionDivider());
     }
 
     if (state.mho_parameters.enhanced_tooltips_item_properties && item.openedWith !== undefined && item.openedWith !== null) {
@@ -444,7 +457,7 @@ export function createAdvancedProperties(content, item, tooltip) {
         const item_recipes: HTMLTableElement = document.createElement('table');
         item_recipes.classList.add('recipes');
         content.appendChild(item_recipes);
-        item.recipes.forEach((recipe) => {
+        getDisplayedRecipes(item.recipes).forEach((recipe: MhoRecipe) => {
             item_recipes.appendChild(getRecipeElement(recipe));
         });
     }
@@ -523,8 +536,69 @@ export function createAdvancedStatus(content, status, tooltip) {
     }
 }
 
-/** Affiche les propriétés ou les actions associées à l'objet survolé */
+/** Texte de l'appareil photo avec chance et durée de fuite. */
+function getFlashPhotoText(chance: number, seconds: number): string {
+    return getI18N(texts.flash_photo).replace('{chance}', String(chance)).replace('{seconds}', String(seconds));
+}
 
+/** Icône et libellé d'une propriété affichée en tuile. */
+interface PropertyTile {
+    img: string;
+    label: I18nLabel;
+}
+
+/** Propriétés affichées en tuile d'icône seule, libellé au survol. */
+const ICON_ONLY_PROPERTIES: Record<string, PropertyTile> = {
+    lock: { img: 'icons/lock.gif', label: texts.lock },
+    hero_dog_fetch: { img: 'item/item_tamed_pet.gif', label: texts.hero_dog_fetch },
+    is_water: { img: 'status/status_hydrated.gif', label: texts.is_water }
+};
+
+/** Chantiers qui multiplient la défense en veille de l'objet (BuildingQueryListener.php, entrées non nulles). */
+const WATCH_BONUS_PROPERTIES: Record<string, PropertyTile> = {
+    nw_armory: { img: 'building/small_grinder2.gif', label: texts.nw_armory },
+    nw_ikea: { img: 'building/small_ikea.gif', label: texts.nw_ikea },
+    nw_trebuchet: { img: 'building/small_animfence.gif', label: texts.nw_trebuchet },
+    nw_shooting: { img: 'building/small_sewers.gif', label: texts.nw_shooting }
+};
+
+/** Tuile d'icône, libellé au survol de toute la tuile. */
+function createIconTile(tile: PropertyTile): HTMLSpanElement {
+    const element: HTMLSpanElement = document.createElement('span');
+    element.classList.add('mho-item-tile');
+    element.title = getI18N(tile.label);
+    const icon: HTMLImageElement = document.createElement('img');
+    icon.src = repo_img_hordes_url + tile.img;
+    icon.alt = element.title;
+    element.appendChild(icon);
+    return element;
+}
+
+/** Ligne de tuiles des propriétés présentes dans `tiles`, précédée d'un titre ; `null` si aucune. */
+function createTileRow(properties: string[], tiles: Record<string, PropertyTile>, title?: string): HTMLDivElement | null {
+    const present: PropertyTile[] = properties.filter((property: string): boolean => property in tiles).map((property: string): PropertyTile => tiles[property]);
+    if (present.length === 0) return null;
+    const row: HTMLDivElement = document.createElement('div');
+    row.classList.add('mho-item-tiles');
+    if (title !== undefined) {
+        const header: HTMLSpanElement = document.createElement('span');
+        header.textContent = title;
+        row.appendChild(header);
+    }
+    present.forEach((tile: PropertyTile): void => {
+        row.appendChild(createIconTile(tile));
+    });
+    return row;
+}
+
+/** Lignes de tuiles des propriétés : icônes seules, puis chantiers du bonus de veille. */
+function createPropertyTileRows(properties: string[]): HTMLDivElement[] {
+    const watch_bonus: HTMLDivElement | null = createTileRow(properties, WATCH_BONUS_PROPERTIES, getI18N(texts.watch_bonus));
+    watch_bonus?.classList.add('mho-watch-bonus');
+    return [createTileRow(properties, ICON_ONLY_PROPERTIES), watch_bonus].filter((row: HTMLDivElement | null): row is HTMLDivElement => row !== null);
+}
+
+/** Affiche les propriétés ou les actions associées à l'objet survolé */
 export function displayPropertiesOrActions(property_or_action, hovered_item) {
     const item_action: HTMLDivElement = document.createElement('div');
     // TODO MAPPING BACK
@@ -546,6 +620,7 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.innerHTML = `+${property_or_action.slice(5, 6)}<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
         case 'alcohol':
+        case 'alcohol_dx':
             item_action.classList.add('item-tag-alcohol');
             item_action.innerHTML = `+6<img src="${repo_img_hordes_url}emotes/ap.${lang}.gif">`;
             break;
@@ -581,70 +656,56 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
                 item_action.classList.remove('item-tag', 'mho-item-tag');
             }
             break;
-        case 'flash_photo_1': {
+        // Valeurs : groupes des fixtures zone_escape_* (do_nothing 60/30/1/0 contre escape 33/66/100/100)
+        case 'flash_photo_1':
             item_action.classList.add('mho-item-tag-large');
-            const fail_1 = Math.round(60 / 90 * 100);
-            item_action.innerText = `${100 - fail_1}% de chances de pouvoir fuir pendant 30 secondes`;
+            item_action.innerText = getFlashPhotoText(35, 30);
             break;
-        }
-        case 'flash_photo_2': {
+        case 'flash_photo_2':
             item_action.classList.add('mho-item-tag-large');
-            const fail_2 = Math.round(30 / 90 * 100);
-            item_action.innerText = `${100 - fail_2}% de chances de pouvoir fuir pendant 60 secondes`;
+            item_action.innerText = getFlashPhotoText(69, 60);
             break;
-        }
-        case 'flash_photo_3': {
+        case 'flash_photo_3':
             item_action.classList.add('mho-item-tag-large');
-            const fail_3 = 1;
-            item_action.innerText = `Succès : ${100 - fail_3}% de chances de pouvoir fuir pendant 120 secondes`;
+            item_action.innerText = getFlashPhotoText(99, 120);
             break;
-        }
-        case 'flash_photo_4': {
+        case 'flash_photo_4':
             item_action.classList.add('mho-item-tag-large');
-            const fail_4 = 1;
-            item_action.innerText = `Succès : ${100 - fail_4}% de chances de pouvoir fuir pendant 120 secondes`;
+            item_action.innerText = getFlashPhotoText(100, 120);
             break;
-        }
         case 'can_cook':
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Peut être cuisiné';
+            item_action.innerText = getI18N(texts.can_cook);
             break;
-        case 'pet':
+        case 'nosteal':
+        case 'inedible':
+        case 'haunting_soul':
+        case 'angry_soul':
+        case 'defence_cp':
+        case 'prevent_terror':
+        case 'found_poisoned':
+        case 'special_guitar':
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Animal';
+            item_action.innerText = getI18N(texts[property_or_action as keyof typeof texts]);
             break;
         case 'can_poison':
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Peut être empoisonné';
+            item_action.innerText = getI18N(texts.can_poison);
             break;
         case 'camp_bonus':
+            // 5 % par objet : CitizenHandler.php:736
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Dans le sac, augmente de 5% les chances de survie en camping';
-            break;
-        case 'load_maglite':
-        case 'load_lamp':
-        case 'load_pilegun':
-        case 'load_radio':
-        case 'load_dildo':
-        case 'load_lpointer':
-        case 'load_mixergun':
-        case 'load_taser':
-        case 'load_chainsaw':
-        case 'load_pilegun3':
-        case 'load_pilegun2':
-        case 'load_emt':
-        case 'load_rmk2':
-            item_action.classList.add('item-tag-load');
-            item_action.innerText = 'Peut être rechargé';
+            item_action.innerText = getI18N(texts.camp_bonus);
             break;
         case 'smokebomb':
             item_action.classList.add('item-tag-smokebomb');
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerHTML = 'Efface les entrées du registre (-3 minutes)<br />Dissimule votre prochaine entrée (+1 minute)';
+            // -3 min : ProcessZoneEffect.php:184 ; +1 min : fixtures (chatSilence: 60)
+            item_action.innerHTML = getI18N(texts.smokebomb);
             break;
         case 'improve':
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Permet d\'aménager un campement';
+            item_action.innerText = getI18N(texts.camp_improve_property);
             break;
         case 'defence':
             // déjà affichés par le jeu
@@ -655,6 +716,7 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
             // ne pas afficher
             item_action.classList.remove('item-tag', 'mho-item-tag');
             break;
+        // Table : HeroicItemActionListener.php:130-139
         case 'hero_surv_1':
             if (state.mh_user.townDetails) {
                 const days = state.mh_user.townDetails?.day;
@@ -674,7 +736,7 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
                 if (devastated) chances = Math.max(0.1, chances - 0.2);
                 const success = chances * 100;
                 item_action.classList.add('mho-item-tag-no-img');
-                item_action.innerText = `${success}% de chances de réussir son manuel`;
+                item_action.innerText = getI18N(texts.manual_success).replace('{chance}', String(success));
             } else {
                 item_action.classList.remove('item-tag', 'mho-item-tag');
             }
@@ -684,35 +746,56 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
             item_action.classList.remove('item-tag', 'mho-item-tag');
             break;
         case 'prevent_night':
+            // ÷4 : CitizenChanceQueryListener.php:334
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Malus de nuit divisé par 4';
+            item_action.innerText = getI18N(texts.prevent_night);
             break;
         case 'no_post':
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Ne peut pas être envoyé par message';
+            item_action.innerText = getI18N(texts.no_post);
             break;
         case 'wagging_flag':
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Attire 2.5% des zombies du débordement';
+            item_action.innerText = getI18N(texts.wagging_flag);
             break;
         case 'esc_fixed':
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Ne peut pas être déposé par le chef d\'escorte';
+            item_action.innerText = getI18N(texts.esc_fixed);
             break;
         case 'impoundable':
             item_action.classList.add('mho-item-tag-no-img');
-            item_action.innerText = 'Perdu en cas de bannissement';
+            item_action.innerText = getI18N(texts.impoundable);
             break;
+        // Portés par les tuiles et par la recette de recharge
+        case 'lock':
+        case 'hero_dog_fetch':
+        case 'is_water':
+        case 'nw_armory':
+        case 'nw_ikea':
+        case 'nw_trebuchet':
+        case 'nw_shooting':
+        case 'load_maglite':
+        case 'load_lamp':
+        case 'load_pilegun':
+        case 'load_radio':
+        case 'load_dildo':
+        case 'load_lpointer':
+        case 'load_mixergun':
+        case 'load_taser':
+        case 'load_chainsaw':
+        case 'load_pilegun3':
+        case 'load_pilegun2':
+        case 'load_emt':
+        case 'load_rmk2':
+        case 'lure':
+        case 'food':
+        case 'drug':
+        case 'ressource':
+        case 'pet':
         case 'box_opener':
         case 'can_opener':
         case 'parcel_opener':
-        case 'nw_ikea':
-        case 'nw_armory':
-        case 'ressource':
-        case 'food':
         case 'weapon':
-        case 'drug':
-        case 'nw_trebuchet':
         case 'slaughter_2xs':
         case 'throw_animal_cat':
         case 'throw_animal_cat_t1':
@@ -728,14 +811,12 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'throw_b_machine_3':
         case 'cuddle_teddy_1':
         case 'cuddle_teddy_2':
-        case 'lock':
         case 'home_store_plus2':
         case 'home_store_plus':
         case 'home_def_plus':
         case 'throw_b_pc':
         case 'slaughter_bmb':
         case 'throw_animal_angryc':
-        case 'special_guitar':
         case 'fire_pilegun':
         case 'fire_taser':
         case 'fill_asplash1':
@@ -755,7 +836,6 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'fill_ksplash2':
         case 'fire_pilegun3':
         case 'throw_b_chain':
-        case 'nw_shooting':
         case 'fire_splash3':
         case 'throw_b_torch_off':
         case 'throw_boomfruit':
@@ -780,10 +860,7 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'drug_par_2':
         case 'drug_par_3':
         case 'drug_par_4':
-        case 'prevent_terror':
         case 'read_rp_cover':
-        case 'found_poisoned':
-        case 'is_water':
         case 'water_tl0':
         case 'water_tl1a':
         case 'water_tl1b':
@@ -908,7 +985,6 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'eat_fleshroom_2':
         case 'eat_cadaver_1':
         case 'eat_cadaver_2':
-        case 'alcohol_dx':
         case 'water_no_effect':
         case 'potion_tl0a':
         case 'potion_tl0b':
@@ -964,10 +1040,7 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'hero_tamer_2':
         case 'hero_tamer_2b':
         case 'alarm_clock':
-        case 'inedible':
-        case 'lure':
         case 'equip_shoe_first':
-        case 'hero_dog_fetch':
         case 'nw_impact_cumul':
         case 'eat_apple':
         case 'drink_quantum_1':
@@ -975,7 +1048,6 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'drink_quantum_3':
         case 'play_soccer_1':
         case 'play_soccer_2':
-        case 'nosteal':
         case 'install_garland':
         case 'uninstall_garland':
         case 'open_cellobox':

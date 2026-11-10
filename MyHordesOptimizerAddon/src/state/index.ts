@@ -21,6 +21,8 @@ export const state: MhoState = {
     map: undefined,
     current_cell: undefined,
     my_expeditions: undefined,
+    my_expeditions_key: undefined,
+    my_expeditions_loaded_at: undefined,
     town_notes: undefined,
     user_notes: undefined,
     citizen_notes: undefined,

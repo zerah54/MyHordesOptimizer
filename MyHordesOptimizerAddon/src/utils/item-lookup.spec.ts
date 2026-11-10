@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { state } from '../state';
-import { getItemFromImg, resolveInventoryObjects } from './item-lookup';
+import { countInventoryObjects, getItemFromImg, resolveInventoryObjects } from './item-lookup';
 
 const known_item = { id: 42, img: 'item/known.png', label: { fr: 'Objet connu' } } as any;
 
@@ -65,5 +65,26 @@ describe('resolveInventoryObjects', () => {
 
         expect(result).toEqual([{ id: 42, isBroken: true }]);
         expect(warnSpy).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('countInventoryObjects', () => {
+    it('regroupe les objets identiques selon leur identifiant et leur état cassé', () => {
+        const result = countInventoryObjects([
+            { id: 42, isBroken: false },
+            { id: 42, isBroken: true },
+            { id: 42, isBroken: false },
+            { id: 7, isBroken: false }
+        ]);
+
+        expect(result).toEqual([
+            { id: 42, isBroken: false, count: 2 },
+            { id: 42, isBroken: true, count: 1 },
+            { id: 7, isBroken: false, count: 1 }
+        ]);
+    });
+
+    it('rend une liste vide pour un sol vide', () => {
+        expect(countInventoryObjects([])).toEqual([]);
     });
 });

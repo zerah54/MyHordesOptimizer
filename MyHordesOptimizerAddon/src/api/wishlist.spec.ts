@@ -42,4 +42,18 @@ describe('addItemToWishlist', () => {
 
         expect(state.wishlist?.wishList?.some((entry) => entry.item.id === 42)).toBe(true);
     });
+
+    it('waits for a token before posting, the route being reserved to logged-in citizens, and no longer sends the userId', async () => {
+        fetcherMock.mockImplementation((_url: string, options?: { method?: string }) => {
+            if (options?.method === 'POST') return Promise.resolve(textResponse(200));
+            return Promise.resolve(jsonResponse(200, { wishList: [] }));
+        });
+
+        await addItemToWishlist({ id: 42, wishListCount: 0 });
+
+        const post_call: unknown[] | undefined = fetcherMock.mock.calls
+            .find((call: unknown[]) => (call[1] as { method?: string } | undefined)?.method === 'POST');
+        expect(post_call?.[0]).toBe('https://api.test/wishlist/add/42?townId=12');
+        expect(post_call?.[2]).toEqual({ wait_for_token: true });
+    });
 });

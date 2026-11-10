@@ -128,6 +128,18 @@ function parseFirstInteger(text: string | null): number | null {
 }
 
 /**
+ * Toutes les lignes du jour sont affichées dans le registre de la case. Le registre du désert
+ * enchaîne les jours, du plus récent au plus ancien, chacun sous un en-tête (le premier, celui du
+ * jour, est toujours affiché) : l'en-tête d'un jour précédent prouve que le jour est complet, même
+ * si le lien « Afficher toutes les entrées » reste pour les jours plus anciens. Sans lui, il faut
+ * un registre chargé, sans lien ni chargement en cours (le jeu affiche le lien avant le chargement).
+ */
+export function isDayDigLogComplete(root: ParentNode): boolean {
+    return root.querySelectorAll('.log-day-header').length > 1
+        || (!!root.querySelector('.log-content') && !root.querySelector('.log-complete-link, .log-spinner'));
+}
+
+/**
  * Lignes du jour du registre de la case. Le registre du désert affiche tous les jours à la suite,
  * séparés par un en-tête « Jour N » : seules comptent celles du jour (`today`, à défaut celui du
  * premier en-tête). `null` quand le registre est absent, en chargement, ou qu'une heure est

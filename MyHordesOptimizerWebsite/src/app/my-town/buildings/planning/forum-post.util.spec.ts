@@ -384,8 +384,24 @@ describe('forum-post.util', (): void => {
 
             expect(text).toContain(':middot: Cartographier le désert (1:ap:)');
             expect(text).toContain(':middot: Creuser dans les galeries (1:ap:)');
-            expect(text).toContain(':home: Cuisine niv. 2 (3:ap:)');
+            expect(text).toContain(':item_dish_tasty: Cuisine niv. 2 (3:ap:)');
             expect(text).not.toMatch(/@Alice:1 @Chloé:3/);
+        });
+
+        it('améliorations de la maison : une émote propre à chacune', (): void => {
+            const emotes: Record<string, string> = {
+                kitchenLevel: ':item_dish_tasty:',
+                laboLevel: ':lab:',
+                restLevel: ':sleep:',
+                renfortLevel: ':item_fence:',
+                hasFence: ':item_chain:'
+            };
+            for (const [ref, emote] of Object.entries(emotes)) {
+                const content: BuildingPlanContentDTO = { ...plan(), citizens: [{ userId: 2, tasks: [{ kind: 'homeUpgrade', ref, level: 1, pa: 2 }] }] };
+
+                expect(joined(programPost(context(content)))).toContain(`${emote} `);
+                expect(joined(programPost(context(content)))).not.toContain(':home: ');
+            }
         });
 
         it('un citoyen sans consigne n\'apparaît pas', (): void => {

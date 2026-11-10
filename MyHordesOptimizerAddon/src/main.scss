@@ -628,10 +628,6 @@ div.item-tag-food::after {
     background: url(__REPO_IMG_HORDES_URL__status/status_haseaten.gif) 50%/contain no-repeat;
 }
 
-div.item-tag-load::after {
-    background: url(__REPO_IMG_HORDES_URL__item/item_pile.gif) 50%/contain no-repeat;
-}
-
 div.item-tag-hero::after {
     background: url(__REPO_IMG_HORDES_URL__icons/star.gif) 50%/contain no-repeat;
 }
@@ -651,6 +647,25 @@ div.item-tag.mho-item-tag-no-img {
 .mho-item-tag {
     min-height: 18px !important;
     height: unset !important;
+}
+
+/* Icônes seules : tuiles des recettes aux couleurs des étiquettes du jeu, sans le ::after de .item-tag qui
+   recouvrirait l'icône et masquerait son libellé au survol. */
+.mho-item-tiles {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25em;
+    margin-top: 3px;
+}
+
+.mho-item-tile {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5em;
+    border-radius: 0.25em;
+    background: #022142;
+    border: 1px solid #011d37;
 }
 
 #__MHO_DISPLAY_MAP_ID__, #__MHO_STORE_NOTIFICATIONS_ID__, #__MHO_DISPLAY_EXPEDITIONS_ID__ {
@@ -1686,3 +1701,254 @@ body.mho-spoiler-pin-enabled .forum-post-content .spoiler {
     }
 }
 
+
+/*
+ * Tracé MHO de mon expédition dans l'Outre-Monde (ui/expedition-route.ts). Le jeu re-rend les flèches de
+ * déplacement à chaque rendu de la carte : la ou les directions à suivre sont donc posées sur `hordes-map`,
+ * qu'il ne remplace pas. La flèche à suivre reprend celle du jeu (`assets/img/icons/map/226.svg`, `227.svg`,
+ * `228.svg` au survol, mêmes opacités) en rose MHO (couleur claire du logo) au lieu du vert de ses itinéraires ;
+ * `!important` l'emporte sur les flèches de danger du jeu, `filter: none` sur son propre `.on-route`. Hors du
+ * tracé (`back`), la flèche qui le rejoint clignote.
+ */
+$mho-route-arrow-path: 'M43.1.55l36.45 20.3q1.15.65 1.75 1.9l.15.2q.55 1.3.25 2.75l-.05.15-.2.6H.4l-.2-.6-.05-.15q-.35-1.45.25-2.75l.1-.2q.6-1.25 1.8-1.9L38.75.55q1-.55 2.15-.55h.05q1.1 0 2.15.55';
+$mho-route-arrow-outline: 'M41.45.5q1.1 0 2.15.55l36.45 20.3q1.15.65 1.75 1.9l.15.2q.55 1.3.25 2.75l-.05.15-.2.6H.9l-.2-.6-.05-.15Q.3 24.75.9 23.45l.1-.2q.6-1.25 1.8-1.9l36.45-20.3q1-.55 2.15-.55h.05z';
+$mho-route-arrow-color: '%23bf61cf';
+
+@function mho-route-arrow-fill($opacity) {
+    @return url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='26.45' width='81.8'%3E%3Cpath d='#{$mho-route-arrow-path}' fill='#{$mho-route-arrow-color}' fill-opacity='#{$opacity}' fill-rule='evenodd'/%3E%3C/svg%3E");
+}
+
+$mho-route-arrow-stroke: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='27.45' width='82.8'%3E%3Cpath d='#{$mho-route-arrow-outline}' fill='none' stroke='#{$mho-route-arrow-color}' stroke-linejoin='round' stroke-opacity='.6'/%3E%3C/svg%3E");
+
+@keyframes mho-route-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+}
+
+@each $direction in north, east, south, west {
+    hordes-map[data-mho-route~='#{$direction}'] .action-move-#{$direction} {
+        background: $mho-route-arrow-stroke 50% / contain no-repeat, mho-route-arrow-fill(0.2) 50% / contain no-repeat !important;
+        filter: none !important;
+
+        &:hover {
+            background: mho-route-arrow-fill(0.7) 50% no-repeat !important;
+        }
+    }
+
+    hordes-map[data-mho-route-mode='back'][data-mho-route~='#{$direction}'] .action-move-#{$direction} {
+        animation: mho-route-pulse 1.4s ease-in-out infinite;
+    }
+}
+
+#mho-expedition-route {
+    .mho-expedition-route-header {
+        margin-top: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    .mho-expedition-route-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 0.5em;
+        vertical-align: middle;
+    }
+
+    .mho-expedition-route-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35em;
+    }
+
+    .mho-expedition-route-status {
+        font-weight: bold;
+    }
+
+    .mho-expedition-route-subtitle {
+        margin-top: 0.3em;
+        border-bottom: 1px solid currentColor;
+        opacity: 0.85;
+    }
+
+    .mho-expedition-route-next {
+        font-size: 12px;
+        opacity: 0.85;
+    }
+}
+
+/* Tracé et consignes case par case (ui/cell-orders.ts) : bloc du désert et fenêtre des expéditions */
+#mho-expedition-route,
+#mho-expeditions-window {
+    .mho-expedition-route-reload {
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .mho-expedition-route-swatch {
+        display: inline-block;
+        width: 1.5em;
+        height: 0.4em;
+        margin-right: 0.4em;
+        border-radius: 2px;
+        vertical-align: middle;
+    }
+
+    .mho-expedition-route-passage {
+        margin-top: 0.3em;
+        font-weight: bold;
+    }
+
+    .mho-expedition-route-empty {
+        opacity: 0.5;
+        font-style: italic;
+        font-size: 12px;
+    }
+
+    .mho-expedition-route-others {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2em;
+        opacity: 0.7;
+        font-size: 11px;
+    }
+}
+
+/* Une consigne en lecture seule (ui/expedition-order.ts) : bloc du désert et fenêtre des expéditions */
+.mho-order {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35em;
+
+    &.mho-order-done .mho-order-content {
+        text-decoration: line-through;
+        opacity: 0.6;
+    }
+
+    .mho-order-cell,
+    .mho-order-owner {
+        white-space: nowrap;
+        opacity: 0.75;
+    }
+
+    .mho-order-owner {
+        font-style: italic;
+    }
+
+    .mho-order-img {
+        max-height: 16px;
+        margin-right: 0.25em;
+        vertical-align: middle;
+    }
+
+    .mho-order-glyph {
+        margin-right: 0.25em;
+    }
+
+    .mho-order-text > p {
+        margin: 0;
+    }
+}
+
+/* Fenêtre « Mon programme » (ui/my-program.ts) : en-tête au-dessus des onglets, contenu des onglets dans le flux */
+#mho-expeditions-window {
+    .mho-window-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mho-program-header {
+        display: flex;
+        flex-shrink: 0;
+        align-items: center;
+        gap: 0.5em;
+        margin-right: 24px;
+
+        /* Les boutons du jeu sont pleine largeur */
+        > button {
+            flex: none;
+            width: auto;
+            margin: 0;
+        }
+    }
+
+    .mho-program-title {
+        margin: 0 auto 0 0;
+    }
+
+    #tabs {
+        flex-shrink: 0;
+    }
+
+    .tab-content {
+        position: static;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .mho-program-expedition-choice {
+        margin-bottom: 0.5em;
+    }
+
+    .mho-program-expedition-cell {
+        margin-top: 0.5em;
+        font-weight: bold;
+    }
+
+    .mho-program-buildings {
+        h3 {
+            margin: 0.75em 0 0.25em;
+        }
+
+        ul, ol {
+            margin: 0;
+        }
+
+        li.done {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        /* Hors du barré de la ligne */
+        .mho-program-buildings-detected, .mho-program-buildings-check {
+            display: inline-block;
+        }
+
+        /* Son espace de tête disparaît en inline-block */
+        .mho-program-buildings-check {
+            margin-left: 0.25em;
+        }
+
+        .mho-program-buildings-detected {
+            font-size: 11px;
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .note {
+            opacity: 0.75;
+        }
+    }
+}
+
+.mho-advanced-tooltip .mho-item-extra, #item-list > li.selected > .properties > .mho-item-extra {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25em;
+    margin-top: 0.25em;
+}
+
+.mho-advanced-tooltip .mho-item-extra > .item, #item-list > li.selected > .properties > .mho-item-extra > .item {
+    background-color: #524053;
+    padding: 0.25em;
+    border-radius: 0.25em;
+    display: inline-flex;
+    align-items: center;
+}

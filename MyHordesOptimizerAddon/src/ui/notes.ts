@@ -5,6 +5,7 @@ import { state } from '../state';
 import { ensureDashedSeparatorAfter } from '../utils/dom';
 import { getI18N } from '../utils/i18n';
 import { pageIsTownHistory } from '../utils/page';
+import { areTownKeysMigrated, getViewTownKey } from '../utils/town-page-key';
 
 const citizen_note_icon_class: string = 'mho-citizen-note-icon';
 const user_note_block_class: string = 'mho-user-note-block';
@@ -110,9 +111,8 @@ export function displayTownNote(): void {
     }
     if (existing) return;
 
-    const map_id_raw: string | null = view_town.getAttribute('data-town-id');
-    if (!map_id_raw) return;
-    const map_id: number = +map_id_raw;
+    const map_id: number | null = getViewTownKey(view_town, document.URL, areTownKeysMigrated());
+    if (map_id === null) return;
 
     if (!state.town_notes) {
         if (!is_loading_town_notes) {
@@ -158,9 +158,8 @@ export function displayCitizenNoteIcons(): void {
         return;
     }
 
-    const map_id_raw: string | null = view_town.getAttribute('data-town-id');
-    if (!map_id_raw) return;
-    const map_id: number = +map_id_raw;
+    const map_id: number | null = getViewTownKey(view_town, document.URL, areTownKeysMigrated());
+    if (map_id === null) return;
 
     if (!state.citizen_notes || state.citizen_notes_map_id !== map_id) {
         if (!is_loading_citizen_notes) {

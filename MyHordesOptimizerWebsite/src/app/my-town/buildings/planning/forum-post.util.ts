@@ -375,10 +375,20 @@ function resourceLines(context: PostContext): string[] {
     return lines;
 }
 
+/** Émote de chaque amélioration de la maison (`:home:` par défaut). */
+const HOME_UPGRADE_EMOTES: Readonly<Record<string, string>> = {
+    kitchenLevel: ':item_dish_tasty:',
+    laboLevel: ':lab:',
+    restLevel: ':sleep:',
+    renfortLevel: ':item_fence:',
+    hasFence: ':item_chain:'
+};
+
 /** Libellé d'une tâche personnelle, avec son coût quand il n'est pas nul. */
 function taskLine(context: PostContext, task: PlanTaskDTO): string {
     const cost: string = task.pa > 0 ? ` (${task.pa}:ap:)` : '';
-    const icon: string = task.kind === 'home' || task.kind === 'homeUpgrade' ? ':home:' : ':middot:';
+    const upgrade_emote: string | undefined = task.kind === 'homeUpgrade' && typeof task.ref === 'string' ? HOME_UPGRADE_EMOTES[task.ref] : undefined;
+    const icon: string = upgrade_emote ?? (task.kind === 'home' || task.kind === 'homeUpgrade' ? ':home:' : ':middot:');
     return `${icon} ${taskLabel(task, context.homes)}${cost}`;
 }
 

@@ -207,6 +207,15 @@ export const params_categories: ParamCategory[] = [
                                 },
                             },
                             {
+                                id: 'update_gh_job_markers',
+                                label: {
+                                    en: 'Updates information from job markers',
+                                    fr: 'Met à jour les informations issues des marqueurs de métiers',
+                                    de: 'Aktualisiert Informationen von Jobmarkierungen',
+                                    es: 'Actualiza la información de los marcadores de trabajo.'
+                                },
+                            },
+                            {
                                 id: 'update_gh_ah',
                                 label: {
                                     en: 'Heroic Actions',
@@ -309,6 +318,35 @@ export const params_categories: ParamCategory[] = [
                             }
                         ]
                     },
+                    {
+                        id: 'update_zen',
+                        label: {
+                            en: 'Update Zen Hordes',
+                            fr: 'Mettre à jour Zen Hordes',
+                            de: 'Zen Hordes aktualisieren',
+                            es: 'Actualizar Zen Hordes'
+                        },
+                        children: [
+                            {
+                                id: 'update_zen_job_markers',
+                                label: {
+                                    en: 'Updates information from job markers',
+                                    fr: 'Met à jour les informations issues des marqueurs de métiers',
+                                    de: 'Aktualisiert Informationen von Jobmarkierungen',
+                                    es: 'Actualiza la información de los marcadores de trabajo.'
+                                },
+                            },
+                            {
+                                id: 'update_zen_devastated',
+                                label: {
+                                    en: 'Update even when the town is in Chaos',
+                                    fr: 'Mise à jour même quand la ville est en Chaos',
+                                    de: 'Aktualisierung auch dann, wenn in der Stadt Chaos herrscht',
+                                    es: 'Actualizar incluso cuando la ciudad esté en Caos'
+                                },
+                            }
+                        ]
+                    },
                 ]
             },
             // {
@@ -344,10 +382,31 @@ export const params_categories: ParamCategory[] = [
             {
                 id: 'display_my_expeditions',
                 label: {
-                    en: 'Shows details of the MyHordes Optimizer expeditions I am registered for',
-                    fr: 'Affiche les détails des expéditions de MyHordes Optimizer auxquelles je suis inscrit',
-                    de: 'Zeigt Details zu MyHordes Optimizer-Expeditionen an, für die ich registriert bin',
-                    es: 'Muestra los detalles de las expediciones de MyHordes Optimizer a las que estoy registrado'
+                    en: 'Shows “My program”',
+                    fr: 'Affiche « Mon programme »',
+                    de: 'Zeigt „Mein Programm“ an',
+                    es: 'Muestra «Mi programa»'
+                },
+                help: {
+                    en: 'My expeditions and my construction site instructions of the day.',
+                    fr: 'Mes expéditions et mes consignes de chantiers du jour.',
+                    de: 'Meine Expeditionen und meine Konstruktionsanweisungen des Tages.',
+                    es: 'Mis expediciones y mis consignas de construcciones del día.'
+                },
+            },
+            {
+                id: 'display_expedition_route',
+                label: {
+                    en: 'Shows the details of my expedition in the World Beyond',
+                    fr: 'Affiche le détail de mon expédition dans l\'Outre-Monde',
+                    de: 'Zeigt die Details meiner Expedition in der Außenwelt an',
+                    es: 'Muestra el detalle de mi expedición en el Ultramundo'
+                },
+                help: {
+                    en: 'Shows under the map the route followed (one of your expeditions, or a town route without expedition, to choose in the list), the direction to take, the instructions of the current zone and the next zone that has some. Also colors in MHO pink the move arrow that leads to the next zone of the route (it blinks to get back to the route).',
+                    fr: 'Affiche sous la carte le tracé suivi (une de vos expéditions, ou un tracé de la ville sans expédition, au choix dans la liste), la direction à prendre, les consignes de la case et la prochaine case qui en a. Colore aussi en rose MHO la flèche de déplacement qui mène à la case suivante du tracé (elle clignote pour revenir sur le tracé).',
+                    de: 'Zeigt unter der Karte die verfolgte Route (eine deiner Expeditionen oder eine Route der Stadt ohne Expedition, in der Liste auswählbar), die einzuschlagende Richtung, die Anweisungen der aktuellen Zone und die nächste Zone mit Anweisungen. Färbt außerdem den Bewegungspfeil, der zur nächsten Zone der Route führt, in MHO-Rosa (er blinkt, um zur Route zurückzukehren).',
+                    es: 'Muestra bajo el mapa la ruta seguida (una de tus expediciones o una ruta del pueblo sin expedición, a elegir en la lista), la dirección a tomar, las instrucciones de la zona actual y la siguiente zona que las tenga. También colorea en rosa MHO la flecha de movimiento que lleva a la siguiente zona de la ruta (parpadea para volver a la ruta).'
                 },
             },
             {
@@ -932,7 +991,7 @@ export const params_categories: ParamCategory[] = [
                     en: 'Notify me at the end of a search',
                     fr: 'Me notifier à la fin de la fouille',
                     de: 'Mich Benachrichtigen am Ende einer Grabungsaktion',
-                    es: 'Notificarme al final de la búsquedas'
+                    es: 'Notificarme al final de la búsqueda'
                 },
                 help: {
                     en: 'Allows to receive a notification when a search ends if the page was not closed in the meantime',

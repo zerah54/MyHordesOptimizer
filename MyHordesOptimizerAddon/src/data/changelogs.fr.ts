@@ -1,4 +1,14 @@
 export const changelogs: Record<string, string> = {
+    '1.1.64': `
+        [Nouveauté] Mon programme : nouvelle fenêtre avec votre expédition, vos chantiers, vos consignes du jour et les évolutions votées ce soir
+        [Nouveauté] Expéditions : suivi du tracé dans le désert (direction à prendre, consignes de la case, prochaine case à consignes)
+        [Nouveauté] Zen Hordes : Il est désormais possible d'envoyer des informations à ZenHordes
+
+        [Amélioration] Tooltips améliorés et Wiki : Plus d'informations
+        [Amélioration] Gest'Hordes : Nouvelle option pour envoyer les marqueurs de métiers
+
+        [Correctif] L'avertissement de registre de fouilles incomplet est plus fiable
+        `,
     '1.1.63': `
         [Nouveauté] La tour de guet affiche la plage d'attaque affinée partagée par la ville, sous l'attaque calculée du jour et du lendemain
         [Nouveauté] Le calculateur de camping affiche la chance brute entre parenthèses quand le plafond ou le plancher l'a modifiée

@@ -451,3 +451,70 @@ describe('displayUserGlobalNote', () => {
         expect(document.querySelector('.mho-user-note-block')).toBeNull();
     });
 });
+
+describe('notes sur une ville importée', () => {
+    /** Page d'une ville importée : bandeau Twinoid, une ligne de citoyen et le bouton d'ancrage */
+    const renderImportedTownPage = (): void => {
+        document.body.innerHTML = '<div class="view-town" data-town-id="5">'
+            + '<div class="green-note"><img src="/images/badges/twinoid.png"></div>'
+            + '<div class="row"><button></button></div>'
+            + '<div class="row-table citizens-list"><div class="row"><div class="cell"><span class="username" x-user-id="9"></span></div></div></div>'
+            + '</div>';
+    };
+
+    beforeEach(() => {
+        window.history.pushState({}, '', '/jx/soul/me/town/129/soul_me');
+        renderImportedTownPage();
+    });
+
+    afterEach(() => {
+        state.parameters = undefined;
+    });
+
+    it('clés non migrées : aucune note de ville', () => {
+        state.parameters = undefined;
+        state.town_notes = {};
+
+        displayTownNote();
+
+        expect(document.querySelector('.mho-note-block')).toBeNull();
+    });
+
+    it('clés migrées : la note de ville est enregistrée sous la clé -129', async () => {
+        state.parameters = [{ name: 'TownKeysMigrated', value: '1' }];
+        state.town_notes = {};
+        vi.spyOn(window, 'prompt').mockReturnValue('note');
+
+        displayTownNote();
+        document.querySelector<HTMLElement>('.mho-note-block .mho-note-icon')!.click();
+        await flush();
+
+        expect(upsertTownNoteMock).toHaveBeenCalledWith(-129, 'note');
+    });
+
+    it('clés non migrées : aucune icône citoyen ni chargement', () => {
+        state.parameters = undefined;
+        state.citizen_notes = {};
+        state.citizen_notes_map_id = 5;
+
+        displayCitizenNoteIcons();
+
+        expect(document.querySelector('.mho-citizen-note-icon')).toBeNull();
+        expect(getMyCitizenNotesMock).not.toHaveBeenCalled();
+    });
+
+    it('clés migrées : les notes citoyens sont chargées avec -129, puis l\'icône s\'affiche', async () => {
+        state.parameters = [{ name: 'TownKeysMigrated', value: '1' }];
+        getMyCitizenNotesMock.mockImplementation(async () => {
+            state.citizen_notes = {};
+            state.citizen_notes_map_id = -129;
+            return {};
+        });
+
+        displayCitizenNoteIcons();
+        await flush();
+
+        expect(getMyCitizenNotesMock).toHaveBeenCalledWith(-129);
+        expect(document.querySelector('.mho-citizen-note-icon')).not.toBeNull();
+    });
+});

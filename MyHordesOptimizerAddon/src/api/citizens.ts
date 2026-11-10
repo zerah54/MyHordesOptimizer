@@ -4,9 +4,13 @@ import { addError } from '../utils/notifications';
 import type { TownCitizenRef } from '../utils/successful-digs-page';
 import { convertResponsePromiseToError } from '../utils/version';
 
-export function getCitizens() {
+/**
+ * Citoyens de la ville du joueur, rangés dans `state.citizens`.
+ * @param {boolean} fresh Contourne le cache HTTP du navigateur (l'ETag de la route ne suit pas les coches ni la maison).
+ */
+export function getCitizens(fresh: boolean = false) {
     return new Promise<any>((resolve, reject) => {
-        fetcher(state.api_url + `/Fetcher/citizens?userId=${state.mh_user.id}&townId=${state.mh_user.townDetails?.townId}`)
+        fetcher(state.api_url + `/Fetcher/citizens?userId=${state.mh_user.id}&townId=${state.mh_user.townDetails?.townId}`, fresh ? { cache: 'no-store' } : undefined)
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();

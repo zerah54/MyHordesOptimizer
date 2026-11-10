@@ -108,6 +108,25 @@ export function resolveInventoryObjects(elements: Element[]): ResolvedInventoryO
     return resolved;
 }
 
+/** Objet d'inventaire regroupé : `count` exemplaires identiques (même identifiant, même état cassé). */
+export interface CountedInventoryObject extends ResolvedInventoryObject {
+    count: number;
+}
+
+/** Regroupe les objets identiques d'un inventaire, dans l'ordre de première apparition. */
+export function countInventoryObjects(objects: ResolvedInventoryObject[]): CountedInventoryObject[] {
+    const counted: CountedInventoryObject[] = [];
+    for (const object of objects) {
+        const existing: CountedInventoryObject | undefined = counted.find((candidate: CountedInventoryObject) => candidate.id === object.id && candidate.isBroken === object.isBroken);
+        if (existing) {
+            existing.count += 1;
+        } else {
+            counted.push({ ...object, count: 1 });
+        }
+    }
+    return counted;
+}
+
 export function getStatusFromImg(img_src) {
     if (img_src) {
         const img_path = getFixedImagePath(img_src);

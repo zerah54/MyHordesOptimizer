@@ -1,9 +1,12 @@
 import { hordes_img_url, lang, mho_sent_digs_key, mho_token_key } from '../config/constants';
 import { state } from '../state';
 import type { ApiToken } from '../types';
-import { detectDailyActionDone } from '../utils/daily-action-detection';
+import { reportHomeDailyActions } from '../utils/daily-action-detection';
+import type { ScavNextCells, ScoutNextCells } from '../utils/desert-radars';
+import { getScavNextCells, getScoutNextCells } from '../utils/desert-radars';
+import { detectEquippedShoes } from '../utils/equipped-shoes';
 import { fetcher } from '../utils/fetch';
-import { resolveInventoryObjects } from '../utils/item-lookup';
+import { countInventoryObjects, resolveInventoryObjects } from '../utils/item-lookup';
 import { fixMhCompiledImg } from '../utils/misc';
 import { addError } from '../utils/notifications';
 import { getCurrentTownDay, pageIsAmelio, pageIsDesert, pageIsDoors, pageIsHouse } from '../utils/page';
@@ -14,9 +17,12 @@ import { isSentDigsMemory, mergeWithSentDigs } from '../utils/successful-digs';
 import type { PageUser } from '../utils/successful-digs-page';
 import { collectSuccessfulDigs } from '../utils/successful-digs-page';
 import { convertResponsePromiseToError } from '../utils/version';
+import type { ZenHordesCell, ZenHordesScope } from '../utils/zen-hordes-cell';
+import { collectZenHordesCell, resolveZenHordesScope } from '../utils/zen-hordes-cell';
 import { fetchTownCitizenRefs } from './citizens';
 import { saveDailyAction } from './daily-actions';
 import { getMap } from './map';
+import { saveShoesEquipped } from './shoes';
 import { getWishlist } from './wishlist';
 
 export interface ExternalToolUpdateError {
@@ -53,6 +59,20 @@ function applyRenewedTokenIfPresent(job_state: ExternalToolsUpdateJobState): voi
     setStorageItem(mho_token_key, state.token);
 }
 
+/**
+ * Vrai si un relevé de métier a été lu : une case envoyée sans aucun marqueur mettrait quand même à jour,
+ * chez Gest'Hordes, la date de passage de la case et la position du joueur.
+ */
+function hasJobMarker(next_cells: ScavNextCells | ScoutNextCells, zone_level: number | undefined): boolean {
+    return zone_level !== undefined
+        || Object.values(next_cells).some((value: boolean | number | undefined): boolean => value !== undefined);
+}
+
+/** Ajoute des relevés à la case réservée à Gest'Hordes, créée à la première donnée. */
+function addToGestHordesCell(data: any, position: readonly (string | number)[], fields: Record<string, unknown>): void {
+    data.map.gestHordesCell = { ...(data.map.gestHordesCell ?? { x: +position[0], y: +position[1] }), ...fields };
+}
+
 /** Identifiant rendu par le serveur quand aucun lancement n'est connu pour ce joueur */
 const empty_job_id: string = '00000000-0000-0000-0000-000000000000';
 /** Intervalle d'interrogation de l'avancement */
@@ -63,20 +83,6 @@ const polling_timeout_ms: number = 120000;
 export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJobState) => void): Promise<ExternalToolsUpdateJobState> {
     const { mh_user, mho_parameters, api_url, external_app_id } = state as any;
     return new Promise<ExternalToolsUpdateJobState>(async (resolve, reject) => {
-
-        const convertListOfSingleObjectsIntoListOfCountedObjects = (objects) => {
-            const object_map = [];
-            objects.forEach((object) => {
-                const object_in_map = object_map.find((_object_in_map) => _object_in_map.id === object.id && _object_in_map.isBroken === object.isBroken);
-                if (object_in_map) {
-                    object_in_map.count += 1;
-                } else if (object) {
-                    object.count = 1;
-                    object_map.push(object);
-                }
-            });
-            return object_map;
-        };
 
         const data: any = {};
         const nb_dead_zombies = +document.querySelectorAll('.actor.splatter').length;
@@ -93,7 +99,8 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
             isBigBrothHordes: /* mho_parameters && mho_parameters.update_bbh && !is_mh_beta ? 'api' : */ 'none',
             isFataMorgana: mho_parameters && mho_parameters.update_fata ? 'api' : 'none',
             isGestHordes: mho_parameters && mho_parameters.update_gh ? 'api' : 'none',
-            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? 'api' : 'none'
+            isMyHordesOptimizer: mho_parameters && mho_parameters.update_mho ? 'api' : 'none',
+            isZenHordes: 'none'
         };
 
         const position = getCurrentPosition();
@@ -110,17 +117,14 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
             citizen_list = [{ id: mh_user.id, userName: mh_user.userName, job: mh_user.jobDetails.uid }];
         }
 
+        // Gest'Hordes a sa propre case, remplie selon ses seules options : la case partagée part chez tous les outils qui la lisent.
         // Mise à jour en ville chaos. Le relevé lit la page du désert (note « zone épuisée », zombies,
-        // sol) : hors de cette page, il enverrait une case vide et « non épuisée ». Le cas Fata Morgana
-        // échappait à `pageIsDesert()`, faute de parenthèses.
-        if (pageIsDesert() && (
-            (mh_user.townDetails?.isChaos && mho_parameters.update_gh && mho_parameters.update_gh_devastated)
-            || (mho_parameters.update_mho && mho_parameters.update_mho_devastated)
-            || (mho_parameters.update_fata && mho_parameters.update_fata_devastated))) {
+        // sol) : hors de cette page, il enverrait une case vide et « non épuisée ».
+        const devastated_for_gh: boolean = !!(mh_user.townDetails?.isChaos && mho_parameters.update_gh && mho_parameters.update_gh_devastated);
+        const devastated_in_cell: boolean = !!((mho_parameters.update_mho && mho_parameters.update_mho_devastated)
+            || (mho_parameters.update_fata && mho_parameters.update_fata_devastated));
+        if (pageIsDesert() && (devastated_for_gh || devastated_in_cell)) {
 
-            if (mho_parameters.update_gh && mho_parameters.update_gh_devastated && mh_user.townDetails?.isChaos) {
-                data.map.toolsToUpdate.isGestHordes = 'cell';
-            }
             if (mho_parameters.update_mho && mho_parameters.update_mho_devastated && mh_user.townDetails?.isChaos) {
                 data.map.toolsToUpdate.isMyHordesOptimizer = 'cell';
             }
@@ -135,28 +139,30 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 y: +position[1],
                 zombies: +document.querySelectorAll('.actor.zombie').length,
                 zoneEmpty: !!document.querySelector('#mgd-zone-note'),
-                objects: convertListOfSingleObjectsIntoListOfCountedObjects(objects),
+                objects: countInventoryObjects(objects),
                 citizenId: citizen_list.map((citizen) => citizen.id)
             };
-            if (data.map.cell) {
-                data.map.cell.zombies = content.zombies;
-                data.map.cell.zoneEmpty = content.zoneEmpty;
-                data.map.cell.objects = content.objects || [];
-                data.map.cell.citizenId = content.citizenId;
-            } else {
-                data.map.cell = content;
+            if (devastated_in_cell) {
+                if (data.map.cell) {
+                    data.map.cell.zombies = content.zombies;
+                    data.map.cell.zoneEmpty = content.zoneEmpty;
+                    data.map.cell.objects = content.objects || [];
+                    data.map.cell.citizenId = content.citizenId;
+                } else {
+                    data.map.cell = content;
+                }
+            }
+            if (devastated_for_gh) {
+                addToGestHordesCell(data, position, { zombies: content.zombies, zoneEmpty: content.zoneEmpty, objects: content.objects });
             }
         }
 
         // Mise à jour du nombre de zombies tués
-        if (((mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies)
-                || (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
-                || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies))
-            && pageIsDesert() && nb_dead_zombies > 0) {
+        const killed_zombies_for_gh: boolean = !!(mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies);
+        const killed_zombies_in_cell: boolean = !!((mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies)
+            || (mho_parameters.update_fata && mho_parameters.update_fata_killed_zombies));
+        if ((killed_zombies_for_gh || killed_zombies_in_cell) && pageIsDesert() && nb_dead_zombies > 0) {
 
-            if (mho_parameters.update_gh && mho_parameters.update_gh_killed_zombies) {
-                data.map.toolsToUpdate.isGestHordes = 'cell';
-            }
             if (mho_parameters.update_mho && mho_parameters.update_mho_killed_zombies) {
                 data.map.toolsToUpdate.isMyHordesOptimizer = 'cell';
             }
@@ -171,16 +177,23 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 citizenId: citizen_list.map((citizen) => citizen.id)
             };
 
-            if (data.map.cell) {
-                data.map.cell.deadZombies = nb_dead_zombies;
-            } else {
-                data.map.cell = content;
+            if (killed_zombies_in_cell) {
+                if (data.map.cell) {
+                    data.map.cell.deadZombies = nb_dead_zombies;
+                } else {
+                    data.map.cell = content;
+                }
+            }
+            if (killed_zombies_for_gh) {
+                addToGestHordesCell(data, position, { deadZombies: nb_dead_zombies });
             }
         }
 
         // Mise à jour des marqueurs issus des métiers
-        if (((mho_parameters.update_mho && mho_parameters.update_mho_job_markers)
-                || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers))
+        const job_markers_in_cell: boolean = !!((mho_parameters.update_mho && mho_parameters.update_mho_job_markers)
+            || (mho_parameters.update_fata && mho_parameters.update_fata_job_markers));
+        const job_markers_for_gh: boolean = !!(mho_parameters.update_gh && mho_parameters.update_gh_job_markers);
+        if ((job_markers_in_cell || job_markers_for_gh)
             && pageIsDesert() && (mh_user.jobDetails.uid === 'dig' || mh_user.jobDetails.uid === 'vest')) {
 
             if (mho_parameters.update_mho && mho_parameters.update_mho_job_markers) {
@@ -208,21 +221,21 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 const content = {
                     x: +position[0],
                     y: +position[1],
-                    scavNextCells: {
-                        north: document.querySelector('.scavenger-sense-north') ? !document.querySelector('.scavenger-sense-north.scavenger-sense-1') : undefined,
-                        east: document.querySelector('.scavenger-sense-east') ? !document.querySelector('.scavenger-sense-east.scavenger-sense-1') : undefined,
-                        south: document.querySelector('.scavenger-sense-south') ? !document.querySelector('.scavenger-sense-south.scavenger-sense-1') : undefined,
-                        west: document.querySelector('.scavenger-sense-west') ? !document.querySelector('.scavenger-sense-west.scavenger-sense-1') : undefined
-                    },
+                    scavNextCells: getScavNextCells(),
                     scavZoneLevel: scav_zone_level,
                     citizenId: citizen_list.map((citizen) => citizen.id),
                 };
 
-                if (data.map.cell) {
-                    data.map.cell.scavNextCells = content.scavNextCells;
-                    data.map.cell.scavZoneLevel = content.scavZoneLevel;
-                } else {
-                    data.map.cell = content;
+                if (job_markers_in_cell) {
+                    if (data.map.cell) {
+                        data.map.cell.scavNextCells = content.scavNextCells;
+                        data.map.cell.scavZoneLevel = content.scavZoneLevel;
+                    } else {
+                        data.map.cell = content;
+                    }
+                }
+                if (job_markers_for_gh && hasJobMarker(content.scavNextCells, content.scavZoneLevel)) {
+                    addToGestHordesCell(data, position, { scavNextCells: content.scavNextCells, scavZoneLevel: content.scavZoneLevel });
                 }
             } else if (mh_user.jobDetails.uid === 'vest') {
                 // Le bloc .zone-scout n'existe pas si le niveau d'exploration est inconnu
@@ -240,21 +253,33 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
                 const content = {
                     x: +position[0],
                     y: +position[1],
-                    scoutNextCells: {
-                        north: document.querySelector('.scout-sense-north') ? +document.querySelector('.scout-sense-north').querySelector('text')?.innerHTML : undefined,
-                        east: document.querySelector('.scout-sense-east') ? +document.querySelector('.scout-sense-east').querySelector('text')?.innerHTML : undefined,
-                        south: document.querySelector('.scout-sense-south') ? +document.querySelector('.scout-sense-south').querySelector('text')?.innerHTML : undefined,
-                        west: document.querySelector('.scout-sense-west') ? +document.querySelector('.scout-sense-west').querySelector('text')?.innerHTML : undefined
-                    },
+                    scoutNextCells: getScoutNextCells(),
                     scoutZoneLvl: scout_zone_level
                 };
 
-                if (data.map.cell) {
-                    data.map.cell.scoutNextCells = content.scoutNextCells;
-                    data.map.cell.scoutZoneLvl = content.scoutZoneLvl;
-                } else {
-                    data.map.cell = content;
+                if (job_markers_in_cell) {
+                    if (data.map.cell) {
+                        data.map.cell.scoutNextCells = content.scoutNextCells;
+                        data.map.cell.scoutZoneLvl = content.scoutZoneLvl;
+                    } else {
+                        data.map.cell = content;
+                    }
                 }
+                if (job_markers_for_gh && hasJobMarker(content.scoutNextCells, content.scoutZoneLvl)) {
+                    addToGestHordesCell(data, position, { scoutNextCells: content.scoutNextCells, scoutZoneLvl: content.scoutZoneLvl });
+                }
+            }
+        }
+
+        // Zen Hordes : la case est relevée à part, jamais dans `data.map.cell` que Fata, GH et MHO lisent quel que soit leur mode
+        const zen_scope: ZenHordesScope = pageIsDesert()
+            ? resolveZenHordesScope(mho_parameters, mh_user.townDetails?.isChaos, mh_user.jobDetails?.uid)
+            : { zone: false, radars: false };
+        if (zen_scope.zone || zen_scope.radars) {
+            const zen_cell: ZenHordesCell | undefined = collectZenHordesCell(position, zen_scope, mh_user.jobDetails?.uid);
+            if (zen_cell) {
+                data.map.toolsToUpdate.isZenHordes = 'cell';
+                data.map.zenHordesCell = zen_cell;
             }
         }
 
@@ -275,7 +300,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
 
             rucksacks.push({
                 userId: mh_user.id,
-                objects: convertListOfSingleObjectsIntoListOfCountedObjects(my_rusksack),
+                objects: countInventoryObjects(my_rusksack),
             });
 
             if (pageIsDesert()) {
@@ -286,12 +311,15 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
 
                     rucksacks.push({
                         userId: escort_id,
-                        objects: convertListOfSingleObjectsIntoListOfCountedObjects(escort_rucksack),
+                        objects: countInventoryObjects(escort_rucksack),
                     });
                 });
             }
 
             data.bags.contents = rucksacks;
+
+            // Envoi à part, sans attente : un échec (déjà notifié) ne doit pas retarder ni empêcher la mise à jour
+            saveShoesEquipped(detectEquippedShoes(document.querySelector('.inventory.rucksack')))?.catch((): void => undefined);
         }
 
 
@@ -311,7 +339,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
             // côté jeu), visible du propriétaire mais pas des autres citoyens — ne doit pas être relevé.
             const chest_elements = resolveInventoryObjects(Array.from(document.querySelector('.inventory.chest')?.querySelectorAll('li.item:not(.locked):not(.banished_hidden)') || []));
 
-            data.chest.contents = convertListOfSingleObjectsIntoListOfCountedObjects(chest_elements);
+            data.chest.contents = countInventoryObjects(chest_elements);
         }
 
         // Mise à jour des positions des âmes en tant que chaman
@@ -472,23 +500,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
         /** Récupération des actions quotidiennes */
         if ((mho_parameters.update_mho && mho_parameters.update_mho_daily_actions) && pageIsHouse()) {
 
-            await saveDailyAction('home_pool', detectDailyActionDone('pool'));
-            await saveDailyAction('home_shower', detectDailyActionDone('shower'));
-            await saveDailyAction('home_clean', detectDailyActionDone('sort'));
-
-            /** Espace naturel des ermites */
-
-            /** Cuisine */
-
-            /** Labo */
-
-            /** Tour des gardiens */
-
-            await saveDailyAction('home_rest', detectDailyActionDone('rest'));
-
-            /** Galerie des fouineurs */
-
-            /** Repaire des éclaireurs */
+            await reportHomeDailyActions(saveDailyAction, mh_user.jobDetails?.uid);
         }
 
         /** Envoi des informations */

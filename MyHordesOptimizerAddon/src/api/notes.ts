@@ -85,7 +85,7 @@ export function upsertUserNote(userId: number, note: string): Promise<void> {
     });
 }
 
-/** @param mapId Identifiant public de la ville (`data-town-id`), pas l'IdTown interne */
+/** @param mapId Clé publique de la ville (`getViewTownKey`), pas l'IdTown interne */
 export function getMyCitizenNotes(mapId: number): Promise<Record<number, NoteDto>> {
     return new Promise<Record<number, NoteDto>>((resolve, reject) => {
         fetcher(state.api_url + '/Note/citizen/mine?townId=' + mapId)
@@ -102,7 +102,7 @@ export function getMyCitizenNotes(mapId: number): Promise<Record<number, NoteDto
     });
 }
 
-/** @param mapId Identifiant public de la ville (`data-town-id`), pas l'IdTown interne */
+/** @param mapId Clé publique de la ville (`getViewTownKey`), pas l'IdTown interne */
 export function upsertCitizenNote(userId: number, mapId: number, note: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
         putNote(state.api_url + '/Note/citizen/' + userId + '?townId=' + mapId, note)

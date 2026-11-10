@@ -45,6 +45,8 @@ export const mho_forum_thread_styles_key = 'MHO_forum_thread_styles';
 export const mho_anti_abuse_key = 'MHO_anti_abuse';
 /** Fouilles réussies déjà envoyées ce jour-là, par case et citoyen : l'envoi suivant en garde le maximum */
 export const mho_sent_digs_key: string = `MHO_${local_storage_prefix}sent_digs`;
+/** Tracé suivi dans le désert, pour une ville et un jour */
+export const mho_expedition_route_choice_key: string = `MHO_${local_storage_prefix}expedition_route_choice`;
 export const mho_version_key = 'MHO_version';
 export const gm_mh_external_app_id_key = is_mh_beta ? 'MHO_mh_beta_external_app_id' : `MHO_${local_storage_prefix}mh_external_app_id`;
 

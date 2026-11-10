@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
+import { texts } from '../i18n/texts';
 import { state } from '../state';
 import type { MhoItem, MhoItemSummary, WishlistItem } from '../types';
-import { createAdvancedProperties } from './tooltips';
+import { getI18N } from '../utils/i18n';
+import { createAdvancedProperties, displayPropertiesOrActions } from './tooltips';
 
 function baseItem(overrides: Partial<MhoItem> = {}): MhoItem {
     return {
@@ -180,5 +182,114 @@ describe('createAdvancedProperties — zone quantités (souhaité/dépôt, banqu
         const stock_div = content.children[0] as HTMLElement;
         expect(stock_div.style.marginTop).not.toBe('');
         expect(stock_div.style.marginTop).toBe(stock_div.style.marginBottom);
+    });
+});
+
+describe('displayPropertiesOrActions — appareil photo et textes localisés', () => {
+    it('affiche 35 % et 30 s pour flash_photo_1', () => {
+        const text: string = displayPropertiesOrActions('flash_photo_1', baseItem()).innerText;
+        expect(text).toContain('35');
+        expect(text).toContain('30');
+    });
+
+    it('affiche 69 % et 60 s pour flash_photo_2', () => {
+        const text: string = displayPropertiesOrActions('flash_photo_2', baseItem()).innerText;
+        expect(text).toContain('69');
+        expect(text).toContain('60');
+    });
+
+    it('affiche 99 % et 120 s pour flash_photo_3', () => {
+        const text: string = displayPropertiesOrActions('flash_photo_3', baseItem()).innerText;
+        expect(text).toContain('99');
+        expect(text).toContain('120');
+    });
+
+    it('affiche 100 % pour flash_photo_4', () => {
+        expect(displayPropertiesOrActions('flash_photo_4', baseItem()).innerText).toContain('100');
+    });
+
+    it('localise can_cook (jsdom en anglais)', () => {
+        const text: string = displayPropertiesOrActions('can_cook', baseItem()).innerText;
+        expect(text).not.toBe('Peut être cuisiné');
+        expect(text.length).toBeGreaterThan(0);
+    });
+});
+
+const DISPLAYED_PROPERTIES: string[] = [
+    'nosteal', 'inedible', 'haunting_soul', 'angry_soul', 'defence_cp', 'prevent_terror', 'found_poisoned', 'special_guitar'
+];
+const HIDDEN_PROPERTIES: string[] = [
+    'single_use', 'defence', 'weapon', 'deco', 'box_opener', 'can_opener', 'parcel_opener', 'nw_impact_cumul',
+    'food', 'drug', 'ressource', 'pet', 'lure', 'lock', 'hero_dog_fetch', 'is_water', 'nw_armory', 'nw_ikea', 'nw_trebuchet', 'nw_shooting',
+    'load_pilegun', 'load_lamp'
+];
+
+describe('displayPropertiesOrActions — propriétés autrefois ignorées', () => {
+    it.each(DISPLAYED_PROPERTIES)('affiche %s dans un tag non vide', (property: string) => {
+        const element: HTMLDivElement = displayPropertiesOrActions(property, baseItem());
+        expect(element.classList.contains('mho-item-tag')).toBe(true);
+        expect(element.innerText.length).toBeGreaterThan(0);
+    });
+
+    it.each(HIDDEN_PROPERTIES)('masque %s', (property: string) => {
+        expect(displayPropertiesOrActions(property, baseItem()).classList.contains('item-tag')).toBe(false);
+    });
+
+    it('affiche l\'alcool sans condition comme l\'alcool', () => {
+        expect(displayPropertiesOrActions('alcohol_dx', baseItem()).classList.contains('item-tag-alcohol')).toBe(true);
+    });
+});
+
+describe('createAdvancedProperties — tuiles d\'icônes', () => {
+    /** Rend les propriétés d'un objet. */
+    function render(properties: string[]): HTMLDivElement {
+        state.mho_parameters = { enhanced_tooltips_item_properties: true };
+        const content: HTMLDivElement = document.createElement('div');
+        createAdvancedProperties(content, baseItem({ properties }), null);
+        return content;
+    }
+
+    it('regroupe coffre, chien et Désaltère en tuiles, libellé au survol de la tuile', () => {
+        const tiles: HTMLElement[] = Array.from(render(['lock', 'hero_dog_fetch', 'is_water', 'nosteal']).querySelectorAll('.mho-item-tiles .mho-item-tile'));
+        expect(tiles.map((tile: HTMLElement): string => tile.querySelector('img')?.src ?? '')).toEqual([
+            expect.stringContaining('icons/lock.gif'), expect.stringContaining('item/item_tamed_pet.gif'), expect.stringContaining('status/status_hydrated.gif')
+        ]);
+        expect(tiles.every((tile: HTMLElement): boolean => tile.title.length > 0)).toBe(true);
+    });
+
+    it('affiche les chantiers du bonus de veille sur une ligne titrée', () => {
+        const row: HTMLElement | null = render(['nw_armory', 'nw_shooting']).querySelector('.mho-watch-bonus');
+        const tiles: HTMLElement[] = Array.from(row?.querySelectorAll('.mho-item-tile') ?? []);
+        expect(row?.textContent).toContain(getI18N(texts.watch_bonus));
+        expect(tiles.map((tile: HTMLElement): string => tile.querySelector('img')?.src ?? '')).toEqual([
+            expect.stringContaining('building/small_grinder2.gif'), expect.stringContaining('building/small_sewers.gif')
+        ]);
+        expect(tiles[0].title).toBe(getI18N(texts.nw_armory));
+    });
+
+    it('n\'ajoute aucune ligne de tuiles sans propriété concernée', () => {
+        expect(render(['nosteal']).querySelector('.mho-item-tiles')).toBeNull();
+    });
+});
+
+describe('texts.improve', () => {
+    it('conserve le texte des améliorations de camping (non écrasé par la propriété improve)', () => {
+        expect(texts.improve.fr).toContain('Améliorations simples');
+        expect(texts.camp_improve_property.fr).toContain('Permet d\'aménager un campement');
+    });
+});
+
+describe('createAdvancedProperties — sections des fiches enrichies', () => {
+    it('createAdvancedProperties ajoute les sections pour un objet qui a seulement des actionEffects', () => {
+        state.mho_parameters = { enhanced_tooltips_item_properties: true };
+        state.mh_user = undefined;
+
+        const item: MhoItem = baseItem({
+            actionEffects: [{ actionName: 'open', kind: 'Open', outcomes: [{ kind: 'Consumed', probability: 1 }] }]
+        });
+        const content: HTMLDivElement = document.createElement('div');
+        createAdvancedProperties(content, item, null);
+
+        expect(content.querySelector('.mho-item-extra')).not.toBeNull();
     });
 });

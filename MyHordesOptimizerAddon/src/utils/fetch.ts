@@ -6,6 +6,7 @@ import { automaticallyOpenBag } from '../ui/bag';
 import { displayCampingPredict } from '../ui/camping-predict';
 import { displayCellDetailsOnPage } from '../ui/cell-details';
 import { alertIfInactiveAndNoEscort, changeDefaultEscortOptions, preventFromLeaving } from '../ui/desert';
+import { displayExpeditionRouteOnPage } from '../ui/expedition-route';
 import { createExpeditionsBtn } from '../ui/expeditions';
 import { addExternalLinksColumnToWelcomeTowns, addExternalLinksToProfiles, addExternalLinksToTowns } from '../ui/external-links';
 import {
@@ -56,6 +57,8 @@ export function initOptionsWithLoginNeeded(): void {
         displayEstimationsOnWatchtower,
         /** Se cale elle-même sur le rendu de la carte : plus besoin de la retarder */
         displayCellDetailsOnPage,
+        /** Tracé et consignes de mon expédition, sous le bloc précédent (`GET expeditions/me` exige le bearer) */
+        displayExpeditionRouteOnPage,
         /** Nécessitent le bearer (endpoints /Note [Authorize]), contrairement au reste des options sans connexion */
         displayTownNote,
         displayCitizenNoteIcons,
