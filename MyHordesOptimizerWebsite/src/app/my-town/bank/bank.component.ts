@@ -22,10 +22,11 @@ import { LocalizedLabelPipe } from '../../_core/pipes/localized-label.pipe';
 import { localizedLabel, normalizeString } from '../../_core/utilities/string.utils';
 import { FilterFieldComponent } from '../../_shared/filter-field/filter-field.component';
 import { ItemComponent } from '../../_shared/item/item.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { SelectComponent } from '../../_shared/select/select.component';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent];
+const components: Imports = [FilterFieldComponent, ItemComponent, SelectComponent, PageTitleComponent];
 const pipes: Imports = [ItemImgPipe, ItemsGroupByCategoryPipe, LocalizedLabelPipe];
 const material_modules: Imports = [MatButtonToggleModule, MatCardModule, MatFormFieldModule, MatIconModule, MatTooltipModule];
 

@@ -50,7 +50,7 @@ export interface GlobalSearchEntry {
     readonly img: string | null;
     /** Avatar MyHordes d'un joueur (chemin ou URL, voir `mho-avatar`), ou `null`. */
     readonly avatar: string | null;
-    /** Icône Material Symbols quand il n'y a pas d'icône du jeu. */
+    /** Icône Material Symbols quand il n'y a pas d'icône du jeu, ou `''` pour n'en afficher aucune. */
     readonly symbol: string;
     readonly link: GlobalSearchLink;
 }
@@ -329,7 +329,7 @@ export function pageEntries(routes: readonly SidenavLinks[],
         if (!path) {
             return;
         }
-        entries.push(createEntry('pages', path, label, trail.join(' › '), null, 'article', { path, query_params: null }));
+        entries.push(createEntry('pages', path, label, trail.join(' › '), route.icon ?? null, '', { path, query_params: null }));
     };
     routes.forEach((route: SidenavLinks): void => visit(route, []));
     return entries.filter((entry: GlobalSearchEntry): boolean => entry.folded !== '');

@@ -2,10 +2,10 @@ import { signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CitizenFiltersStore } from '../citizen-filters.store';
-import { DayEvaluation } from '../plan-evaluation.util';
 import { BuildingPlanContentDTO, emptyPlanContent } from '../plan.types';
+import { DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
-import { createFakeStore, FAKE_REGULAR_CITIZENS, FakePlanningStore } from '../planning.store.fake';
+import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { TrackingRow } from '../tracking.util';
 import { PlanningCardsComponent } from './planning-cards.component';
 
@@ -75,6 +75,13 @@ describe('PlanningCardsComponent', (): void => {
         expect(card('program').querySelector('.pa')?.textContent).toMatch(/\d+/);
     });
 
+    it('Programme : les PA prévus comptent les travaux de maison des consignes', async (): Promise<void> => {
+        await render({ ...emptyPlanContent(), citizens: [{ userId: 1, tasks: [{ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 1, pa: 6 }, { kind: 'free', label: 'Eau', pa: 2 }] }] });
+
+        expect(card('program').querySelector('.pa')?.textContent?.replace(/\s/g, '')).toContain('6');
+        expect(card('program').querySelector('.pa')?.textContent?.replace(/\s/g, '')).not.toContain('8');
+    });
+
     it('Suivi : additionne les consignes faites de tous les citoyens', async (): Promise<void> => {
         await render();
         rows.set([trackingRow(1, 2), trackingRow(2, 3)]);
@@ -93,13 +100,22 @@ describe('PlanningCardsComponent', (): void => {
         expect(card('tracking').querySelector('.caption')?.textContent).toContain('prévues');
     });
 
-    it('Citoyens et budget : nombre de citoyens', async (): Promise<void> => {
+    it('Budget : nombre de citoyens', async (): Promise<void> => {
         await render();
 
         expect(card('budget').querySelector('.value')?.textContent?.trim()).toBe('3');
     });
 
-    describe('budget dans la carte Citoyens et budget', (): void => {
+    it('cartes Consignes et Budget, dans l\'ordre Programme, Consignes, Budget, Ressources, Défense hors chantiers', async (): Promise<void> => {
+        await render();
+
+        expect(card('tracking').querySelector('.title')?.textContent?.trim()).toBe('Consignes');
+        expect(card('budget').querySelector('.title')?.textContent?.trim()).toBe('Budget');
+        expect(Array.from((fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('button.card')).map((button: HTMLElement): string => button.dataset['card'] ?? ''))
+            .toEqual(['program', 'tracking', 'budget', 'resources', 'defense']);
+    });
+
+    describe('budget dans la carte Budget', (): void => {
         function pool(name: string): HTMLElement | null {
             return card('budget').querySelector<HTMLElement>(`.budgets .budget[data-pool="${name}"]`);
         }
@@ -114,7 +130,15 @@ describe('PlanningCardsComponent', (): void => {
             expect(pool('banned')?.querySelector('.value')?.textContent?.trim()).toBe(`${budgets.banned.remaining}`);
             expect(pool('regular')?.textContent).toContain('Non-bannis');
             expect(pool('regular')?.querySelector('.value')?.textContent?.trim()).toBe(`${budgets.regular.remaining}`);
-            expect(pool('regular')?.textContent).toContain(`PA restants sur ${budgets.regular.budget}`);
+            expect(pool('regular')?.textContent).toContain(`restants sur ${budgets.regular.budget}`);
+            expect(pool('regular')?.querySelector('mho-icon-ap')).not.toBeNull();
+        });
+
+        it('aucun espace entre les PA prévus et l\'icône PA', async (): Promise<void> => {
+            await render();
+
+            const icon: Element | null = card('program').querySelector('.pa mho-icon-ap');
+            expect(icon?.querySelector('img')?.previousSibling?.textContent).toMatch(/^\d+$/);
         });
 
         it('un budget dépassé est en évidence', async (): Promise<void> => {
@@ -144,18 +168,24 @@ describe('PlanningCardsComponent', (): void => {
         });
     });
 
-    it('Ressources : additionne les objets manquants, en évidence', async (): Promise<void> => {
+    it('Ressources : nombre d\'objets consommés, puis une pastille par objet manquant', async (): Promise<void> => {
         await render(wallProgram());
 
         expect(card('resources').querySelector('.value')?.textContent?.trim()).toBe('1');
-        expect(card('resources').querySelector('.value')?.classList.contains('ko')).toBe(true);
+        expect(card('resources').querySelector('.caption')?.textContent).toContain('il manque');
+        const chip: HTMLElement | null = card('resources').querySelector<HTMLElement>('.missing-item[data-item="5"]');
+        expect(chip?.querySelector('img')?.getAttribute('src')).toContain('item/item_wood.gif');
+        expect(chip?.querySelector('.ko')?.textContent?.trim()).toBe('−1');
     });
 
-    it('Ressources sans manque : pas de mise en évidence', async (): Promise<void> => {
-        await render();
+    it('Ressources sans manque : « rien ne manque », sans pastille', async (): Promise<void> => {
+        await render(wallProgram());
+        fake.evaluation.set(fakeEvaluation(wallProgram(), { bank: new Map<number, number>([[5, 9]]) }));
+        fixture.detectChanges();
 
-        expect(card('resources').querySelector('.value')?.textContent?.trim()).toBe('0');
-        expect(card('resources').querySelector('.value')?.classList.contains('ko')).toBe(false);
+        expect(card('resources').querySelector('.value')?.textContent?.trim()).toBe('1');
+        expect(card('resources').querySelector('.caption')?.textContent).toContain('rien ne manque');
+        expect(card('resources').querySelector('.missing-item')).toBeNull();
     });
 
     it('Défense hors chantiers : total des sources libres', async (): Promise<void> => {

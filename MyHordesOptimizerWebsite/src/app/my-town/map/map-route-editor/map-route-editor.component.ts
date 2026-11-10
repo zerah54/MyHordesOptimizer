@@ -13,13 +13,14 @@ import moment from 'moment';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
 import { MapRoute, mapRouteColorVar, MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
 import { getUserId } from '../../../_core/utilities/localstorage.util';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../_shared/confirm-dialog/confirm-dialog.component';
+import { IconApComponent } from '../../../_shared/icon-ap/icon-ap.component';
 import { cellOrdersOf, OwnedExpeditionOrder } from '../../expeditions/expedition-orders/expedition-orders.util';
 import { cellPlaceLabel } from '../../expeditions/expedition-orders/order-labels';
 import { buildRoadbook, Roadbook, RoadbookStep } from '../../expeditions/expedition-orders/roadbook.util';
@@ -61,7 +62,7 @@ interface CitizenOption {
     templateUrl: './map-route-editor.component.html',
     styleUrls: ['./map-route-editor.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...material_modules]
+    imports: [...material_modules, IconApComponent]
 })
 export class MapRouteEditorComponent {
     public readonly map: InputSignal<Town | undefined> = input.required();

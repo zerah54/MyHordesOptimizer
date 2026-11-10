@@ -15,7 +15,14 @@
     }
     <span class="text">
         @if (view().verb; as verb) {
-            <b class="verb">{{ verb }}</b> {{ view().rest }}
+            <b class="verb">{{ verb }}</b>
+            @if (order().kind === 'explore') {
+                <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                (<mho-icon-ap [value]="1"/>)
+                <!-- @formatter:on -->
+            } @else {
+                {{ view().rest }}
+            }
             @if (view().note; as note) {
                 — <i class="note">{{ note }}</i>
             }

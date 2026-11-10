@@ -10,15 +10,40 @@
                 <th i18n>Besoin</th>
                 <th i18n>Banque</th>
                 <th i18n>Manque</th>
+                <th i18n>Sacs</th>
+                <th i18n>Coffres</th>
+                <th i18n>Carte</th>
             </tr>
             </thead>
             <tbody>
                 @for (row of rows(); track row.itemId) {
                     <tr class="resource" [attr.data-item]="row.itemId" [class.missing]="row.gap > 0">
-                        <td>{{ row.label }}</td>
+                        <td>
+                            <span class="item">
+                                @if (row.icon !== '') {
+                                    <img class="item-icon" [src]="row.icon" alt="">
+                                }
+                                {{ row.label }}
+                            </span>
+                        </td>
                         <td class="need">{{ row.need }}</td>
                         <td class="stock">{{ row.stock }}</td>
                         <td class="gap">{{ row.gap }}</td>
+                        <td class="bags" [matTooltip]="row.bags.tooltip" matTooltipClass="citizens-tooltip">
+                            @if (row.bags.total > 0) {
+                                {{ row.bags.total }}
+                            }
+                        </td>
+                        <td class="chests" [matTooltip]="row.chests.tooltip" matTooltipClass="citizens-tooltip">
+                            @if (row.chests.total > 0) {
+                                {{ row.chests.total }}
+                            }
+                        </td>
+                        <td class="ground">
+                            @if (row.ground > 0) {
+                                <mho-item-map [map]="map()" [itemId]="row.itemId">{{ row.ground }}</mho-item-map>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

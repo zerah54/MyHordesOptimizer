@@ -9,6 +9,7 @@ import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
+import { IconApComponent } from '../../../_shared/icon-ap/icon-ap.component';
 import { describeOrder, ExpeditionOrderDescription } from '../expedition-orders/order-labels';
 
 const material_modules: Imports = [MatCheckboxModule, MatIconModule];
@@ -22,7 +23,7 @@ const material_modules: Imports = [MatCheckboxModule, MatIconModule];
     templateUrl: './expedition-order.component.html',
     styleUrls: ['./expedition-order.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...material_modules]
+    imports: [...material_modules, IconApComponent]
 })
 export class ExpeditionOrderComponent {
     public readonly order: InputSignal<ExpeditionOrder> = input.required();

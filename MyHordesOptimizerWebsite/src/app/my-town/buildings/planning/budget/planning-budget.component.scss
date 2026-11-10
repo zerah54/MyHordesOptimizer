@@ -1,13 +1,6 @@
 :host {
     display: block;
 
-    .fields {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1em;
-        margin: 0.5em 0;
-    }
-
     table.summary {
         width: 100%;
         margin-bottom: 1em;
@@ -21,27 +14,16 @@
         }
     }
 
-    .task {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.5em;
-        margin-bottom: 0.25em;
-    }
+    table.breakdown {
+        td {
+            text-align: right;
+        }
 
-    .badge-banned,
-    .badge-tech {
-        margin-left: 0.5em;
-        padding: 0 0.4em;
-        border: 1px solid currentColor;
-        border-radius: 4px;
-        font-size: 0.8em;
-        opacity: 0.8;
-    }
-
-    .over-committed {
-        color: var(--mho-accent);
-        vertical-align: middle;
+        tr.total th,
+        tr.total td {
+            border-top: 1px solid var(--mho-line);
+            font-weight: 600;
+        }
     }
 
     .remaining.negative {

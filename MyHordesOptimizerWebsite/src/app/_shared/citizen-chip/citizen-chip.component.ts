@@ -42,6 +42,8 @@ export class CitizenChipComponent {
     public readonly day: InputSignal<number> = input.required<number>();
     /** Actions quotidiennes à montrer (celles que la ville permet). */
     public readonly actions: InputSignal<DailyActionEnum[]> = input<DailyActionEnum[]>(DailyActionEnum.getAllValues<DailyActionEnum>());
+    /** Maison déjà affichée en colonnes par la page : habitation retirée de la fiche, améliorations aussi sur grand écran. */
+    public readonly homeInColumns: InputSignal<boolean> = input<boolean>(false);
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly open: WritableSignal<boolean> = signal(false);
@@ -59,23 +61,24 @@ export class CitizenChipComponent {
 
     /**
      * Niveau de maison, libellé officiel.
-     * @returns {CardEntry | null} Niveau, nul s'il est inconnu.
+     * @returns {CardEntry | null} Niveau, nul s'il est inconnu (absent ou négatif).
      */
     protected house(): CardEntry | null {
         const house: HomeWithValue | undefined = this.homeEntries().find((entry: HomeWithValue): boolean => entry.element.key === HomeEnum.HOUSE_LEVEL.key);
-        if (house === undefined || typeof house.value !== 'number') {
+        if (house === undefined || typeof house.value !== 'number' || house.value < 0) {
             return null;
         }
         return { img: getHomeIcon(house), label: HomeEnum.HOUSE_LEVEL.value.house_options?.[house.value]?.[moment.locale()] ?? `${house.value}` };
     }
 
     /**
-     * Améliorations présentes (niveau non nul).
+     * Améliorations présentes (niveau 1 ou plus ; négatif = inconnu).
      * @returns {CardEntry[]} Améliorations.
      */
     protected upgrades(): CardEntry[] {
         return this.homeEntries()
-            .filter((entry: HomeWithValue): boolean => entry.element.key !== HomeEnum.HOUSE_LEVEL.key && entry.value !== false && entry.value !== 0)
+            .filter((entry: HomeWithValue): boolean => entry.element.key !== HomeEnum.HOUSE_LEVEL.key
+                && (entry.value === true || (typeof entry.value === 'number' && entry.value > 0)))
             .map((entry: HomeWithValue): CardEntry => ({
                 img: getHomeIcon(entry),
                 label: typeof entry.value === 'number' && entry.element.value.max_lvl > 1 ? `${entry.element.getLabel()} ${$localize`niv.`} ${entry.value}` : entry.element.getLabel()

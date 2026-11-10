@@ -12,6 +12,7 @@ export const environment: Environment = {
     website_url: 'http://localhost:4200/',
     myhordes_url: 'https://myhordes.eu/',
     myhordes_app_id: 22,
+    login_mode: 'Key',
     firebase_config: {}
 };
 
@@ -21,6 +22,8 @@ interface Environment {
     website_url: string;
     myhordes_url: string;
     myhordes_app_id: number;
+    /** Native : page d'autorisation de MyHordes. Key : saisie de l'identifiant d'app externe. */
+    login_mode: 'Native' | 'Key';
     firebase_config: FirebaseOptions;
 }
 

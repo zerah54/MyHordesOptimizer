@@ -130,16 +130,10 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                     {
                         var nameWithoutYml = translationFile.Name.Substring(0, translationFile.Name.LastIndexOf(".")); // Remove .yml
                         var nameWithoutLocal = nameWithoutYml.Substring(0, nameWithoutYml.LastIndexOf(".")); // Puis .{locale}
-                        var file = YmlFilesByLocale["fr"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.fr.yml");
-                        var translatedFrenchStrings = new List<string>() { file!.Translations[deutchString] };
-
-                        file = YmlFilesByLocale["es"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.es.yml");
-                        var translatedSpanishStrings = new List<string>() { file!.Translations[deutchString] };
-
-                        file = YmlFilesByLocale["en"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.en.yml");
-                        var translatedEnglishStrings = new List<string>() { file!.Translations[deutchString] };
-
-                        result.AddTranslation(de: deutchString, context: nameWithoutLocal, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
+                        result.AddTranslation(de: deutchString, context: nameWithoutLocal, isExactMatch: isExactMatch,
+                            fr: FindInSiblingFile("fr", nameWithoutLocal, deutchString),
+                            es: FindInSiblingFile("es", nameWithoutLocal, deutchString),
+                            en: FindInSiblingFile("en", nameWithoutLocal, deutchString));
                     }
                 }
             }
@@ -160,20 +154,26 @@ namespace MyHordesOptimizerApi.Services.Impl.Translations
                     {
                         var nameWithoutYml = translationFile.Name.Substring(0, translationFile.Name.LastIndexOf(".")); // Remove .yml
                         var nameWithoutLocal = nameWithoutYml.Substring(0, nameWithoutYml.LastIndexOf(".")); // Puis .{locale}
-                        var file = YmlFilesByLocale["fr"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.fr.yml");
-                        var translatedFrenchStrings = new List<string>() { file!.Translations[deutchString] };
-
-                        file = YmlFilesByLocale["es"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.es.yml");
-                        var translatedSpanishStrings = new List<string>() { file!.Translations[deutchString] };
-
-                        file = YmlFilesByLocale["en"].FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.en.yml");
-                        var translatedEnglishStrings = new List<string>() { file!.Translations[deutchString] };
-
-                        result.AddTranslation(de: deutchString, context: nameWithoutLocal, isExactMatch: isExactMatch, fr: translatedFrenchStrings, es: translatedSpanishStrings, en: translatedEnglishStrings);
+                        result.AddTranslation(de: deutchString, context: nameWithoutLocal, isExactMatch: isExactMatch,
+                            fr: FindInSiblingFile("fr", nameWithoutLocal, deutchString),
+                            es: FindInSiblingFile("es", nameWithoutLocal, deutchString),
+                            en: FindInSiblingFile("en", nameWithoutLocal, deutchString));
                     }
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Traduction d'une clé allemande dans le fichier homologue d'une langue ; vide si le fichier ou la clé manque
+        /// (une nouvelle chaîne allemande arrive dans le dépôt avant d'être traduite).
+        /// </summary>
+        private List<string> FindInSiblingFile(string locale, string nameWithoutLocal, string deutchString)
+        {
+            var file = YmlFilesByLocale.GetValueOrDefault(locale)?.FirstOrDefault(x => x.Name == $"{nameWithoutLocal}.{locale}.yml");
+            return file != null && file.Translations.TryGetValue(deutchString, out var translation)
+                ? new List<string> { translation }
+                : new List<string>();
         }
 
         public async Task ResetTranslation()

@@ -243,7 +243,190 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
 
         #endregion
 
-        #region Citizens (Fetcher/Citizens) — count:max(IdLastUpdateInfo) sur TownCitizen
+        #region Citizens (Fetcher/Citizens) — empreinte de toutes les données servies par GetCitizens
+
+        private sealed record CitizensSeed(IETagVersionService VersionService, MhoContext Context, int MapId, int UserId, string Suffix,
+            User User, User Updater, TownCitizen Citizen, Bag Bag, BagItem BagItem, Chest Chest, ChestItem ChestItem, Item Item,
+            TownCitizenDailyAction DailyAction, TownCadaver Cadaver, CauseOfDeath CauseOfDeath);
+
+        /// <summary>
+        /// Deux citoyens (le second mort, avec cadavre et cause de décès), sac, coffre et action quotidienne, mis à jour par un
+        /// joueur extérieur à la ville : chaque test ne touche qu'une source.
+        /// </summary>
+        private CitizensSeed NewCitizensFixture()
+        {
+            var (versionService, context, mapId, userId, suffix) = NewFixture();
+            var random = new Random();
+            var other = new User { IdUser = random.Next(1, int.MaxValue), Name = "other-" + suffix };
+            var updater = new User { IdUser = random.Next(1, int.MaxValue), Name = "updater-" + suffix };
+            var causeOfDeath = new CauseOfDeath { Dtype = random.Next(100000, int.MaxValue), LabelFr = "v1" };
+            context.AddRange(other, updater, causeOfDeath);
+            var lastUpdate = new LastUpdateInfo { DateUpdate = DateTime.UtcNow, IdUser = updater.IdUser };
+            context.LastUpdateInfos.Add(lastUpdate);
+            context.SaveChanges();
+            var idLastUpdate = lastUpdate.IdLastUpdateInfo;
+            var idItem = AddItem(context, suffix);
+            var bag = new Bag { IdLastUpdateInfo = idLastUpdate };
+            var chest = new Chest { IdLastUpdateInfo = idLastUpdate };
+            context.AddRange(bag, chest);
+            context.SaveChanges();
+            var bagItem = new BagItem { IdBag = bag.IdBag, IdItem = idItem, IsBroken = false, Count = 1 };
+            var chestItem = new ChestItem { IdChest = chest.IdChest, IdItem = idItem, IsBroken = false, Count = 1 };
+            var citizen = new TownCitizen { IdTown = mapId, IdUser = userId, IdLastUpdateInfo = idLastUpdate, IdBag = bag.IdBag, IdChest = chest.IdChest };
+            var dead = new TownCitizen { IdTown = mapId, IdUser = other.IdUser, IdLastUpdateInfo = idLastUpdate, Dead = true };
+            var dailyAction = new TownCitizenDailyAction { IdTown = mapId, IdUser = userId, IdLastUpdateInfo = idLastUpdate, Day = 1, ActionKey = "test-" + suffix };
+            var cadaver = new TownCadaver { IdTown = mapId, IdUser = other.IdUser, DeathMessage = "v1", CauseOfDeath = causeOfDeath.Dtype };
+            context.AddRange(bagItem, chestItem, citizen, dead, dailyAction, cadaver);
+            context.SaveChanges();
+            var user = context.Users.Single(u => u.IdUser == userId);
+            var item = context.Items.Single(i => i.IdItem == idItem);
+            return new CitizensSeed(versionService, context, mapId, userId, suffix, user, updater, citizen, bag, bagItem, chest, chestItem, item,
+                dailyAction, cadaver, causeOfDeath);
+        }
+
+        private void AssertCitizensVersionChanges(Action<CitizensSeed> mutate)
+        {
+            var seed = NewCitizensFixture();
+            var v1 = seed.VersionService.GetVersion(ETagResource.Citizens, seed.MapId, seed.UserId);
+
+            mutate(seed);
+            seed.Context.SaveChanges();
+            var v2 = seed.VersionService.GetVersion(ETagResource.Citizens, seed.MapId, seed.UserId);
+
+            v1.Should().NotBeNull();
+            v2.Should().NotBe(v1);
+        }
+
+        [Fact]
+        public void Citizens_AucunCitoyen_RenvoieNull()
+        {
+            var (versionService, _, mapId, userId, _) = NewFixture();
+
+            versionService.GetVersion(ETagResource.Citizens, mapId, userId).Should().BeNull();
+        }
+
+        [Fact]
+        public void Citizens_DonneesInchangees_MemeVersion()
+        {
+            var seed = NewCitizensFixture();
+
+            var v1 = seed.VersionService.GetVersion(ETagResource.Citizens, seed.MapId, seed.UserId);
+            var v2 = seed.VersionService.GetVersion(ETagResource.Citizens, seed.MapId, seed.UserId);
+
+            v1.Should().NotBeNull();
+            v2.Should().Be(v1);
+        }
+
+        [Fact]
+        public void Citizens_DonneeNonServie_MemeVersion()
+        {
+            var seed = NewCitizensFixture();
+            var v1 = seed.VersionService.GetVersion(ETagResource.Citizens, seed.MapId, seed.UserId);
+
+            seed.User.NbTownsPlayed += 1;
+            seed.User.PlayedMapsImportedAt = DateTime.UtcNow;
+            seed.Context.Towns.Single(t => t.IdTown == seed.MapId).WishlistDateUpdate = DateTime.UtcNow;
+            seed.Context.SaveChanges();
+            var v2 = seed.VersionService.GetVersion(ETagResource.Citizens, seed.MapId, seed.UserId);
+
+            v1.Should().NotBeNull();
+            v2.Should().Be(v1);
+        }
+
+        [Fact]
+        public void Citizens_Maison_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => { s.Citizen.IdLastUpdateInfoHome = AddLastUpdateInfo(s.Context); s.Citizen.HouseLevel = 2; });
+
+        [Fact]
+        public void Citizens_Etats_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => { s.Citizen.IdLastUpdateInfoStatus = AddLastUpdateInfo(s.Context); s.Citizen.IsThirsty = true; });
+
+        [Fact]
+        public void Citizens_ActionsHeroiques_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => { s.Citizen.IdLastUpdateInfoHeroicAction = AddLastUpdateInfo(s.Context); s.Citizen.HasRescue = true; });
+
+        [Fact]
+        public void Citizens_StatutGoule_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => { s.Citizen.IdLastUpdateInfoGhoulStatus = AddLastUpdateInfo(s.Context); s.Citizen.GhoulVoracity = 10; });
+
+        [Fact]
+        public void Citizens_Chamanique_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => { s.Citizen.IdLastUpdateChamanic = AddLastUpdateInfo(s.Context); s.Citizen.NbPotionChamanique = 1; });
+
+        [Fact]
+        public void Citizens_NombreDeCampings_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Citizen.CampingCount = 2);
+
+        [Fact]
+        public void Citizens_Chaussures_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Citizen.ShoesEquipped = true);
+
+        [Fact]
+        public void Citizens_CapacitesHeroiques_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Citizen.HeroSkillLevelS = 3);
+
+        [Fact]
+        public void Citizens_MiseAJourDuSac_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Bag.IdLastUpdateInfo = AddLastUpdateInfo(s.Context));
+
+        [Fact]
+        public void Citizens_ContenuDuSacSeul_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.BagItem.Count = 3);
+
+        [Fact]
+        public void Citizens_SacVide_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Context.BagItems.Remove(s.BagItem));
+
+        [Fact]
+        public void Citizens_MiseAJourDuCoffre_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Chest.IdLastUpdateInfo = AddLastUpdateInfo(s.Context));
+
+        [Fact]
+        public void Citizens_ContenuDuCoffreSeul_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.ChestItem.Count = 3);
+
+        [Fact]
+        public void Citizens_AjoutDActionQuotidienne_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Context.TownCitizenDailyActions.Add(new TownCitizenDailyAction
+            {
+                IdTown = s.MapId, IdUser = s.UserId, IdLastUpdateInfo = s.DailyAction.IdLastUpdateInfo, Day = 1, ActionKey = "test2-" + s.Suffix
+            }));
+
+        [Fact]
+        public void Citizens_SuppressionDActionQuotidienne_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Context.TownCitizenDailyActions.Remove(s.DailyAction));
+
+        [Fact]
+        public void Citizens_Cadavre_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Cadaver.DeathMessage = "v2");
+
+        [Fact]
+        public void Citizens_RoleDeVille_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Context.Towns.Single(t => t.IdTown == s.MapId).IdShaman = s.UserId);
+
+        [Fact]
+        public void Citizens_AvatarDuJoueur_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.User.Avatar = "avatar-" + s.Suffix);
+
+        [Fact]
+        public void Citizens_RenommageDuJoueur_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.User.Name = "renamed-" + s.Suffix);
+
+        [Fact]
+        public void Citizens_RenommageDeLAuteurDUneMiseAJour_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Updater.Name = "renamed-updater-" + s.Suffix);
+
+        [Fact]
+        public void Citizens_ObjetDuReferentiel_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Item.LabelFr = "label-" + s.Suffix);
+
+        [Fact]
+        public void Citizens_ProprieteDObjet_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.Item.PropertyNames.Add(new Property { Name = "test-prop-" + s.Suffix }));
+
+        [Fact]
+        public void Citizens_CauseDeDeces_ChangeLaVersion()
+            => AssertCitizensVersionChanges(s => s.CauseOfDeath.LabelFr = "v2");
 
         [Fact]
         public void Citizens_ArriveeDUnDeuxiemeCitoyen_ChangeLaVersion()

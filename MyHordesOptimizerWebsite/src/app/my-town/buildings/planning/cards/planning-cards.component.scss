@@ -80,6 +80,30 @@
         opacity: 0.8;
     }
 
+    .line {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0 0.3em;
+    }
+
+    .missing-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.2em 0.5em;
+    }
+
+    .missing-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.15em;
+
+        .ko {
+            color: var(--mho-danger);
+            font-weight: 700;
+        }
+    }
+
     .alert {
         display: inline-flex;
         align-items: center;

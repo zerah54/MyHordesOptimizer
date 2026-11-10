@@ -1,5 +1,7 @@
 <mat-card-header class="mho-my-program-header">
-    <mat-card-title i18n>Mon programme</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="townProgram"/>
+    </mat-card-title>
 </mat-card-header>
 
 <mat-card-content class="mho-my-program">
@@ -38,8 +40,7 @@
             <div class="hidden-bar expedition">
                 <mat-icon aria-hidden="true">explore</mat-icon>
                 <span class="hidden-text">
-                    <ng-container i18n>Expédition masquée pour J</ng-container>
-                    {{ store.selected_day() }}
+                    {{ hidden_expedition_label() }}
                     @if (expedition_totals().total > 0) {
                         · {{ expedition_totals().done }}/{{ expedition_totals().total }}
                         <ng-container i18n>consignes faites</ng-container>
@@ -95,8 +96,7 @@
         @if (hidden().buildings) {
             <div class="hidden-bar buildings">
                 <mat-icon aria-hidden="true">construction</mat-icon>
-                <span class="hidden-text"><ng-container i18n>Chantiers masqués pour J</ng-container>
-                    {{ store.selected_day() }}</span>
+                <span class="hidden-text">{{ hidden_buildings_label() }}</span>
                 <button mat-button type="button" data-action="show-buildings" (click)="setBlockHidden('buildings', false)" i18n>Réafficher</button>
             </div>
         } @else {
@@ -151,13 +151,13 @@
                             <mat-icon aria-hidden="true">warning</mat-icon>
                             @switch (notice) {
                                 @case ('pairs') {
-                                    <span i18n>Investissez vos PA par paires de PA pour ne rien perdre.</span>
+                                    <span i18n>Investissez vos <mho-icon-ap/> par paires pour ne rien perdre.</span>
                                 }
                                 @case ('banned-forbidden') {
                                     <span i18n>Chantiers interdits aux bannis.</span>
                                 }
                                 @case ('over-committed') {
-                                    <span i18n>Consignes individuelles et expédition au-delà de vos PA de base.</span>
+                                    <span i18n>Consignes individuelles et expédition au-delà de vos <mho-icon-ap/> de base.</span>
                                 }
                             }
                         </p>
@@ -170,11 +170,16 @@
                         </section>
                     }
 
-                    @if (program.voteBuildingId !== null) {
+                    @let vote_names = voteNames(program);
+                    @if (vote_names.length > 0) {
                         <p class="vote">
                             <mat-icon aria-hidden="true">how_to_vote</mat-icon>
-                            <ng-container i18n>Évolution votée ce soir</ng-container>
-                            : {{ buildingName(program.voteBuildingId) }}
+                            @if (vote_names.length > 1) {
+                                <ng-container i18n>Évolutions votées ce soir</ng-container>
+                            } @else {
+                                <ng-container i18n>Évolution votée ce soir</ng-container>
+                            }
+                            : {{ vote_names.join(', ') }}
                         </p>
                     }
 
@@ -231,8 +236,9 @@
                 @let status = task_statuses()[index];
                 @if (future()) {
                     <li>{{ taskText(task) }}@if (task.pa > 0) {
-                        ({{ task.pa }}
-                        <ng-container i18n>PA</ng-container>)
+                        <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                        (<mho-icon-ap [value]="task.pa"/>)
+                        <!-- @formatter:on -->
                     }</li>
                 } @else {
                     <li [class.done]="status.done">
@@ -240,8 +246,9 @@
                                       [disabled]="!store.can_track() || store.isPending(userId, task) || locked(task, status)"
                                       (change)="onToggle($event, userId, task, status)">
                             {{ taskText(task) }}@if (task.pa > 0) {
-                            ({{ task.pa }}
-                            <ng-container i18n>PA</ng-container>)
+                            <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                            (<mho-icon-ap [value]="task.pa"/>)
+                            <!-- @formatter:on -->
                         }
                         </mat-checkbox>
                         @if (status.source === 'data') {

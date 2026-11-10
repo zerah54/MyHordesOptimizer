@@ -42,4 +42,13 @@ export class DaySelectorComponent {
             this.valueChange.emit(day);
         }
     }
+
+    /**
+     * Libellé d'un jour, numéro collé à la lettre (traduit d'un bloc : le gabarit y glisserait une espace).
+     * @param {number} day Jour.
+     * @returns {string} Libellé.
+     */
+    protected label(day: number): string {
+        return $localize`J${day}:day:`;
+    }
 }

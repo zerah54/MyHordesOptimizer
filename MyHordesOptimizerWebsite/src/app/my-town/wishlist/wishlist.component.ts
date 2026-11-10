@@ -15,7 +15,7 @@ import {
     viewChild,
     WritableSignal
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -32,18 +32,21 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
-import { Observable, Subject } from 'rxjs';
+import { catchError, Observable, of, Subject } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { read, utils, WorkBook, WorkSheet, write } from 'xlsx';
 
 import { environment } from '../../../environments/environment';
 import { HORDES_IMG_REPO, WISHLIST_EDITION_MODE_KEY } from '../../_abstract_model/const';
+import { ItemEmotesDTO } from '../../_abstract_model/dto/item.dto';
 import { WishlistDepot } from '../../_abstract_model/enum/wishlist-depot.enum';
 import { StandardColumn } from '../../_abstract_model/interfaces';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Imports, ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
+import { Town } from '../../_abstract_model/types/town.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { TypedCellDefDirective } from '../../_core/directives/typed-cell-def.directive';
@@ -52,13 +55,15 @@ import { ClipboardService } from '../../_core/services/clipboard.service';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm-dialog/confirm-dialog.component';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
+import { ItemMapComponent } from '../../_shared/item-map/item-map.component';
 import { LastUpdateComponent } from '../../_shared/last-update/last-update.component';
 import { MenuAddComponent } from '../../_shared/list-elements-add-remove/menu-add/menu-add.component';
 import { HeaderWithStringFilterComponent } from '../../_shared/lists/header-with-string-filter/header-with-string-filter.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { ItemAlreadyInListPipe } from './item-already-in-list.pipe';
 
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
-const components: Imports = [DeferredCellComponent, HeaderWithStringFilterComponent, LastUpdateComponent, MenuAddComponent];
+const components: Imports = [DeferredCellComponent, HeaderWithStringFilterComponent, ItemMapComponent, LastUpdateComponent, MenuAddComponent, PageTitleComponent];
 const directives: Imports = [TypedCellDefDirective];
 const pipes: Imports = [ColumnIdPipe];
 const material_modules: Imports = [DragDropModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatOptionModule, MatSelectModule, MatSlideToggleModule, MatTableModule, MatTooltipModule];
@@ -77,6 +82,8 @@ export class WishlistComponent implements OnInit {
     protected readonly depots: WishlistDepot[] = WishlistDepot.getAllValues();
     protected wishlist_info: WritableSignal<WishlistInfo | null> = signal(null);
     protected items: WritableSignal<Item[]> = signal([]);
+    /** Balises forum des objets, par uid. */
+    private readonly item_emotes: WritableSignal<ItemEmotesDTO> = signal({});
     protected edition_mode: WritableSignal<boolean> = signal(JSON.parse(localStorage.getItem(WISHLIST_EDITION_MODE_KEY) || 'false'));
     protected readonly columns: StandardColumn[] = [
         { id: 'sort', header: '', displayed: (): boolean => this.edition_mode() },
@@ -96,6 +103,9 @@ export class WishlistComponent implements OnInit {
     ];
     /** Mode observateur : lecture seule, l'édition est désactivée. */
     protected readonly is_readonly: Signal<boolean> = inject(TownContextService).isReadonly;
+    /** Carte de la ville pour la colonne Carte ; nulle tant qu'elle n'est pas chargée ou si elle est indisponible. */
+    protected readonly map: Signal<Town | null> = toSignal(
+        inject(TownService).getMap().pipe(catchError((): Observable<null> => of(null))), { initialValue: null });
     protected wishlist_filters: WritableSignal<WishlistFilters> = signal({ items: '', depot: [] });
     protected current_zone_xp_pa_add_item: WritableSignal<number> = signal(0);
     protected readonly add_label: string = $localize`Ajouter à la liste de courses`;
@@ -203,6 +213,12 @@ export class WishlistComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((items: Item[]): void => {
                 this.items.set(items);
+            });
+
+        this.api.getItemEmotes()
+            .pipe(takeUntilDestroyed(this.destroy_ref))
+            .subscribe((item_emotes: ItemEmotesDTO): void => {
+                this.item_emotes.set(item_emotes);
             });
     }
 
@@ -418,28 +434,35 @@ export class WishlistComponent implements OnInit {
         const light: WishlistItem[] = info.wishlist_items.filter((item: WishlistItem): boolean => !item.item.is_heaver && item.priority >= 0);
         const do_not_bring_back: WishlistItem[] = info.wishlist_items.filter((item: WishlistItem): boolean => item.priority < 0);
 
+        const to_bring_back: WishlistItem[] = [...heavy, ...light];
+        const legend: string[] = [];
+        if (to_bring_back.some((item: WishlistItem): boolean => item.depot.value.count === WishlistDepot.TELEPORT.value.count)) {
+            legend.push(`[i]${WishlistDepot.TELEPORT.value.label}[/i]`);
+        }
+        if (to_bring_back.some((item: WishlistItem): boolean => item.should_signal)) {
+            legend.push(`[bad]${$localize`Objet à signaler`}[/bad]:warning:`);
+        }
+        if (legend.length > 0) {
+            text += `${$localize`Légende`} : ${legend.join(' · ')}\n`;
+        }
         if (heavy.length > 0) {
             text += `\n[collapse=${$localize`Encombrants`}]\n`;
             heavy.forEach((item: WishlistItem): void => {
-                text += item.should_signal ? '[bad]' : '';
-                text += `:middot:${item.item.label[this.locale]}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
-                text += item.should_signal ? '[/bad]:warning:\n' : '\n';
+                text += this.forumLine(item);
             });
             text += '[/collapse]\n';
         }
         if (light.length > 0) {
             text += `\n[collapse=${$localize`Non-Encombrants`}]\n`;
             light.forEach((item: WishlistItem): void => {
-                text += item.should_signal ? '[bad]' : '';
-                text += `:middot:${item.item.label[this.locale]}` + (item.count >= 0 ? ` (x${item.count})` : '') + (item.depot.value.count === 1 ? `[i]${$localize`Zone de rappatriement`}[/i]` : '');
-                text += item.should_signal ? '[/bad]:warning:\n' : '\n';
+                text += this.forumLine(item);
             });
             text += '[/collapse]\n';
         }
         if (do_not_bring_back.length > 0) {
             text += `\n[collapse=${$localize`Ne pas rapporter`}]\n`;
             do_not_bring_back.forEach((item: WishlistItem): void => {
-                text += `:middot:${item.item.label[this.locale]}\n`;
+                text += `:middot:${this.forumLabel(item.item)}\n`;
             });
             text += '[/collapse]\n';
         }
@@ -448,6 +471,32 @@ export class WishlistComponent implements OnInit {
         text += `[aparte]${$localize`Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=${environment.website_url}my-town/wishlist]ce lien[/link]`}[/aparte]`;
 
         this.clipboard.copy(text, $localize`La liste a bien été copiée au format forum`);
+    }
+
+    /**
+     * Ligne d'un objet à rapporter au format forum, terminée par sa zone si elle n'est pas infinie,
+     * en italique si à déposer dans la zone de rapatriement.
+     * @param {WishlistItem} item Ligne de la liste.
+     * @returns {string} Texte, retour à la ligne compris.
+     */
+    private forumLine(item: WishlistItem): string {
+        let label: string = this.forumLabel(item.item) + (item.count >= 0 ? ` (x${item.count})` : '')
+            + (item.zone_x_pa > 0 ? ` – ${$localize`zone`} ${item.zone_x_pa}:ap:` : '');
+        if (item.depot.value.count === WishlistDepot.TELEPORT.value.count) {
+            label = `[i]${label}[/i]`;
+        }
+        return item.should_signal ? `[bad]:middot:${label}[/bad]:warning:\n` : `:middot:${label}\n`;
+    }
+
+    /**
+     * Nom d'un objet au format forum, précédé de sa balise quand le jeu en a une.
+     * @param {Item} item Objet.
+     * @returns {string} Texte.
+     */
+    private forumLabel(item: Item): string {
+        const emote: string | undefined = this.item_emotes()[item.uid];
+        const label: string = item.label[this.locale];
+        return emote === undefined ? label : `${emote} ${label}`;
     }
 
     protected shareExcel(): void {

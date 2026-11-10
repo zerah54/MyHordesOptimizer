@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Controllers.ActionFillters;
+using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
@@ -169,6 +170,24 @@ namespace MyHordesOptimizerApi.Controllers
         {
             return _cache.GetOrCreate(ReferentialCacheKeys.HomeReferential,
                 _ => _myHordesFetcherService.GetHomeReferential())!;
+        }
+
+        /// <summary>Évolutions des chantiers (niveaux, textes, valeurs par niveau), statiques (fichier de l'extracteur).</summary>
+        [HttpGet]
+        [Route("BuildingUpgrades")]
+        public ActionResult<Dictionary<string, BuildingUpgradeCodeModel>> GetBuildingUpgrades()
+        {
+            return _cache.GetOrCreate(ReferentialCacheKeys.BuildingUpgrades,
+                _ => _myHordesFetcherService.GetBuildingUpgrades())!;
+        }
+
+        /// <summary>Balise forum des objets qui en ont une, par uid, statique (fichier de l'extracteur).</summary>
+        [HttpGet]
+        [Route("ItemEmotes")]
+        public ActionResult<Dictionary<string, string>> GetItemEmotes()
+        {
+            return _cache.GetOrCreate(ReferentialCacheKeys.ItemEmotes,
+                _ => _myHordesFetcherService.GetItemEmotes())!;
         }
 
         [HttpGet]

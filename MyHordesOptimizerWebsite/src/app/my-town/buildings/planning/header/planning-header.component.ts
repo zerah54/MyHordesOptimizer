@@ -3,9 +3,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { finalize } from 'rxjs';
 
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../../_shared/confirm-dialog/confirm-dialog.component';
@@ -13,12 +13,12 @@ import { DaySelectorComponent } from '../../../../_shared/day-selector/day-selec
 import { PlanningNameDialogComponent, PlanningNameDialogData, PlanningNameDialogResult } from '../name-dialog/planning-name-dialog.component';
 import { BuildingPlanContentDTO, BuildingPlanDTO } from '../plan.types';
 import { PlanningStore } from '../planning.store';
-import { PlanningShareComponent } from '../share/planning-share.component';
+import { confirmDiscardChanges } from '../unsaved-changes.util';
 
-const components: Imports = [DaySelectorComponent, PlanningShareComponent];
-const material_modules: Imports = [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatProgressSpinnerModule, MatSlideToggleModule, MatTooltipModule];
+const components: Imports = [DaySelectorComponent];
+const material_modules: Imports = [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatSlideToggleModule, MatTooltipModule];
 
-/** En-tête de la page Chantiers : jour, propositions en puces (menu par proposition), gestion des bannis, partage, enregistrement. */
+/** En-tête de la page Chantiers : jour, propositions en puces (menu par proposition), gestion des bannis, état de l'enregistrement. */
 @Component({
     selector: 'mho-planning-header',
     templateUrl: './planning-header.component.html',
@@ -31,6 +31,8 @@ export class PlanningHeaderComponent {
     protected readonly store: PlanningStore = inject(PlanningStore);
 
     private readonly dialog: MatDialog = inject(MatDialog);
+    /** Départ de la proposition en cours (enregistrement, confirmation) : toute autre demande de changement est ignorée. */
+    private leaving: boolean = false;
 
     /**
      * Vrai pour la proposition affichée.
@@ -39,6 +41,28 @@ export class PlanningHeaderComponent {
      */
     protected isSelected(plan: BuildingPlanDTO): boolean {
         return this.store.selected_plan()?.id === plan.id;
+    }
+
+    /**
+     * Affiche un autre jour, après confirmation s'il reste des modifications non enregistrées.
+     * @param {number} day Jour choisi.
+     */
+    protected selectDay(day: number): void {
+        if (day === this.store.selected_day()) {
+            return;
+        }
+        this.afterDiscardConfirmed((): void => this.store.selectDay(day));
+    }
+
+    /**
+     * Affiche une autre proposition, après confirmation s'il reste des modifications non enregistrées.
+     * @param {number} plan_id Proposition choisie.
+     */
+    protected selectPlan(plan_id: number): void {
+        if (plan_id === this.store.selected_plan()?.id) {
+            return;
+        }
+        this.afterDiscardConfirmed((): void => this.store.selectPlan(plan_id));
     }
 
     /**
@@ -56,9 +80,10 @@ export class PlanningHeaderComponent {
         this.askName({ title: $localize`Nouvelle proposition`, name: $localize`Plan`, offerCopy: this.store.selected_plan() !== null },
                      (result: PlanningNameDialogResult): void => {
                          if (result.copy) {
+                             // La copie emporte la copie de travail : rien n'est perdu.
                              this.store.duplicatePlan(result.name);
                          } else {
-                             this.store.createPlan(result.name);
+                             this.afterDiscardConfirmed((): void => this.store.createPlan(result.name));
                          }
                      });
     }
@@ -96,6 +121,25 @@ export class PlanningHeaderComponent {
                     this.store.deletePlan();
                 }
             });
+    }
+
+    /**
+     * Applique une action qui remplace la copie de travail, après enregistrement ; confirmation seulement si celui-ci échoue.
+     * Ignorée tant qu'un départ est en cours.
+     * @param {() => void} apply Action à appliquer.
+     */
+    private afterDiscardConfirmed(apply: () => void): void {
+        if (this.leaving) {
+            return;
+        }
+        this.leaving = true;
+        confirmDiscardChanges(this.store, this.dialog).pipe(finalize((): void => {
+            this.leaving = false;
+        })).subscribe((confirmed: boolean): void => {
+            if (confirmed) {
+                apply();
+            }
+        });
     }
 
     /**

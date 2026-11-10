@@ -1,18 +1,22 @@
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
+import { Property } from '../../../_abstract_model/enum/property.enum';
 import { Building, BuildingResource } from '../../../_abstract_model/types/building.class';
-import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
+import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
 import { HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { buildingCost } from '../../../_core/utilities/building-cost.util';
-import { ExpeditionPartPa } from './budget.util';
+import { ExpeditionPartPa, ExpeditionSeatPa } from './budget.util';
 import { BuildingProgress, initialProgress } from './building-progress.util';
-import { HomeLevelDTO, HomeReferentialDTO } from './home-referential.types';
+import { homeDefenseFactor, TownDefenseFactors } from './defense-gain.util';
+import { CIRCULAR_QUARTERS_UID } from './defense-rules.const';
+import { HomeReferentialDTO, HomeResourceDTO, HomeUpgradeLevelDTO } from './home-referential.types';
+import { UPGRADE_KEY_BY_NAME } from './home-upgrades.util';
+import { TownBuildingResourceDTO, TownBuildingStateDTO, TownDefenseStateDTO } from './plan.types';
 import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
-import { TownBuildingResourceDTO, TownBuildingStateDTO } from './plan.types';
 import { ResourceCount } from './resources.util';
 
 /** Niveau de plan estimé d'un chantier (nombre de plans lus en Pandémonium). */
@@ -134,7 +138,67 @@ export function hasSlaveryOf(buildings: Building[], states: TownBuildingStateDTO
 }
 
 /**
- * Citoyens vivants de la ville, avec leur statut de banni, leur métier et leur niveau de maison connu.
+ * Uids des chantiers construits d'après l'état synchronisé.
+ * @param {Building[]} buildings Référentiel des chantiers.
+ * @param {TownBuildingStateDTO[]} states États synchronisés.
+ * @returns {Set<string>} Uids construits.
+ */
+export function builtUidsOf(buildings: Building[], states: TownBuildingStateDTO[]): Set<string> {
+    const built_ids: Set<number> = new Set<number>(states.filter((state: TownBuildingStateDTO): boolean => state.isBuilt).map((state: TownBuildingStateDTO): number => state.buildingId));
+    return new Set<string>(buildings.filter((building: Building): boolean => built_ids.has(building.id)).map((building: Building): string => building.uid));
+}
+
+/**
+ * Niveau d'évolution des chantiers construits, d'après l'état synchronisé (0 quand il est inconnu).
+ * @param {Building[]} buildings Référentiel des chantiers.
+ * @param {TownBuildingStateDTO[]} states États synchronisés.
+ * @returns {Map<string, number>} Niveau par uid.
+ */
+export function buildingLevelsOf(buildings: Building[], states: TownBuildingStateDTO[]): Map<string, number> {
+    const uids: Map<number, string> = new Map<number, string>(buildings.map((building: Building): [number, string] => [building.id, building.uid]));
+    const levels: Map<string, number> = new Map<string, number>();
+    for (const state of states) {
+        const uid: string | undefined = uids.get(state.buildingId);
+        if (state.isBuilt && uid !== undefined) {
+            levels.set(uid, state.level ?? 0);
+        }
+    }
+    return levels;
+}
+
+/**
+ * Objets qui comptent comme objets de défense (propriété `defence`).
+ * @param {readonly Item[]} items Objets du référentiel.
+ * @returns {Set<number>} Identifiants.
+ */
+export function defenseItemIdsOf(items: readonly Item[]): Set<number> {
+    return new Set<number>(items
+        .filter((item: Item): boolean => item.properties.some((property: Property): boolean => property?.key === Property.DEFENCE.key))
+        .map((item: Item): number => item.id));
+}
+
+/**
+ * Composantes de la défense de la ville tirées de la dernière mise à jour : objets de défense en banque et leur multiplicateur,
+ * défense brute des maisons (déduite de la part comptée par la ville), citoyens vivants et morts, échelle globale (1 − bonus).
+ * @param {TownDefenseStateDTO | null} defense Défense synchronisée.
+ * @param {readonly Citizen[]} citizens Citoyens de la ville, morts compris.
+ * @param {ReadonlySet<string>} built_uids Uids des chantiers construits.
+ * @returns {TownDefenseFactors} Composantes.
+ */
+export function townDefenseFactors(defense: TownDefenseStateDTO | null, citizens: readonly Citizen[], built_uids: ReadonlySet<string>): TownDefenseFactors {
+    const dead: number = citizens.filter((citizen: Citizen): boolean => citizen.is_dead === true).length;
+    return {
+        defenseItems: defense?.items ?? 0,
+        itemFactor: defense?.itemsMul ?? 1,
+        homeRaw: (defense?.citizenHomes ?? 0) / homeDefenseFactor(built_uids.has(CIRCULAR_QUARTERS_UID)),
+        alive: citizens.length - dead,
+        dead,
+        scale: 1 - (defense?.bonus ?? 0)
+    };
+}
+
+/**
+ * Citoyens vivants de la ville, avec leur statut de banni, leur métier et leur niveau de maison connu (négatif = 0).
  * @param {Citizen[]} citizens Citoyens de la ville.
  * @returns {CitizenRef[]} Citoyens pris en compte dans le budget.
  */
@@ -148,22 +212,42 @@ export function citizenRefs(citizens: Citizen[]): CitizenRef[] {
                 name: citizen.name,
                 banned: citizen.is_shunned === true,
                 technician: citizen.job?.key === JobEnum.TECHNICIAN.key,
-                homeLevel: typeof house?.value === 'number' ? house.value : null
+                homeLevel: typeof house?.value === 'number' ? Math.max(house.value, 0) : null,
+                upgradeLevels: upgradeLevelsOf(citizen)
             };
         });
 }
 
 /**
- * Parties d'expédition avec la longueur de leur tracé et les citoyens inscrits.
+ * Niveau de chaque amélioration de maison d'un citoyen (booléen = 0 ou 1, négatif = 0), hors niveau d'habitation.
+ * @param {Citizen} citizen Citoyen.
+ * @returns {Map<string, number> | null} Niveaux par clé `HomeEnum`, nuls sans données de maison.
+ */
+function upgradeLevelsOf(citizen: Citizen): Map<string, number> | null {
+    const content: HomeWithValue[] | undefined = citizen.home?.content;
+    if (content === undefined || content.length === 0) {
+        return null;
+    }
+    const levels: Map<string, number> = new Map<string, number>();
+    for (const entry of content) {
+        if (entry.element.key !== HomeEnum.HOUSE_LEVEL.key) {
+            levels.set(entry.element.key, typeof entry.value === 'boolean' ? (entry.value ? 1 : 0) : Math.max(entry.value, 0));
+        }
+    }
+    return levels;
+}
+
+/**
+ * Parties d'expédition avec la longueur de leur tracé et la place de chaque citoyen inscrit (PE de départ, 0 sans PE exigés).
  * @param {Expedition[]} expeditions Expéditions du jour.
  * @returns {ExpeditionPartPa[]} Parties à compter dans le budget.
  */
 export function expeditionParts(expeditions: Expedition[]): ExpeditionPartPa[] {
     return expeditions.flatMap((expedition: Expedition): ExpeditionPartPa[] => expedition.parts.map((part: ExpeditionPart): ExpeditionPartPa => ({
         routeLength: part.map_route?.length ?? null,
-        citizenIds: part.citizens
-            .map((citizen: CitizenExpedition): number | undefined => citizen.citizen_id)
-            .filter((id: number | undefined): id is number => id !== undefined)
+        seats: part.citizens
+            .filter((citizen: CitizenExpedition): boolean => citizen.citizen_id !== undefined)
+            .map((citizen: CitizenExpedition): ExpeditionSeatPa => ({ citizenId: citizen.citizen_id as number, startPe: citizen.required_sp ?? 0 }))
     })));
 }
 
@@ -230,21 +314,40 @@ export function homeLevelRefs(referential: HomeReferentialDTO, item_id_by_uid: R
             def: level.def,
             ap: level.ap,
             apUrbanism: level.apUrbanism,
-            resources: homeResources(level, item_id_by_uid)
+            resources: homeResources(level.resources, item_id_by_uid),
+            resourcesUrbanism: homeResources(level.resourcesUrbanism, item_id_by_uid)
         });
     }
     return refs;
 }
 
 /**
- * Ressources d'un niveau de maison dont l'uid est connu.
- * @param {HomeLevelDTO} level Niveau de maison.
+ * Ressources de chaque niveau des améliorations de maison connues du site, par clé `HomeEnum`.
+ * @param {HomeReferentialDTO} referential Référentiel des maisons.
+ * @param {ReadonlyMap<string, number>} item_id_by_uid Identifiant d'objet par uid.
+ * @returns {Map<string, ReadonlyMap<number, ResourceCount[]>>} Ressources résolues, indexées par clé puis par niveau.
+ */
+export function homeUpgradeResources(referential: HomeReferentialDTO, item_id_by_uid: ReadonlyMap<string, number>): Map<string, ReadonlyMap<number, ResourceCount[]>> {
+    const refs: Map<string, ReadonlyMap<number, ResourceCount[]>> = new Map<string, ReadonlyMap<number, ResourceCount[]>>();
+    for (const upgrade of referential.upgrades) {
+        const key: string | undefined = UPGRADE_KEY_BY_NAME[upgrade.name];
+        if (key !== undefined) {
+            refs.set(key, new Map<number, ResourceCount[]>(upgrade.levels.map((level: HomeUpgradeLevelDTO): [number, ResourceCount[]] =>
+                [level.level, homeResources(level.resources, item_id_by_uid)])));
+        }
+    }
+    return refs;
+}
+
+/**
+ * Ressources de maison dont l'uid est connu.
+ * @param {HomeResourceDTO[]} resources Ressources du référentiel.
  * @param {ReadonlyMap<string, number>} item_id_by_uid Identifiant d'objet par uid.
  * @returns {ResourceCount[]} Ressources résolues.
  */
-function homeResources(level: HomeLevelDTO, item_id_by_uid: ReadonlyMap<string, number>): ResourceCount[] {
+function homeResources(resources: HomeResourceDTO[], item_id_by_uid: ReadonlyMap<string, number>): ResourceCount[] {
     const resolved: ResourceCount[] = [];
-    for (const resource of level.resources) {
+    for (const resource of resources) {
         const item_id: number | undefined = item_id_by_uid.get(resource.itemUid);
         if (item_id !== undefined) {
             resolved.push({ itemId: item_id, count: resource.count });

@@ -21,7 +21,7 @@
                             @if (option.is_private) {
                                 <mat-icon class="lock" aria-label="Privé" i18n-aria-label>lock</mat-icon>
                             }
-                            <span class="ap">{{ option.length }}<small>PA</small></span>
+                            <span class="ap"><mho-icon-ap [value]="option.length"/></span>
                         </span>
                     </mat-option>
                 }

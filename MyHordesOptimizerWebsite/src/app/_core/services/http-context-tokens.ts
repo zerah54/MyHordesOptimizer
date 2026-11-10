@@ -9,7 +9,7 @@ import { HttpContextToken } from '@angular/common/http';
 /** Laisse l'erreur remonter telle quelle, sans message ni tentative de reconnexion */
 export const BYPASS_ERROR: HttpContextToken<boolean> = new HttpContextToken(() => false);
 
-/** Comme BYPASS_ERROR, pour ce seul statut : l'abonné le gère et l'affiche lui-même */
-export const SILENT_ERROR_STATUS: HttpContextToken<number | null> = new HttpContextToken<number | null>(() => null);
+/** Comme BYPASS_ERROR, pour ce ou ces statuts : l'abonné les gère et les affiche lui-même */
+export const SILENT_ERROR_STATUS: HttpContextToken<number | readonly number[] | null> = new HttpContextToken<number | readonly number[] | null>(() => null);
 
 export const BYPASS_LOADING: HttpContextToken<boolean> = new HttpContextToken(() => false);

@@ -22,6 +22,7 @@ import type { Mock } from 'vitest';
 import { MapRouteDTO, MapRouteRequestDTO } from '../../_abstract_model/dto/map-route.dto';
 import { MapThemeActiveDTO, MapThemeDTO } from '../../_abstract_model/dto/map-theme.dto';
 import { ApiService } from '../../_abstract_model/services/api.service';
+import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../_abstract_model/services/town.service';
 import { Category } from '../../_abstract_model/types/category.class';
 import { Cell } from '../../_abstract_model/types/cell.class';
@@ -44,6 +45,7 @@ import { TownContextService } from '../../_core/services/town-context.service';
 import { setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { ConfirmDialogComponent } from '../../_shared/confirm-dialog/confirm-dialog.component';
 import { DrawMapComponent, MapCellPick } from './draw-map/draw-map.component';
+import { DumpUpgrades, NO_DUMP } from './draw-map/map-cell/pipes/trash-value.pipe';
 import { Distance, MapComponent, MapOptions } from './map.component';
 import { DEFAULT_CORNERS } from './map-corners';
 import { DayExpeditionsStore } from './map-orders/day-expeditions.store';
@@ -72,6 +74,7 @@ class DrawMapStubComponent {
     public readonly cellCut: OutputEmitterRef<MapRoutePoint> = output();
     public readonly cellUpdated: OutputEmitterRef<Cell> = output();
     public readonly spottedItems: InputSignal<ReadonlySet<number>> = input<ReadonlySet<number>>(new Set<number>());
+    public readonly dump: InputSignal<DumpUpgrades | undefined> = input();
 }
 
 /** Remplace MapRoutesStore : pas de hub SignalR ni d'appel HTTP, des signaux pilotés par le test. */
@@ -354,6 +357,32 @@ describe('MapComponent', (): void => {
         const stub: DrawMapStubComponent = drawMapStub();
         expect(stub.options()?.dig_mode).toBe('average');
         expect(stub.options()?.distances).toEqual([]);
+    });
+
+    it('offers the dump map type', (): void => {
+        create();
+        fixture.detectChanges();
+
+        expect(mapTypeToggle('Décharge')).toBeTruthy();
+    });
+
+    it('does not load the buildings while the dump map is not shown', (): void => {
+        const built_levels: Mock = vi.spyOn(TestBed.inject(BuiltBuildingsService), 'builtLevels').mockReturnValue(of(new Map<string, number>([['small_trash_#00', 2]])));
+        create();
+        fixture.detectChanges();
+
+        expect(built_levels).not.toHaveBeenCalled();
+        expect(drawMapStub().dump()).toEqual(NO_DUMP);
+    });
+
+    it('gives the cells the dump upgrades once the dump map is shown', (): void => {
+        const built_levels: Mock = vi.spyOn(TestBed.inject(BuiltBuildingsService), 'builtLevels').mockReturnValue(of(new Map<string, number>([['small_trash_#00', 2]])));
+        localStorage.setItem('MAP_OPTIONS', JSON.stringify({ map_type: 'trash' }));
+        create();
+        fixture.detectChanges();
+
+        expect(built_levels).toHaveBeenCalledTimes(1);
+        expect(drawMapStub().dump()).toEqual({ level: 2, humidified: false });
     });
 
     it('restores a stored corner layout and fills the corners it does not know with their default', (): void => {

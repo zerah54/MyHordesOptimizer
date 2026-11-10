@@ -23,6 +23,8 @@ import { isHouseLevelEditable } from '../../_abstract_model/types/town-details.c
 import { TownContextService } from '../../_core/services/town-context.service';
 import { getTown, user } from '../../_core/utilities/localstorage.util';
 import { DaySelectorComponent } from '../../_shared/day-selector/day-selector.component';
+import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { StepResult } from '../buildings/planning/building-progress.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO } from '../buildings/planning/plan.types';
 import { CitizenRef, DayEvaluation } from '../buildings/planning/plan-evaluation.util';
@@ -40,7 +42,7 @@ import { hiddenKey, isHidden, ProgramBlock, safeStorage, setHidden } from './pro
 
 const angular_common: Imports = [NgTemplateOutlet, RouterLink];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatIconModule, MatProgressSpinnerModule, MatTooltipModule];
-const components: Imports = [DaySelectorComponent, ProgramExpeditionComponent];
+const components: Imports = [DaySelectorComponent, ProgramExpeditionComponent, PageTitleComponent];
 
 /** Mes consignes d'expédition du jour, toutes expéditions, et présence d'une expédition en préparation. */
 interface ExpeditionTotals {
@@ -63,7 +65,7 @@ interface PastProgram {
     styleUrls: ['./my-program.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [PlanningStore],
-    imports: [...angular_common, ...material_modules, ...components]
+    imports: [...angular_common, ...material_modules, ...components, IconApComponent]
 })
 export class MyProgramComponent implements OnInit {
 
@@ -178,6 +180,11 @@ export class MyProgramComponent implements OnInit {
 
     /** Jour à venir : consignes sans case (rien ne peut encore être fait). */
     protected readonly future: Signal<boolean> = computed((): boolean => this.store.selected_day() > this.store.current_day);
+    // Bandeaux des blocs masqués : numéro du jour collé à la lettre, traduits d'un bloc (le gabarit y glisserait une espace).
+    /** Bandeau de l'expédition masquée. */
+    protected readonly hidden_expedition_label: Signal<string> = computed((): string => $localize`Expédition masquée pour J${this.store.selected_day()}:day:`);
+    /** Bandeau des chantiers masqués. */
+    protected readonly hidden_buildings_label: Signal<string> = computed((): string => $localize`Chantiers masqués pour J${this.store.selected_day()}:day:`);
 
     public constructor() {
         effect((): void => {
@@ -258,6 +265,17 @@ export class MyProgramComponent implements OnInit {
      */
     protected buildingName(building_id: number): string {
         return this.store.buildings().get(building_id)?.label ?? `#${building_id}`;
+    }
+
+    /**
+     * Libellés des chantiers à voter ce soir (le second seulement avec le Brasier Sacrificiel).
+     * @param {MyProgram} program Programme du citoyen.
+     * @returns {string[]} Libellés, vide sans vote.
+     */
+    protected voteNames(program: MyProgram): string[] {
+        return [program.voteBuildingId, program.secondVoteBuildingId]
+            .filter((building_id: number | null): building_id is number => building_id !== null)
+            .map((building_id: number): string => this.buildingName(building_id));
     }
 
     /**

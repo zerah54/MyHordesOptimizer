@@ -1,4 +1,5 @@
 ﻿using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
+using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
@@ -47,6 +48,10 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 
         /// <summary>Niveaux de maison et améliorations, statiques (fichiers de l'extracteur).</summary>
         HomeReferentialDto GetHomeReferential();
+
+        /// <summary>Évolutions des chantiers par uid, statiques (Data/Buildings/upgrades.json de l'extracteur).</summary>
+        Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades();
+        Dictionary<string, string> GetItemEmotes();
         MyHordesOptimizerMapDto GetMap(int townId);
         IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId);
         List<MyHordesOptimizerMapDigDto> CreateOrUpdateMapDigs(int townId, int userId, List<MyHordesOptimizerMapDigDto> requests);

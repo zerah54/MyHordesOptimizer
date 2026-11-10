@@ -65,7 +65,13 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
         public IClientProxy Group(string groupName) => _proxy;
         public IClientProxy GroupExcept(string groupName, IReadOnlyList<string> excludedConnectionIds) => _proxy;
         public IClientProxy Groups(IReadOnlyList<string> groupNames) => _proxy;
-        public IClientProxy OthersInGroup(string groupName) => _proxy;
+        /// <summary>Groupes ciblés via OthersInGroup (diffusion hors appelant).</summary>
+        public List<string> OthersInGroupTargets { get; } = new();
+        public IClientProxy OthersInGroup(string groupName)
+        {
+            OthersInGroupTargets.Add(groupName);
+            return _proxy;
+        }
         public IClientProxy User(string userId) => _proxy;
         public IClientProxy Users(IReadOnlyList<string> userIds) => _proxy;
     }

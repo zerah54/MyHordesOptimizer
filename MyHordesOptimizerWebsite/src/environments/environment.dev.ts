@@ -6,6 +6,8 @@ export const environment: Environment = {
     website_url: 'https://myhordes-optimizer-dev.web.app/',
     myhordes_url: 'https://myhordes.eu/',
     myhordes_app_id: 22,
+    // L'app MyHordes n'a qu'une URL de retour publique : le login natif ne ramène pas sur cette instance.
+    login_mode: 'Key',
     firebase_config: {
         apiKey: 'AIzaSyB3H--KamQP_FZfFgFgrGXHpaa9msDqp50',
         authDomain: 'myhordes-optimizer-dev.firebaseapp.com',
@@ -22,5 +24,7 @@ interface Environment {
     website_url: string;
     myhordes_url: string;
     myhordes_app_id: number;
+    /** Native : page d'autorisation de MyHordes. Key : saisie de l'identifiant d'app externe. */
+    login_mode: 'Native' | 'Key';
     firebase_config: FirebaseOptions;
 }

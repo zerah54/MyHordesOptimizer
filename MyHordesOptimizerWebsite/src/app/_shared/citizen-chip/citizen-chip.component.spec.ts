@@ -110,6 +110,30 @@ describe('CitizenChipComponent', (): void => {
         expect(text).not.toContain('Prudence');
     });
 
+    it('niveaux inconnus (négatifs) : ni amélioration « niv. -1 », ni habitation « -1 »', (): void => {
+        fixture.componentInstance.citizen().home = Object.assign(new Home(), {
+            content: [{ element: HomeEnum.HOUSE_LEVEL, value: -1 }, { element: HomeEnum.KITCHEN_LEVEL, value: -1 }]
+        });
+        hover();
+
+        const text: string = card()?.textContent ?? '';
+        expect(text).not.toContain('-1');
+        expect(text).toContain('Aucune connue');
+    });
+
+    it('maison affichée en colonnes par la page : habitation retirée, améliorations marquées pour être masquées sur grand écran', (): void => {
+        hover();
+        expect(card()?.querySelector('.upgrades.in-columns')).toBeNull();
+        expect(card()?.textContent).toContain('Habitation');
+        (fixture.nativeElement as HTMLElement).querySelector('button')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+
+        fixture.componentRef.setInput('homeInColumns', true);
+        hover();
+
+        expect(card()?.textContent).not.toContain('Habitation');
+        expect(card()?.querySelector('.upgrades.in-columns')?.textContent).toContain('Cuisine niv. 2');
+    });
+
     it('Échap ferme la fiche', (): void => {
         hover();
         (fixture.nativeElement as HTMLElement).querySelector('button')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));

@@ -10,6 +10,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
         public int AllowedOverflow { get; set; }
         /// <summary><c>Building.IdBuilding</c> du chantier voté le soir, ou null.</summary>
         public int? EveningVoteBuildingId { get; set; }
+        /// <summary>Second chantier voté le soir, compté seulement si le Brasier Sacrificiel est construit ; null sinon.</summary>
+        public int? EveningSecondVoteBuildingId { get; set; }
         /// <summary>Gestion des bannis activée à la main sur cette proposition.</summary>
         public bool ManageBanned { get; set; }
         public int BasePa { get; set; } = 19;
@@ -21,6 +23,15 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
         public string? Instructions { get; set; }
         /// <summary>Niveau de plan estimé (0-2) par <c>Building.IdBuilding</c>, utilisé en Pandémonium.</summary>
         public Dictionary<int, int> PlanTiers { get; set; } = new();
+        /// <summary>Pertes prévues cette nuit : chantier laissé détruire ou bonus d'évolution perdu.</summary>
+        public List<PlanLossDto> Losses { get; set; } = new();
+    }
+    public class PlanLossDto
+    {
+        /// <summary><c>Building.IdBuilding</c> du chantier construit concerné.</summary>
+        public int BuildingId { get; set; }
+        /// <summary><c>destroyed</c> (détruit pendant l'attaque, perdu dès le lendemain) ou <c>bonus</c> (bonus d'évolution perdu la nuit même).</summary>
+        public string Kind { get; set; } = "destroyed";
     }
 
     public class PlanCitizenDto
@@ -38,6 +49,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
         public string Kind { get; set; } = "free";
         public string? Ref { get; set; }
         public int? Level { get; set; }
+        /// <summary>Action utilisable plusieurs fois par jour (fouilles des galeries du Fouineur) : utilisations prévues ; null = une.</summary>
+        public int? Count { get; set; }
         public string? Label { get; set; }
         public int Pa { get; set; }
     }

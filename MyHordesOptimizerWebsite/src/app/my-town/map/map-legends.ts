@@ -19,7 +19,7 @@ export interface MapLegendEntry {
  * - Danger : seuils du champ `danger` de l'API de MyHordes (`JSONv1Controller`, 1–2, 3–5, plus de
  *   5 zombies), libellés de sa carte (`MapController`) ; une zone pas vue aujourd'hui est inconnue.
  * - Exploration : niveau relevé par un éclaireur, libellés du jeu (`beyond.html.twig`).
- * - Décharge (développement) : pas de légende.
+ * - Décharge : pas de légende.
  */
 export const MAP_LEGENDS: Readonly<Record<MapType, readonly MapLegendEntry[] | null>> = {
     digs: DIG_LEVELS.map((level: DigLevelInfo): MapLegendEntry => ({ swatch: `level-${level.level}`, label: level.label, range: level.range })),

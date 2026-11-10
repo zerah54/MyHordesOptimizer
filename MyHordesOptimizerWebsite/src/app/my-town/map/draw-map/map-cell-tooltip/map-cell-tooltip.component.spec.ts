@@ -39,4 +39,19 @@ describe('MapCellTooltipComponent', () => {
         expect(entries.map((entry: HTMLElement): string | undefined => entry.querySelector('.item-quantity')?.textContent?.trim())).toEqual(['2', '3', '1']);
         expect(entries.map((entry: HTMLElement): boolean => entry.classList.contains('spotted'))).toEqual([true, true, false]);
     });
+
+    it('affiche le nombre de passages d\'éclaireur quand il est connu', () => {
+        TestBed.configureTestingModule({
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), ...provideMapOrdersTesting()]
+        });
+        const fixture: ComponentFixture<MapCellTooltipComponent> = TestBed.createComponent(MapCellTooltipComponent);
+        const cell: Cell = Object.assign(new Cell(), {
+            is_town: false, citizens: [], items: [],
+            scout_estimation_zombie: null, scav_zone_level: null, is_excavated: null, scout_zone_level: 1, scout_visits: 7
+        });
+        fixture.componentInstance.cell.set(cell);
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('.scout-visits')?.textContent).toContain('7/15');
+    });
 });

@@ -1,5 +1,7 @@
 <mat-card-header class="mho-state-manager-header">
-    <mat-card-title i18n>Gestionnaire d'état</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="toolsStateManager"/>
+    </mat-card-title>
 </mat-card-header>
 
 <mat-card-content class="mho-state-manager">
@@ -8,17 +10,17 @@
         <div class="states-cards-origine">
             <div class="states-cards-origine-content">
                 <mho-list-element-add-remove withQuantity
-                    (add)="addToBag(+$event)"
-                    (empty)="emptyBagContent()"
-                    (remove)="removeFromBag(+$event)"
-                    [currentList]="starting_bag"
-                    [lists]="bag_lists()"
-                    addLabel="Ajouter au sac" i18n-addLabel
-                    emptyLabel="Vider le sac" i18n-emptyLabel
-                    i18n-label
-                    i18n-removeLabel
-                    label="Sac"
-                    removeLabel="Retirer du sac"/>
+                                             (add)="addToBag(+$event)"
+                                             (empty)="emptyBagContent()"
+                                             (remove)="removeFromBag(+$event)"
+                                             [currentList]="starting_bag"
+                                             [lists]="bag_lists()"
+                                             addLabel="Ajouter au sac" i18n-addLabel
+                                             emptyLabel="Vider le sac" i18n-emptyLabel
+                                             i18n-label
+                                             i18n-removeLabel
+                                             label="Sac"
+                                             removeLabel="Retirer du sac"/>
             </div>
             <div class="states-cards-origine-content">
                 <mho-compact-stepper
@@ -121,10 +123,8 @@
                                 }
                                 <mat-icon class="ranked-order-arrow" matTooltip="État final résultant" i18n-matTooltip>arrow_forward</mat-icon>
                                 <span class="ranked-order-totals">
-                                    <span class="ranked-order-total" matTooltip="PA dépensés" i18n-matTooltip>{{ candidate.total_ap }}
-                                        <mho-icon-ap/></span>
-                                    <span class="ranked-order-total" matTooltip="PE dépensés" i18n-matTooltip>{{ candidate.total_sp }}
-                                        <mho-icon-ep/></span>
+                                    <span class="ranked-order-total" matTooltip="PA dépensés" i18n-matTooltip><mho-icon-ap [value]="candidate.total_ap"/></span>
+                                    <span class="ranked-order-total" matTooltip="PE dépensés" i18n-matTooltip><mho-icon-ep [value]="candidate.total_sp"/></span>
                                     <span class="ranked-order-total-sum" i18n>Total : {{ candidate.total_distance }}</span>
                                 </span>
                                 <span class="ranked-order-final">
@@ -190,11 +190,9 @@
             <h3 i18n>État actuel</h3>
             <div class="states-cards-current">
                 <h4>
-                    {{ currentState().ap }}
-                    <mho-icon-ap/>
+                    <mho-icon-ap [value]="currentState().ap"/>
                     &nbsp;
-                    {{ currentState().sp }}
-                    <mho-icon-ep/>
+                    <mho-icon-ep [value]="currentState().sp"/>
                     &nbsp;
                     <span i18n>PDC :</span> {{ currentState().pdc }}
                 </h4>
@@ -238,10 +236,8 @@
                         <mat-divider/>
                         <mat-list-item>
                             <div class="ligne-historique-etat" matListItemLine>
-                                <span class="delta">{{ row.ap_delta >= 0 ? '+' : '' }}{{ row.ap_delta }}
-                                    <mho-icon-ap/></span>
-                                <span class="delta">{{ row.sp_delta >= 0 ? '+' : '' }}{{ row.sp_delta }}
-                                    <mho-icon-ep/></span>
+                                <span class="delta"><mho-icon-ap [value]="(row.ap_delta >= 0 ? '+' : '') + row.ap_delta"/></span>
+                                <span class="delta"><mho-icon-ep [value]="(row.sp_delta >= 0 ? '+' : '') + row.sp_delta"/></span>
                                 <span class="delta" i18n>PDC : {{ row.pdc }}</span>
                                 @for (status of row.added_statuses; track status) {
                                     <img [src]="HORDES_IMG_REPO + 'status/status_' + status + '.gif'" [matTooltip]="statusLabel(status)" alt="">

@@ -20,6 +20,8 @@ export interface MyProgram {
     dayInstructions: string | null;
     /** Chantier à voter ce soir, nul sans consigne de vote. */
     voteBuildingId: number | null;
+    /** Second chantier à voter ce soir (Brasier Sacrificiel construit), nul sinon. */
+    secondVoteBuildingId: number | null;
     notices: MyProgramNotice[];
 }
 
@@ -58,6 +60,7 @@ export function myProgram(user_id: number | null, content: BuildingPlanContentDT
         items,
         dayInstructions: day_instructions === '' ? null : day_instructions,
         voteBuildingId: content.eveningVoteBuildingId,
+        secondVoteBuildingId: evaluation.secondVote === null ? null : (content.eveningSecondVoteBuildingId ?? null),
         notices
     };
 }

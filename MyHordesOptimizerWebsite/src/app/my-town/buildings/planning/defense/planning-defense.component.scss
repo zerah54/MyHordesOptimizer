@@ -13,4 +13,30 @@
             vertical-align: middle;
         }
     }
+
+    .losses {
+        margin-top: 1.5em;
+
+        h3 {
+            margin: 0 0 0.25em;
+        }
+
+        .hint {
+            margin: 0 0 0.75em;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+    }
+}
+
+// Hors de `:host` : les options du select sont rendues dans le panneau (overlay).
+.icon-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+// Taille NON fixée : sprites pixel art.
+.building-icon {
+    flex: 0 0 auto;
 }

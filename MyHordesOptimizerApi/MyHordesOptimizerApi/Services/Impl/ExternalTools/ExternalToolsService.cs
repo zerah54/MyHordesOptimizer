@@ -625,6 +625,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                 realY,
                                 updateCellDto.ScavZoneLevel,
                                 updateCellDto.ScoutZoneLvl,
+                                scoutVisits: null,
+                                scoutVisitsEntered: false,
                                 updateCellDto.ScavNextCells,
                                 updateCellDto.ScoutNextCells,
                                 newLastUpdate!.IdLastUpdateInfo);

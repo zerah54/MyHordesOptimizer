@@ -2,6 +2,7 @@ import { environment } from '../../../environments/environment';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { getTown, getUser } from '../../_core/utilities/localstorage.util';
+import { sitePage } from '../../_core/utilities/site-pages';
 import { ProgramMenuService } from '../../my-town/program/program-menu.service';
 
 /**
@@ -12,6 +13,8 @@ import { ProgramMenuService } from '../../my-town/program/program-menu.service';
  */
 export interface SidenavLinks {
     label: string;
+    /** Icône du registre des pages, relative à `HORDES_IMG_REPO`. */
+    icon?: string;
     path?: string;
     /** Suffixe relatif à la ville (map, bank, …) : le chemin complet est calculé selon le contexte. */
     townSuffix?: string;
@@ -36,23 +39,23 @@ export interface SidenavLinks {
 export function buildSidenavLinks(town_context: TownContextService, program_menu: ProgramMenuService): SidenavLinks[] {
     return [
         {
-            label: $localize`Ma ville`, lvl: 0, displayed: true, isTownRoot: true, authorized: (): boolean => isInTown(), expanded: true, children: [
-                { label: $localize`Revenir à ma ville`, returnHome: true, displayed: true, lvl: 1, authorized: (): boolean => town_context.isReadonly(), spoil: false },
-                { label: $localize`Carte`, townSuffix: 'map', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
-                { label: $localize`Banque`, townSuffix: 'bank', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
-                { label: $localize`Citoyens`, townSuffix: 'citizens', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
+            ...sitePage('town'), lvl: 0, displayed: true, isTownRoot: true, authorized: (): boolean => isInTown(), expanded: true, children: [
+                { ...sitePage('townReturn'), returnHome: true, displayed: true, lvl: 1, authorized: (): boolean => town_context.isReadonly(), spoil: false },
+                { ...sitePage('townMap'), townSuffix: 'map', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
+                { ...sitePage('townBank'), townSuffix: 'bank', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
+                { ...sitePage('townCitizens'), townSuffix: 'citizens', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
                 {
-                    label: $localize`Liste de courses`,
+                    ...sitePage('townWishlist'),
                     townSuffix: 'wishlist',
                     displayed: true,
                     lvl: 1,
                     authorized: (): boolean => isInTown(),
                     spoil: false
                 },
-                { label: $localize`Statistiques`, townSuffix: 'stats', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
-                { label: $localize`Expéditions`, townSuffix: 'expeditions', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
+                { ...sitePage('townStats'), townSuffix: 'stats', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
+                { ...sitePage('townExpeditions'), townSuffix: 'expeditions', displayed: true, lvl: 1, authorized: (): boolean => isInTown(), spoil: false },
                 {
-                    label: $localize`Chantiers`,
+                    ...sitePage('townBuildings'),
                     townSuffix: 'buildings',
                     displayed: true,
                     lvl: 1,
@@ -60,7 +63,7 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
                     spoil: false
                 },
                 {
-                    label: $localize`Veilles`,
+                    ...sitePage('townNightwatch'),
                     townSuffix: 'nightwatch',
                     displayed: true,
                     lvl: 1,
@@ -68,7 +71,7 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
                     spoil: false
                 },
                 {
-                    label: $localize`Campings`,
+                    ...sitePage('townCampings'),
                     townSuffix: 'campings',
                     displayed: true,
                     lvl: 1,
@@ -76,41 +79,38 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
                     spoil: false
                 },
                 {
-                    label: $localize`Mon programme`,
+                    ...sitePage('townProgram'),
                     townSuffix: 'program',
                     displayed: true,
                     lvl: 1,
-                    authorized: (): boolean => isInTown() && !environment.production && program_menu.visible(),
+                    authorized: (): boolean => isInTown() && program_menu.visible(),
                     spoil: false
                 },
             ], spoil: false
         },
         {
-            label: $localize`Outils`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
-                { label: $localize`Camping`, path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
-                { label: $localize`Chances de survie`, path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
-                { label: $localize`Simulateur de débordement`, path: 'tools/overflow', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
-                { label: $localize`Gestionnaire d'état`, path: 'tools/state-manager', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+            ...sitePage('tools'), lvl: 0, displayed: true, authorized: (): boolean => true, expanded: true, children: [
+                { ...sitePage('toolsCamping'), path: 'tools/camping', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { ...sitePage('toolsProbabilities'), path: 'tools/probabilities', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { ...sitePage('toolsOverflow'), path: 'tools/overflow', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { ...sitePage('toolsStateManager'), path: 'tools/state-manager', displayed: true, lvl: 1, authorized: (): boolean => true, spoil: false },
             ], spoil: false
         },
         {
-            label: $localize`Annuaire`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
-                { label: $localize`Citoyens`, path: 'directory/citizens', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
-                { label: $localize`Villes`, path: 'directory/towns', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+            ...sitePage('directory'), lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
+                { ...sitePage('directoryCitizens'), path: 'directory/citizens', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { ...sitePage('directoryTowns'), path: 'directory/towns', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
             ], spoil: false
         },
         {
-            label: $localize`Wiki`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
-                { label: $localize`Objets`, path: 'wiki/items', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
-                { label: $localize`Recettes`, path: 'wiki/recipes', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
-                { label: $localize`Pouvoirs`, path: 'wiki/hero-skills', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
-                // « Bâtiments » désigne ici les bâtiments d'EXTÉRIEUR (les ruines). Les constructions
-                // en ville portent leur nom du jeu, « Chantiers », pour que les deux entrées ne
-                // soient pas homonymes.
-                { label: $localize`Bâtiments`, path: 'wiki/ruins', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
-                { label: $localize`Chantiers`, path: 'wiki/buildings', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
+            ...sitePage('wiki'), lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
+                { ...sitePage('wikiItems'), path: 'wiki/items', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { ...sitePage('wikiRecipes'), path: 'wiki/recipes', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { ...sitePage('wikiHeroSkills'), path: 'wiki/hero-skills', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { ...sitePage('wikiRuins'), path: 'wiki/ruins', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
+                { ...sitePage('wikiBuildings'), path: 'wiki/buildings', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: true },
                 {
-                    label: $localize`Informations diverses`,
+                    ...sitePage('wikiMiscellaneousInfo'),
                     path: 'wiki/miscellaneous-info',
                     displayed: false,
                     lvl: 1,
@@ -118,7 +118,7 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
                     spoil: false
                 },
                 {
-                    label: $localize`Villes privées`,
+                    ...sitePage('wikiPrivateTowns'),
                     path: 'wiki/private-towns',
                     displayed: false,
                     lvl: 1,
@@ -128,7 +128,7 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
             ], spoil: false
         },
         {
-            label: $localize`Tutoriels`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
+            ...sitePage('tutorials'), lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
                 {
                     label: $localize`Script / Extension`, displayed: false, lvl: 1, authorized: (): boolean => true, expanded: false, children: [
                         tutorialLink($localize`Installation`, 'script-extension/installation'),
@@ -162,9 +162,9 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
             ], spoil: false
         },
         {
-            label: $localize`Mini-Jeux`, lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
-                { label: $localize`368 Pictos`, path: 'games/368-pictos', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
-                { label: $localize`Démineur`, path: 'games/minesweeper', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+            ...sitePage('games'), lvl: 0, displayed: true, authorized: (): boolean => true, expanded: false, children: [
+                { ...sitePage('games368Pictos'), path: 'games/368-pictos', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
+                { ...sitePage('gamesMinesweeper'), path: 'games/minesweeper', displayed: false, lvl: 1, authorized: (): boolean => true, spoil: false },
             ], spoil: false
         },
     ];

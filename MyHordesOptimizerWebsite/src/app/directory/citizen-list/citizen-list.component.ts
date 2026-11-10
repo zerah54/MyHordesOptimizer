@@ -38,9 +38,10 @@ import { getUserId } from '../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../_shared/avatar/avatar.component';
 import { NoteDialogComponent, NoteDialogData } from '../../_shared/note-dialog/note-dialog.component';
 import { NoteIconComponent } from '../../_shared/note-icon/note-icon.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 
 const angular_common: Imports = [CommonModule, ReactiveFormsModule];
-const components: Imports = [AvatarComponent, NoteIconComponent];
+const components: Imports = [AvatarComponent, NoteIconComponent, PageTitleComponent];
 const directives: Imports = [MiddleClickLinkDirective, TypedCellDefDirective];
 const pipes: Imports = [];
 const material_modules: Imports = [

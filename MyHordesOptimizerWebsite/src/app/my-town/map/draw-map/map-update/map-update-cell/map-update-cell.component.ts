@@ -13,20 +13,22 @@ import {
     WritableSignal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../../../../_abstract_model/const';
 import { Direction } from '../../../../../_abstract_model/enum/direction.enum';
 import { ApiService } from '../../../../../_abstract_model/services/api.service';
 import { Imports } from '../../../../../_abstract_model/types/_types';
-import { Cell } from '../../../../../_abstract_model/types/cell.class';
+import { Cell, MAX_SCOUT_VISITS, scoutLevelFromVisits, ScoutVisitsRange,scoutVisitsRange } from '../../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../../_abstract_model/types/item.class';
 import { ItemCountShort } from '../../../../../_abstract_model/types/item-count-short.class';
@@ -40,7 +42,7 @@ import { ItemsInBagsPipe } from './items-in-bags.pipe';
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage, ReactiveFormsModule];
 const components: Imports = [LastUpdateComponent];
 const pipes: Imports = [ArrayItemDetailsPipe, ItemImgPipe, ItemDetailsPipe, ItemsInBagsPipe];
-const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatInputModule, MatMenuModule, MatSelectModule];
+const material_modules: Imports = [MatCheckboxModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSelectModule, MatTooltipModule];
 
 @Component({
     selector: 'mho-map-update-cell',
@@ -65,6 +67,9 @@ export class MapUpdateCellComponent implements OnInit {
     ];
     /** Niveaux d'abondance du fouineur, avec les libellés du jeu */
     protected readonly dig_levels: readonly DigLevelInfo[] = DIG_LEVELS;
+    protected readonly MAX_SCOUT_VISITS: number = MAX_SCOUT_VISITS;
+    /** Avertissement affiché quand le nombre de passages sort de la plage du niveau choisi ; null sinon */
+    protected readonly scout_visits_warning: WritableSignal<string | null> = signal(null);
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly locale: string = moment.locale();
     private readonly fb: FormBuilder = inject(FormBuilder);
@@ -76,6 +81,12 @@ export class MapUpdateCellComponent implements OnInit {
         if (value === null || value === undefined || value === '') return null;
         const parsed: number = +value;
         return isNaN(parsed) ? null : parsed;
+    }
+
+    /** Nombre de passages saisi, ramené à un entier entre 0 et MAX_SCOUT_VISITS ; null si le champ est vide */
+    private static toScoutVisits(value: number | string | null | undefined): number | null {
+        const visits: number | null = MapUpdateCellComponent.toNullableNumber(value);
+        return visits === null ? null : Math.min(MAX_SCOUT_VISITS, Math.max(0, Math.trunc(visits)));
     }
 
     /** Construit un radar à partir des 4 directions, ou null si aucune n'est renseignée */
@@ -99,6 +110,7 @@ export class MapUpdateCellComponent implements OnInit {
             items: [this.cell().items],
             scav_zone_level: [this.cell().scav_zone_level],
             scout_zone_level: [this.cell().scout_zone_level],
+            scout_visits: [this.cell().scout_visits],
             scav_north: [this.cell().scav_next_cells?.north ?? null],
             scav_south: [this.cell().scav_next_cells?.south ?? null],
             scav_east: [this.cell().scav_next_cells?.east ?? null],
@@ -108,6 +120,7 @@ export class MapUpdateCellComponent implements OnInit {
             scout_east: [this.cell().scout_next_cells?.east ?? null],
             scout_west: [this.cell().scout_next_cells?.west ?? null],
         });
+        this.updateScoutVisitsWarning(this.cell());
 
         this.cell_form.valueChanges
             .pipe(takeUntilDestroyed(this.destroy_ref))
@@ -118,7 +131,7 @@ export class MapUpdateCellComponent implements OnInit {
                 new_cell.nb_zombie_killed = +values.nb_killed_zombies;
                 new_cell.items = [...values.items];
                 new_cell.scav_zone_level = MapUpdateCellComponent.toNullableNumber(values.scav_zone_level);
-                new_cell.scout_zone_level = MapUpdateCellComponent.toNullableNumber(values.scout_zone_level);
+                this.applyScoutVisits(new_cell, values.scout_visits, values.scout_zone_level);
                 /** Les radars décrivent les cases voisines : ils ne sont envoyés que si au moins une direction est renseignée */
                 new_cell.scav_next_cells = MapUpdateCellComponent.buildRadar<boolean>([values.scav_north, values.scav_south, values.scav_east, values.scav_west]);
                 new_cell.scout_next_cells = MapUpdateCellComponent.buildRadar<number>([
@@ -129,6 +142,42 @@ export class MapUpdateCellComponent implements OnInit {
                 ]);
                 this.cellChange.emit(new_cell);
             });
+    }
+
+    /**
+     * Le niveau choisi prime ; sans niveau, celui du nombre de passages est enregistré, sans remplir la liste
+     * (taper « 12 » passerait sinon par un « 1 » incompatible).
+     *
+     * @param {Cell} cell case modifiée
+     * @param {number | null} raw_visits valeur saisie dans le champ des passages
+     * @param {number | null} raw_level niveau choisi dans la liste
+     */
+    private applyScoutVisits(cell: Cell, raw_visits: number | null, raw_level: number | null): void {
+        const visits: number | null = MapUpdateCellComponent.toScoutVisits(raw_visits);
+        if (visits !== null && visits !== raw_visits) {
+            const visits_control: AbstractControl = this.cell_form.controls['scout_visits'];
+            visits_control.setValue(visits, { emitEvent: false });
+        }
+        const level: number | null = MapUpdateCellComponent.toNullableNumber(raw_level);
+        cell.scout_visits = visits;
+        cell.scout_zone_level = level ?? (visits === null ? null : scoutLevelFromVisits(visits));
+        this.updateScoutVisitsWarning(cell);
+    }
+
+    /**
+     * Affiche l'avertissement du champ des passages quand le nombre sort de la plage du niveau d'exploration.
+     *
+     * @param {Cell} cell case modifiée
+     */
+    private updateScoutVisitsWarning(cell: Cell): void {
+        if (cell.isScoutVisitsConsistent() || cell.scout_zone_level === null) {
+            this.scout_visits_warning.set(null);
+            return;
+        }
+        const range: ScoutVisitsRange = scoutVisitsRange(cell.scout_zone_level);
+        this.scout_visits_warning.set(range.min === range.max
+            ? $localize`Incompatible avec le niveau d'exploration : ${range.max}:max: passages`
+            : $localize`Incompatible avec le niveau d'exploration : ${range.min}:min: à ${range.max}:max: passages`);
     }
 
     /**
@@ -208,6 +257,7 @@ interface CellInfoUpdate {
     items: ItemCountShort[];
     scav_zone_level: number | null;
     scout_zone_level: number | null;
+    scout_visits: number | null;
     /** Radar du fouineur : true = case voisine épuisée, false = il reste des objets, null = non renseigné */
     scav_north: boolean | null;
     scav_south: boolean | null;

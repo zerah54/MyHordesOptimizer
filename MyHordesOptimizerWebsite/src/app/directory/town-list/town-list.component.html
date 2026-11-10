@@ -1,5 +1,7 @@
 <mat-card-header class="mho-town-list-header">
-    <mat-card-title i18n>Villes</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="directoryTowns"/>
+    </mat-card-title>
     <mat-form-field appearance="outline" class="season-phase-filter" subscriptSizing="dynamic">
         <mat-label i18n>Saison / phase</mat-label>
         <mat-select [compareWith]="compareCombo" [formControl]="seasonPhaseControl">

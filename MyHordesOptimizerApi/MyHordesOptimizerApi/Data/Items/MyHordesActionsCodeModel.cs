@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace MyHordesOptimizerApi.Data.Items
 {
@@ -11,6 +12,9 @@ namespace MyHordesOptimizerApi.Data.Items
     /// </summary>
     public class MyHordesActionsCodeModel
     {
+        [JsonProperty("label")]
+        public string? Label { get; set; }
+
         [JsonProperty("meta")]
         public List<string> Meta { get; set; } = new List<string>();
 
@@ -20,11 +24,10 @@ namespace MyHordesOptimizerApi.Data.Items
     }
 
     /// <summary>
-    /// Quelques actions sans rapport avec l'ouverture (ex. <c>load_lpointer</c>,
-    /// <c>play_soccer_1</c>) sérialisent "result" comme un objet JSON (artefact d'un tableau PHP
-    /// à clés mixtes), pas un tableau. Sans incidence sur cette fonctionnalité — mais qui ferait
-    /// sinon planter la désérialisation de tout le fichier. On les ignore (liste vide) ; le
-    /// cas normal (tableau) délègue au comportement par défaut de Newtonsoft, inchangé.
+    /// Quelques actions sérialisent "result" comme un objet JSON (artefact d'un tableau PHP à clés
+    /// mixtes, ex. <c>{"0": "kill_1_zombie_s", "chances": {...}}</c>), pas un tableau. L'objet est
+    /// aplati en liste de ses valeurs dans l'ordre des clés ; les chaînes restent des <c>string</c>,
+    /// les autres jetons des <c>JToken</c> (<c>JObject</c>…), comme pour la forme tableau.
     /// </summary>
     public class ActionResultConverter : JsonConverter
     {
@@ -36,8 +39,12 @@ namespace MyHordesOptimizerApi.Data.Items
         {
             if (reader.TokenType == JsonToken.StartObject)
             {
-                reader.Skip();
-                return new List<object>();
+                var result = new List<object>();
+                foreach (JProperty property in JObject.Load(reader).Properties())
+                {
+                    result.Add(property.Value is JValue { Type: JTokenType.String } value ? value.Value! : property.Value);
+                }
+                return result;
             }
 
             return serializer.Deserialize<List<object>>(reader) ?? new List<object>();

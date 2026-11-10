@@ -24,13 +24,22 @@ function sameTaskKey(task: BulkTaskTemplate): string {
  * @param {number[]} user_ids Citoyens visés.
  * @param {BulkTaskTemplate} template Consigne.
  * @param {(user_id: number) => number} pa_of PA de la consigne pour un citoyen.
+ * @param {(user_id: number) => number} [count_of] Utilisations prévues d'une action pour un citoyen (1 si absent).
+ * @param {(user_id: number) => number | null} [level_of] Niveau visé propre à chaque citoyen, nul s'il ne doit rien recevoir (niveau du modèle si absent).
  * @returns {number} Nombre de citoyens qui ont reçu la consigne.
  */
-export function bulkAddTask(content: BuildingPlanContentDTO, user_ids: number[], template: BulkTaskTemplate, pa_of: (user_id: number) => number): number {
-    const key: string = sameTaskKey(template);
+export function bulkAddTask(
+    content: BuildingPlanContentDTO, user_ids: number[], template: BulkTaskTemplate, pa_of: (user_id: number) => number, count_of?: (user_id: number) => number,
+    level_of?: (user_id: number) => number | null
+): number {
     const label: string = (template.label ?? '').trim();
     let added: number = 0;
     for (const user_id of user_ids) {
+        const level: number | null | undefined = level_of === undefined ? template.level : level_of(user_id);
+        if (level_of !== undefined && level === null) {
+            continue;
+        }
+        const key: string = sameTaskKey({ ...template, level });
         let entry: PlanCitizenDTO | undefined = content.citizens.find((candidate: PlanCitizenDTO): boolean => candidate.userId === user_id);
         if (entry === undefined) {
             entry = { userId: user_id, tasks: [] };
@@ -43,13 +52,17 @@ export function bulkAddTask(content: BuildingPlanContentDTO, user_ids: number[],
         if (typeof template.ref === 'string') {
             task.ref = template.ref;
         }
-        if (typeof template.level === 'number') {
-            task.level = template.level;
+        if (typeof level === 'number') {
+            task.level = level;
         }
         if (template.kind === 'free' || (template.kind === 'homeUpgrade' && typeof template.ref !== 'string')) {
             task.label = label;
         }
         task.pa = pa_of(user_id);
+        const count: number = count_of?.(user_id) ?? 1;
+        if (count > 1) {
+            task.count = count;
+        }
         entry.tasks.push(task);
         added++;
     }

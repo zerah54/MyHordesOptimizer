@@ -43,7 +43,28 @@ describe('PlanningItemValuesDialogComponent', (): void => {
         type(root().querySelector<HTMLInputElement>('tr.value input[data-field="item-value"]') as HTMLInputElement, '3');
         root().querySelector<HTMLButtonElement>('button[data-action="save-values"]')?.click();
 
-        expect(fake.actions['saveItemValues']).toHaveBeenCalledWith({ '5': 3 });
+        expect(fake.actions['saveItemValues']).toHaveBeenCalledWith({ '5': 3 }, 1);
+    });
+
+    it('enregistre avec la version lue à la première modification, même si les valeurs ont été enregistrées ailleurs depuis', async (): Promise<void> => {
+        await render();
+        const input: HTMLInputElement = root().querySelector<HTMLInputElement>('tr.value input[data-field="item-value"]') as HTMLInputElement;
+
+        type(input, '3');
+        fake.settings_version.set(2);
+        type(input, '4');
+        root().querySelector<HTMLButtonElement>('button[data-action="save-values"]')?.click();
+
+        expect(fake.actions['saveItemValues']).toHaveBeenCalledWith({ '5': 4 }, 1);
+    });
+
+    it('sans modification locale, enregistre sur la version courante', async (): Promise<void> => {
+        await render();
+        fake.settings_version.set(2);
+
+        root().querySelector<HTMLButtonElement>('button[data-action="save-values"]')?.click();
+
+        expect(fake.actions['saveItemValues']).toHaveBeenCalledWith({ '5': 2 }, null);
     });
 
     it('les suggestions proposent le nom des objets, pas leur uid', async (): Promise<void> => {

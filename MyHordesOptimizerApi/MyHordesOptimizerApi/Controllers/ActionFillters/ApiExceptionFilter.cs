@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
@@ -49,6 +50,13 @@ public class ApiExceptionFilter : ExceptionFilterAttribute
             Logger.LogInformation(exception.Message);
             var result = new ObjectResult(exception.Message);
             result.StatusCode = (int)HttpStatusCode.Conflict;
+            context.Result = result;
+        }
+        else if (exception is MhoLockedException)
+        {
+            Logger.LogInformation(exception.Message);
+            var result = new ObjectResult(exception.Message);
+            result.StatusCode = StatusCodes.Status423Locked;
             context.Result = result;
         }
         else if (exception is MhoBadRequestException)

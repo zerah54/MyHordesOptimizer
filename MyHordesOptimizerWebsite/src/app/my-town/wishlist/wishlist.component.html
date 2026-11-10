@@ -1,6 +1,6 @@
 <mat-card-header class="mho-wishlist-header">
     <mat-card-title>
-        <ng-container i18n>Liste de courses</ng-container>
+        <mho-page-title page="townWishlist"/>
         <button mat-icon-button type="button" matTooltip="Copier au format forum" i18n-matTooltip (click)="shareWishlistForum()">
             <mat-icon>share</mat-icon>
         </button>
@@ -153,7 +153,11 @@
                                             </span>
                                         }
                                         @case ('map_cell_item_count') {
-                                            {{ row.map_cell_item_count }}
+                                            @if (row.map_cell_item_count > 0) {
+                                                <mho-item-map [map]="map()" [itemId]="row.item.id">{{ row.map_cell_item_count }}</mho-item-map>
+                                            } @else {
+                                                {{ row.map_cell_item_count }}
+                                            }
                                         }
                                         @case ('count') {
                                             @if (row.depot.value.count >= -1) {
@@ -221,7 +225,7 @@
                                                     </mat-checkbox>
                                                 }
                                             } @else {
-                                                @if (row.zone_x_pa >= 0) {
+                                                @if (row.zone_x_pa > 0) {
                                                     {{ row.zone_x_pa }}
                                                 } @else {
                                                     ∞

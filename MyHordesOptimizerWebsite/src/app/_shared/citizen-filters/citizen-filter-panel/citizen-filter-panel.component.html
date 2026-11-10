@@ -1,0 +1,167 @@
+<div class="filters-panel">
+    <div class="filters-header">
+        <span class="title" i18n>Filtres</span>
+        <span class="spacer"></span>
+        <button mat-button type="button" data-action="reset-citizen-filters" [disabled]="store.active_count() === 0" (click)="store.reset()" i18n>
+            Réinitialiser
+        </button>
+        <button mat-icon-button type="button" data-action="close-citizen-filters" i18n-aria-label aria-label="Fermer" (click)="closed.emit()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <section class="filters-section">
+        <h4 i18n>Général</h4>
+        <mat-form-field subscriptSizing="dynamic">
+            <mat-label i18n>Nom</mat-label>
+            <mho-select data-filter="names" [ngModel]="selected_citizens()" (ngModelChange)="onCitizens($event)" [options]="citizen_options()" bindLabel="name"
+                        multiple searchable></mho-select>
+        </mat-form-field>
+        <div class="filter-row">
+            <mat-button-toggle-group data-filter="jobs" class="value-filter" hideMultipleSelectionIndicator multiple [value]="selected_jobs()"
+                                     (change)="onJobs($event.value)">
+                @for (job of all_jobs; track job.key) {
+                    <mat-button-toggle [value]="job" [matTooltip]="job.value.label">
+                        <img class="toggle-icon" [src]="HORDES_IMG_REPO + job.value.img" [alt]="job.value.label">
+                    </mat-button-toggle>
+                }
+            </mat-button-toggle-group>
+        </div>
+        <mat-form-field subscriptSizing="dynamic">
+            <mat-label i18n>Sac</mat-label>
+            <mho-select data-filter="bag" [ngModel]="selected_items()" (ngModelChange)="onItems($event)" [options]="item_options()" [bindLabel]="item_bind_label"
+                        bindIcon="img" multiple searchable></mho-select>
+        </mat-form-field>
+        <mat-form-field subscriptSizing="dynamic">
+            <mat-label i18n>États</mat-label>
+            <mho-select data-filter="status" [ngModel]="selected_status()" (ngModelChange)="onStatus($event)" [options]="all_status" bindIcon="img"
+                        bindLabel="label" multiple searchable></mho-select>
+        </mat-form-field>
+        <!-- Chamanique : potions puis immunité, sur une même ligne (ordre de la liste). -->
+        <div class="filter-row">
+            @if (options(POTIONS_ID).length > 0) {
+                <span class="filter-label" i18n-matTooltip matTooltip="Potions bues">
+                    <img [src]="HORDES_IMG_REPO + 'item/item_potion.gif'" i18n-alt alt="Potions bues">
+                </span>
+                <mat-button-toggle-group class="value-filter" hideMultipleSelectionIndicator multiple [value]="store.values(POTIONS_ID)"
+                                         (change)="store.setValues(POTIONS_ID, $event.value)">
+                    @for (value of options(POTIONS_ID); track value) {
+                        <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                    }
+                </mat-button-toggle-group>
+            }
+            <button type="button" class="bool-control" data-filter="immune" i18n-matTooltip matTooltip="Immunité — coché : oui · décoché : non · indéterminé : tous"
+                    (click)="store.cycleBool('immune')">
+                <mat-checkbox class="bool-filter" disableRipple tabindex="-1" [checked]="store.boolValue('immune') === true"
+                              [indeterminate]="store.boolValue('immune') === null">
+                    <img class="filter-icon" [src]="HORDES_IMG_REPO + 'icons/small_restoresp.gif'" i18n-alt alt="Immunité">
+                </mat-checkbox>
+            </button>
+        </div>
+    </section>
+
+    <section class="filters-section">
+        <h4 i18n>Actions quotidiennes</h4>
+        @for (action of daily_actions(); track action.key) {
+            <div class="filter-row bool-row">
+                <button type="button" class="bool-control" [attr.data-filter]="'daily_' + action.key" [matTooltip]="action.getLabel() + bool_hint"
+                        (click)="store.cycleBool('daily_' + action.key)">
+                    <mat-checkbox class="bool-filter" disableRipple tabindex="-1" [checked]="store.boolValue('daily_' + action.key) === true"
+                                  [indeterminate]="store.boolValue('daily_' + action.key) === null">
+                        <img class="filter-icon" [src]="HORDES_IMG_REPO + action.value.img" [alt]="action.getLabel()">
+                    </mat-checkbox>
+                </button>
+            </div>
+        }
+    </section>
+
+    <section class="filters-section toggles">
+        <h4 i18n>Actions héroïques</h4>
+        @for (action of heroic_fields; track action.key) {
+            @if (action.value.max_lvl === 1) {
+                <div class="filter-row bool-row">
+                    <button type="button" class="bool-control" [attr.data-filter]="'heroic_' + action.key" [matTooltip]="action.getLabel() + bool_hint"
+                            (click)="store.cycleBool('heroic_' + action.key)">
+                        <mat-checkbox class="bool-filter" disableRipple tabindex="-1" [checked]="store.boolValue('heroic_' + action.key) === true"
+                                      [indeterminate]="store.boolValue('heroic_' + action.key) === null">
+                            <img class="filter-icon" [src]="HORDES_IMG_REPO + action.value.img" [alt]="action.getLabel()">
+                        </mat-checkbox>
+                    </button>
+                </div>
+            } @else if (options('heroic_' + action.key).length > 0) {
+                <div class="filter-row">
+                    <span class="filter-label" [matTooltip]="action.getLabel()">
+                        <img [src]="HORDES_IMG_REPO + action.value.img" [alt]="action.getLabel()">
+                    </span>
+                    <mat-button-toggle-group class="value-filter" hideMultipleSelectionIndicator multiple [value]="store.values('heroic_' + action.key)"
+                                             (change)="store.setValues('heroic_' + action.key, $event.value)">
+                        @for (value of options('heroic_' + action.key); track value) {
+                            <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                </div>
+            }
+        }
+    </section>
+
+    <section class="filters-section toggles">
+        <h4 i18n>Améliorations</h4>
+        @for (home of home_fields; track home.key) {
+            @if (home.value.max_lvl === 1) {
+                <div class="filter-row bool-row">
+                    <button type="button" class="bool-control" [attr.data-filter]="'home_' + home.key" [matTooltip]="home.getLabel() + bool_hint"
+                            (click)="store.cycleBool('home_' + home.key)">
+                        <mat-checkbox class="bool-filter" disableRipple tabindex="-1" [checked]="store.boolValue('home_' + home.key) === true"
+                                      [indeterminate]="store.boolValue('home_' + home.key) === null">
+                            <img class="filter-icon" [src]="HORDES_IMG_REPO + homeIcon(home)" [alt]="home.getLabel()">
+                        </mat-checkbox>
+                    </button>
+                </div>
+            } @else if (options('home_' + home.key).length > 0) {
+                <div class="filter-row" [attr.data-filter]="'home_' + home.key">
+                    <span class="filter-label" [matTooltip]="home.getLabel()">
+                        <img [src]="HORDES_IMG_REPO + homeIcon(home)" [alt]="home.getLabel()">
+                    </span>
+                    <mat-button-toggle-group class="value-filter" hideMultipleSelectionIndicator multiple [value]="store.values('home_' + home.key)"
+                                             (change)="store.setValues('home_' + home.key, $event.value)">
+                        @for (value of options('home_' + home.key); track value) {
+                            <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                </div>
+            }
+        }
+    </section>
+
+    @if (has_skills_or_campings()) {
+        <section class="filters-section toggles">
+            <h4 i18n>Compétences et camping</h4>
+            @for (family of hero_skill_families; track family.key) {
+                @if (options(HERO_SKILL_ID_PREFIX + family.key).length > 0) {
+                    <div class="filter-row">
+                        <span class="filter-label hero-skill-letter" [matTooltip]="hero_skill_names()[family.key]">{{ family.letter }}</span>
+                        <mat-button-toggle-group class="value-filter" hideMultipleSelectionIndicator multiple [value]="store.values(HERO_SKILL_ID_PREFIX + family.key)"
+                                                 (change)="store.setValues(HERO_SKILL_ID_PREFIX + family.key, $event.value)">
+                            @for (value of options(HERO_SKILL_ID_PREFIX + family.key); track value) {
+                                <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                            }
+                        </mat-button-toggle-group>
+                    </div>
+                }
+            }
+            @if (options(CAMPING_COUNT_ID).length > 0) {
+                <div class="filter-row">
+                    <span class="filter-label" [matTooltip]="camping_count_label">
+                        <img [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'" [alt]="camping_count_label">
+                    </span>
+                    <mat-button-toggle-group class="value-filter" hideMultipleSelectionIndicator multiple [value]="store.values(CAMPING_COUNT_ID)"
+                                             (change)="store.setValues(CAMPING_COUNT_ID, $event.value)">
+                        @for (value of options(CAMPING_COUNT_ID); track value) {
+                            <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
+                        }
+                    </mat-button-toggle-group>
+                </div>
+            }
+        </section>
+    }
+</div>

@@ -91,8 +91,8 @@
                                         <ng-container i18n>PV</ng-container> {{ row.life }} / {{ row.maxLife }}
                                     }
                                     @case ('in-progress') {
-                                        <ng-container i18n>reste</ng-container> {{ row.remaining }}
-                                        <ng-container i18n>PA</ng-container>
+                                        <ng-container i18n>reste</ng-container>
+                                        <mho-icon-ap [value]="row.remaining"/>
                                     }
                                     @case ('unlocked') {
                                         <ng-container i18n>débloqué</ng-container>
@@ -105,8 +105,9 @@
                         </td>
                         <td class="center">{{ row.pa ?? '—' }}</td>
                         <td class="center">
-                            @if (row.building.defence > 0) {
-                                {{ row.building.defence }}
+                            @if (row.defence !== 0 || row.building.defence > 0) {
+                                <span class="def" [class.loss]="row.defence < 0"
+                                      [matTooltip]="defenceTooltip + ' ' + row.building.defence">{{ row.defence }}</span>
                             }
                         </td>
                         <td class="center">

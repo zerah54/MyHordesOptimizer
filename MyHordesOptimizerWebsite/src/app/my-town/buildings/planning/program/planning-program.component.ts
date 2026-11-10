@@ -1,4 +1,5 @@
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, output, OutputEmitterRef, Signal, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,20 +9,24 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Building } from '../../../../_abstract_model/types/building.class';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { BuildingProgress, repairLifeAfterPa, repairPaFor, StepIssue, StepResult } from '../building-progress.util';
-import { stepIssueLabel } from '../plan-alerts.util';
-import { BuildingRef, WORKSHOP_UID } from '../plan-evaluation.util';
+import { upgradeLevelText } from '../building-upgrades.types';
 import { BuildingPlanContentDTO, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO, PlanStepKind, PlanStepMode, stepMode } from '../plan.types';
-import { toNonNegativeInt } from '../planning-input.util';
+import { stepIssueLabel } from '../plan-alerts.util';
+import { BuildingRef, DayEvaluation, EveningVote, WORKSHOP_UID } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
+import { toNonNegativeInt } from '../planning-input.util';
 import { addInstruction, ItemPosition, moveItem, removeItem, setInstructions, setInstructionText, setStepMode, setStepNote } from '../program-edit.util';
 import { repairHpPerAp } from '../workshop.util';
 
-const angular_common: Imports = [FormsModule];
+const angular_common: Imports = [FormsModule, NgTemplateOutlet];
+const components: Imports = [IconApComponent];
 const cdk_modules: Imports = [DragDropModule];
 const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSelectModule, MatTooltipModule];
 
@@ -29,6 +34,13 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
 interface ModeOption {
     value: string;
     label: string;
+}
+
+/** Gain de l'évolution votée le soir : niveau atteint, défense gagnée pour la nuit et texte du niveau. */
+interface VoteGain {
+    level: number;
+    defense: number;
+    text: string | null;
 }
 
 /** PV avant et après une réparation évaluée. */
@@ -44,7 +56,7 @@ interface RepairLives {
     templateUrl: './planning-program.component.html',
     styleUrls: ['./planning-program.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...cdk_modules, ...material_modules]
+    imports: [...angular_common, ...components, ...cdk_modules, ...material_modules]
 })
 export class PlanningProgramComponent {
 
@@ -54,6 +66,9 @@ export class PlanningProgramComponent {
     protected readonly store: PlanningStore = inject(PlanningStore);
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly issueLabel: (issue: StepIssue) => string = stepIssueLabel;
+    private readonly locale: string = moment.locale();
+    /** Aide de la défense d'un chantier, suivie de sa défense propre. */
+    protected readonly defenceTooltip: string = $localize`Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense propre :`;
 
     /** Sections dont le champ « nouvelle consigne » est ouvert. */
     protected readonly adding: WritableSignal<ReadonlySet<PlanPool>> = signal<ReadonlySet<PlanPool>>(new Set<PlanPool>());
@@ -111,6 +126,25 @@ export class PlanningProgramComponent {
     protected icon(building_id: number): string {
         const img: string | undefined = this.icons().get(building_id);
         return img === undefined ? '' : HORDES_IMG_REPO + img;
+    }
+
+    /**
+     * Défense propre d'un chantier (référentiel).
+     * @param {number} building_id Chantier.
+     * @returns {number} Défense du référentiel, 0 s'il est inconnu.
+     */
+    protected defence(building_id: number): number {
+        return this.store.buildings().get(building_id)?.defence ?? 0;
+    }
+
+    /**
+     * Défense réellement gagnée par la ville une fois le chantier terminé (objets de défense consommés, effets sur les maisons,
+     * cercueils…) ; sa défense propre sans évaluation.
+     * @param {number} building_id Chantier.
+     * @returns {number} Gain réel, négatif si le chantier consomme plus de défense qu'il n'en apporte.
+     */
+    protected realDefence(building_id: number): number {
+        return this.store.evaluation()?.realDefense.get(building_id) ?? this.defence(building_id);
     }
 
     /**
@@ -290,33 +324,98 @@ export class PlanningProgramComponent {
      * @returns {number | null} Seuil strictement positif, sinon nul.
      */
     protected freeThreshold(building_id: number): number | null {
-        const vote_id: number | null = this.store.draft()?.eveningVoteBuildingId ?? null;
-        if (vote_id === null || this.store.buildings().get(vote_id)?.uid !== WORKSHOP_UID) {
+        const evaluation: DayEvaluation | null = this.store.evaluation();
+        if (evaluation?.vote?.uid !== WORKSHOP_UID && evaluation?.secondVote?.uid !== WORKSHOP_UID) {
             return null;
         }
-        const threshold: number = this.store.evaluation()?.freeThresholds.get(building_id) ?? 0;
+        const threshold: number = evaluation.freeThresholds.get(building_id) ?? 0;
         return threshold > 0 ? threshold : null;
+    }
+
+    /**
+     * Brasier Sacrificiel construit au soir : la nuit applique une seconde évolution.
+     * @returns {boolean} Vrai si le second vote est proposé.
+     */
+    protected doubleVote(): boolean {
+        return this.store.evaluation()?.doubleVote === true;
     }
 
     /** Chantiers votables le soir : à évolution et construits en fin de journée (déjà ou par le programme), plus le chantier déjà voté. */
     protected voteOptions(): BuildingRef[] {
-        const progress: ReadonlyMap<number, BuildingProgress> | undefined = this.store.evaluation()?.progressAfter;
-        const voted_id: number | null = this.store.draft()?.eveningVoteBuildingId ?? null;
-        const upgradable: ReadonlySet<number> = new Set<number>(this.store.catalog().filter((building: Building): boolean => building.has_upgrade).map((building: Building): number => building.id));
-        return [...this.store.plannable_buildings()]
-            .sort((a: BuildingRef, b: BuildingRef): number => a.label.localeCompare(b.label))
-            .filter((building: BuildingRef): boolean => building.id === voted_id
-                || (upgradable.has(building.id) && (progress === undefined || progress.get(building.id)?.built === true)));
+        return this.upgradableOptions(this.store.draft()?.eveningVoteBuildingId ?? null, null);
+    }
+
+    /** Chantiers votables en second : comme le premier vote, sans le chantier déjà voté en premier (jamais deux fois le même). */
+    protected secondVoteOptions(): BuildingRef[] {
+        const draft: BuildingPlanContentDTO | null = this.store.draft();
+        return this.upgradableOptions(draft?.eveningSecondVoteBuildingId ?? null, draft?.eveningVoteBuildingId ?? null);
     }
 
     /**
-     * Choisit le chantier voté le soir.
+     * Gain de l'évolution votée : niveau atteint, défense gagnée pour la nuit (l'évolution s'applique avant l'attaque) et texte du
+     * niveau dans la langue du site ; nul sans vote ou sans évaluation.
+     * @returns {VoteGain | null} Gain.
+     */
+    protected voteGain(): VoteGain | null {
+        return this.gainOf(this.store.evaluation()?.vote ?? null);
+    }
+
+    /**
+     * Gain de la seconde évolution, comme {@link voteGain}.
+     * @returns {VoteGain | null} Gain.
+     */
+    protected secondVoteGain(): VoteGain | null {
+        return this.gainOf(this.store.evaluation()?.secondVote ?? null);
+    }
+
+    /**
+     * Choisit le chantier voté le soir ; s'il était le second vote, celui-ci est vidé (jamais deux fois le même chantier).
      * @param {number | null} building_id Chantier, nul pour aucun.
      */
     protected onVote(building_id: number | null): void {
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
             content.eveningVoteBuildingId = building_id;
+            if (building_id !== null && content.eveningSecondVoteBuildingId === building_id) {
+                content.eveningSecondVoteBuildingId = null;
+            }
         });
+    }
+
+    /**
+     * Choisit le second chantier voté le soir.
+     * @param {number | null} building_id Chantier, nul pour aucun.
+     */
+    protected onSecondVote(building_id: number | null): void {
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            content.eveningSecondVoteBuildingId = building_id;
+        });
+    }
+
+    /**
+     * Chantiers votables : à évolution et construits en fin de journée (déjà ou par le programme), plus le chantier déjà choisi.
+     * @param {number | null} kept_id Chantier déjà choisi, toujours proposé.
+     * @param {number | null} excluded_id Chantier à écarter.
+     * @returns {BuildingRef[]} Chantiers triés par nom.
+     */
+    private upgradableOptions(kept_id: number | null, excluded_id: number | null): BuildingRef[] {
+        const progress: ReadonlyMap<number, BuildingProgress> | undefined = this.store.evaluation()?.progressAfter;
+        const upgradable: ReadonlySet<number> = new Set<number>(this.store.catalog().filter((building: Building): boolean => building.has_upgrade).map((building: Building): number => building.id));
+        return [...this.store.plannable_buildings()]
+            .sort((a: BuildingRef, b: BuildingRef): number => a.label.localeCompare(b.label))
+            .filter((building: BuildingRef): boolean => building.id !== excluded_id && (building.id === kept_id
+                || (upgradable.has(building.id) && (progress === undefined || progress.get(building.id)?.built === true))));
+    }
+
+    /**
+     * Gain d'une évolution votée, avec le texte du niveau dans la langue du site.
+     * @param {EveningVote | null} vote Évolution évaluée.
+     * @returns {VoteGain | null} Gain, nul sans vote.
+     */
+    private gainOf(vote: EveningVote | null): VoteGain | null {
+        if (vote === null) {
+            return null;
+        }
+        return { level: vote.level, defense: vote.defense, text: upgradeLevelText(this.store.upgrades(), vote.uid, vote.level, this.locale) };
     }
 
     /**

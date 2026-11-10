@@ -30,6 +30,7 @@ import { computeReconstructedHomeDefense } from '../../_abstract_model/utils/cit
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { decodeSnapshot, toBoundedNumber, TOOL_SNAPSHOT_PARAM } from '../../_core/utilities/tool-snapshot.util';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { ToolPresetsComponent } from '../../_shared/tool-presets/tool-presets.component';
 
 /** Nombre de paliers d'habitation dans le jeu (niveaux 0 à 8 : Lit de camp → Château). */
@@ -49,7 +50,7 @@ const SNAPSHOT_MAX_ITERATIONS: number = 100_000;
 const MIN_ITERATIONS: number = 100;
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [ToolPresetsComponent];
+const components: Imports = [ToolPresetsComponent, PageTitleComponent];
 const pipes: Imports = [DecimalPipe];
 const material_modules: Imports = [
     MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule,

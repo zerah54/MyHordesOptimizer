@@ -60,6 +60,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 .ForMember(dto => dto.Note, opt => opt.MapFrom(model => model.Note))
                 .ForMember(dto => dto.ScavZoneLevel, opt => opt.MapFrom(model => model.ScavZoneLevel))
                 .ForMember(dto => dto.ScoutZoneLevel, opt => opt.MapFrom(model => model.ScoutZoneLevel))
+                .ForMember(dto => dto.ScoutVisits, opt => opt.MapFrom(model => model.ScoutVisits))
                 .ForMember(dto => dto.ScoutEstimationZombie, opt => opt.MapFrom(model => model.ScoutEstimationZombie))
                 // L'estimation de l'Éclaireur est bruitée : seul l'encadrement est exploitable
                 .ForMember(dto => dto.ScoutEstimationMin, opt => opt.MapFrom(model =>
@@ -124,6 +125,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                // par MapCellRadarExtensions, pas par ce mapping
                .ForMember(dest => dest.ScavZoneLevel, opt => opt.Ignore())
                .ForMember(dest => dest.ScoutZoneLevel, opt => opt.Ignore())
+               .ForMember(dest => dest.ScoutVisits, opt => opt.Ignore())
                .ForMember(dest => dest.ScoutEstimationZombie, opt => opt.Ignore())
                .ForMember(dest => dest.IdScoutEstimationLastUpdateInfo, opt => opt.Ignore())
                .ForMember(dest => dest.X, opt => opt.MapFrom(src => src.X))

@@ -1,0 +1,808 @@
+{
+    "item_boomfruit_#00": {
+        "maxLevel": 5,
+        "texts": {
+            "base": {
+                "de": "Der Granatwerfer gibt 40 zusätzliche Verteidigungspunkte.",
+                "fr": "Le Lance-Grenades apporte 40 points de défense.",
+                "en": "Grenade Launcher gives an additional 40 defence points.",
+                "es": "El lanzagranadas aporta 40 puntos de defensa adicionales."
+            },
+            "levels": [
+                {
+                    "de": "Der Granatwerfer verbraucht beim nächtlichen Angriff 1 Explosive Pampelmuse und steigert seinen Verteidigungswert dafür um 30.",
+                    "fr": "La défense apportée par le Lance-grenades est de 70 points de défense, mais coûte 1 pamplemousse explosif par nuit.",
+                    "en": "The defense provided by the Grenade Launcher is 70 defense points, but cost 1 explosive grapefruit per night.",
+                    "es": "La defensa que proporciona el Lanzagranadas es de 70 puntos de defensa, pero cuesta 1 pomelo explosivo por noche."
+                },
+                {
+                    "de": "Der Granatwerfer verbraucht beim nächtlichen Angriff 2 Explosive Pampelmusen und steigert seinen Verteidigungswert dafür um 75.",
+                    "fr": "La défense apportée par le Lance-grenades est de 115 points de défense, mais coûte 2 pamplemousse explosif par nuit.",
+                    "en": "The defense provided by the Grenade Launcher is 115 defense points, but cost 2 explosive grapefruits per night.",
+                    "es": "La defensa que proporciona el Lanzagranadas es de 115 puntos de defensa, pero cuesta 2 pomelos explosivos por noche."
+                },
+                {
+                    "de": "Der Granatwerfer verbraucht beim nächtlichen Angriff 3 Explosive Pampelmusen und steigert seinen Verteidigungswert dafür um 150.",
+                    "fr": "La défense apportée par le Lance-grenades est de 190 points de défense, mais coûte 3 pamplemousse explosif par nuit.",
+                    "en": "The defense provided by the Grenade Launcher is 190 defense points, but cost 3 explosive grapefruits per night.",
+                    "es": "La defensa que proporciona el Lanzagranadas es de 190 puntos de defensa, pero cuesta 3 pomelos explosivos por noche."
+                },
+                {
+                    "de": "Der Granatwerfer verbraucht beim nächtlichen Angriff 4 Explosive Pampelmusen und steigert seinen Verteidigungswert dafür um 240.",
+                    "fr": "La défense apportée par le Lance-grenades est de 280 points de défense, mais coûte 4 pamplemousse explosif par nuit.",
+                    "en": "The defense provided by the Grenade Launcher is 280 defense points, but cost 4 explosive grapefruits per night.",
+                    "es": "La defensa que proporciona el Lanzagranadas es de 280 puntos de defensa, pero cuesta 4 pomelos explosivos por noche."
+                },
+                {
+                    "de": "Der Granatwerfer verbraucht beim nächtlichen Angriff 5 Explosive Pampelmusen und steigert seinen Verteidigungswert dafür um 340.",
+                    "fr": "La défense apportée par le Lance-grenades est de 380 points de défense, mais coûte 5 pamplemousse explosif par nuit.",
+                    "en": "The defense provided by the Grenade Launcher is 380 defense points, but cost 5 explosive grapefruits per night.",
+                    "es": "La defensa que proporciona el Lanzagranadas es de 380 puntos de defensa, pero cuesta 5 pomelos explosivos por noche."
+                }
+            ]
+        },
+        "effects": {
+            "defenseIncrement": {
+                "levels": [
+                    0,
+                    30,
+                    75,
+                    150,
+                    240,
+                    340
+                ],
+                "default": 0,
+                "source": "BuildingUpgradeListener"
+            }
+        }
+    },
+    "item_home_def_#00": {
+        "maxLevel": 5,
+        "texts": {
+            "base": {
+                "de": "Die entwicklungsfähige Stadtmauer bringt der Stadt 55 Verteidigungspunkte.",
+                "fr": "La Muraille évolutive apporte 55 points de défense.",
+                "en": "The upgraded great wall gives an additional 55 defence points.",
+                "es": "La muralla evolutiva aporta 55 puntos de defensa."
+            },
+            "levels": [
+                {
+                    "de": "Der Verteidigungsbonus der Stadtmauer steigt dauerhaft um 30.",
+                    "fr": "La Muraille évolutive apporte 85 points de défense.",
+                    "en": "The Evolutive Wall gives 85 defence points.",
+                    "es": "La muralla aporta 85 puntos de defensa."
+                },
+                {
+                    "de": "Der Verteidigungsbonus der Stadtmauer steigt dauerhaft um 35.",
+                    "fr": "La Muraille évolutive apporte 120 points de défense.",
+                    "en": "The Evolutive Wall gives 120 defence points.",
+                    "es": "La muralla aporta 120 puntos de defensa."
+                },
+                {
+                    "de": "Der Verteidigungsbonus der Stadtmauer steigt dauerhaft um 50.",
+                    "fr": "La Muraille évolutive apporte 170 points de défense.",
+                    "en": "The Evolutive Wall gives 170 defence points.",
+                    "es": "La muralla aporta 170 puntos de defensa."
+                },
+                {
+                    "de": "Der Verteidigungsbonus der Stadtmauer steigt dauerhaft um 65.",
+                    "fr": "La Muraille évolutive apporte 235 points de défense.",
+                    "en": "The Evolutive Wall gives 235 defence points.",
+                    "es": "La muralla aporta 235 puntos de defensa."
+                },
+                {
+                    "de": "Der Verteidigungsbonus der Stadtmauer steigt dauerhaft um 80.",
+                    "fr": "La Muraille évolutive apporte 315 points de défense.",
+                    "en": "The Evolutive Wall gives 315 defence points.",
+                    "es": "La muralla aporta 315 puntos de defensa."
+                }
+            ]
+        },
+        "effects": {
+            "defenseIncrement": {
+                "levels": [
+                    0,
+                    30,
+                    65,
+                    115,
+                    180,
+                    260
+                ],
+                "default": 0,
+                "source": "BuildingUpgradeListener"
+            }
+        }
+    },
+    "item_meca_parts_#00": {
+        "maxLevel": 3,
+        "texts": {
+            "base": {
+                "de": "Jeder in der Bank abgelegte Verteidigungsgegenstand bringt der Stadt 1.5 Verteidigungspunkte zusätzlich ein.",
+                "fr": "Chaque objet de défense en banque apporte 1,5 point de défense à la ville.",
+                "en": "Each defence object in the bank gives 1.5 defence points to the town.",
+                "es": "Cada objeto de defensa en el Almacén aporta 1.5 puntos de defensa al pueblo."
+            },
+            "levels": [
+                {
+                    "de": "Der Verteidigungsbonus von Gegenständen in der Bank steigt um 100%.",
+                    "fr": "Chaque objet de défense en banque apporte 2 points de défense à la ville.",
+                    "en": "Each defence object in the bank gives 2 defence points to the town.",
+                    "es": "Cada objeto de defensa en el Almacén aporta 2 puntos de defensa al pueblo."
+                },
+                {
+                    "de": "Der Verteidigungsbonus von Gegenständen in der Bank steigt um 150%.",
+                    "fr": "Chaque objet de défense en banque apporte 2,5 points de défense à la ville.",
+                    "en": "Each defence object in the bank gives 2.5 defence points to the town.",
+                    "es": "Cada objeto de defensa en el Almacén aporta 2.5 puntos de defensa al pueblo."
+                },
+                {
+                    "de": "Der Verteidigungsbonus von Gegenständen in der Bank steigt um 200%.",
+                    "fr": "Chaque objet de défense en banque apporte 3 points de défense à la ville.",
+                    "en": "Each defence object in the bank gives 3 defence points to the town.",
+                    "es": "Cada objeto de defensa en el Almacén aporta 3 puntos de defensa al pueblo."
+                }
+            ]
+        }
+    },
+    "item_scope_#00": {
+        "maxLevel": 4,
+        "texts": {
+            "base": {
+                "de": "Die Aussichtsplattform ermöglicht es, den Bürger zu wählen, der am besten bei Expeditionen führen kann. Erspäht jeden Morgen alle Zombies, die sich im Umkreis von 3km um die Stadt aufhalten.",
+                "fr": "La Plateforme d'observation vous permet d'élire le citoyen le plus à même de vous guider lors des expéditions. Chaque matin, détecte tous les zombies à 3 km de la ville.",
+                "en": "The Observation Platform allows you to elect the citizen best able to guide you during expeditions. Zombies within 3 zones are detected.",
+                "es": "La Plataforma de Observación le permite elegir al habitante más capacitado para guiarle durante las expediciones. Cada mañana, revela todas las zonas a 3 km del pueblo."
+            },
+            "levels": [
+                {
+                    "de": "Erspäht jeden Morgen alle Zombies, die sich im Umkreis von 6km um die Stadt aufhalten.",
+                    "fr": "Chaque matin, détecte tous les zombies à 6 km de la ville.",
+                    "en": "Zombies within 6 zones are detected.",
+                    "es": "Cada mañana, revela todas las zonas a 6 km del pueblo."
+                },
+                {
+                    "de": "Erspäht jeden Morgen alle Zombies, die sich im Umkreis von 10km um die Stadt aufhalten.",
+                    "fr": "Chaque matin, détecte tous les zombies à 10 km de la ville.",
+                    "en": "Zombies within 10 zones are detected.",
+                    "es": "Cada mañana, revela todas las zonas a 10 km del pueblo."
+                },
+                {
+                    "de": "Erspäht jeden Morgen alle Zombies, die sich im Umkreis von 10km um die Stadt aufhalten. Bürger im Umkreis von 1km um die Stadt können ohne AP-Verbrauch die Stadt betreten.",
+                    "fr": "Détecte tous les zombies à 10 km de la ville, et permet aux citoyens à 1 km de la ville de rentrer gratuitement.",
+                    "en": "Zombies within 10 zones are detected + Allows citizens within 1 km of the town to return without using any APs.",
+                    "es": "Revela las zonas a 10 km y además permite ingresar gratuitamente a los habitantes que se encuentren a 1km del pueblo."
+                },
+                {
+                    "de": "Erspäht jeden Morgen alle Zombies, die sich im Umkreis von 10km um die Stadt aufhalten. Bürger im Umkreis von 2km um die Stadt können ohne AP-Verbrauch die Stadt betreten.",
+                    "fr": "Détecte tous les zombies à 10 km de la ville, et permet aux citoyens à 2 km de la ville de rentrer gratuitement.",
+                    "en": "Zombies within 10 zones are detected + Allows citizens within 2 km of the town to return without using any APs.",
+                    "es": "Revela las zonas a 10 km y además permite ingresar gratuitamente a los habitantes que se encuentren a 2km del pueblo."
+                }
+            ]
+        },
+        "effects": {
+            "BeyondTeleportRadius": {
+                "levels": [
+                    0,
+                    0,
+                    0,
+                    1,
+                    2
+                ],
+                "default": 0,
+                "source": "BuildingQueryListener"
+            },
+            "NightlyZoneDiscoveryRadius": {
+                "levels": [
+                    3,
+                    6,
+                    10,
+                    10,
+                    10,
+                    10
+                ],
+                "default": 0,
+                "source": "BuildingQueryListener"
+            }
+        }
+    },
+    "item_shield_#00": {
+        "maxLevel": 3,
+        "texts": {
+            "base": {
+                "de": "Die Verteidigung der Stadt wird um 10% erhöht.",
+                "fr": "L’organisation de la défense est basique, le gain de défenses totales de la ville passe à 10 %.",
+                "en": "The total defence of the town is permanently increased by 10%.",
+                "es": "Las defensas del pueblo aumentan en 10%."
+            },
+            "levels": [
+                {
+                    "de": "Die Verteidigung der Stadt wird um 11% erhöht.",
+                    "fr": "L'organisation de la défense est optimisée, le gain de la défense total de la ville passe à 11%.",
+                    "en": "The total defence of the town is permanently increased by 11%.",
+                    "es": "La defensa total del pueblo se ve aumentada permanentemente un 11%."
+                },
+                {
+                    "de": "Die Verteidigung der Stadt wird um 12% erhöht.",
+                    "fr": "L’organisation de la défense est optimisée, le gain de défenses totales de la ville passe à 12 %.",
+                    "en": "The total defence of the town is permanently increased by 12%.",
+                    "es": "Las defensas del pueblo aumentan en 12% (+2%)"
+                },
+                {
+                    "de": "Die Verteidigung der Stadt wird um 13% erhöht.",
+                    "fr": "L'organisation de la défense est optimisée, le gain de la défense total de la ville passe à 13%.",
+                    "en": "The total defence of the town is permanently increased by 13%.",
+                    "es": "La defensa total del pueblo se ve aumentada permanentemente un 13%."
+                }
+            ]
+        },
+        "effects": {
+            "OverallTownDefenseScale": {
+                "levels": [
+                    1.1,
+                    1.11,
+                    1.12,
+                    1.13
+                ],
+                "default": 1,
+                "source": "BuildingQueryListener"
+            }
+        }
+    },
+    "item_soul_blue_static_#00": {
+        "maxLevel": 3,
+        "texts": {
+            "base": {
+                "de": "Du kannst jetzt die Seelen deiner verstorbenen Mitbürger reinigen, um ein wenig zusätzliche Verteidigung zu erhalten.",
+                "fr": "Vous pouvez désormais purifier les âmes de vos concitoyens contre un peu de défense supplémentaire.",
+                "en": "You can now purify the souls of your fellow citizens for a little extra defense.",
+                "es": "Ahora puedes purificar las almas de tus antiguos compañeros para conseguir un poquito más de defensa."
+            },
+            "levels": [
+                {
+                    "de": "Jede gereinigte Seele bringt der Stadt etwas mehr Verteidigung.",
+                    "fr": "Chaque nouvelle âme purifiée rapporte un peu plus de défense à la ville.",
+                    "en": "Each new purified soul brings a little more defense to the town.",
+                    "es": "Cada alma nueva purificada aporta un poco más de defensa al pueblo."
+                },
+                {
+                    "de": "Zusätzlich zum vorherigen Effekt sinkt der Einfluss gequälter Seelen auf den Angriff leicht ab.",
+                    "fr": "En plus des évolutions précédentes, chaque âme torturée impacte moins l'attaque nocturne.",
+                    "en": "In addition to the previous level, each tortured soul has less impact on the night attack.",
+                    "es": "Además del nivel anterior, cada alma torturada tiene un impacto menor en el ataque nocturno."
+                },
+                {
+                    "de": "Zusätzlich zum vorherigen Effekt wird der Verteidigungsbonus gereinigter Seelen weiter erhöht, und jede gereinigte Seele bringt zwei zusätzliche Ranking-Punkte für die Stadt ein.",
+                    "fr": "En plus des évolutions précédentes, chaque nouvelle âme purifiée rapporte encore plus de défense et 2 points de classement à la ville.",
+                    "en": "In addition to the previous level, each new purified soul brings even more defense and 2 ranking points to the town.",
+                    "es": "Además del nivel anterior, cada alma nueva purificada aporta aún más defensa y 2 puntos de clasificación al pueblo."
+                }
+            ]
+        }
+    },
+    "item_tube_#00": {
+        "maxLevel": 5,
+        "texts": {
+            "base": {
+                "de": "Der Wasserwerfer gibt 70 zusätzliche Verteidigungspunkte.",
+                "fr": "Les aqua-tourelles apportent 70 points de défense.",
+                "en": "Water Turrets gives an additional 70 defence points.",
+                "es": "Los sistemas de riego aportan 70 puntos de defensa."
+            },
+            "levels": [
+                {
+                    "de": "Der Wasserturm verbraucht beim nächtlichen Angriff 2 Rationen Wasser und steigert seinen Verteidigungswert dafür um 56.",
+                    "fr": "La défense des aqua-tourelles est multipliée par 1,8 (126 points de défense), mais cela coûte 2 rations d’eau par nuit.",
+                    "en": "The Water Turrets defence is multiplied by 1.8 (126 defense points), but cost 2 water rations per night.",
+                    "es": "La defensa de los sistemas de riego se multiplica por 1.8 (126 pts) pero consumen 2 raciones del pozo cada noche."
+                },
+                {
+                    "de": "Der Wasserturm verbraucht beim nächtlichen Angriff 4 Rationen Wasser und steigert seinen Verteidigungswert dafür um 112.",
+                    "fr": "La défense des aqua-tourelles est multipliée par 2,6 (182 points de défense), mais cela coûte 4 rations d’eau par nuit.",
+                    "en": "The Water Turrets defence is multiplied by 2.6 (182 defense points), but cost 4 water rations per night.",
+                    "es": "La defensa de los sistemas de riego se multiplica por 2.6 (182 pts) pero consumen 4 raciones del pozo cada noche."
+                },
+                {
+                    "de": "Der Wasserturm verbraucht beim nächtlichen Angriff 6 Rationen Wasser und steigert seinen Verteidigungswert dafür um 168.",
+                    "fr": "La défense des aqua-tourelles est multipliée par 3,4 (238 points de défense), mais cela coûte 6 rations d’eau par nuit.",
+                    "en": "The Water Turrets defence is multiplied by 3.4 (238 defense points), but cost 6 water rations per night.",
+                    "es": "La defensa de los sistemas de riego se multiplica por 3.4 (238 pts) pero consumen 6 raciones del pozo cada noche."
+                },
+                {
+                    "de": "Der Wasserturm verbraucht beim nächtlichen Angriff 9 Rationen Wasser und steigert seinen Verteidigungswert dafür um 252.",
+                    "fr": "La défense des aqua-tourelles est multipliée par 4.6 (322 points de défense), mais coûte 9 rations d'eau par nuit.",
+                    "en": "The Water Turrets defence is multiplied by 4.6 (322 defense points), but cost 9 water rations per night.",
+                    "es": "La defensa de las torretas de agua se multiplica por 4,6 (322 puntos de defensa), pero cuestan 9 raciones de agua por noche."
+                },
+                {
+                    "de": "Der Wasserturm verbraucht beim nächtlichen Angriff 12 Rationen Wasser und steigert seinen Verteidigungswert dafür um 336.",
+                    "fr": "La défense des aqua-tourelles est multipliée par 5.8 (406 points de défense), mais coûte 12 rations d'eau par nuit.",
+                    "en": "The Water Turrets defence is multiplied by 5.8 (406 defense points), but cost 12 water rations per night.",
+                    "es": "La defensa de las torretas de agua se multiplica por 5,8 (406 puntos de defensa), pero cuestan 12 raciones de agua por noche."
+                }
+            ]
+        },
+        "effects": {
+            "defenseMultiplier": {
+                "levels": [
+                    0,
+                    0.8,
+                    1.6,
+                    2.4,
+                    3.6,
+                    4.8
+                ],
+                "default": 0,
+                "source": "BuildingUpgradeListener"
+            }
+        }
+    },
+    "item_vegetable_tasty_#00": {
+        "maxLevel": 4,
+        "texts": {
+            "base": {
+                "de": "Produziert Verdächtiges Gemüse und Darmmelone.",
+                "fr": "Produit des légumes suspects et des melons d'intestin.",
+                "en": "Produces Suspicious-looking Vegetable and Intestine Melon.",
+                "es": "Produce verduras sospechosas y melones intestinales."
+            },
+            "levels": [
+                {
+                    "de": "Produziert täglich zusätzlich zu seiner ursprünglichen Produktion Stufe Mutterkorn und Trockene Kräuter.",
+                    "fr": "Produit quotidiennement du claviceps purpurea et des herbes en plus de sa production originale.",
+                    "en": "Produces Ergot Fungus and Herbs daily in addition to its original production.",
+                    "es": "Produce Claviceps Purpúrea y Hierbas, además de su producción original."
+                },
+                {
+                    "de": "Produziert täglich zusätzlich zu seiner Produktion aus den vorherigen Stufen Explosive Pampelmusen.",
+                    "fr": "Produit quotidiennement des pamplemousses explosifs en plus de sa production du niveau précédent.",
+                    "en": "Produces Explosive Grapefruits daily in addition to its production from the previous level.",
+                    "es": "Produce Pomelos Explosivos diariamente, además de su producción del nivel anterior."
+                },
+                {
+                    "de": "Produziert täglich zu seiner Produktion aus den vorherigen Stufen Apfel.",
+                    "fr": "Produit quotidiennement des pommes en plus de sa production du niveau précédent.",
+                    "en": "Produces Apples daily in addition to its production from the previous level.",
+                    "es": "Produce Manzanas diariamente, además de su producción del nivel anterior."
+                },
+                {
+                    "de": "Produziert täglich zusätzlich zu seiner Produktion der vorherigen Stufen Toller Kürbis.",
+                    "fr": "Produit quotidiennement de la citrouille en plus de sa production du niveau précédent.",
+                    "en": "Produces Impressive Pumpkin daily in addition to its production from the previous level.",
+                    "es": "Produce Gran Calabazas diariamente, además de su producción del nivel anterior."
+                }
+            ]
+        }
+    },
+    "small_cemetery_#00": {
+        "maxLevel": 2,
+        "texts": {
+            "base": {
+                "de": "Jeder zum Friedhof gebrachte tote Mitbürger bringt insgesamt +3 Verteidigungspunkt für die Gesamtverteidigung der Stadt",
+                "fr": "Chaque citoyen mort rapporte +3 points de défense à la ville.",
+                "en": "Each dead citizen brought to the cemetery gives +3 defence points to the town. ",
+                "es": "Cada cadáver da +3 puntos de defensa al pueblo."
+            },
+            "levels": [
+                {
+                    "de": "Jeder zum Friedhof gebrachte tote Mitbürger bringt insgesamt +7 Verteidigungspunkte für die Gesamtverteidigung der Stadt",
+                    "fr": "Chaque citoyen mort rapporte +7 points de défense à la ville.",
+                    "en": "Each dead citizen brought to the cemetery gives +7 defence points to the town.",
+                    "es": "Cada cadáver da +7 puntos de defensa al pueblo."
+                },
+                {
+                    "de": "Jeder zum Friedhof gebrachte tote Mitbürger bringt insgesamt +14 Verteidigungspunkte für die Gesamtverteidigung der Stadt",
+                    "fr": "Chaque citoyen mort rapporte +14 points de défense à la ville.",
+                    "en": "Each dead citizen brought to the cemetery gives +14 defence points to the town. ",
+                    "es": "Cada cadáver da +14 puntos de defensa al pueblo."
+                }
+            ]
+        },
+        "effects": {
+            "calculate_town_def.ratio": {
+                "levels": [
+                    3,
+                    7,
+                    14
+                ],
+                "default": 14,
+                "source": "TownHandler"
+            }
+        }
+    },
+    "small_door_closed_#00": {
+        "maxLevel": 3,
+        "texts": {
+            "base": {
+                "de": "Das Portal bringt 5 Verteidigungspunkte.",
+                "fr": "Le Portail apporte 5 points de défense.",
+                "en": "The Portal provide 5 defense points.",
+                "es": "El Portal ofrece 5 puntos de defensa."
+            },
+            "levels": [
+                {
+                    "de": "Das Portal bringt 20 Verteidigungspunkte.",
+                    "fr": "Le Portail apporte 20 points de défense.",
+                    "en": "The Portal provide 20 defense points.",
+                    "es": "El Portal ofrece 20 puntos de defensa."
+                },
+                {
+                    "de": "Das Portal bringt 50 Verteidigungspunkte.",
+                    "fr": "Le Portail apporte 50 points de défense.",
+                    "en": "The Portal provide 50 defense points.",
+                    "es": "El Portal ofrece 50 puntos de defensa."
+                },
+                {
+                    "de": "Das Portal bringt 80 Verteidigungspunkte und die Öffnung der Tür ist bis zum Mittag kostenlos.",
+                    "fr": "Le Portail apporte 80 points de défense et l'ouverture de la porte est gratuite avant midi.",
+                    "en": "The Portal provide 80 defense points and opening the door is free before midday.",
+                    "es": "El Portal ofrece 80 puntos de defensa y abrir el portal antes del medio día no tiene coste."
+                }
+            ]
+        },
+        "effects": {
+            "defenseIncrement": {
+                "levels": [
+                    0,
+                    15,
+                    45,
+                    75
+                ],
+                "default": 0,
+                "source": "BuildingUpgradeListener"
+            }
+        }
+    },
+    "small_gather_#00": {
+        "maxLevel": 5,
+        "texts": {
+            "base": {
+                "de": "Der Verteidigungswert der Stadt steigt mit dem Großen Graben auf 10 Punkte.",
+                "fr": "Le Grand fossé apporte 10 points de défense.",
+                "en": "The Great Pit gives an additional 10 defence points.",
+                "es": "La zanja periférica aporta 10 puntos de defensa."
+            },
+            "levels": [
+                {
+                    "de": "Der Verteidigungsbonus des Grabens steigt dauerhaft um 20.",
+                    "fr": "Le Grand fossé apporte 30 points de défense.",
+                    "en": "The Great Pit provides 30 defence points.",
+                    "es": "La Zanja periférica da 30 puntos de defensa."
+                },
+                {
+                    "de": "Der Verteidigungsbonus des Grabens steigt dauerhaft um 25.",
+                    "fr": "Le Grand fossé apporte 55 points de défense.",
+                    "en": "The Great Pit provides 55 defence points.",
+                    "es": "La Zanja periférica da 55 puntos de defensa."
+                },
+                {
+                    "de": "Der Verteidigungsbonus des Grabens steigt dauerhaft um 30.",
+                    "fr": "Le Grand fossé apporte 85 points de défense.",
+                    "en": "The Great Pit provides 85 defence points.",
+                    "es": "La Zanja periférica da 85 puntos de defensa."
+                },
+                {
+                    "de": "Der Verteidigungsbonus des Grabens steigt dauerhaft um 35.",
+                    "fr": "Le Grand fossé apporte 120 points de défense.",
+                    "en": "The Great Pit provides 120 defence points.",
+                    "es": "La Zanja periférica da 120 puntos de defensa."
+                },
+                {
+                    "de": "Der Verteidigungsbonus des Grabens steigt dauerhaft um 40.",
+                    "fr": "Le Grand fossé apporte 160 points de défense.",
+                    "en": "The Great Pit provides 160 defence points.",
+                    "es": "La Zanja periférica da 160 puntos de defensa"
+                }
+            ]
+        },
+        "effects": {
+            "defenseIncrement": {
+                "levels": [
+                    0,
+                    20,
+                    45,
+                    75,
+                    110,
+                    150
+                ],
+                "default": 0,
+                "source": "BuildingUpgradeListener"
+            }
+        }
+    },
+    "small_gather_#02": {
+        "maxLevel": 5,
+        "texts": {
+            "base": {
+                "de": "Zeigt die Windrichtung in der Zeitung an.",
+                "fr": "Permet de connaître la direction du vent dans la Gazette.",
+                "en": "Allows you to know the wind direction in the Gazette.",
+                "es": "Permite conocer la dirección del viento en el Boletín."
+            },
+            "levels": [
+                {
+                    "de": "Die Chance, dass sich die Zonen in Windrichtung regenerieren steigt auf 37%.",
+                    "fr": "Les chances de régénération d'une case du désert passent à 37%.",
+                    "en": "There is a 37% chance of desert zone regeneration.",
+                    "es": "Las posibilidades de regeneración de una zona del desierto pasan a 37%."
+                },
+                {
+                    "de": "Die Chance, dass sich die Zonen in Windrichtung regenerieren steigt auf 49%.",
+                    "fr": "Les chances de régénération d’une case du désert passent à 49 %.",
+                    "en": "There is a 49% chance of desert zone regeneration.",
+                    "es": "Las posibilidades de regeneración de una zona del desierto pasan a 49%."
+                },
+                {
+                    "de": "Die Chance, dass sich die Zonen in Windrichtung regenerieren steigt auf 61%.",
+                    "fr": "Les chances de régénération d’une case du désert passent à 61 %.",
+                    "en": "There is a 61% chance of desert zone regeneration.",
+                    "es": "Las posibilidades de regeneración de una zona del desierto pasan a 61%."
+                },
+                {
+                    "de": "Die Chance, dass sich die Zonen in Windrichtung regenerieren steigt auf 73%.",
+                    "fr": "Les chances de régénération d’une case du désert passent à 73 %.",
+                    "en": "There is a 73% chance of desert zone regeneration.",
+                    "es": "Las posibilidades de regeneración de una zona del desierto pasan a 73%."
+                },
+                {
+                    "de": "Die Chance, dass sich die Zonen in Windrichtung regenerieren steigt auf 85%.",
+                    "fr": "Les chances de régénération d’une case du désert passent à 85 %.",
+                    "en": "There is a 85% chance of desert zone regeneration.",
+                    "es": "Las posibilidades de regeneración de una zona del desierto pasan a 85%."
+                }
+            ]
+        },
+        "effects": {
+            "NightlyZoneRecoveryChance": {
+                "levels": [
+                    0.25,
+                    0.37,
+                    0.49,
+                    0.61,
+                    0.73,
+                    0.85
+                ],
+                "default": 0.25,
+                "source": "BuildingQueryListener"
+            }
+        }
+    },
+    "small_novlamps_#00": {
+        "maxLevel": 1,
+        "texts": {
+            "base": {
+                "de": "Die Verringerung der Fundchancen bei Nacht wird im Umkreis von 6km um die Stadt negiert.",
+                "fr": "La réduction des chances de fouilles la nuit est annulée dans un rayon de 6 km autour de la ville",
+                "en": "The nighttime search chances penalty is removed within a 6 km radius of town.",
+                "es": "La reducción de las posibilidades de búsqueda nocturna se anula en un radio de 6 km alrededor del pueblo."
+            },
+            "levels": [
+                {
+                    "de": "Die Verringerung der Fundchancen bei Nacht wird auf der gesamten Karte negiert, pro Tag werden 2 Batterien verbraucht.",
+                    "fr": "La réduction des chances de fouilles la nuit est annulée sur toute la carte, 2 piles sont consommées chaque jour.",
+                    "en": "The nighttime search chances penalty is fully removed in the world beyond, 2 batteries are consumed per day.",
+                    "es": "La reducción de la posibilidad de búsquedas nocturnas se cancela en todo el mapa, se consume 2 baterías por día."
+                }
+            ]
+        }
+    },
+    "small_refine_#00": {
+        "maxLevel": 5,
+        "texts": {
+            "base": {
+                "de": "Ermöglicht die Umwandlung von Objekten, mit etwas Anstrengung.",
+                "fr": "Vous permet de transformer des objets, avec un certain effort.",
+                "en": "Allows the transformation of objects, for a little effort.",
+                "es": "Permite la transformación de objetos, con un poquito de esfuerzo."
+            },
+            "levels": [
+                {
+                    "de": "Die AP-Kosten aller Bauprojekte werden um 5% gesenkt.",
+                    "fr": "Le coût en PA de tous les chantiers est réduit de 6 %.",
+                    "en": "The cost (AP) of all construction projects is reduced by 6%.",
+                    "es": "Los costos en PA de todas las obras se reducen en 6%."
+                },
+                {
+                    "de": "Die AP-Kosten aller Bauprojekte werden um 10% gesenkt.",
+                    "fr": "Le coût en PA de tous les chantiers est réduit de 12 %.",
+                    "en": "The cost (AP) of all construction projects is reduced by 12%.",
+                    "es": "Los costos en PA de todas las obras se reducen en 12%."
+                },
+                {
+                    "de": "Die AP-Kosten aller Bauprojekte werden um 15% gesenkt.",
+                    "fr": "Le coût en PA de tous les chantiers est réduit de 18 %.",
+                    "en": "The cost (AP) of all construction projects is reduced by 18%.",
+                    "es": "Los costos en PA de todas las obras se reducen en 18%."
+                },
+                {
+                    "de": "Die AP-Kosten aller Bauprojekte werden um 25% gesenkt. Erhöht die Effektivität von Reparaturen um einen Punkt.",
+                    "fr": "Le coût en PA de tous les chantiers est réduit de 25%. Augmente le rendement de réparation de un point.",
+                    "en": "The building cost (AP) of all construction projects is reduced by 25%. Increases repair yield by one point.",
+                    "es": "Los costos en PA de todas las obras se reducen en 25%. Aumenta el rendimiento de reparación por un punto."
+                },
+                {
+                    "de": "Die AP-Kosten aller Bauprojekte werden um 35% gesenkt. Erhöht die Effektivität von Reparaturen um zwei Punkte.",
+                    "fr": "Le coût en PA de tous les chantiers est réduit de 35%. Augmente le rendement de réparation de deux points.",
+                    "en": "The building cost (AP) of all construction projects is reduced by 35%. Increases repair yield by two points.",
+                    "es": "Los costos en PA de todas las obras se reducen en 35%. Aumenta el rendimiento de reparación por dos puntos."
+                }
+            ]
+        },
+        "effects": {
+            "ConstructionAPRatio": {
+                "levels": [
+                    null,
+                    null,
+                    null,
+                    null,
+                    0.75,
+                    0.65
+                ],
+                "default": null,
+                "source": "BuildingQueryListener"
+            }
+        }
+    },
+    "small_round_path_#00": {
+        "maxLevel": 3,
+        "texts": {
+            "base": {
+                "de": "Diese Brustwehr um die Stadt erlaubt es einigen Wächtern, die Stadt von der Mauer aus zu schützen.",
+                "fr": "Ce Chemin de Ronde autour de la ville permettra à quelques veilleurs de protéger la ville depuis les remparts.",
+                "en": "These Battlements around town will allow for a few watchmen to defend it from the ramparts.",
+                "es": "Estas almenas alrededor del pueblo permitirán que unos cuantos centinelas protejan el pueblo desde las murallas."
+            },
+            "levels": [
+                {
+                    "de": "Indem man die Zinnen etwas erweitert, können mehr Wächter während des Angriffs kämpfen.",
+                    "fr": "En élargissant quelque peu le Chemin de Ronde, plus de veilleurs pourront lutter lors de l'attaque.",
+                    "en": "By widening the Battlements a little, more watchmen will be able to fight during the attack.",
+                    "es": "Al ampliar un poco las almenas, más centinelas podrán luchar durante el ataque."
+                },
+                {
+                    "de": "Der Brustwehr ist so breit, dass die ganze Stadt dort übernachten kann.",
+                    "fr": "Un Chemin de Ronde si large que toute la ville pourrait désormais y passer la nuit.",
+                    "en": "A Battlements so wide that the whole town could now spend the night there.",
+                    "es": "Unas almenas tan espaciosas que ahora todo el pueblo podría pasar allí la noche."
+                },
+                {
+                    "de": "Durch den Ausbau der Brustwehr können sich die Wächter dort etwas sicherer fühlen.",
+                    "fr": "En aménageant le Chemin de Ronde, les veilleurs s'y sentiront légèrement plus en sécurité.",
+                    "en": "By developing the Battlements, the watchmen will feel slightly safer there.",
+                    "es": "Al remodelar las almenas, los centinelas se sentirán un poco más seguros allí."
+                }
+            ]
+        },
+        "effects": {
+            "NightWatcherCap": {
+                "levels": [
+                    10,
+                    20,
+                    40,
+                    40
+                ],
+                "default": 40,
+                "source": "BuildingQueryListener"
+            }
+        }
+    },
+    "small_strategy_#01": {
+        "maxLevel": 4,
+        "texts": {
+            "base": {
+                "de": "Die Stadt erhält nach dem nächsten Angriff einmalig 1 ungewöhnliche Baupläne.",
+                "fr": "La ville obtiendra 1 plan inhabituel après l'attaque.",
+                "en": "The Town will receive 1 uncommon blueprint after the attack.",
+                "es": "El pueblo recibirá 1 plano inusual tras el ataque."
+            },
+            "levels": [
+                {
+                    "de": "Die Stadt erhält nach jedem Angriff 1 gewöhnliche und 1 ungewöhnliche Baupläne sowie.",
+                    "fr": "La ville reçoit également 1 plan commun et 1 plan inhabituel après chaque attaque.",
+                    "en": "The town receives 1 common and 1 uncommon blueprint as well after each attack.",
+                    "es": "El pueblo recibirá 1 plano común y 1 plano inusual tras cada ataque."
+                },
+                {
+                    "de": "Die Stadt erhält nach jedem Angriff 1 ungewöhnliche und 1 seltene Baupläne sowie.",
+                    "fr": "La ville reçoit 1 plan inhabituel et 1 plan rare après chaque attaque.",
+                    "en": "After each attack, the town receives 1 uncommon blueprint and 1 rare blueprint.",
+                    "es": "El pueblo recibirá 1 plano inusual y 1 plano raro tras cada ataque."
+                },
+                {
+                    "de": "Die Stadt erhält nach jedem Angriff 2 seltene Baupläne.",
+                    "fr": "La ville reçoit 2 plans rares après chaque attaque.",
+                    "en": "The town receives 2 rare blueprints after each attack.",
+                    "es": "El pueblo recibirá 2 planos raros tras cada ataque."
+                },
+                {
+                    "de": "Die Stadt erhält nach jedem Angriff 1 seltene Baupläne und - möglicherweise - eine nette Überraschung.",
+                    "fr": "Après chaque attaque, la ville reçoit 1 plan rare et – éventuellement – une belle surprise.",
+                    "en": "After each attack, the town receives 1 rare blueprint and – possibly – a nice surprise.",
+                    "es": "El pueblo recibirá 1 plano raro tras cada ataque, y posiblemente una sorpresa."
+                }
+            ]
+        }
+    },
+    "small_trash_#00": {
+        "maxLevel": 2,
+        "texts": {
+            "base": {
+                "de": "Ermöglicht das Zerstören von Gegenständen für 1 Verteidigungspunkt.",
+                "fr": "Permet de jeter des objets pour 1 point de défense.",
+                "en": "Allows you to dump items for 1 defense point.",
+                "es": "Permite tirar objetos para 1 punto de defensa."
+            },
+            "levels": [
+                {
+                    "de": "Ermöglicht die fachgerechte Entsorgung von Waffen und Nahrung auf der Müllhalde.",
+                    "fr": "Augmente la défense fournie pour toutes les armes et nourritures jetées dans la décharge.",
+                    "en": "Increases the defense provided for any weapons and food thrown at the dump.",
+                    "es": "Aumenta la defensa proporcionada por cualquier arma y comida lanzada al vertedero."
+                },
+                {
+                    "de": "Ermöglicht das fachgerechte Massakrieren unschuldiger Tiere und Steigert die Ausbeute jedes auf den Müll geworfenen Verteidigungs-Gegenstandes.",
+                    "fr": "Augmente la défense fournie pour tous les objets défensifs et animaux jetés dans la décharge.",
+                    "en": "Increases the defense provided for any defensive objects and animals thrown at the dump.",
+                    "es": "Aumenta la defensa proporcionada por cualquier objeto defensivo y animal lanzado al vertedero."
+                }
+            ]
+        }
+    },
+    "small_water_#00": {
+        "maxLevel": 5,
+        "texts": {
+            "base": {
+                "de": "Der Brunnen wird einmalig mit 15 Rationen Wasser befüllt.",
+                "fr": "Ajoute 15 rations d'eau dans le puits (une seule fois).",
+                "en": "15 rations of water are added to the well (one time only)",
+                "es": "Se añaden 15 raciones de agua al pozo (solo una vez)."
+            },
+            "levels": [
+                {
+                    "de": "Der Brunnen der Stadt wird einmalig um 20 Rationen Wasser aufgefüllt",
+                    "fr": "Ajoute 20 rations d’eau dans le puits (une seule fois).",
+                    "en": "Add 20 water rations to the well (one time only).",
+                    "es": "Añade 20 raciones de agua al pozo (una sola vez)."
+                },
+                {
+                    "de": "Der Brunnen der Stadt wird einmalig um 20 Rationen Wasser aufgefüllt",
+                    "fr": "Ajoute 20 rations d’eau dans le puits (une seule fois).",
+                    "en": "Add 20 water rations to the well (one time only).",
+                    "es": "Añade 20 raciones de agua al pozo (una sola vez)."
+                },
+                {
+                    "de": "Der Brunnen der Stadt wird einmalig um 30 Rationen Wasser aufgefüllt",
+                    "fr": "Ajoute 30 rations d’eau dans le puits (une seule fois).",
+                    "en": "Add 30 water rations to the well (one time only).",
+                    "es": "Añade 30 raciones de agua al pozo (una sola vez)."
+                },
+                {
+                    "de": "Der Brunnen der Stadt wird einmalig um 30 Rationen Wasser aufgefüllt",
+                    "fr": "Ajoute 30 rations d’eau dans le puits (une seule fois).",
+                    "en": "Add 30 water rations to the well (one time only).",
+                    "es": "Añade 30 raciones de agua al pozo (una sola vez)."
+                },
+                {
+                    "de": "Der Brunnen der Stadt wird einmalig um 40 Rationen Wasser aufgefüllt",
+                    "fr": "Ajoute 40 rations d’eau dans le puits (une seule fois).",
+                    "en": "Add 40 water rations to the well (one time only).",
+                    "es": "Añade 40 raciones de agua al pozo (una sola vez)."
+                }
+            ]
+        },
+        "effects": {
+            "waterIncrement": {
+                "levels": [
+                    5,
+                    20,
+                    20,
+                    30,
+                    30,
+                    40
+                ],
+                "default": 0,
+                "source": "BuildingUpgradeListener"
+            }
+        }
+    }
+}

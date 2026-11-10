@@ -1,21 +1,28 @@
 import { PlanningDay, PlanningStatic } from '../../../_abstract_model/services/planning-data.service';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { expeditionPaByCitizen } from './budget.util';
+import { TownDefenseFactors } from './defense-gain.util';
 import { BuildingPlanContentDTO } from './plan.types';
 import { BuildingRef, CitizenRef, DayInput, HomeLevelRef } from './plan-evaluation.util';
 import {
     bankMap,
+    buildingLevelsOf,
     buildingProgressMap,
     buildingRefs,
+    builtUidsOf,
     citizenRefs,
+    defenseItemIdsOf,
     expeditionParts,
     hasSlaveryOf,
     homeLevelRefs,
+    homeUpgradeResources,
     itemValueMap,
     PlanTier,
     planTierMap,
+    townDefenseFactors,
     workshopLevelOf
 } from './planning-data.util';
+import { ResourceCount } from './resources.util';
 
 /** Données chargées et réglages d'affichage nécessaires à l'assemblage des entrées du calcul. */
 export interface PlanningContext {
@@ -40,8 +47,12 @@ export function buildDayInputs(context: PlanningContext, first_day: number, cont
     const item_values: Map<number, number> = itemValueMap(data.plans.itemValues);
     const item_id_by_uid: Map<string, number> = new Map<string, number>(data.items.map((item: Item): [string, number] => [item.uid, item.id]));
     const homes: Map<number, HomeLevelRef> = homeLevelRefs(data.homes, item_id_by_uid, context.locale);
+    const home_upgrades: Map<string, ReadonlyMap<number, ResourceCount[]>> = homeUpgradeResources(data.homes, item_id_by_uid);
     const workshop_level: number = workshopLevelOf(data.buildings, data.state.buildings);
     const has_slavery: boolean = hasSlaveryOf(data.buildings, data.state.buildings);
+    const defense_factors: TownDefenseFactors = townDefenseFactors(data.state.defense, data.citizens, builtUidsOf(data.buildings, data.state.buildings));
+    const defense_item_ids: Set<number> = defenseItemIdsOf(data.items);
+    const building_levels: Map<string, number> = buildingLevelsOf(data.buildings, data.state.buildings);
 
     return contents.map((content: BuildingPlanContentDTO, index: number): DayInput => {
         const day: PlanningDay | undefined = context.days.get(first_day + index);
@@ -62,7 +73,12 @@ export function buildDayInputs(context: PlanningContext, first_day: number, cont
             baseDefense: data.state.defense?.total ?? 0,
             temporaryDefense: data.state.defense?.temp ?? 0,
             homes,
-            hardMode: context.hard_mode
+            homeUpgrades: home_upgrades,
+            hardMode: context.hard_mode,
+            defenseFactors: defense_factors,
+            defenseItemIds: defense_item_ids,
+            upgrades: data.upgrades,
+            buildingLevels: building_levels
         };
     });
 }

@@ -35,7 +35,10 @@ export interface BudgetCitizen {
     technician: boolean;
     basePa: number;
     expeditionPa: number;
+    /** PA des tâches que les PC peuvent payer. */
     taskPa: number;
+    /** PA des tâches payables en PA seulement (agrandissement de maison). */
+    apOnlyTaskPa: number;
 }
 
 /** Capacité de travail d'un citoyen sur les chantiers. */
@@ -64,21 +67,27 @@ export interface PoolBudget {
     remaining: number;
 }
 
-/** Partie d'expédition : longueur du tracé (nulle si aucun tracé) et citoyens inscrits. */
+/** Place d'un citoyen dans une partie d'expédition, avec les PE qu'il a au départ (dépensés avant les PA). */
+export interface ExpeditionSeatPa {
+    citizenId: number;
+    startPe: number;
+}
+
+/** Partie d'expédition : longueur du tracé (nulle si aucun tracé) et places des citoyens inscrits. */
 export interface ExpeditionPartPa {
     routeLength: number | null;
-    citizenIds: number[];
+    seats: ExpeditionSeatPa[];
 }
 
 /**
- * Capacité d'un citoyen : les tâches consomment les PC avant les PA ; jamais négative.
+ * Capacité d'un citoyen : les tâches consomment les PC avant les PA, sauf celles payables en PA seulement ; jamais négative.
  * @param {BudgetCitizen} citizen Données du citoyen.
  * @returns {CitizenCapacity} PA, PC et capacité totale utilisables sur les chantiers.
  */
 export function citizenCapacity(citizen: BudgetCitizen): CitizenCapacity {
     const cp: number = citizen.technician ? TECHNICIAN_CP : 0;
     const cp_used: number = Math.min(cp, citizen.taskPa);
-    const pa_used_by_tasks: number = citizen.taskPa - cp_used;
+    const pa_used_by_tasks: number = citizen.taskPa - cp_used + citizen.apOnlyTaskPa;
     const pa_left: number = citizen.basePa - citizen.expeditionPa - pa_used_by_tasks;
     const pa_capacity: number = Math.max(0, pa_left);
     const cp_capacity: number = cp - cp_used;
@@ -114,7 +123,8 @@ export function poolBudgets(capacities: CitizenCapacity[], lines: BudgetLine[], 
 }
 
 /**
- * PA d'expédition de chaque citoyen : Σ longueur du tracé (un retour éventuel est déjà dans la boucle) sur les parties où il est inscrit.
+ * PA d'expédition de chaque citoyen : Σ (longueur du tracé − PE de départ, jamais négatif) sur les parties où il est inscrit ; un
+ * retour éventuel est déjà dans la boucle.
  * @param {ExpeditionPartPa[]} parts Parties d'expédition du jour.
  * @returns {{ pa: Map<number, number>; partsWithoutRoute: number }} PA par citoyen et nombre de parties sans tracé.
  */
@@ -126,8 +136,8 @@ export function expeditionPaByCitizen(parts: ExpeditionPartPa[]): { pa: Map<numb
             parts_without_route++;
             continue;
         }
-        for (const id of part.citizenIds) {
-            pa.set(id, (pa.get(id) ?? 0) + part.routeLength);
+        for (const seat of part.seats) {
+            pa.set(seat.citizenId, (pa.get(seat.citizenId) ?? 0) + Math.max(0, part.routeLength - seat.startPe));
         }
     }
     return { pa, partsWithoutRoute: parts_without_route };

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Internal;
+using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
@@ -68,6 +69,8 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
         }
 
         public HomeReferentialDto GetHomeReferential() => throw new NotSupportedException();
+        public Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades() => throw new NotSupportedException();
+        public Dictionary<string, string> GetItemEmotes() => throw new NotSupportedException();
 
         public IEnumerable<string> GetItemUidsWithCitizenStateImpact() => throw new NotSupportedException();
         public Task<SimpleMeDto> GetSimpleMeAsync() => throw new NotSupportedException();

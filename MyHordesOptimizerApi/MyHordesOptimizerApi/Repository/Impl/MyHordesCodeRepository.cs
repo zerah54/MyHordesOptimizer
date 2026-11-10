@@ -85,6 +85,18 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return dico;
         }
 
+        public Dictionary<string, MyHordesItemExtrasCodeModel> GetItemExtras() =>
+            File.ReadAllText("Data/Items/item-extras.json").FromJson<Dictionary<string, MyHordesItemExtrasCodeModel>>();
+
+        public Dictionary<string, JArray> GetResultGroups() =>
+            File.ReadAllText("Data/Items/result-groups.json").FromJson<Dictionary<string, JArray>>();
+
+        public Dictionary<string, MyHordesMetaResultCodeModel> GetMetaRequirements() =>
+            File.ReadAllText("Data/Items/meta-requirements.json").FromJson<Dictionary<string, MyHordesMetaResultCodeModel>>();
+
+        public Dictionary<string, string> GetItemsNightwatch() =>
+            File.ReadAllText("Data/Items/items-nightwatch.json").FromJson<Dictionary<string, string>>();
+
         public Dictionary<string, Dictionary<string, dynamic[]>> GetItemsDropRates()
         {
             var path = "Data/Items/find.json";
@@ -198,6 +210,20 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var json = File.ReadAllText(path);
             var dico = json.FromJson<Dictionary<string, Dictionary<string, string>>>();
             return dico;
+        }
+
+        public Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades()
+        {
+            var path = "Data/Buildings/upgrades.json";
+            var json = File.ReadAllText(path);
+            var dico = json.FromJson<Dictionary<string, BuildingUpgradeCodeModel>>();
+            return dico;
+        }
+
+        public Dictionary<string, string> GetItemEmotes()
+        {
+            var json = File.ReadAllText("Data/Items/emotes.json");
+            return json.FromJson<Dictionary<string, string>>();
         }
 
         public List<HomeLevelCodeModel> GetHomeLevels()

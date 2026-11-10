@@ -1,0 +1,35 @@
+{
+  "lamp_on_#00": {
+    "watchImpact": -1
+  },
+  "music_#00": {
+    "watchImpact": -2
+  },
+  "car_door_#00": {
+    "watchImpact": 3
+  },
+  "taser_#00": {
+    "watchImpact": 1
+  },
+  "cart_#00": {
+    "bagExtensionType": 1
+  },
+  "bag_#00": {
+    "bagExtensionType": 1
+  },
+  "bagxl_#00": {
+    "bagExtensionType": 1
+  },
+  "pocket_belt_#00": {
+    "bagExtensionType": 2
+  },
+  "coffee_#00": {
+    "watchImpact": 1
+  },
+  "shield_#00": {
+    "watchImpact": 5
+  },
+  "pumpkin_tasty_#00": {
+    "watchImpact": 1
+  }
+}

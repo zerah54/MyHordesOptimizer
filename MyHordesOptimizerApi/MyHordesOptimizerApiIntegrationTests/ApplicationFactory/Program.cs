@@ -128,6 +128,12 @@ builder.Services.AddScoped<ITownAccessService, MyHordesOptimizerApiIntegrationTe
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
 builder.Services.AddScoped<IMapRouteService, MyHordesOptimizerApi.Services.Impl.MapRoutes.MapRouteService>();
 builder.Services.AddScoped<IBuildingPlanService, MyHordesOptimizerApi.Services.Impl.BuildingPlans.BuildingPlanService>();
+// Verrous des propositions de plan ; AddSignalR rend IHubContext<BuildingPlansHub> résoluble pour le diffuseur
+// du contrôleur (sans MapHub ni balayeur : aucun test HTTP n'ouvre de connexion).
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Impl.BuildingPlans.BuildingPlanLockRegistry>();
+builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Interfaces.IBuildingPlanBroadcaster, MyHordesOptimizerApi.Services.Impl.BuildingPlans.BuildingPlanBroadcaster>();
+builder.Services.AddSignalR();
 
 // Requis par TownWriteAccessHttpTests (Controllers.MyHordesOptimizerMapController).
 builder.Services.AddScoped<IMyHordesOptimizerMapService, MyHordesOptimizerMapService>();

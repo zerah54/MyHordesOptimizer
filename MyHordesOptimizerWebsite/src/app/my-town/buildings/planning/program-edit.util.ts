@@ -1,5 +1,5 @@
 import { BuildingProgress } from './building-progress.util';
-import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanStepDTO, PlanStepMode, PlanTaskDTO } from './plan.types';
+import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanLossDTO, PlanPool, PlanStepDTO, PlanStepMode, PlanTaskDTO } from './plan.types';
 
 /** Ce qu'il faut savoir des chantiers pour cocher dans l'arbre : parents, avancement au début du jour, pertes de PV la nuit. */
 export interface ToggleContext {
@@ -241,6 +241,16 @@ export function sanitizeContent(content: BuildingPlanContentDTO): BuildingPlanCo
         .map(sanitizeItem)
         .filter((item: PlanItemDTO | null): item is PlanItemDTO => item !== null);
     const instructions: string = (content.instructions ?? '').trim();
+    // L'API refuse deux pertes identiques (même chantier, même type) : on garde la première.
+    const loss_keys: Set<string> = new Set<string>();
+    const losses: PlanLossDTO[] = (content.losses ?? []).filter((loss: PlanLossDTO): boolean => {
+        const key: string = `${loss.buildingId}|${loss.kind}`;
+        if (loss_keys.has(key)) {
+            return false;
+        }
+        loss_keys.add(key);
+        return true;
+    });
     return {
         ...content,
         citizens: content.citizens.map((citizen: PlanCitizenDTO): PlanCitizenDTO => ({
@@ -248,6 +258,7 @@ export function sanitizeContent(content: BuildingPlanContentDTO): BuildingPlanCo
             tasks: citizen.tasks.filter((task: PlanTaskDTO): boolean => task.kind !== 'action' || (typeof task.ref === 'string' && task.ref !== ''))
         })),
         instructions: instructions === '' ? null : instructions,
+        losses,
         programs: { banned: clean(content.programs.banned), regular: clean(content.programs.regular) }
     };
 }

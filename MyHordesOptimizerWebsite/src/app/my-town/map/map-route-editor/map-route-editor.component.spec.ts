@@ -164,12 +164,13 @@ describe('MapRouteEditorComponent', (): void => {
         const element: HTMLElement = render();
 
         expect(text(element.querySelector('.editor-title'))).toBe('Nouveau tracé');
-        expect(text(element.querySelector('.summary'))).toContain('4 PA');
-        expect(text(element.querySelector('.summary'))).toContain('Retour en ville : +4 PA');
+        expect(text(element.querySelector('.summary .total'))).toBe('4');
+        expect(element.querySelector('.summary .unit mho-icon-ap img')).not.toBeNull();
+        expect(text(element.querySelector('.summary'))).toContain('Retour en ville : +4');
         const steps: string[] = Array.from(element.querySelectorAll('.step')).map((step: Element): string => {
             return ['.node', '.coordinates', '.place', '.ap'].map((selector: string): string => text(step.querySelector(selector))).join('|');
         });
-        expect(steps).toEqual(['D|[0 ; 0]|Ville|0PA', 'A|[2 ; 2]||4PA']);
+        expect(steps).toEqual(['D|[0 ; 0]|Ville|0', 'A|[2 ; 2]||4']);
     });
 
     it('lists the cells with orders of the expeditions that follow the route, and those it left', (): void => {
@@ -188,7 +189,7 @@ describe('MapRouteEditorComponent', (): void => {
         const steps: string[] = Array.from(element.querySelectorAll('.step')).map((step: Element): string => {
             return ['.node', '.coordinates', '.orders', '.ap', '.off-pill'].map((selector: string): string => text(step.querySelector(selector))).join('|');
         });
-        expect(steps).toEqual(['D|[0 ; 0]||0PA|', '1|[0 ; 1]|2 consignes|1PA|', 'A|[0 ; 2]||2PA|', '!|[2 ; -2]|1 consigne||Hors tracé']);
+        expect(steps).toEqual(['D|[0 ; 0]||0|', '1|[0 ; 1]|2 consignes|1|', 'A|[0 ; 2]||2|', '!|[2 ; -2]|1 consigne||Hors tracé']);
     });
 
     it('lists the start alone before any destination', (): void => {

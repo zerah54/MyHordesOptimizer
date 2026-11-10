@@ -12,6 +12,7 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { MapRoute, mapRouteColorVar, MapRouteLinkedPart } from '../../../_abstract_model/types/map-route.class';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../_shared/confirm-dialog/confirm-dialog.component';
+import { IconApComponent } from '../../../_shared/icon-ap/icon-ap.component';
 import { ruinVisitAp } from '../expedition-orders/expedition-orders.util';
 import { partApLabel } from '../expedition-orders/order-labels';
 
@@ -40,7 +41,7 @@ interface RouteOption {
     templateUrl: './expedition-part-route.component.html',
     styleUrls: ['./expedition-part-route.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [RouterLink, ...material_modules]
+    imports: [RouterLink, ...material_modules, IconApComponent]
 })
 export class ExpeditionPartRouteComponent {
     public readonly part: InputSignal<ExpeditionPart> = input.required();

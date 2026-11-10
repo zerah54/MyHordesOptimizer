@@ -39,7 +39,8 @@
                     <span class="title" i18n>Bannis</span>
                     <span class="value"><strong
                         [class.negative]="evaluation.budgets.banned.remaining < 0">{{ evaluation.budgets.banned.remaining }}</strong></span>
-                    <span class="sub"><ng-container i18n>PA restants sur</ng-container>
+                    <span class="sub"><mho-icon-ap/>
+                        <ng-container i18n>restants sur</ng-container>
                         {{ evaluation.budgets.banned.budget }}</span>
                 </div>
             }
@@ -52,7 +53,8 @@
                 }
                 <span class="value"><strong
                     [class.negative]="evaluation.budgets.regular.remaining < 0">{{ evaluation.budgets.regular.remaining }}</strong></span>
-                <span class="sub"><ng-container i18n>PA restants sur</ng-container>
+                <span class="sub"><mho-icon-ap/>
+                        <ng-container i18n>restants sur</ng-container>
                     {{ evaluation.budgets.regular.budget }}</span>
             </div>
 

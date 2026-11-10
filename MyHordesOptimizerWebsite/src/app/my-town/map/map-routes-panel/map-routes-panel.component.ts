@@ -15,6 +15,7 @@ import { MapRouteGame } from '../../../_abstract_model/types/map-route-game.clas
 import { MapRouteAccess } from '../../../_abstract_model/types/map-routes.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
+import { IconApComponent } from '../../../_shared/icon-ap/icon-ap.component';
 import { orderCountLabel } from '../../expeditions/expedition-orders/order-labels';
 import { RouteOrderCount } from '../map-orders/map-cell-orders';
 import { buildRouteDetail, cellsByCoordinates, citizenName, MapRouteDetail, routeSubtitle } from '../map-routes/map-route-detail';
@@ -79,7 +80,7 @@ const COLOR_LABELS: Readonly<Record<MapRouteColor, string>> = {
     templateUrl: './map-routes-panel.component.html',
     styleUrls: ['./map-routes-panel.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...material_modules]
+    imports: [...angular_common, ...material_modules, IconApComponent]
 })
 export class MapRoutesPanelComponent {
     public readonly views: InputSignal<readonly MapRouteView[]> = input.required();

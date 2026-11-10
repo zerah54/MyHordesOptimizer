@@ -5,6 +5,7 @@ import { CommonModel, dtoToModelArray, modelToDtoArray } from './_common.class';
 import { I18nLabels } from './_types';
 import { CatapultEffect } from './catapult-effect.class';
 import { Category } from './category.class';
+import { ChargeChance, ItemActionEffects } from './item-action-effects.class';
 import { ItemSummary } from './item-summary.class';
 import { Recipe } from './recipe.class';
 
@@ -35,6 +36,16 @@ export class Item extends CommonModel<ItemDTO> {
     public technician_open_cp_cost: number | null = null;
     /** Effet catapulte réel de l'objet. `null` si l'objet n'est pas catapultable. */
     public catapult_effect: CatapultEffect | null = null;
+    /** Effets des actions du jeu liées à l'objet (ouverture, abattage, purification, attaque, veille). */
+    public action_effects: ItemActionEffects[] = [];
+    /** Charges possibles au rechargement. `null` si l'objet ne se recharge pas. */
+    public reload_charges: ChargeChance[] | null = null;
+    /** Impact sur la veille (0 si aucun). */
+    public watch_impact: number = 0;
+    /** Capacité supplémentaire apportée en tant que sac. `null` si ce n'est pas un sac. */
+    public bag_capacity_bonus: number | null = null;
+    /** Sacs qui ne se cumulent pas avec celui-ci. `null` si aucun groupe d'exclusion. */
+    public bag_exclusive_group: ItemSummary[] | null = null;
     public bank_count!: number;
     public wishlist_count!: number;
     public drop_rate_not_praf!: number;
@@ -66,6 +77,11 @@ export class Item extends CommonModel<ItemDTO> {
             openSuccessRate: this.open_success_rate,
             technicianOpenCpCost: this.technician_open_cp_cost,
             catapultEffect: this.catapult_effect ? this.catapult_effect.modelToDto() : null,
+            actionEffects: modelToDtoArray(this.action_effects),
+            reloadCharges: this.reload_charges ? modelToDtoArray(this.reload_charges) : null,
+            watchImpact: this.watch_impact,
+            bagCapacityBonus: this.bag_capacity_bonus,
+            bagExclusiveGroup: this.bag_exclusive_group ? modelToDtoArray(this.bag_exclusive_group) : null,
             wishListCount: this.wishlist_count,
             id: this.id,
             uid: this.uid,
@@ -97,6 +113,11 @@ export class Item extends CommonModel<ItemDTO> {
             this.open_success_rate = dto.openSuccessRate ?? null;
             this.technician_open_cp_cost = dto.technicianOpenCpCost ?? null;
             this.catapult_effect = dto.catapultEffect ? new CatapultEffect(dto.catapultEffect) : null;
+            this.action_effects = dtoToModelArray(ItemActionEffects, dto.actionEffects);
+            this.reload_charges = dto.reloadCharges ? dtoToModelArray(ChargeChance, dto.reloadCharges) : null;
+            this.watch_impact = dto.watchImpact ?? 0;
+            this.bag_capacity_bonus = dto.bagCapacityBonus ?? null;
+            this.bag_exclusive_group = dto.bagExclusiveGroup ? dtoToModelArray(ItemSummary, dto.bagExclusiveGroup) : null;
             this.wishlist_count = dto.wishListCount;
             this.uid = dto.uid;
             this.id = dto.id;

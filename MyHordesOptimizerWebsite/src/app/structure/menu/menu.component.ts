@@ -27,6 +27,7 @@ import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/ro
 import { filter } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
+import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Theme } from '../../_abstract_model/interfaces';
 import { AdminService } from '../../_abstract_model/services/admin.service';
 import { Imports } from '../../_abstract_model/types/_types';
@@ -88,6 +89,8 @@ export class MenuComponent implements OnInit {
     private readonly change_detector: ChangeDetectorRef = inject(ChangeDetectorRef);
     private readonly dialog: MatDialog = inject(MatDialog);
     protected readonly myhordes_url: string = environment.myhordes_url;
+    /** L'url des images de hordes */
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
 
     public ngOnInit(): void {

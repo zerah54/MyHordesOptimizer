@@ -33,6 +33,7 @@ using MyHordesOptimizerApi.Serilog;
 using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Impl.Estimations;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
+using MyHordesOptimizerApi.Services.Impl.BuildingPlans;
 using MyHordesOptimizerApi.Services.Impl.Import;
 using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Impl.Towns;
@@ -235,6 +236,11 @@ builder.Services.AddSingleton<TownSyncLock>();
 // Verrou des imports référentiels globaux (tables sans IdTown) : distinct de TownSyncLock, singleton
 // pour la même raison.
 builder.Services.AddSingleton<ReferentialImportLock>();
+// Verrous des propositions de plan : en mémoire, partagés par tous les hubs.
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<BuildingPlanLockRegistry>();
+builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Interfaces.IBuildingPlanBroadcaster, BuildingPlanBroadcaster>();
+builder.Services.AddHostedService<BuildingPlanLockSweeper>();
 builder.Services.AddScoped<IWishListService, WishListService>();
 builder.Services.AddSingleton<IMinesweeperBoardGenerator, MinesweeperBoardGenerator>();
 builder.Services.AddScoped<IMinesweeperService, MinesweeperService>();
@@ -374,5 +380,6 @@ app.UseHttpLogging();
 
 app.MapControllers();
 app.MapHub<ExpeditionsHub>("/hub/expeditions");
+app.MapHub<BuildingPlansHub>("/hub/building-plans");
 
 app.Run();

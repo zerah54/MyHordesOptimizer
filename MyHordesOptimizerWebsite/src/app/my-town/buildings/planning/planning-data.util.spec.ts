@@ -2,17 +2,17 @@ import { BuildingDTO } from '../../../_abstract_model/dto/building.dto';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { Building } from '../../../_abstract_model/types/building.class';
-import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
+import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
 import { Home } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { ExpeditionPartPa } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { HomeReferentialDTO } from './home-referential.types';
-import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
 import { TownBuildingStateDTO } from './plan.types';
+import { BuildingRef, CitizenRef, HomeLevelRef, SLAVERY_UID, WORKSHOP_UID } from './plan-evaluation.util';
 import {
     bankMap,
     buildingProgressMap,
@@ -21,11 +21,13 @@ import {
     expeditionParts,
     hasSlaveryOf,
     homeLevelRefs,
+    homeUpgradeResources,
     itemValueMap,
     PlanTier,
     planTierMap,
     workshopLevelOf
 } from './planning-data.util';
+import { ResourceCount } from './resources.util';
 
 function building(overrides: Partial<BuildingDTO> = {}): Building {
     return new Building({
@@ -178,6 +180,24 @@ describe('planning-data.util', (): void => {
             expect(citizenRefs([citizen({ home })])[0].homeLevel).toBe(3);
             expect(citizenRefs([citizen({})])[0].homeLevel).toBeNull();
         });
+
+        it('niveaux négatifs (non définis) = niveau 0, habitation comme améliorations', (): void => {
+            const home: Home = Object.assign(new Home(), { content: [{ element: HomeEnum.HOUSE_LEVEL, value: -1 }, { element: HomeEnum.KITCHEN_LEVEL, value: -1 }] });
+            const ref: CitizenRef = citizenRefs([citizen({ home })])[0];
+            expect(ref.homeLevel).toBe(0);
+            expect(ref.upgradeLevels?.get(HomeEnum.KITCHEN_LEVEL.key)).toBe(0);
+        });
+
+        it('lit le niveau des améliorations (booléen = 0 ou 1), null sans données de maison', (): void => {
+            const home: Home = Object.assign(new Home(), {
+                content: [{ element: HomeEnum.HOUSE_LEVEL, value: 3 }, { element: HomeEnum.LAB_LEVEL, value: 2 }, { element: HomeEnum.HAS_FENCE, value: true }]
+            });
+            const levels: ReadonlyMap<string, number> | null = citizenRefs([citizen({ home })])[0].upgradeLevels;
+            expect(levels?.get(HomeEnum.LAB_LEVEL.key)).toBe(2);
+            expect(levels?.get(HomeEnum.HAS_FENCE.key)).toBe(1);
+            expect(levels?.has(HomeEnum.HOUSE_LEVEL.key)).toBe(false);
+            expect(citizenRefs([citizen({})])[0].upgradeLevels).toBeNull();
+        });
     });
 
     describe('expeditionParts', (): void => {
@@ -194,7 +214,17 @@ describe('planning-data.util', (): void => {
 
             const parts: ExpeditionPartPa[] = expeditionParts([expedition]);
 
-            expect(parts).toEqual([{ routeLength: 6, citizenIds: [1] }, { routeLength: null, citizenIds: [1] }]);
+            expect(parts).toEqual([{ routeLength: 6, seats: [{ citizenId: 1, startPe: 0 }] }, { routeLength: null, seats: [{ citizenId: 1, startPe: 0 }] }]);
+        });
+
+        it('parties d\'expédition : PE de départ de chaque place, 0 sans PE exigés', (): void => {
+            const with_pe: CitizenExpedition = Object.assign(new CitizenExpedition(), { citizen_id: 1, required_sp: 3, required_sp_operator: 'max' });
+            const without_pe: CitizenExpedition = Object.assign(new CitizenExpedition(), { citizen_id: 2 });
+            const expedition: Expedition = Object.assign(new Expedition(), {
+                parts: [Object.assign(new ExpeditionPart(), { map_route: { length: 8 } as ExpeditionPartRoute, citizens: [with_pe, without_pe] })]
+            });
+
+            expect(expeditionParts([expedition])).toEqual([{ routeLength: 8, seats: [{ citizenId: 1, startPe: 3 }, { citizenId: 2, startPe: 0 }] }]);
         });
     });
 
@@ -220,6 +250,23 @@ describe('planning-data.util', (): void => {
         });
     });
 
+    describe('homeUpgradeResources', (): void => {
+        it('indexe par clé HomeEnum puis par niveau, en ignorant les améliorations et uid inconnus', (): void => {
+            const referential: HomeReferentialDTO = {
+                levels: [],
+                upgrades: [
+                    { name: 'lock', label: 'Schloss', description: '', levels: [{ level: 1, ap: 3, resources: [{ itemUid: 'wood_bad_#00', count: 2 }, { itemUid: 'inconnu', count: 9 }] }] },
+                    { name: 'inconnue', label: '?', description: '', levels: [{ level: 1, ap: 1, resources: [{ itemUid: 'wood_bad_#00', count: 1 }] }] }
+                ]
+            };
+
+            const resources: Map<string, ReadonlyMap<number, ResourceCount[]>> = homeUpgradeResources(referential, new Map<string, number>([['wood_bad_#00', 12]]));
+
+            expect(Array.from(resources.keys())).toEqual([HomeEnum.HAS_LOCK.key]);
+            expect(resources.get(HomeEnum.HAS_LOCK.key)?.get(1)).toEqual([{ itemId: 12, count: 2 }]);
+        });
+    });
+
     describe('homeLevelRefs', (): void => {
         it('indexe par niveau et résout les ressources, en ignorant les uid inconnus', (): void => {
             const referential: HomeReferentialDTO = {
@@ -227,7 +274,7 @@ describe('planning-data.util', (): void => {
                     { level: 0, label: 'Feldbett', icon: '', def: 0, ap: 0, apUrbanism: 0, resources: [], resourcesUrbanism: [], buildingUid: null, allowsUpgrades: false, theft: false },
                     {
                         level: 2, label: 'Baracke', icon: '', def: 4, ap: 4, apUrbanism: 3, buildingUid: null, allowsUpgrades: true, theft: false,
-                        resources: [{ itemUid: 'wood_bad_#00', count: 1 }, { itemUid: 'inconnu', count: 9 }], resourcesUrbanism: []
+                        resources: [{ itemUid: 'wood_bad_#00', count: 1 }, { itemUid: 'inconnu', count: 9 }], resourcesUrbanism: [{ itemUid: 'wood_bad_#00', count: 2 }]
                     }
                 ],
                 upgrades: []
@@ -238,6 +285,7 @@ describe('planning-data.util', (): void => {
             expect(refs.get(2)?.resources).toEqual([{ itemId: 12, count: 1 }]);
             expect(refs.get(2)?.def).toBe(4);
             expect(refs.get(2)?.apUrbanism).toBe(3);
+            expect(refs.get(2)?.resourcesUrbanism).toEqual([{ itemId: 12, count: 2 }]);
             expect(refs.get(0)?.resources).toEqual([]);
         });
 

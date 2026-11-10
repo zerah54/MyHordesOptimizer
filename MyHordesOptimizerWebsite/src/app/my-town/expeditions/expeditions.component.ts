@@ -54,9 +54,11 @@ import { ConfirmDialogComponent, ConfirmDialogData } from '../../_shared/confirm
 import { DaySelectorComponent } from '../../_shared/day-selector/day-selector.component';
 import { DaysUpToPipe } from '../../_shared/day-selector/days-up-to.pipe';
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
+import { IconEpComponent } from '../../_shared/icon-ep/icon-ep.component';
 import { CountAvailableApPipe } from '../../_shared/list-elements-add-remove/count-available-ap.pipe';
 import { ItemsSortMode, sanitizeItemsSortMode } from '../../_shared/list-elements-add-remove/items-sort-mode';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { SelectComponent } from '../../_shared/select/select.component';
 import { TriStateCheckboxComponent } from '../../_shared/tri-state-checkbox/tri-state-checkbox.component';
 import { MapRoutesStore } from '../map/map-routes/map-routes.store';
@@ -89,7 +91,7 @@ type PlaceRequirement = Partial<Pick<CitizenExpedition, 'required_sp' | 'require
 const angular_common: Imports = [CommonModule, FormsModule, NgOptimizedImage];
 const components: Imports = [
     ActiveCitizensComponent, CompactStepperComponent, DaySelectorComponent, ExpeditionOrderComponent, ExpeditionPartRouteComponent, ExpeditionRoadbookComponent, IconApComponent, ListElementAddRemoveComponent,
-    SelectComponent, TriStateCheckboxComponent
+    SelectComponent, TriStateCheckboxComponent, PageTitleComponent
 ];
 const pipes: Imports = [CitizensForExpePipe, CitizenFromIdPipe, CompassRoseComponent, DaysUpToPipe, FormatPreRegisteredPipe, JobFromIdPipe, SomeHeroicActionNeededPipe, TotalPdcPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSlideToggleModule, MatTooltipModule];
@@ -99,7 +101,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     templateUrl: './expeditions.component.html',
     styleUrls: ['./expeditions.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, IconEpComponent]
 })
 export class ExpeditionsComponent implements OnInit {
 

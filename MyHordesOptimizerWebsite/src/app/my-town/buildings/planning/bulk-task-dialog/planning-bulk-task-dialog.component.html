@@ -43,9 +43,10 @@
                             @for (option of upgrade.levels; track option.level) {
                                 <mat-option [value]="option.level">
                                     <ng-container i18n>niv.</ng-container>
-                                    {{ option.level }} ({{ option.ap }}
-                                    <ng-container i18n>PA</ng-container>
-                                    )
+                                    {{ option.level }}
+                                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                                    (<mho-icon-ap [value]="option.ap"/>)
+                                    <!-- @formatter:on -->
                                 </mat-option>
                             }
                         </mat-select>
@@ -53,17 +54,22 @@
                 }
             }
             @case ('home') {
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>Niveau visé</mat-label>
-                    <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
-                        @for (home of home_levels(); track home.level) {
-                            <mat-option [value]="home.level">{{ home.label }} ({{ home.ap }}
-                                <ng-container i18n>PA</ng-container>
-                                )
-                            </mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
+                @if (store.unlimited_home_levels()) {
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <mat-label i18n>Niveau visé</mat-label>
+                        <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
+                            @for (home of home_levels(); track home.level) {
+                                <mat-option [value]="home.level">{{ home.label }}
+                                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                                    (<mho-icon-ap [value]="home.ap"/>)
+                                    <!-- @formatter:on -->
+                                </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                } @else {
+                    <p class="next-level" data-field="bulk-next-level" i18n>Niveau suivant de chaque citoyen (un agrandissement par jour)</p>
+                }
             }
             @default {
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
@@ -71,7 +77,9 @@
                     <input matInput type="text" maxlength="64" data-field="bulk-label" [value]="label()" (input)="label.set($any($event.target).value)">
                 </mat-form-field>
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>PA</mat-label>
+                    <mat-label>
+                        <mho-icon-ap/>
+                    </mat-label>
                     <input matInput type="number" min="0" data-field="bulk-pa" [value]="pa()" (input)="onPa($any($event.target).value)">
                 </mat-form-field>
             }

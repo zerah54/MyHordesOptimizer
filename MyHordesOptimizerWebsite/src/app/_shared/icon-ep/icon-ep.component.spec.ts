@@ -30,13 +30,30 @@ describe('IconEpComponent', (): void => {
         moment.locale(originalLocale);
     });
 
-    it('renders a single 16x16 image', (): void => {
+    it('renders the image at its native size', (): void => {
         fixture = TestBed.createComponent(IconEpComponent);
         fixture.detectChanges();
 
         const img: HTMLImageElement = fixture.debugElement.query(By.css('img')).nativeElement;
-        expect(img.width).toBe(16);
-        expect(img.height).toBe(16);
+        expect(img.hasAttribute('width')).toBe(false);
+        expect(img.hasAttribute('height')).toBe(false);
+    });
+
+    it('renders the value right against the image, with no space', (): void => {
+        fixture = TestBed.createComponent(IconEpComponent);
+        fixture.componentRef.setInput('value', 3);
+        fixture.detectChanges();
+
+        const img: HTMLImageElement = fixture.debugElement.query(By.css('img')).nativeElement;
+        expect(img.previousSibling?.textContent).toBe('3');
+    });
+
+    it('renders only the image without a value', (): void => {
+        fixture = TestBed.createComponent(IconEpComponent);
+        fixture.detectChanges();
+
+        expect((fixture.nativeElement as HTMLElement).textContent?.trim()).toBe('');
+        expect(fixture.debugElement.query(By.css('img'))).not.toBeNull();
     });
 
     it('uses the unsuffixed icon for the German locale', (): void => {

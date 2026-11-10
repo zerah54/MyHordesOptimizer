@@ -3,8 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 import { emptyPlanContent, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } from '../plan.types';
+import { CitizenRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
-import { createFakeStore, FakePlanningStore } from '../planning.store.fake';
+import { createFakeStore, FAKE_CITIZENS, FakePlanningStore } from '../planning.store.fake';
 import { PlanningBulkTaskDialogComponent, PlanningBulkTaskDialogData } from './planning-bulk-task-dialog.component';
 
 /** Signaux du formulaire, pilotés par les tests. */
@@ -65,6 +66,38 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
         return fake.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === user_id)?.tasks ?? [];
     }
 
+    /**
+     * Ouvre la liste des niveaux visés.
+     * @returns {string[]} Libellés des niveaux, espaces normalisées.
+     */
+    function levelOptions(): string[] {
+        fixture.detectChanges();
+        (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('mat-select[data-field="bulk-level"] .mat-mdc-select-trigger')?.click();
+        fixture.detectChanges();
+        return Array.from(document.querySelectorAll<HTMLElement>('mat-option'))
+            .map((option: HTMLElement): string => (option.textContent ?? '').replace(/\s+/g, ' ').trim());
+    }
+
+    it('amélioration : PA de chaque niveau collés à leurs parenthèses', async (): Promise<void> => {
+        await render();
+        form().kind.set('homeUpgrade');
+        form().upgrade_key.set('kitchenLevel');
+
+        const options: string[] = levelOptions();
+        expect(options.length).toBeGreaterThan(0);
+        options.forEach((option: string): void => expect(option).toMatch(/^niv\. \d+ \(\d+\)$/));
+    });
+
+    it('maison en chaos : PA de chaque niveau collés à leurs parenthèses', async (): Promise<void> => {
+        await render();
+        fake.unlimited_home_levels.set(true);
+        form().kind.set('home');
+
+        const options: string[] = levelOptions();
+        expect(options.length).toBeGreaterThan(0);
+        options.forEach((option: string): void => expect(option).toMatch(/\S \(\d+\)$/));
+    });
+
     it('annonce le nombre de citoyens visés', async (): Promise<void> => {
         await render();
 
@@ -89,16 +122,42 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
         form().level.set(2);
         confirm();
 
-        expect(tasksOf(1)[0]).toEqual(expect.objectContaining({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 3 }));
+        expect(tasksOf(1)[0]).toEqual(expect.objectContaining({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 9 }));
     });
 
-    it('maison : niveau visé et PA du référentiel', async (): Promise<void> => {
-        await render();
+    it('amélioration déjà atteinte par un citoyen : il ne la reçoit pas', async (): Promise<void> => {
+        await render([1, 3]);
+        fake.citizens.set(FAKE_CITIZENS.map((citizen: CitizenRef): CitizenRef =>
+            (citizen.userId === 1 ? { ...citizen, upgradeLevels: new Map<string, number>([['kitchenLevel', 2]]) } : citizen)));
+        form().kind.set('homeUpgrade');
+        form().upgrade_key.set('kitchenLevel');
+        form().level.set(2);
+        confirm();
+
+        expect(tasksOf(1)).toEqual([]);
+        expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 9 }));
+    });
+
+    it('maison hors chaos : niveau suivant de chacun, rien sans niveau connu', async (): Promise<void> => {
+        await render([1, 3]);
+        form().kind.set('home');
+        confirm();
+
+        expect(tasksOf(1)).toEqual([]);
+        expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'home', level: 2, pa: 4 }));
+        expect(close).toHaveBeenCalledWith(1);
+    });
+
+    it('maison en chaos : niveau visé, PA de chaque niveau manquant', async (): Promise<void> => {
+        await render([1, 3]);
+        fake.unlimited_home_levels.set(true);
+        fake.citizens.set(FAKE_CITIZENS.map((citizen: CitizenRef): CitizenRef => (citizen.userId === 3 ? { ...citizen, homeLevel: 0 } : citizen)));
         form().kind.set('home');
         form().level.set(2);
         confirm();
 
-        expect(tasksOf(2)[0]).toEqual(expect.objectContaining({ kind: 'home', level: 2, pa: 4 }));
+        expect(tasksOf(1)[0]).toEqual(expect.objectContaining({ kind: 'home', level: 2, pa: 4 }));
+        expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'home', level: 2, pa: 6 }));
     });
 
     it('consigne libre : libellé et PA saisis ; libellé vide = validation impossible', async (): Promise<void> => {

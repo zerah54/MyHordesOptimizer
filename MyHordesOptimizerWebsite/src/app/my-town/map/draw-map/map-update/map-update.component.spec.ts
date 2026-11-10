@@ -305,6 +305,19 @@ describe('MapUpdateComponent', (): void => {
         });
     });
 
+    it('« Enregistrer » est désactivé tant que les passages d\'éclaireur ne collent pas au niveau d\'exploration', (): void => {
+        create({ cell: newCell({ scout_zone_level: 2, scout_visits: 12 }), all_citizens: [], all_ruins: [] });
+        fixture.detectChanges();
+        const save: HTMLButtonElement = fixture.nativeElement.querySelector('button[mat-raised-button]');
+        expect(save.disabled).toBe(false);
+
+        const cellStub: MapUpdateCellStubComponent = fixture.debugElement.query((de) => de.componentInstance instanceof MapUpdateCellStubComponent).componentInstance;
+        cellStub.cellChange.emit(newCell({ scout_zone_level: 2, scout_visits: 7 }));
+        fixture.detectChanges();
+
+        expect(save.disabled).toBe(true);
+    });
+
     it('before any save, both mat-dialog-close bindings return the original data.cell', (): void => {
         const original: Cell = newCell({ displayed_x: 1, displayed_y: 2 });
         create({ cell: original, all_citizens: [], all_ruins: [] });

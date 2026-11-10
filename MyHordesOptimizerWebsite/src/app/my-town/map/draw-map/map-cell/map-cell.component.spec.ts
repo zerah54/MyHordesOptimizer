@@ -6,7 +6,6 @@ import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Property } from '../../../../_abstract_model/enum/property.enum';
-import { Trash } from '../../../../_abstract_model/enum/trash.enum';
 import { Cell } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { ItemCountShort } from '../../../../_abstract_model/types/item-count-short.class';
@@ -447,14 +446,23 @@ describe('MapCellComponent', (): void => {
             fixture.detectChanges();
             expect(corner('corner-top-left')).toBeNull();
 
-            const trashes: Trash[] = Trash.getAllValues();
-            const item: Item = new Item();
-            item.id = 1;
-            item.properties = [<Property>trashes.find((candidate: Trash): boolean => !!candidate.value.property)?.value.property];
-            setInputs(newCell({ items: [Object.assign(new ItemCountShort(), { item_id: 1, count: 2 })] }), withCorners({ top_left: 'trash' }));
+            const item: Item = Object.assign(new Item(), { id: 1, uid: 'knife_#00', properties: [Property.WEAPON] });
+            setInputs(newCell({ items: [Object.assign(new ItemCountShort(), { item_id: 1, count: 2, is_broken: false })] }), withCorners({ top_left: 'trash' }));
             fixture.componentRef.setInput('allItems', [item]);
             fixture.detectChanges();
             expect(corner('corner-top-left')?.textContent?.trim()).toBe('2');
+        });
+
+        it('shows the defence the dump gives, from its upgrades', (): void => {
+            const item: Item = Object.assign(new Item(), { id: 1, uid: 'knife_#00', properties: [Property.WEAPON] });
+            setInputs(newCell({ items: [Object.assign(new ItemCountShort(), { item_id: 1, count: 2, is_broken: false })] }),
+                      withCorners({ top_left: 'trash' }, { ...options, map_type: 'trash', trash_mode: 'def' }));
+            fixture.componentRef.setInput('allItems', [item]);
+            fixture.componentRef.setInput('dump', { level: 1, humidified: true });
+            fixture.detectChanges();
+
+            expect(corner('corner-top-left')?.textContent?.trim()).toBe('14');
+            expect(fixture.nativeElement.querySelector('.map-cell').classList).toContain('trash-2');
         });
 
         it('keeps a remaining digs count of 0: the zone is depleted', (): void => {

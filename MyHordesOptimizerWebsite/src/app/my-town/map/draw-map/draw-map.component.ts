@@ -39,6 +39,7 @@ import { pointKey } from '../map-routes/route-path.util';
 import { NO_SPOTTED_ITEMS } from '../map-spotted-items';
 import { MapBorderComponent } from './map-border/map-border.component';
 import { MapCellComponent, MapCellSelection } from './map-cell/map-cell.component';
+import { DumpUpgrades, NO_DUMP } from './map-cell/pipes/trash-value.pipe';
 import { MapCellDetailsComponent } from './map-cell-details/map-cell-details.component';
 import { MapRoutesLayerComponent } from './map-routes-layer/map-routes-layer.component';
 import { MapUpdateComponent, MapUpdateData } from './map-update/map-update.component';
@@ -108,6 +109,8 @@ export class DrawMapComponent {
     public routeEditing: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
     /** Ids des objets à repérer : les cases qui en portent sont mises en valeur, les autres atténuées. */
     public spottedItems: InputSignal<ReadonlySet<number>> = input<ReadonlySet<number>>(NO_SPOTTED_ITEMS);
+    /** Évolutions de la Décharge, pour la carte « Décharge ». */
+    public dump: InputSignal<DumpUpgrades> = input<DumpUpgrades>(NO_DUMP);
 
     /** Mode tracé : case cliquée. */
     public cellPicked: OutputEmitterRef<MapCellPick> = output();

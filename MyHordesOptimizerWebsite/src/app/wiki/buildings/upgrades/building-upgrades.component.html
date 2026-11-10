@@ -1,0 +1,48 @@
+<div class="mat-elevation-z8 table-scroll">
+    <table #table [dataSource]="rows()" mat-table>
+
+        <ng-container matColumnDef="label">
+            <th *matHeaderCellDef mat-header-cell i18n>Nom du chantier</th>
+            <td *matCellDef="let row; table: table" mat-cell>
+                <div class="label-cell">
+                    <img [alt]="nameOf(row)" [src]="HORDES_IMG_REPO + row.img">
+                    <span class="name">{{ nameOf(row) }}</span>
+                </div>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="level">
+            <th *matHeaderCellDef mat-header-cell i18n>Niveau</th>
+            <td *matCellDef="let row; table: table" mat-cell>
+                @let current = currentLevelOf(row);
+                <mat-button-toggle-group (change)="consult(row, $event)" [value]="displayedLevelOf(row)" hideSingleSelectionIndicator
+                                         i18n-aria-label aria-label="Niveau d'évolution">
+                    @for (level of levelsOf(row); track level) {
+                        <mat-button-toggle [class.is-current]="level === current" [matTooltipDisabled]="level !== current" [value]="level"
+                                           i18n-matTooltip matTooltip="Niveau actuel dans ta ville">{{ level }}
+                        </mat-button-toggle>
+                    }
+                </mat-button-toggle-group>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="text">
+            <th *matHeaderCellDef mat-header-cell i18n>Effet</th>
+            <td *matCellDef="let row; table: table" mat-cell>
+                @let current = currentLevelOf(row);
+                {{ textOf(row) }}
+                @if (current !== null && current !== displayedLevelOf(row)) {
+                    <span class="current-hint"><ng-container i18n>Niveau actuel :</ng-container>
+                        {{ current }}</span>
+                }
+            </td>
+        </ng-container>
+
+        <tr *matHeaderRowDef="displayed_columns; sticky: true" mat-header-row></tr>
+        <tr *matRowDef="let row; columns: displayed_columns;" mat-row></tr>
+
+        <tr *matNoDataRow class="mat-row">
+            <td [attr.colspan]="displayed_columns.length" class="mat-cell" i18n>Aucune évolution à afficher.</td>
+        </tr>
+    </table>
+</div>

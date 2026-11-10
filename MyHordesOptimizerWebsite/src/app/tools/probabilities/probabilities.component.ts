@@ -13,6 +13,7 @@ import moment from 'moment';
 import { Imports } from '../../_abstract_model/types/_types';
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { decodeSnapshot, toBoundedNumber, TOOL_SNAPSHOT_PARAM } from '../../_core/utilities/tool-snapshot.util';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { ToolPresetsComponent } from '../../_shared/tool-presets/tool-presets.component';
 
 /** Borne haute de la saisie, reprise de l'attribut `max` du gabarit. */
@@ -26,7 +27,7 @@ const SNAPSHOT_MAX_SIMULATIONS: number = 20;
 const SNAPSHOT_MAX_TITLE_LENGTH: number = 60;
 
 const angular_common: Imports = [CommonModule, FormsModule];
-const components: Imports = [ToolPresetsComponent];
+const components: Imports = [ToolPresetsComponent, PageTitleComponent];
 const pipes: Imports = [DecimalPipe];
 const material_modules: Imports = [MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule];
 

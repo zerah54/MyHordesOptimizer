@@ -1,10 +1,24 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-/** Palier de remplissage d'une zone pour la carte « Décharge », de 0 (rien) à 3 (beaucoup). */
-export function trashLevel(trash_number: number): number {
-    if (trash_number === 0) return 0;
-    if (trash_number <= 4) return 1;
-    if (trash_number <= 8) return 2;
+import { MapOptions } from '../../../map.component';
+
+/** Bornes hautes des paliers 1 et 2, par mode ; au-delà, palier 3. */
+const TIER_BOUNDS: Readonly<Record<MapOptions['trash_mode'], readonly [number, number]>> = {
+    nb: [4, 8],
+    def: [8, 16]
+};
+
+/**
+ * Palier de remplissage d'une zone pour la carte « Décharge », de 0 (rien) à 3 (beaucoup).
+ * @param {number} value Valeur de la zone.
+ * @param {MapOptions['trash_mode']} mode Nombre d'objets ou défense.
+ * @returns {number} Palier.
+ */
+export function trashLevel(value: number, mode: MapOptions['trash_mode']): number {
+    const [first, second]: readonly [number, number] = TIER_BOUNDS[mode];
+    if (value === 0) return 0;
+    if (value <= first) return 1;
+    if (value <= second) return 2;
     return 3;
 }
 
@@ -12,7 +26,7 @@ export function trashLevel(trash_number: number): number {
     name: 'trashLevel'
 })
 export class TrashLevelPipe implements PipeTransform {
-    public transform(trash_number: number): number {
-        return trashLevel(trash_number);
+    public transform(value: number, mode: MapOptions['trash_mode']): number {
+        return trashLevel(value, mode);
     }
 }

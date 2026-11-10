@@ -2,9 +2,9 @@ import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BuildingProgress } from '../building-progress.util';
+import { BuildingProgress, StepResult } from '../building-progress.util';
 import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO } from '../plan.types';
-import { BuildingRef } from '../plan-evaluation.util';
+import { BuildingRef, DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { PlanningProgramComponent } from './planning-program.component';
@@ -25,6 +25,9 @@ function content(): BuildingPlanContentDTO {
 
 interface TestableProgram {
     voteOptions: () => BuildingRef[];
+    secondVoteOptions: () => BuildingRef[];
+    onVote: (building_id: number | null) => void;
+    onSecondVote: (building_id: number | null) => void;
     onDrop: (event: CdkDragDrop<PlanPool>) => void;
 }
 
@@ -154,6 +157,27 @@ describe('PlanningProgramComponent', (): void => {
 
         expect(items('banned')[0].querySelector('[data-issue="banned-cannot-build"]')).not.toBeNull();
         expect(items('regular')[0].querySelector('[data-issue]')).toBeNull();
+    });
+
+    it('l\'arrondi des bannis est libellé avec l\'icône PA', async (): Promise<void> => {
+        await render();
+        const evaluation: DayEvaluation = fake.evaluation() as DayEvaluation;
+        fake.evaluation.set({
+            ...evaluation,
+            results: evaluation.results.map((result: StepResult): StepResult => result.pool === 'banned' && result.index === 0 ? { ...result, issues: ['slavery-rounding'] } : result)
+        });
+        fixture.detectChanges();
+
+        expect(items('banned')[0].querySelector('[data-issue="slavery-rounding"] mho-icon-ap img')).not.toBeNull();
+    });
+
+    it('« Laisser à N » est libellé avec l\'icône PA', async (): Promise<void> => {
+        await render();
+
+        items('regular')[0].querySelector<HTMLElement>('mat-select[data-field="mode"] .mat-mdc-select-trigger')?.click();
+        fixture.detectChanges();
+        expect(document.querySelector('mat-option[data-mode="build:leave"] mho-icon-ap img')).not.toBeNull();
+        document.querySelector<HTMLElement>('mat-option[data-mode="build:finish"]')?.click();
     });
 
     it('marque « non débloqué » un chantier absent de l\'état synchronisé', async (): Promise<void> => {
@@ -390,6 +414,61 @@ describe('PlanningProgramComponent', (): void => {
         expect(ids).toContain(2);
     });
 
+    it('une construction rappelle la défense apportée par le chantier, pas une réparation', async (): Promise<void> => {
+        await render();
+
+        expect(items('regular')[0].querySelector('.def')?.textContent).toContain('+30');
+        expect(items('regular')[2].querySelector('.def')).toBeNull();
+    });
+
+    it('la défense affichée est le gain réel : objets de défense consommés retirés', async (): Promise<void> => {
+        await render();
+        fake.evaluation.set(fakeEvaluation(content(), {
+            defenseFactors: { defenseItems: 4, itemFactor: 1, homeRaw: 0, alive: 3, dead: 0, scale: 1 },
+            defenseItemIds: new Set<number>([5])
+        }));
+        fixture.detectChanges();
+
+        expect(items('regular')[0].querySelector('.def')?.getAttribute('data-real')).toBe('28');
+    });
+
+    it('le libellé du vote porte l\'icône d\'évolution et le chantier voté son icône', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = content();
+        plan.eveningVoteBuildingId = 2;
+        await render(plan);
+
+        const field: HTMLElement = fixture.nativeElement.querySelector('mat-form-field.vote') as HTMLElement;
+        expect(field.querySelector('mat-label img')?.getAttribute('src')).toContain('emotes/fortify.gif');
+        expect(field.querySelector('.mat-mdc-select-value img')?.getAttribute('src')).toContain('building/');
+        expect(field.querySelector('.mat-mdc-select-value')?.textContent).toContain('Atelier');
+    });
+
+    it('le vote affiche le niveau atteint, la défense gagnée pour la nuit et le texte d\'évolution', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = content();
+        plan.eveningVoteBuildingId = 3;
+        await render(plan);
+        fake.upgrades.set({
+            gate: {
+                maxLevel: 2,
+                texts: {
+                    base: null,
+                    levels: [
+                        { de: 'Stufe 1', fr: 'La porte apporte 15 points de défense.', en: 'La porte apporte 15 points de défense.' },
+                        { de: 'Stufe 2', fr: 'Niveau 2', en: 'Level 2' }
+                    ]
+                },
+                effects: { defenseIncrement: { levels: [0, 15, 45], default: 0, source: 'BuildingUpgradeListener' } }
+            }
+        });
+        fake.evaluation.set(fakeEvaluation(plan, { upgrades: fake.upgrades() }));
+        fixture.detectChanges();
+
+        const gain: HTMLElement | null = fixture.nativeElement.querySelector('[data-field="vote-gain"]');
+        expect(gain?.textContent).toContain('Niveau 1');
+        expect(gain?.textContent).toContain('+15');
+        expect(gain?.textContent).toContain('La porte apporte 15 points de défense.');
+    });
+
     it('le vote du soir sur l\'atelier affiche le seuil gratuit des chantiers restants', async (): Promise<void> => {
         const plan: BuildingPlanContentDTO = content();
         plan.eveningVoteBuildingId = 2;
@@ -397,5 +476,57 @@ describe('PlanningProgramComponent', (): void => {
         await render(plan);
 
         expect(items('regular')[0].querySelector<HTMLElement>('.free-threshold')?.textContent).toContain('2');
+    });
+
+    describe('second vote (Brasier Sacrificiel)', (): void => {
+        /**
+         * Rend le plan avec une évaluation où le Brasier est construit au soir.
+         * @param {BuildingPlanContentDTO} plan Contenu du plan.
+         * @param {Partial<DayEvaluation>} overrides Champs d'évaluation à remplacer.
+         */
+        async function renderDouble(plan: BuildingPlanContentDTO, overrides: Partial<DayEvaluation> = {}): Promise<void> {
+            await render(plan);
+            fake.evaluation.set({ ...fakeEvaluation(plan), doubleVote: true, ...overrides });
+            fixture.detectChanges();
+        }
+
+        it('sans Brasier, un seul vote', async (): Promise<void> => {
+            await render();
+
+            expect(root().querySelector('mat-select[data-field="second-vote"]')).toBeNull();
+        });
+
+        it('avec le Brasier, le second vote exclut le premier chantier et garde celui déjà choisi', async (): Promise<void> => {
+            const plan: BuildingPlanContentDTO = { ...content(), eveningVoteBuildingId: 3, eveningSecondVoteBuildingId: 2 };
+            await renderDouble(plan);
+
+            expect(root().querySelector('mat-select[data-field="second-vote"]')).not.toBeNull();
+            const ids: number[] = (fixture.componentInstance as unknown as TestableProgram).secondVoteOptions().map((building: BuildingRef): number => building.id);
+            expect(ids).toContain(2);
+            expect(ids).not.toContain(3);
+        });
+
+        it('le second vote affiche sa défense gagnée pour la nuit', async (): Promise<void> => {
+            await renderDouble({ ...content(), eveningSecondVoteBuildingId: 3 }, { secondVote: { uid: 'gate', level: 2, defense: 30 } });
+
+            expect(root().querySelector('[data-field="second-vote-gain"]')?.textContent).toContain('+30');
+        });
+
+        it('choisir le second chantier l\'enregistre dans le plan', async (): Promise<void> => {
+            await renderDouble(content());
+
+            (fixture.componentInstance as unknown as TestableProgram).onSecondVote(3);
+
+            expect(fake.draft()?.eveningSecondVoteBuildingId).toBe(3);
+        });
+
+        it('voter en premier le second chantier vide le second vote', async (): Promise<void> => {
+            await renderDouble({ ...content(), eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
+
+            (fixture.componentInstance as unknown as TestableProgram).onVote(3);
+
+            expect(fake.draft()?.eveningVoteBuildingId).toBe(3);
+            expect(fake.draft()?.eveningSecondVoteBuildingId).toBeNull();
+        });
     });
 });

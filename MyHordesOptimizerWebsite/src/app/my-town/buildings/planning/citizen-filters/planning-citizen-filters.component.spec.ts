@@ -3,7 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, of } from 'rxjs';
 
+import { CitizenFilterSortStore } from '../../../../_shared/citizen-filters/citizen-filter-sort.store';
 import { PlanningBulkTaskDialogComponent } from '../bulk-task-dialog/planning-bulk-task-dialog.component';
+import { PlanningCitizenFilterSheetComponent } from '../citizen-filter-sheet/planning-citizen-filter-sheet.component';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { emptyPlanContent } from '../plan.types';
 import { PlanningStore } from '../planning.store';
@@ -23,6 +25,7 @@ describe('PlanningCitizenFiltersComponent', (): void => {
             providers: [
                 { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: PlanningStore, useValue: fake.store },
+                CitizenFilterSortStore,
                 CitizenFiltersStore
             ]
         }).overrideProvider(MatDialog, { useValue: { open } }).compileComponents();
@@ -37,6 +40,17 @@ describe('PlanningCitizenFiltersComponent', (): void => {
     function bulk(): HTMLButtonElement {
         return (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('button[data-action="bulk-add"]') as HTMLButtonElement;
     }
+
+    it('« Filtres » ouvre le volet des filtres communs au site ; le badge compte les critères actifs', (): void => {
+        const button: HTMLButtonElement = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('button[data-action="citizen-filters"]') as HTMLButtonElement;
+        TestBed.inject(CitizenFilterSortStore).setJobs(['scout']);
+        fixture.detectChanges();
+
+        button.click();
+
+        expect(open).toHaveBeenCalledWith(PlanningCitizenFilterSheetComponent, expect.objectContaining({ panelClass: 'mho-side-sheet' }));
+        expect(button.textContent).toContain('1');
+    });
 
     it('ajout groupé inactif sans citoyen coché', (): void => {
         expect(bulk().disabled).toBe(true);

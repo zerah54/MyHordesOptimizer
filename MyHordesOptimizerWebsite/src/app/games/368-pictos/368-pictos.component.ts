@@ -5,10 +5,11 @@ import { MatCardModule } from '@angular/material/card';
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Imports } from '../../_abstract_model/types/_types';
 import { MaxPipe } from '../../_core/pipes/number.pipe';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { PictosHighlightedCell } from './368-pictos-highlighted-cell.pipe';
 
 const angular_common: Imports = [];
-const components: Imports = [];
+const components: Imports = [PageTitleComponent];
 const pipes: Imports = [ MaxPipe, PictosHighlightedCell ];
 const material_modules: Imports = [ MatCardModule, DragDropModule ];
 

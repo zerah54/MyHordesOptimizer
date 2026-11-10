@@ -16,6 +16,7 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
                 AttackOverride = 1443,
                 AllowedOverflow = 21,
                 EveningVoteBuildingId = 12,
+                EveningSecondVoteBuildingId = 13,
                 ManageBanned = true,
                 BasePa = 19,
                 Instructions = "Planches en banque avant 18h.",
@@ -70,6 +71,7 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
             restored.Programs.Regular.Should().BeEmpty();
             restored.Instructions.Should().BeNull();
             restored.PlanTiers.Should().BeEmpty();
+            restored.EveningSecondVoteBuildingId.Should().BeNull();
         }
     }
 }

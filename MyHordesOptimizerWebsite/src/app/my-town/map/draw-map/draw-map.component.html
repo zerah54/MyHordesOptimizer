@@ -19,7 +19,7 @@
                     <mho-map-cell [cell]="cell"
                                   [allItems]="allItems()" [allRuins]="allRuins()"
                                   [allCitizens]="allCitizens()" [options]="options()" [drawedMap]="drawed_map()"
-                                  [detailed]="zoom_tier() === 'detail'" [spottedItems]="spottedItems()"
+                                  [detailed]="zoom_tier() === 'detail'" [spottedItems]="spottedItems()" [dump]="dump()"
                                   [selected]="row_index === selected_row() && cell_index === selected_column()"
                                   [crossed]="row_index === selected_row() || cell_index === selected_column()"
                                   (cellSelected)="selectCell($event, row_index, cell_index)"

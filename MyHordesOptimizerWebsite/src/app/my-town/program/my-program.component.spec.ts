@@ -8,12 +8,12 @@ import type { Mock } from 'vitest';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../_abstract_model/services/town.service';
-import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { DailyAction } from '../../_abstract_model/types/daily-action.class';
+import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../_abstract_model/types/expedition-part.class';
-import { Expedition } from '../../_abstract_model/types/expedition.class';
 import { Me } from '../../_abstract_model/types/me.class';
 import { Ruin } from '../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -315,9 +315,16 @@ describe('MyProgramComponent', (): void => {
     it('conserve le bloc Chantiers actuel', async (): Promise<void> => {
         await render(content({ citizens: [{ userId: 1, tasks: [{ kind: 'free', label: 'Puits', pa: 3 }] }] }));
 
-        expect(text('.block.buildings .steps')).toContain('Terminer Mur');
+        expect(text('.block.buildings .steps')).toContain('Mur');
+        expect(text('.block.buildings .steps')).not.toContain('Terminer');
         expect(text('.block.buildings .tasks')).toContain('Puits');
         expect(root().querySelector('.block.expedition .steps')).toBeNull();
+    });
+
+    it('colle les PA d\'une consigne à ses parenthèses', async (): Promise<void> => {
+        await render(content({ citizens: [{ userId: 1, tasks: [{ kind: 'free', label: 'Puits', pa: 3 }] }] }));
+
+        expect(flat('.block.buildings .tasks')).toContain('Puits (3)');
     });
 
     it('lance le chargement et affiche le titre', async (): Promise<void> => {
@@ -351,7 +358,8 @@ describe('MyProgramComponent', (): void => {
     it('non-banni : ses étapes, pas celles des bannis', async (): Promise<void> => {
         await render();
 
-        expect(text('.steps')).toContain('Terminer Mur');
+        expect(text('.steps')).toContain('Mur');
+        expect(text('.steps')).not.toContain('Terminer');
         expect(text('.steps')).not.toContain('Réparer entièrement Porte');
         expect(root().querySelector('.notice')).toBeNull();
     });
@@ -370,7 +378,7 @@ describe('MyProgramComponent', (): void => {
 
         expect(root().querySelector('.notice[data-notice="banned-forbidden"]')).not.toBeNull();
         expect(text('.steps')).toContain('Réparer entièrement Porte');
-        expect(text('.steps')).not.toContain('Terminer');
+        expect(text('.steps')).not.toContain('Mur');
     });
 
     it('affiche les consignes du jour, les consignes de la section et les notes d\'étape', async (): Promise<void> => {
@@ -392,6 +400,16 @@ describe('MyProgramComponent', (): void => {
         await render(content({ eveningVoteBuildingId: 2 }));
 
         expect(text('.vote')).toContain('Atelier');
+    });
+
+    it('avec le Brasier Sacrificiel, affiche les deux chantiers votés ce soir', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = content({ eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
+        await render(plan);
+        fake.evaluation.set({ ...fakeEvaluation(plan), doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0 } });
+        fixture.detectChanges();
+
+        expect(text('.vote')).toContain('Évolutions votées ce soir');
+        expect(text('.vote')).toContain('Atelier, Porte');
     });
 
     it('les consignes du jour gardent leurs retours à la ligne', async (): Promise<void> => {

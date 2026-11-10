@@ -33,10 +33,11 @@ export class AuthenticationService extends GlobalService {
 
     /**
      * @param {boolean} [silent] Ne remonte aucun message à l'utilisateur si la clef est refusée
+     * @param {boolean} [bypass_loading] N'affiche pas le voile de chargement (rafraîchissement en arrière-plan)
      */
-    public getToken(silent?: boolean): Observable<TokenWithMe> {
+    public getToken(silent?: boolean, bypass_loading?: boolean): Observable<TokenWithMe> {
         return new Observable((sub: Subscriber<TokenWithMe>) => {
-            super.get<TokenWithMeDTO>(this.API_URL + `/Authentication/Token?userKey=${getExternalAppId()}`, undefined, undefined, silent)
+            super.get<TokenWithMeDTO>(this.API_URL + `/Authentication/Token?userKey=${getExternalAppId()}`, bypass_loading, undefined, silent)
                 .subscribe({
                     next: (response: HttpResponse<TokenWithMeDTO>) => {
                         const token_with_me: TokenWithMe = new TokenWithMe(response.body);

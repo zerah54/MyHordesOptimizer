@@ -12,6 +12,7 @@ function buildItemDto(overrides: Partial<ItemDTO> = {}): ItemDTO {
         openedWith: null, opens: [],
         openApCost: null, openSuccessRate: null, technicianOpenCpCost: null,
         catapultEffect: null,
+        actionEffects: [], reloadCharges: null, watchImpact: 0, bagCapacityBonus: null, bagExclusiveGroup: null,
         bankCount: 0, wishListCount: 0, dropRateNotPraf: 0, dropRatePraf: 0,
         ...overrides
     };

@@ -5,6 +5,7 @@ import { MatSidenavContainer } from '@angular/material/sidenav';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
+import { HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { AdminService } from '../../_abstract_model/services/admin.service';
 import { ThemeService } from '../../_core/services/theme.service';
 import { TownContextService } from '../../_core/services/town-context.service';
@@ -13,6 +14,7 @@ import { MenuComponent } from './menu.component';
 
 interface SidenavLink {
     label: string;
+    icon?: string;
     path?: string;
     townSuffix?: string;
     isTownRoot?: boolean;
@@ -155,6 +157,23 @@ describe('MenuComponent', (): void => {
             const route: SidenavLink = { label: 'r', displayed: true, authorized: (): boolean => true, spoil: false, children: [] };
 
             expect((): void => testable.toggleDisplayChildren(route)).not.toThrow();
+        });
+    });
+
+    describe('icônes des entrées', (): void => {
+        it('affiche l\'icône d\'une entrée qui en a une, à sa taille native, et rien pour les autres', (): void => {
+            testable.routes = [
+                { label: 'Banque', icon: 'icons/bank.gif', path: 'bank', displayed: true, authorized: (): boolean => true, spoil: false },
+                { label: 'Carte', path: 'map', displayed: true, authorized: (): boolean => true, spoil: false }
+            ];
+            fixture.detectChanges();
+
+            const images: HTMLImageElement[] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll('mat-list img'));
+            expect(images.length).toBe(1);
+            expect(images[0].getAttribute('src')).toBe(`${HORDES_IMG_REPO}icons/bank.gif`);
+            expect(images[0].getAttribute('alt')).toBe('');
+            expect(images[0].hasAttribute('width')).toBe(false);
+            expect(images[0].hasAttribute('height')).toBe(false);
         });
     });
 

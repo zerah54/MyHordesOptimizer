@@ -5,7 +5,7 @@
 
             @if (currentList() | isItems) {
                 <div class="count-ap-in-bag">
-                    {{ currentList() | countAvailableAp:lists() }}&nbsp;<mho-icon-ap></mho-icon-ap>
+                    <mho-icon-ap [value]="currentList() | countAvailableAp:lists()"/>
                 </div>
             }
 

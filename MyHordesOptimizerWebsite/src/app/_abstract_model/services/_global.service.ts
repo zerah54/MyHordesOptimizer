@@ -27,8 +27,8 @@ export class GlobalService {
         return this.http.post<T>(url, params, { responseType: 'json', headers: headers, context: context });
     }
 
-    protected put<T>(url: string, body: unknown, params?: HttpParams, bypass_error?: boolean, silent_status: number | null = null): Observable<HttpResponse<T>> {
-        const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json');
+    protected put<T>(url: string, body: unknown, params?: HttpParams, bypass_error?: boolean, silent_status: number | readonly number[] | null = null, extra_headers: Record<string, string> = {}): Observable<HttpResponse<T>> {
+        const headers: HttpHeaders = new HttpHeaders({ ...extra_headers, 'Content-Type': 'application/json' });
         const context: HttpContext = new HttpContext()
             .set(BYPASS_ERROR, !!bypass_error)
             .set(SILENT_ERROR_STATUS, silent_status);
@@ -44,8 +44,9 @@ export class GlobalService {
             });
     }
 
-    protected delete<T>(url: string): Observable<HttpResponse<T>> {
+    protected delete<T>(url: string, extra_headers: Record<string, string> = {}): Observable<HttpResponse<T>> {
         return this.http.delete<T>(url, {
+            headers: new HttpHeaders(extra_headers),
             responseType: 'json',
             observe: 'response',
         });

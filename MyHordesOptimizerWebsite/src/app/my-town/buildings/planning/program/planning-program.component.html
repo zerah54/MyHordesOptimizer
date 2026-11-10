@@ -21,15 +21,12 @@
                         </h3>
                     }
                     @if (pool === 'regular') {
-                        <mat-form-field class="vote" appearance="outline" subscriptSizing="dynamic">
-                            <mat-label i18n>Chantier voté ce soir</mat-label>
-                            <mat-select [value]="draft.eveningVoteBuildingId" [disabled]="!store.can_edit()" (selectionChange)="onVote($event.value)">
-                                <mat-option [value]="null" i18n>Aucun</mat-option>
-                                @for (building of voteOptions(); track building.id) {
-                                    <mat-option [value]="building.id">{{ building.label }}</mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
+                        <ng-container [ngTemplateOutlet]="voteField"
+                                      [ngTemplateOutletContext]="{ field: 'vote', value: draft.eveningVoteBuildingId, options: voteOptions(), gain: voteGain() }"/>
+                        @if (doubleVote()) {
+                            <ng-container [ngTemplateOutlet]="voteField"
+                                          [ngTemplateOutletContext]="{ field: 'second-vote', value: draft.eveningSecondVoteBuildingId ?? null, options: secondVoteOptions(), gain: secondVoteGain() }"/>
+                        }
                     }
                     @if (store.can_edit()) {
                         <span class="pool-actions">
@@ -56,6 +53,16 @@
                                         <img class="building-icon" [src]="src" alt="">
                                     }
                                     <span class="name">{{ label(step.buildingId) }}</span>
+                                    @if (step.kind === 'build') {
+                                        @let real_def = realDefence(step.buildingId);
+                                        @if (real_def !== 0 || defence(step.buildingId) > 0) {
+                                            <span class="def" [attr.data-real]="real_def" [class.loss]="real_def < 0"
+                                                  [matTooltip]="defenceTooltip + ' ' + defence(step.buildingId)">
+                                                {{ real_def > 0 ? '+' : '' }}{{ real_def }}
+                                                <img class="game-icon" [src]="HORDES_IMG_REPO + 'icons/small_def.gif'" i18n-alt alt="déf">
+                                            </span>
+                                        }
+                                    }
                                     @if (isLocked(step.buildingId)) {
                                         <span class="badge-locked" i18n i18n-matTooltip matTooltip="Ce chantier n'est pas encore débloqué dans la ville">non débloqué</span>
                                     }
@@ -66,14 +73,20 @@
                                         <mat-select data-field="mode" [value]="modeValue(step)" [disabled]="!store.can_edit()"
                                                     (selectionChange)="setMode(pool, index, $event.value)">
                                             @for (option of modeOptions(step); track option.value) {
-                                                <mat-option [value]="option.value" [attr.data-mode]="option.value">{{ option.label }}</mat-option>
+                                                <mat-option [value]="option.value" [attr.data-mode]="option.value">
+                                                    @if (option.value === 'build:leave') {
+                                                        <ng-container i18n>Laisser à N <mho-icon-ap/></ng-container>
+                                                    } @else {
+                                                        {{ option.label }}
+                                                    }
+                                                </mat-option>
                                             }
                                         </mat-select>
                                     </mat-form-field>
                                     @if (isLeave(step)) {
                                         @if (step.kind === 'build') {
                                             <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
-                                                <mat-label i18n>PA restants</mat-label>
+                                                <mat-label i18n><mho-icon-ap/> restants</mat-label>
                                                 <input matInput type="number" min="0" data-field="target" [ngModel]="step.targetRemaining"
                                                        [disabled]="!store.can_edit()" (ngModelChange)="onTarget(pool, index, $event)">
                                             </mat-form-field>
@@ -85,7 +98,7 @@
                                             </mat-form-field>
                                             <mat-icon class="link" aria-hidden="true">sync_alt</mat-icon>
                                             <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
-                                                <mat-label i18n>PA</mat-label>
+                                                <mat-label><mho-icon-ap/></mat-label>
                                                 <input matInput type="number" min="0" data-field="target-pa" [ngModel]="targetPa(step, res)"
                                                        [disabled]="!store.can_edit() || res === undefined"
                                                        (ngModelChange)="onTargetPa(pool, index, step, res, $event)">
@@ -95,23 +108,22 @@
                                     @if (step.kind === 'build') {
                                         @if (freeThreshold(step.buildingId); as threshold) {
                                             <span class="free-threshold"><ng-container i18n>Gratuit demain si ≤</ng-container>
-                                                {{ threshold }}
-                                                <ng-container i18n>PA</ng-container></span>
+                                                <mho-icon-ap [value]="threshold"/></span>
                                         }
                                     }
                                 </span>
 
                                 @if (res) {
-                                    <span class="cost">{{ res.paCost }}
-                                        <ng-container i18n>PA</ng-container></span>
+                                    <span class="cost"><mho-icon-ap [value]="res.paCost"/></span>
                                     @if (step.kind === 'build') {
                                         <span class="result" [attr.data-done]="res.completes">
                                             @if (res.completes) {
                                                 <mat-icon>check</mat-icon>
                                                 <ng-container i18n>terminé</ng-container>
                                             } @else {
-                                                {{ res.remainingAfter + res.points }} → {{ res.remainingAfter }}
-                                                <ng-container i18n>PA restants</ng-container>
+                                                {{ res.remainingAfter + res.points }} →
+                                                <mho-icon-ap [value]="res.remainingAfter"/>
+                                                <ng-container i18n>restants</ng-container>
                                             }
                                         </span>
                                     } @else {
@@ -121,13 +133,17 @@
                                                 {{ lives.before }} → {{ lives.after }} / {{ lives.max }}
                                             </span>
                                             <span class="rate">{{ hpPerAp() }}
-                                                <ng-container i18n>PV/PA</ng-container></span>
+                                                <ng-container>PV</ng-container>/<mho-icon-ap/></span>
                                         }
                                     }
                                     @for (issue of res.issues; track issue) {
                                         <span class="issue" [attr.data-issue]="issue">
                                             <mat-icon>warning</mat-icon>
-                                            {{ issueLabel(issue) }}
+                                            @if (issue === 'slavery-rounding') {
+                                                <ng-container i18n>Investir par paires de <mho-icon-ap/> : le rendement est réduit</ng-container>
+                                            } @else {
+                                                {{ issueLabel(issue) }}
+                                            }
                                         </span>
                                     }
                                 }
@@ -208,4 +224,59 @@
             </button>
         </ng-template>
     </mat-menu>
+
+    <!-- Choix d'un chantier voté le soir (premier vote, ou second avec le Brasier Sacrificiel) et gain de son évolution. -->
+    <ng-template #voteField let-field="field" let-value="value" let-options="options" let-gain="gain">
+        <mat-form-field class="vote" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>
+                <span class="icon-label">
+                    <img class="game-icon" [src]="HORDES_IMG_REPO + 'emotes/fortify.gif'" alt="">
+                    @if (field === 'vote') {
+                        <ng-container i18n>Chantier voté ce soir</ng-container>
+                    } @else {
+                        <ng-container i18n>Second chantier voté ce soir</ng-container>
+                    }
+                </span>
+            </mat-label>
+            <mat-select [attr.data-field]="field" [value]="value" [disabled]="!store.can_edit()"
+                        (selectionChange)="field === 'vote' ? onVote($event.value) : onSecondVote($event.value)">
+                @if (value !== null) {
+                    <mat-select-trigger>
+                        <span class="icon-label">
+                            @if (icon(value); as src) {
+                                <img class="building-icon" [src]="src" alt="">
+                            }
+                            {{ label(value) }}
+                        </span>
+                    </mat-select-trigger>
+                }
+                <mat-option [value]="null" i18n>Aucun</mat-option>
+                @for (building of options; track building.id) {
+                    <mat-option [value]="building.id">
+                        <span class="icon-label">
+                            @if (icon(building.id); as src) {
+                                <img class="building-icon" [src]="src" alt="">
+                            }
+                            {{ building.label }}
+                        </span>
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        @if (gain) {
+            <span class="vote-gain" [attr.data-field]="field + '-gain'">
+                <ng-container i18n>Niveau</ng-container>
+                {{ gain.level }}
+                @if (gain.defense !== 0) {
+                    <span class="def" i18n-matTooltip matTooltip="Défense gagnée dès cette nuit : l'évolution s'applique avant l'attaque">
+                        {{ gain.defense > 0 ? '+' : '' }}{{ gain.defense }}
+                        <img class="game-icon" [src]="HORDES_IMG_REPO + 'icons/small_def.gif'" i18n-alt alt="déf">
+                    </span>
+                }
+                @if (gain.text; as text) {
+                    <span class="vote-text">{{ text }}</span>
+                }
+            </span>
+        }
+    </ng-template>
 }

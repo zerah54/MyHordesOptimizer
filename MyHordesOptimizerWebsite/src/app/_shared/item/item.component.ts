@@ -1,4 +1,4 @@
-import { CommonModule, DecimalPipe, NgOptimizedImage } from '@angular/common';
+import { CommonModule, DecimalPipe, formatNumber, NgOptimizedImage } from '@angular/common';
 import {
     booleanAttribute,
     ChangeDetectionStrategy,
@@ -21,9 +21,14 @@ import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
 
 import { HORDES_IMG_REPO } from '../../_abstract_model/const';
+import { Action } from '../../_abstract_model/enum/action.enum';
+import { Property } from '../../_abstract_model/enum/property.enum';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
 import { Imports } from '../../_abstract_model/types/_types';
+import { ActionOutcome, ChargeChance, ItemActionEffects } from '../../_abstract_model/types/item-action-effects.class';
 import { Item } from '../../_abstract_model/types/item.class';
+import { RecipeResultItem } from '../../_abstract_model/types/recipe-result-item.class';
+import { Recipe } from '../../_abstract_model/types/recipe.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { ItemImgPipe } from '../../_core/pipes/item-img.pipe';
 import { getTown } from '../../_core/utilities/localstorage.util';
@@ -54,6 +59,29 @@ const DIG_SCALE_MAX: number = 100;
 const DIG_FRACTION_FLOOR: number = 25;
 /** Plus grand dénominateur d'une fraction lisible. */
 const DIG_FRACTION_MAX_OUT_OF: number = 10;
+
+/** Trouvailles héroïques, de la plus petite à la plus grande : seule la plus petite qui donne l'objet est affichée. */
+const FIND_TIERS: string[] = ['hero_find', 'hero_find_lucky', 'hero_find_lucky2', 'hero_find_lucky3'];
+
+/**
+ * Propriétés masquées sur la fiche : l'appât ne sert qu'au Système de Pièges des Apprivoiseurs, les outils
+ * d'ouverture sont déjà portés par la ligne « Ouvre », le cumul de veille par la ligne des chances de survie.
+ */
+const HIDDEN_PROPERTIES: string[] = ['lure', 'box_opener', 'can_opener', 'parcel_opener', 'nw_impact_cumul'];
+
+/** Les deux recettes consomment-elles exactement les mêmes objets ? */
+function sameComponents(a: Recipe, b: Recipe): boolean {
+    const key: (recipe: Recipe) => string = (recipe: Recipe): string => recipe.components.map((item: Item): string => item.uid).sort().join('|');
+    return key(a) === key(b);
+}
+
+/** Charges possibles d'une recharge, de la plus probable à la moins probable. */
+export interface ReloadSummary {
+    min: number;
+    max: number;
+    /** « 4 : 50 %, 3 : 25 % » */
+    detail: string;
+}
 
 export type DigBand = 'very-common' | 'common' | 'uncommon' | 'rare' | 'very-rare';
 
@@ -150,6 +178,65 @@ export class ItemComponent implements OnInit {
             praf: not_praf <= 0
         };
     });
+    /** Actions à afficher : sans le « détruit » des ouvertures ni la forme vide des attaques d'armes à charges. */
+    protected readonly action_effects: Signal<ItemActionEffects[]> = computed((): ItemActionEffects[] => {
+        const item: Item = this.item();
+        const has_charges: boolean = (item?.reload_charges?.length ?? 0) > 0;
+        return (item?.action_effects ?? []).map((effects: ItemActionEffects): ItemActionEffects => Object.assign(new ItemActionEffects(), effects, {
+            outcomes: effects.outcomes.filter((outcome: ActionOutcome): boolean =>
+                !(effects.kind === 'Open' && outcome.kind === 'Consumed')
+                && !(has_charges && effects.kind === 'Attack' && outcome.kind === 'Transformed'))
+        }));
+    });
+    /** Devenir de l'objet en veille, affiché juste au-dessus de la catapulte. */
+    protected readonly watch_effects: Signal<ItemActionEffects[]> = computed((): ItemActionEffects[] =>
+        this.action_effects().filter((effects: ItemActionEffects): boolean => effects.kind === 'Nightwatch'));
+    /** Actions autres que la veille. */
+    protected readonly other_action_effects: Signal<ItemActionEffects[]> = computed((): ItemActionEffects[] =>
+        this.action_effects().filter((effects: ItemActionEffects): boolean => effects.kind !== 'Nightwatch'));
+    /** Recettes à afficher : sans celles de l'Établi des Techniciens que l'Atelier donne déjà. */
+    protected readonly displayed_recipes: Signal<Recipe[]> = computed((): Recipe[] => {
+        const recipes: Recipe[] = this.item()?.recipes ?? [];
+        const workshop: Recipe[] = recipes.filter((recipe: Recipe): boolean => recipe.type === 'Recipe::WorkshopType');
+        return recipes.filter((recipe: Recipe): boolean => recipe.type !== 'Recipe::WorkshopTypeTechSpecific'
+            || !workshop.some((other: Recipe): boolean => sameComponents(other, recipe)
+                && recipe.result.every((result: RecipeResultItem): boolean =>
+                    other.result.some((other_result: RecipeResultItem): boolean => other_result.item?.uid === result.item?.uid))));
+    });
+    /** Propriétés à afficher : sans celles qui redonnent la catégorie ni l'appât, et une seule trouvaille, la plus petite qui donne l'objet. */
+    protected readonly displayed_properties: Signal<Property[]> = computed((): Property[] => {
+        const properties: Property[] = (this.item()?.properties ?? [])
+            .filter((property: Property): boolean => !property || (property.value.category !== 'category' && !HIDDEN_PROPERTIES.includes(property.key)));
+        const smallest_find: string | undefined = FIND_TIERS.find((key: string): boolean =>
+            properties.some((property: Property): boolean => property?.key === key));
+        return properties.filter((property: Property): boolean => !(property && FIND_TIERS.includes(property.key)) || property.key === smallest_find);
+    });
+    /** Propriétés affichées en icône seule, regroupées sur une ligne. */
+    protected readonly icon_properties: Signal<Property[]> = computed((): Property[] =>
+        this.displayed_properties().filter((property: Property): boolean => !!property?.value.icon_only));
+    /** Chantiers qui donnent un bonus de veille à l'objet, regroupés sur une ligne. */
+    protected readonly watch_bonus_properties: Signal<Property[]> = computed((): Property[] =>
+        this.displayed_properties().filter((property: Property): boolean => property?.value.category === 'nightwatch'));
+    /** Propriétés affichées avec leur libellé, une par ligne. */
+    protected readonly text_properties: Signal<Property[]> = computed((): Property[] =>
+        this.displayed_properties().filter((property: Property): boolean => !property?.value.icon_only && property?.value.category !== 'nightwatch'));
+    /** Actions à libellé, sans la recharge que porte déjà la recette de recharge. */
+    protected readonly displayed_actions: Signal<Action[]> = computed((): Action[] =>
+        (this.item()?.actions ?? []).filter((action: Action | undefined): action is Action => !!action && action !== Action.LOAD_PILEGUN));
+    /** Les chances de survie en veille s'additionnent-elles par exemplaire ? */
+    protected readonly watch_cumulable: Signal<boolean> = computed((): boolean =>
+        (this.item()?.properties ?? []).some((property: Property): boolean => property?.key === 'nw_impact_cumul'));
+    /** Charges obtenues à la recharge, `null` pour un objet sans recharge. */
+    protected readonly reload_summary: Signal<ReloadSummary | null> = computed((): ReloadSummary | null => {
+        const charges: ChargeChance[] = [...(this.item()?.reload_charges ?? [])].sort((a: ChargeChance, b: ChargeChance): number => b.charges - a.charges);
+        if (charges.length === 0) return null;
+        return {
+            min: charges[charges.length - 1].charges,
+            max: charges[0].charges,
+            detail: charges.map((chance: ChargeChance): string =>
+                `${chance.charges} : ${formatNumber(chance.probability * 100, this.locale, '1.0-2')} %`).join(', ')
+        };
+    });
     protected town: TownDetails | null = getTown();
     private wishlist_services: WishlistService = inject(WishlistService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
@@ -179,6 +266,27 @@ export class ItemComponent implements OnInit {
                 current_item.wishlist_count = 1;
                 this.item.set(Object.assign(new Item(), current_item));
             });
+    }
+
+    /**
+     * Libellé officiel de l'action, construit à l'appel pour suivre la langue active.
+     *
+     * @param {ItemActionEffects} effects
+     * @returns {string}
+     */
+    protected actionLabel(effects: ItemActionEffects): string {
+        switch (effects.kind) {
+            case 'Open':
+                return $localize`Ouvrir`;
+            case 'Slaughter':
+                return $localize`Découper`;
+            case 'Purify':
+                return effects.ap_cost === 1 ? $localize`Purifier (1PA)` : $localize`Purifier`;
+            case 'Attack':
+                return $localize`Attaquer avec`;
+            default:
+                return effects.action_name;
+        }
     }
 
     protected toggleAdvancedMode(): void {

@@ -1,11 +1,25 @@
 <div class="mho-buildings">
     <div class="page-toolbar">
-        <mat-button-toggle-group (ngModelChange)="onModeChange($event)" [ngModel]="hard_mode" i18n-aria-label aria-label="Mode de jeu">
-            <mat-button-toggle [value]="false" i18n>Normal</mat-button-toggle>
-            <mat-button-toggle [value]="true" i18n>Pandémonium</mat-button-toggle>
+        <mat-button-toggle-group (ngModelChange)="view.set($event)" [ngModel]="view()" i18n-aria-label aria-label="Page du wiki des chantiers">
+            <mat-button-toggle value="buildings" i18n>Chantiers</mat-button-toggle>
+            <mat-button-toggle value="upgrades" i18n>Évolutions</mat-button-toggle>
         </mat-button-toggle-group>
+        @if (view() === 'buildings') {
+            <mat-button-toggle-group (ngModelChange)="onModeChange($event)" [ngModel]="hard_mode" i18n-aria-label aria-label="Mode de jeu">
+                <mat-button-toggle [value]="false" i18n>Normal</mat-button-toggle>
+                <mat-button-toggle [value]="true" i18n>Pandémonium</mat-button-toggle>
+            </mat-button-toggle-group>
+        } @else if (town) {
+            <mat-slide-toggle (ngModelChange)="town_only.set($event)" [ngModel]="town_only()">
+                <ng-container i18n>Dans ma ville</ng-container>
+            </mat-slide-toggle>
+        }
     </div>
-    <div class="mat-elevation-z8 table-scroll">
+    @if (view() === 'upgrades') {
+        <mho-wiki-building-upgrades [townOnly]="town_only()"></mho-wiki-building-upgrades>
+    }
+    <!-- Masqué et non détruit : le défilement et les cases cochées survivent à un aller-retour. -->
+    <div [hidden]="view() !== 'buildings'" class="mat-elevation-z8 table-scroll">
         <table #table [dataSource]="rows()" mat-table>
 
             <!-- Sélection : coche un chantier pour le récapitulatif du bas de page. Cocher une
@@ -173,7 +187,7 @@
          colonnes de données) : ça écrasait la colonne « select » au lieu d'occuper toute la
          largeur. En div sœur de .table-scroll, il prend toute la largeur de la carte et reste fixe
          sous le tableau qui défile, sans toucher à ses colonnes. -->
-    @if (hasSelection()) {
+    @if (hasSelection() && view() === 'buildings') {
         @let totals = selectedTotals();
         @let missing = missingFromWishlist(totals.resources);
         <div class="selection-summary">

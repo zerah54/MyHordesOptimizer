@@ -1,5 +1,7 @@
 <mat-card-header class="mho-368-chickens-header">
-    <mat-card-title i18n>368 Pictos</mat-card-title>
+    <mat-card-title>
+        <mho-page-title page="games368Pictos"/>
+    </mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-368-chickens">
     <div class="game-board">
@@ -44,15 +46,15 @@
                 </div>
             </div>
         } @else {
-        <div class="score">
-            <div>
-                <ng-container i18n>Coups&nbsp;:</ng-container>&nbsp;{{ attempts }}
+            <div class="score">
+                <div>
+                    <ng-container i18n>Coups&nbsp;:</ng-container>&nbsp;{{ attempts }}
+                </div>
+                <div>
+                    <ng-container i18n>Temps&nbsp;:</ng-container>&nbsp;{{ time_spent() }}
+                </div>
             </div>
-            <div>
-                <ng-container i18n>Temps&nbsp;:</ng-container>&nbsp;{{ time_spent() }}
-            </div>
-        </div>
-        <button (click)="init()" i18n>Nouvelle partie</button>
-    }
+            <button (click)="init()" i18n>Nouvelle partie</button>
+        }
     </div>
 </mat-card-content>

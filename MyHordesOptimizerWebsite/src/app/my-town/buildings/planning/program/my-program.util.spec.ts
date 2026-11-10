@@ -79,6 +79,14 @@ describe('myProgram', (): void => {
         expect((program_of(1, content()) as MyProgram).voteBuildingId).toBeNull();
     });
 
+    it('rappelle le second chantier voté seulement avec le Brasier Sacrificiel', (): void => {
+        const plan: BuildingPlanContentDTO = content({ eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
+        const double: DayEvaluation = { ...fakeEvaluation(plan), doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0 } };
+
+        expect((program_of(1, plan, double) as MyProgram).secondVoteBuildingId).toBe(3);
+        expect((program_of(1, plan) as MyProgram).secondVoteBuildingId).toBeNull();
+    });
+
     it('consignes du jour rognées, nulles si vides', (): void => {
         expect((program_of(1, content({ instructions: '  Planches en banque  ' })) as MyProgram).dayInstructions).toBe('Planches en banque');
         expect((program_of(1, content({ instructions: '   ' })) as MyProgram).dayInstructions).toBeNull();

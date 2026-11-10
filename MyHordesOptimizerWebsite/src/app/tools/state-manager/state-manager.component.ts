@@ -25,10 +25,11 @@ import { CompactToggleComponent } from '../../_shared/compact-toggle/compact-tog
 import { IconApComponent } from '../../_shared/icon-ap/icon-ap.component';
 import { IconEpComponent } from '../../_shared/icon-ep/icon-ep.component';
 import { ListElementAddRemoveComponent } from '../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 
 const angular_common: Imports = [CommonModule];
 const components: Imports = [
-    IconApComponent, IconEpComponent, CompactToggleComponent, CompactStepperComponent, ListElementAddRemoveComponent
+    IconApComponent, IconEpComponent, CompactToggleComponent, CompactStepperComponent, ListElementAddRemoveComponent, PageTitleComponent
 ];
 const material_modules: Imports = [
     MatButtonModule, MatCardModule, MatDividerModule, MatIconModule, MatListModule, MatTooltipModule

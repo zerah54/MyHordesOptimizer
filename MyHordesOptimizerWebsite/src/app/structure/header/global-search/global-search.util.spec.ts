@@ -220,6 +220,17 @@ describe('global-search.util', (): void => {
             expect(entries[0].link).toEqual({ path: 'wiki/items', query_params: null });
         });
 
+        it('montre l\'icône de la page, et aucun pictogramme quand elle n\'en a pas', (): void => {
+            const routes: SidenavLinks[] = [
+                { label: 'Objets', icon: 'icons/item.gif', path: 'wiki/items', displayed: true, authorized: (): boolean => true, spoil: false },
+                { label: 'Recettes', path: 'wiki/recipes', displayed: true, authorized: (): boolean => true, spoil: false }
+            ];
+            const entries: GlobalSearchEntry[] = pageEntries(routes, (route: SidenavLinks): string | undefined => route.path, (route: SidenavLinks): string => route.label);
+
+            expect(entries.map((entry: GlobalSearchEntry): string | null => entry.img)).toEqual(['icons/item.gif', null]);
+            expect(entries.map((entry: GlobalSearchEntry): string => entry.symbol)).toEqual(['', '']);
+        });
+
         it('links the players of the directory to their profile, without the missing avatars', (): void => {
             const entries: GlobalSearchEntry[] = playerEntries([
                 { id: 5, name: 'Zerah', avatar: '/storage/zerah.png' },

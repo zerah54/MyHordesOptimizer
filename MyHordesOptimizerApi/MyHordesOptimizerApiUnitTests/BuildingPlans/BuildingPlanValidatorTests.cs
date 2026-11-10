@@ -284,6 +284,45 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
             BuildingPlanValidator.SerializeContent(WithTasks(new PlanTaskDto { Id = "a1", Kind = "action", Ref = "home_crows", Pa = 1 }));
         }
 
+        [Fact]
+        public void SerializeContent_AcceptsPlannedLosses()
+        {
+            var content = new BuildingPlanContentDto();
+            content.Losses.Add(new PlanLossDto { BuildingId = 3, Kind = "destroyed" });
+            content.Losses.Add(new PlanLossDto { BuildingId = 3, Kind = "bonus" });
+
+            BuildingPlanValidator.SerializeContent(content);
+        }
+
+        [Theory]
+        [InlineData("burnt", 4)]
+        [InlineData("destroyed", 3)]
+        public void SerializeContent_RejectsUnknownOrDuplicateLoss(string kind, int buildingId)
+        {
+            var content = new BuildingPlanContentDto();
+            content.Losses.Add(new PlanLossDto { BuildingId = 3, Kind = "destroyed" });
+            content.Losses.Add(new PlanLossDto { BuildingId = buildingId, Kind = kind });
+
+            var act = () => BuildingPlanValidator.SerializeContent(content);
+            act.Should().Throw<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public void SerializeContent_AcceptsActionTaskWithSeveralUses()
+        {
+            BuildingPlanValidator.SerializeContent(WithTasks(new PlanTaskDto { Id = "a1", Kind = "action", Ref = "home_scavenge", Count = 3, Pa = 3 }));
+        }
+
+        [Theory]
+        [InlineData("action", 0)]
+        [InlineData("action", 4)]
+        [InlineData("free", 2)]
+        public void SerializeContent_RejectsInvalidUses(string kind, int count)
+        {
+            var act = () => BuildingPlanValidator.SerializeContent(WithTasks(new PlanTaskDto { Kind = kind, Ref = "home_scavenge", Label = "x", Count = count }));
+            act.Should().Throw<MhoTechnicalException>();
+        }
+
         [Theory]
         [InlineData("../../DataImport/all")]
         [InlineData("home crows")]

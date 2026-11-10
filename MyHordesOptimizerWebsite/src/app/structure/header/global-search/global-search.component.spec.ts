@@ -143,6 +143,15 @@ describe('GlobalSearchComponent', (): void => {
         expect(options()[0].getAttribute('aria-selected')).toBe('true');
     });
 
+    it('n\'affiche aucun pictogramme devant une page sans icône', async (): Promise<void> => {
+        await createComponent();
+        await type('banque');
+
+        const bank: HTMLElement | undefined = options().find((option: HTMLElement): boolean => option.querySelector('.label')?.textContent?.trim() === 'Banque');
+        expect(bank).toBeDefined();
+        expect(bank?.querySelector('.well mat-icon, .well img')).toBeNull();
+    });
+
     it('moves the active option with the arrows, wrapping around, and opens it with Enter', async (): Promise<void> => {
         await createComponent();
         await type('pil');

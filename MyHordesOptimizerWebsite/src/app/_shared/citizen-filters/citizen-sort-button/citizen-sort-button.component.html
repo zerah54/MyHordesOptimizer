@@ -1,0 +1,18 @@
+<button mat-stroked-button type="button" data-action="sort-citizens" [matMenuTriggerFor]="sort_menu">
+    <mat-icon>{{ active_label() === null ? 'sort' : (store.sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward') }}</mat-icon>
+    @if (active_label(); as label) {
+        <span>{{ label }}</span>
+    } @else {
+        <span i18n>Trier par</span>
+    }
+</button>
+<mat-menu #sort_menu="matMenu">
+    @for (field of fields(); track field.id) {
+        <button mat-menu-item type="button" [attr.data-sort]="field.id" (click)="store.sortBy(field.id)">
+            <span>{{ field.label }}</span>
+            @if (store.sort_field() === field.id) {
+                <mat-icon>{{ store.sort_direction() === 'asc' ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+            }
+        </button>
+    }
+</mat-menu>

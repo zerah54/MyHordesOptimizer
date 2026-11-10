@@ -24,10 +24,10 @@
     } @else if (place.preinscrit_heroic_skill) {
         <span class="skill">{{ place.preinscrit_heroic_skill }}</span>
     }
-    <span class="ap"><ng-container i18n>PA</ng-container>
+    <span class="ap"><mho-icon-ap/>
         {{ place.base_ap ?? 6 }}</span>
     @if (spRequirementLabel(place); as sp) {
-        <span class="sp"><ng-container i18n>PE</ng-container>
+        <span class="sp"><mho-icon-ep/>
             {{ sp }}</span>
     }
     @if (place.is_preinscrit_soif !== undefined && place.is_preinscrit_soif !== null) {

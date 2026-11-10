@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 
 import { Imports } from '../../../../_abstract_model/types/_types';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { BuildingPlanContentDTO } from '../plan.types';
 import { alertAnchor, PlanAlert } from '../plan-alerts.util';
 import { DayEvaluation } from '../plan-evaluation.util';
@@ -29,7 +30,7 @@ const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconM
     host: {
         '[class.flat]': 'flat()'
     },
-    imports: [...angular_common, ...material_modules]
+    imports: [...angular_common, IconApComponent, ...material_modules]
 })
 export class PlanningKpisComponent {
 

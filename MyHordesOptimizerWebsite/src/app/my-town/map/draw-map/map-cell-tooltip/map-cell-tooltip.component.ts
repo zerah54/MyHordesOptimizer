@@ -4,7 +4,7 @@ import { MatDivider } from '@angular/material/list';
 import moment from 'moment/moment';
 
 import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
-import { Cell } from '../../../../_abstract_model/types/cell.class';
+import { Cell, MAX_SCOUT_VISITS } from '../../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../../_abstract_model/types/ruin.class';
@@ -48,5 +48,6 @@ export class MapCellTooltipComponent {
     public spottedItems: WritableSignal<ReadonlySet<number>> = signal(NO_SPOTTED_ITEMS);
 
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
+    protected readonly MAX_SCOUT_VISITS: number = MAX_SCOUT_VISITS;
     protected readonly locale: string = moment.locale();
 }

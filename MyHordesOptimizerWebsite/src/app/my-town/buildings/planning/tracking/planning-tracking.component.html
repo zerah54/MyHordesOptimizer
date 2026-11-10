@@ -5,6 +5,19 @@
     </p>
 }
 
+@if (store.draft(); as draft) {
+    <section class="fields">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>
+                <mho-icon-ap/>
+                de base par citoyen
+            </mat-label>
+            <input matInput type="number" min="0" data-field="default-pa" [ngModel]="draft.basePa" [disabled]="!store.can_edit()"
+                   (ngModelChange)="onDefaultPa($event)">
+        </mat-form-field>
+    </section>
+}
+
 <mho-planning-citizen-filters>
     @if (!future()) {
         <span class="summary">
@@ -29,7 +42,18 @@
             </th>
         }
         <th i18n>Citoyen</th>
+        @for (home of home_columns; track home.key; let first = $first) {
+            <th class="home-col" [class.secondary]="!first" [attr.data-home]="home.key">
+                <img [src]="HORDES_IMG_REPO + headerIcon(home)" [alt]="home.getLabel()" [matTooltip]="home.getLabel()">
+            </th>
+        }
+        <th i18n>
+            <mho-icon-ap/>
+            de base
+        </th>
+        <th i18n>Rab d'expé</th>
         <th i18n>Consignes</th>
+        <th i18n>Capacité</th>
         <th i18n>État</th>
     </tr>
     </thead>
@@ -44,35 +68,96 @@
                     </td>
                 }
                 <td class="who">
-                    <mho-citizen-chip [citizen]="row.citizen" [day]="store.selected_day()" [actions]="store.displayable_actions()"/>
+                    <div>
+                        <mho-citizen-chip [citizen]="row.citizen" [day]="store.selected_day()" [actions]="store.displayable_actions()" [homeInColumns]="true"/>
+                        @if (citizenRef(row.citizen.id); as ref) {
+                            @if (ref.banned) {
+                                <span class="badge-banned" i18n>banni</span>
+                            }
+                            @if (ref.technician) {
+                                <span class="badge-tech" i18n>technicien</span>
+                            }
+                        }
+                    </div>
+                </td>
+                @for (home of home_columns; track home.key; let first = $first) {
+                    @let entry = homeOf(row.citizen, home);
+                    <td class="home-col" [class.secondary]="!first" [attr.data-home]="home.key"
+                        [matTooltip]="first ? homeSummary(row.citizen) : ''">
+                        <span class="home">
+                            @if (entry !== undefined && homeDone(entry)) {
+                                <img [src]="HORDES_IMG_REPO + homeIcon(entry)" [alt]="home.getLabel()">
+                                @if (entry.element.value.max_lvl > 1) {
+                                    {{ entry.value }}
+                                }
+                            } @else {
+                                —
+                            }
+                            @if (store.can_edit()) {
+                                @let target = homeTarget(row.citizen.id, home);
+                                @if (target !== null) {
+                                    @let add_label = homeAddLabel(home, target);
+                                    <button type="button" class="add-home" data-action="add-home" [attr.aria-label]="add_label" [matTooltip]="add_label"
+                                            (click)="addHomeLevel(row.citizen.id, home)">
+                                        <img [src]="HORDES_IMG_REPO + 'icons/small_more2.gif'" alt="">
+                                    </button>
+                                }
+                            }
+                        </span>
+                    </td>
+                }
+                <td class="base-pa">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                        <input matInput type="number" min="0" data-field="base-pa" [ngModel]="basePa(row.citizen.id)" [disabled]="!store.can_edit()"
+                               (ngModelChange)="onBasePa(row.citizen.id, $event)">
+                    </mat-form-field>
+                </td>
+                @let expedition_pa = expeditionPa(row.citizen.id);
+                <td class="rab" [class.negative]="expeditionRab(row.citizen.id) < 0"
+                    [matTooltip]="expedition_pa > 0 ? expeditionTooltip + ' ' + expedition_pa : ''">
+                    {{ expeditionRab(row.citizen.id) }}
                 </td>
                 <td class="tasks">
                     <div class="task-list">
-                        @for (entry of row.tasks; track entry.task.id ?? $index) {
-                            @if (future()) {
-                                <span class="task">{{ entry.label }}@if (entry.task.pa > 0) {
-                                    ({{ entry.task.pa }}
-                                    <ng-container i18n>PA</ng-container>)
-                                }</span>
-                            } @else {
-                                <span class="task" [class.done]="entry.status.done" [class.focused]="isFocused(entry)">
-                                <mat-checkbox [checked]="entry.status.done"
-                                              [disabled]="!store.can_track() || store.isPending(row.citizen.id, entry.task) || locked(entry.task, entry.status)"
-                                              (change)="onToggle($event, row.citizen.id, entry)">
-                                    {{ entry.label }}@if (entry.task.pa > 0) {
-                                    ({{ entry.task.pa }}
-                                    <ng-container i18n>PA</ng-container>)
+                        @for (entry of row.tasks; track entry.task.id ?? $index; let index = $index) {
+                            <span class="task" [class.done]="entry.status.done" [class.focused]="isFocused(entry)">
+                                @if (!future()) {
+                                    <mat-checkbox [checked]="entry.status.done" [aria-label]="entry.label"
+                                                  [disabled]="!store.can_track() || store.isPending(row.citizen.id, entry.task) || locked(entry.task, entry.status)"
+                                                  (change)="onToggle($event, row.citizen.id, entry)"/>
                                 }
-                                </mat-checkbox>
-                                    @if (entry.status.source === 'data') {
-                                        <mat-icon class="detected" i18n-matTooltip matTooltip="Relevé dans les données du citoyen (liste des citoyens, script)">sync</mat-icon>
-                                    }
+                                <button type="button" class="task-label" data-action="edit-task" [disabled]="!canEditTask(entry)"
+                                        [matMenuTriggerFor]="task_menu"
+                                        [matMenuTriggerData]="{ user_id: row.citizen.id, index: index, task_id: entry.task.id ?? null }">
+                                    {{ entry.label }}@if (entry.task.pa > 0) {
+                                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                                    (<mho-icon-ap [value]="entry.task.pa"/>)
+                                    <!-- @formatter:on -->
+                                }
+                                </button>
+                                @if (entry.status.source === 'data') {
+                                    <mat-icon class="detected" i18n-matTooltip
+                                              matTooltip="Relevé dans les données du citoyen (liste des citoyens, script)">sync</mat-icon>
+                                }
                             </span>
-                            }
                         } @empty {
                             <span class="empty" i18n>Aucune consigne</span>
                         }
+                        @if (store.can_edit()) {
+                            <button mat-stroked-button type="button" class="add-task" data-action="add-task" [matMenuTriggerFor]="add_menu"
+                                    [matMenuTriggerData]="{ user_id: row.citizen.id }">
+                                <ng-container i18n>Ajouter une consigne</ng-container>
+                            </button>
+                        }
                     </div>
+                </td>
+                <td class="capacity-cell">
+                    <span class="capacity">{{ capacity(row.citizen.id)?.capacity ?? '' }}</span>
+                    @if (capacity(row.citizen.id)?.overCommitted) {
+                        <mat-icon class="over-committed" i18n-matTooltip matTooltip="Consignes individuelles et expédition dépassent les PA de base">
+                            warning
+                        </mat-icon>
+                    }
                 </td>
                 <td class="state">
                     @switch (state) {
@@ -99,8 +184,25 @@
             </tr>
         } @empty {
             <tr>
-                <td colspan="3" class="empty" i18n>Aucun citoyen ne correspond aux filtres</td>
+                <td [attr.colspan]="column_count()" class="empty" i18n>Aucun citoyen ne correspond aux filtres</td>
             </tr>
         }
     </tbody>
 </table>
+
+<mat-menu #task_menu="matMenu" class="task-menu">
+    <ng-template matMenuContent let-user_id="user_id" let-index="index" let-task_id="task_id">
+        <mho-planning-task-editor [userId]="user_id" [index]="index" [taskId]="task_id"/>
+    </ng-template>
+</mat-menu>
+
+<mat-menu #add_menu="matMenu">
+    <ng-template matMenuContent let-user_id="user_id">
+        <button mat-menu-item type="button" data-kind="home" (click)="addTask(user_id, 'home')" i18n>Maison</button>
+        <button mat-menu-item type="button" data-kind="homeUpgrade" [disabled]="!canAddUpgrade(user_id)" (click)="addTask(user_id, 'homeUpgrade')" i18n>
+            Amélioration de maison
+        </button>
+        <button mat-menu-item type="button" data-kind="action" [disabled]="!hasActions()" (click)="addTask(user_id, 'action')" i18n>Action de chantier</button>
+        <button mat-menu-item type="button" data-kind="free" (click)="addTask(user_id, 'free')" i18n>Libre</button>
+    </ng-template>
+</mat-menu>

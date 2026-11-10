@@ -20,9 +20,9 @@
                     </div>
                     <span class="item_label">{{ item().label[locale] }}
                         @if (item().is_broken) {
-                            &nbsp;(
-                            <ng-container i18n>Cassé</ng-container>
-                            )
+                            <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                            &nbsp;(<ng-container i18n>Cassé</ng-container>)
+                            <!-- @formatter:on -->
                         }
                     </span>
                 </div>
@@ -61,7 +61,7 @@
                                 <span [style.width.%]="dig.bar"></span>
                             </div>
                             <div class="dig-detail">
-                                {{ dig.percent | number:'1.0-2':locale }}%
+                                {{ dig.percent | number:'1.0-2':locale }} %
                                 @if (dig.praf) {
                                     <ng-container i18n>par fouille réussie sur une zone épuisée</ng-container>
                                 } @else {
@@ -72,127 +72,291 @@
                             <div class="dig-detail" i18n>Introuvable en fouille</div>
                         }
                     </div>
-                    @if (item().recipes.length > 0) {
-                    <mat-divider></mat-divider>
-                    @for (recipe of item().recipes; track recipe.name) {
-                        <div>
-                            <mho-recipe [recipe]="recipe"></mho-recipe>
-                        </div>
+                    @if (displayed_recipes().length > 0) {
+                        <mat-divider></mat-divider>
+                        @for (recipe of displayed_recipes(); track recipe.name) {
+                            <div>
+                                <mho-recipe [recipe]="recipe"></mho-recipe>
+                            </div>
+                        }
                     }
-                } @if (item().opened_with !== null) {
-                    <mat-divider></mat-divider>
-                    @if (item().opened_with!.length > 0) {
+                    @if (item().opened_with !== null) {
+                        <mat-divider></mat-divider>
+                        @if (item().opened_with!.length > 0) {
+                            <div class="opener-relation">
+                                <span i18n>Ouvert par</span>
+                                @for (opener of item().opened_with!; track opener.uid) {
+                                    <img [ngSrc]="HORDES_IMG_REPO + opener.img" width="16" height="16" [title]="opener.label[locale]">
+                                }
+                            </div>
+                        }
+                        @if (item().technician_open_cp_cost !== null) {
+                            <div class="opener-relation">
+                                @if (item().opened_with!.length > 0) {
+                                    <ng-container i18n>ou</ng-container>
+                                } @else {
+                                    <ng-container i18n>Alternative Technicien</ng-container>
+                                }
+                                <mho-icon-cp [value]="item().technician_open_cp_cost"/>
+                            </div>
+                        }
+                        @if (item().open_ap_cost !== null) {
+                            <div class="opener-relation">
+                                <ng-container i18n>Ouverture</ng-container>
+                                :
+                                <mho-icon-ap [value]="item().open_ap_cost"/>
+                                @if (item().open_success_rate !== null) {
+                                    - {{ item().open_success_rate! * 100 | number:'1.0-2':locale }} %
+                                }
+                            </div>
+                        }
+                        @if (item().opened_with!.length === 0 && item().technician_open_cp_cost === null && item().open_ap_cost === null) {
+                            <div i18n>Peut être ouvert gratuitement</div>
+                        }
+                    }
+                    @if (item().opens.length > 0) {
+                        <mat-divider></mat-divider>
                         <div class="opener-relation">
-                            <span i18n>Ouvert par</span>
-                            @for (opener of item().opened_with!; track opener.uid) {
-                                <img [ngSrc]="HORDES_IMG_REPO + opener.img" width="16" height="16" [title]="opener.label[locale]">
+                            <span i18n>Ouvre</span>
+                            @for (box of item().opens; track box.uid) {
+                                <img [ngSrc]="HORDES_IMG_REPO + box.img" width="16" height="16" [title]="box.label[locale]">
                             }
                         </div>
-                    } @if (item().technician_open_cp_cost !== null) {
-                        <div class="opener-relation">
-                            @if (item().opened_with!.length > 0) {
-                                <ng-container i18n>ou</ng-container>
-                            } @else {
-                            <ng-container i18n>Alternative Technicien</ng-container>
+                    }
+                    <ng-template #chance let-probability>
+                        @if (probability < 1) {
+                            <span class="chance">{{ probability * 100 | number:'1.0-2':locale }} %</span>
                         }
-                            {{ item().technician_open_cp_cost }}
-                            <mho-icon-cp></mho-icon-cp>
-                        </div>
-                    } @if (item().open_ap_cost !== null) {
-                        <div class="opener-relation">
-                            <ng-container i18n>Ouverture</ng-container>
-                            :
-                            {{ item().open_ap_cost }}
-                            <mho-icon-ap></mho-icon-ap>
-                            @if (item().open_success_rate !== null) {
-                                - {{ item().open_success_rate! * 100 | number:'1.0-2':locale }}%
+                    </ng-template>
+                    @for (effects of watch_effects(); track $index) {
+                        <mat-divider></mat-divider>
+                        <div class="catapult-effect watch-effect" [class.not-current]="effects.applies_to_town === false">
+                            <img [src]="HORDES_IMG_REPO + 'emotes/watch.gif'" i18n-title title="En veille" alt="">
+                            <img [src]="HORDES_IMG_REPO + 'emotes/arrowright.gif'" alt="">
+                            @for (outcome of effects.outcomes; track $index) {
+                                @if (outcome.kind === 'Broken') {
+                                    <span class="catapult-result broken">
+                                        <img [src]="HORDES_IMG_REPO + (item() | itemImg:true)" [title]="item().label[locale]" alt="">
+                                    </span>
+                                } @else if (outcome.kind === 'Transformed' && outcome.item) {
+                                    <span class="catapult-result">
+                                        <img [src]="HORDES_IMG_REPO + outcome.item.img" [title]="outcome.item.label[locale]" alt="">
+                                    </span>
+                                } @else if (outcome.kind === 'Consumed') {
+                                    <span class="catapult-result vanished">
+                                        <img [src]="HORDES_IMG_REPO + item().img" [title]="item().label[locale]" alt="">
+                                    </span>
+                                }
+                                <ng-container [ngTemplateOutlet]="chance" [ngTemplateOutletContext]="{ $implicit: outcome.probability }"/>
+                            } @empty {
+                                <span class="catapult-result">
+                                    <img [src]="HORDES_IMG_REPO + item().img" [title]="item().label[locale]" alt="">
+                                </span>
                             }
                         </div>
-                    } @if (item().opened_with!.length === 0 && item().technician_open_cp_cost === null && item().open_ap_cost === null) {
-                        <div i18n>Peut être ouvert gratuitement</div>
                     }
-                } @if (item().opens.length > 0) {
-                    <mat-divider></mat-divider>
-                    <div class="opener-relation">
-                        <span i18n>Ouvre</span>
-                        @for (box of item().opens; track box.uid) {
-                            <img [ngSrc]="HORDES_IMG_REPO + box.img" width="16" height="16" [title]="box.label[locale]">
-                        }
-                    </div>
-                } @if (item().catapult_effect && (item().catapult_effect!.fate !== 'Intact' || item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null)) {
-                    <mat-divider></mat-divider>
-                    <div class="catapult-effect">
-                        <img [ngSrc]="HORDES_IMG_REPO + 'roles/cata.gif'" width="16" height="16">
-                        <img [ngSrc]="HORDES_IMG_REPO + 'emotes/arrowright.gif'" width="16" height="16">
-                        @if (item().catapult_effect!.fate === 'Broken') {
-                            <span class="catapult-result broken">
+                    @if (item().catapult_effect && (item().catapult_effect!.fate !== 'Intact' || item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null)) {
+                        <mat-divider></mat-divider>
+                        <div class="catapult-effect">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'roles/cata.gif'" width="16" height="16">
+                            <img [ngSrc]="HORDES_IMG_REPO + 'emotes/arrowright.gif'" width="16" height="16">
+                            @if (item().catapult_effect!.fate === 'Broken') {
+                                <span class="catapult-result broken">
                                     <img [ngSrc]="HORDES_IMG_REPO + (item() | itemImg:true)" width="16" height="16" [title]="item().label[locale]">
                                 </span>
-                        } @else if (item().catapult_effect!.fate === 'Transformed' && item().catapult_effect!.morph_target) {
-                        <span class="catapult-result">
+                            } @else if (item().catapult_effect!.fate === 'Transformed' && item().catapult_effect!.morph_target) {
+                                <span class="catapult-result">
                                     <img [ngSrc]="HORDES_IMG_REPO + item().catapult_effect!.morph_target!.img" width="16" height="16"
                                          [title]="item().catapult_effect!.morph_target!.label[locale]">
                                 </span>
-                    } @else if (item().catapult_effect!.fate === 'Intact') {
-                        <span class="catapult-result">
+                            } @else if (item().catapult_effect!.fate === 'Intact') {
+                                <span class="catapult-result">
                                     <img [ngSrc]="HORDES_IMG_REPO + item().img" width="16" height="16" [title]="item().label[locale]">
                                 </span>
-                    } @if (item().catapult_effect!.repel_seconds !== null) {
-                        <span>
+                            }
+                            @if (item().catapult_effect!.repel_seconds !== null) {
+                                <span>
                                     <ng-container i18n>Repousse les zombies pendant</ng-container>
-                            {{ item().catapult_effect!.repel_seconds! / 60 }}
-                            <ng-container i18n>minutes</ng-container>
+                                    {{ item().catapult_effect!.repel_seconds! / 60 }}
+                                    <ng-container i18n>minutes</ng-container>
                                 </span>
-                    } @else if (item().catapult_effect!.kill_min !== null) {
-                        <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
-                        <span>{{ item().catapult_effect!.kill_min }}-{{ item().catapult_effect!.kill_max }}</span>
-                    } @if (item().catapult_effect!.radius === 'Cross') {
-                        <span i18n>sur la zone visée et les cases adjacentes</span>
-                    } @else if (item().catapult_effect!.radius === 'Square') {
-                        <span i18n>dans un rayon de 3×3 cases</span>
-                    } @else if (item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null) {
-                        <span i18n>sur la zone visée</span>
-                    }
-                    </div>
-                } @if (item().deco || item().guard || item().is_heaver) {
-                    <mat-divider></mat-divider>
-                    @if (item().deco) {
-                        <div>
-                            <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                            <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{ item().deco }})
-                        </div>
-                    } @if (item().guard) {
-                        <div>
-                            <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                            <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{ item().guard }})
-                        </div>
-                    } @if (item().is_heaver) {
-                        <div>
-                            <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
-                            <ng-container i18n>Objet encombrant</ng-container>
-                        </div>
-                    }
-                } @if (item().properties && item().properties.length > 0) {
-                    <mat-divider></mat-divider>
-                    @for (property of item().properties; track $index) {
-                        <div>
-                            @if (property?.value?.img && property?.value?.img !== '') {
-                                <img [ngSrc]="HORDES_IMG_REPO + $safeNavigationMigration(property?.value?.img)" width="16"
-                                     height="16">{{ property?.value?.label }}
+                            } @else if (item().catapult_effect!.kill_min !== null) {
+                                <img [ngSrc]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" width="16" height="16">
+                                <span>{{ item().catapult_effect!.kill_min }}-{{ item().catapult_effect!.kill_max }}</span>
+                            }
+                            @if (item().catapult_effect!.radius === 'Cross') {
+                                <span i18n>sur la zone visée et les cases adjacentes</span>
+                            } @else if (item().catapult_effect!.radius === 'Square') {
+                                <span i18n>dans un rayon de 3×3 cases</span>
+                            } @else if (item().catapult_effect!.kill_min !== null || item().catapult_effect!.repel_seconds !== null) {
+                                <span i18n>sur la zone visée</span>
                             }
                         </div>
                     }
-                } @if (item().actions && item().actions.length > 0) {
-                    <mat-divider></mat-divider>
-                    @for (action of item().actions; track $index) {
-                        <div>
-                            @if (action?.value?.img && action?.value?.img !== '') {
-                                <img [ngSrc]="HORDES_IMG_REPO + $safeNavigationMigration(action?.value?.img)" width="16"
-                                     height="16">{{ action?.value?.label }}
+                    @if (item().watch_impact !== 0) {
+                        <mat-divider></mat-divider>
+                        <div class="watch-impact">
+                            <ng-container i18n>Chances de survie en veille</ng-container>
+                            :
+                            <strong>{{ item().watch_impact > 0 ? '+' : '' }}{{ item().watch_impact | number:'1.0-2':locale }} %</strong>
+                            @if (watch_cumulable()) {
+                                <!-- @formatter:off : coupé en plusieurs lignes, la parenthèse serait rendue avec une espace -->
+                                (<ng-container i18n>cumulable</ng-container>)
+                                <!-- @formatter:on -->
                             }
                         </div>
                     }
-                }
+                    @if (item().bag_capacity_bonus) {
+                        <mat-divider></mat-divider>
+                        <div class="bag-effect">
+                            <strong>+{{ item().bag_capacity_bonus }}</strong>
+                            <ng-container i18n>places</ng-container>
+                        </div>
+                        @if (item().bag_exclusive_group && item().bag_exclusive_group!.length > 1) {
+                            <div class="bag-effect">
+                                <ng-container i18n>Un seul à la fois parmi</ng-container>
+                                :
+                                @for (member of item().bag_exclusive_group!; track member.uid) {
+                                    <img [src]="HORDES_IMG_REPO + member.img" [title]="member.label[locale]" alt="">
+                                }
+                            </div>
+                        }
+                    }
+                    @for (effects of other_action_effects(); track $index) {
+                        <mat-divider></mat-divider>
+                        <div class="action-effect" [class.not-current]="effects.applies_to_town === false">
+                            <div class="action-head">
+                                <strong>{{ actionLabel(effects) }}</strong>
+                                @if (effects.kind === 'Attack') {
+                                    {{ item().label[locale] }}
+                                }
+                                @if (effects.building_condition; as condition) {
+                                    <span class="condition">
+                                        @if (condition.built) {
+                                            <ng-container i18n>Avec Système de Pièges des Apprivoiseurs</ng-container>
+                                        } @else {
+                                            <ng-container i18n>Sans Système de Pièges des Apprivoiseurs</ng-container>
+                                        }
+                                    </span>
+                                }
+                                @if (effects.via_loaded_form; as loaded) {
+                                    <span class="loaded-form">
+                                        <ng-container i18n>Une fois chargé</ng-container>
+                                        :
+                                        <img [src]="HORDES_IMG_REPO + loaded.img" [title]="loaded.label[locale]" alt="">
+                                    </span>
+                                }
+                            </div>
+                            @for (outcome of effects.outcomes; track $index) {
+                                <div class="outcome" [class]="outcome.kind.toLowerCase()">
+                                    @switch (outcome.kind) {
+                                        @case ('Produced') {
+                                            @if (outcome.item) {
+                                                <img [src]="HORDES_IMG_REPO + outcome.item.img" [title]="outcome.item.label[locale]" alt="">
+                                            }
+                                            <span>{{ outcome.quantity ?? 1 }}×</span>
+                                        }
+                                        @case ('Kill') {
+                                            <img [src]="HORDES_IMG_REPO + 'icons/small_zombie.gif'" alt="">
+                                            @if (outcome.kill_min === null && outcome.kill_max === null) {
+                                                <ng-container i18n>tous les zombies</ng-container>
+                                            } @else if (outcome.kill_min === outcome.kill_max) {
+                                                <span>{{ outcome.kill_min }}</span>
+                                            } @else {
+                                                <span>{{ outcome.kill_min }}-{{ outcome.kill_max }}</span>
+                                            }
+                                        }
+                                        @case ('Broken') {
+                                            <img [src]="HORDES_IMG_REPO + (item() | itemImg:true)" [title]="item().label[locale]" alt="">
+                                            <ng-container i18n>Cassé</ng-container>
+                                        }
+                                        @case ('Transformed') {
+                                            @if (outcome.item) {
+                                                <img [src]="HORDES_IMG_REPO + outcome.item.img" [title]="outcome.item.label[locale]" alt="">
+                                            }
+                                        }
+                                        @case ('Consumed') {
+                                            <ng-container i18n>Détruit</ng-container>
+                                        }
+                                    }
+                                    <ng-container [ngTemplateOutlet]="chance" [ngTemplateOutletContext]="{ $implicit: outcome.probability }"/>
+                                </div>
+                            }
+                        </div>
+                    }
+                    @if (reload_summary(); as reload) {
+                        <mat-divider></mat-divider>
+                        <div class="reload-charges">
+                            <ng-container i18n>Charges à la recharge</ng-container>
+                            :
+                            @if (reload.min === reload.max) {
+                                {{ reload.max }}
+                            } @else {
+                                {{ reload.min }}
+                                <ng-container i18n>à</ng-container>
+                                {{ reload.max }}
+                                ({{ reload.detail }})
+                            }
+                        </div>
+                    }
+                    @if (item().deco || item().guard || item().is_heaver) {
+                        <mat-divider></mat-divider>
+                        @if (item().deco) {
+                            <div>
+                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                                <ng-container i18n>Objet de décoration</ng-container>&nbsp;(+{{ item().deco }})
+                            </div>
+                        }
+                        @if (item().guard) {
+                            <div>
+                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                                <ng-container i18n>Arme de veille</ng-container>&nbsp;(+{{ item().guard }})
+                            </div>
+                        }
+                        @if (item().is_heaver) {
+                            <div>
+                                <!--                    <img [ngSrc]="HORDES_IMG_REPO + property.value.img" width="16" height="16">-->
+                                <ng-container i18n>Objet encombrant</ng-container>
+                            </div>
+                        }
+                    }
+                    @if (displayed_properties().length > 0) {
+                        <mat-divider></mat-divider>
+                        @if (icon_properties().length > 0) {
+                            <div class="property-icons">
+                                @for (property of icon_properties(); track property.key) {
+                                    <img [src]="HORDES_IMG_REPO + property.value.img" [title]="property.value.label" [alt]="property.value.label">
+                                }
+                            </div>
+                        }
+                        @if (watch_bonus_properties().length > 0) {
+                            <div class="property-icons watch-bonus">
+                                <span i18n>Bonus de veille</span>
+                                @for (property of watch_bonus_properties(); track property.key) {
+                                    <img [src]="HORDES_IMG_REPO + property.value.img" [title]="property.value.label" [alt]="property.value.label">
+                                }
+                            </div>
+                        }
+                        @for (property of text_properties(); track $index) {
+                            <div>
+                                @if (property?.value?.img) {
+                                    <img [src]="HORDES_IMG_REPO + property.value.img" alt="">
+                                }
+                                {{ property?.value?.label }}
+                            </div>
+                        }
+                    }
+                    @if (displayed_actions().length > 0) {
+                        <mat-divider></mat-divider>
+                        @for (action of displayed_actions(); track $index) {
+                            <div class="item-action">
+                                @if (action.value.img) {
+                                    <img [src]="HORDES_IMG_REPO + action.value.img" alt="">
+                                }
+                                {{ action.value.label }}
+                            </div>
+                        }
+                    }
                 </div>
             }
         </div>

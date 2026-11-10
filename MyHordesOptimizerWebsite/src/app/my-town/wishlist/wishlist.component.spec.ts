@@ -1,12 +1,13 @@
 import { CdkDrag, CdkDragDrop, CdkDragPreview, CdkDropList } from '@angular/cdk/drag-drop';
 import { CdkScrollable } from '@angular/cdk/scrolling';
-import { provideHttpClient, withXhr } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { DebugElement, EventEmitter, WritableSignal } from '@angular/core';
 import { ComponentFixture, DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
 import { MatTableDataSource } from '@angular/material/table';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import moment from 'moment';
 import { of, Subject, throwError } from 'rxjs';
 import type { MockInstance } from 'vitest';
 
@@ -18,7 +19,9 @@ import { ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
+import { ClipboardService } from '../../_core/services/clipboard.service';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
+import { ItemMapComponent } from '../../_shared/item-map/item-map.component';
 import { WishlistComponent } from './wishlist.component';
 
 interface TestableComponent {
@@ -36,6 +39,8 @@ interface TestableComponent {
     auto_save$: Subject<WishlistInfo>;
     triggerSave(): void;
     buildExcelRows(items: WishlistItem[]): Record<string, string | number>[];
+    forumLabel(item: Item): string;
+    shareWishlistForum(): void;
 }
 
 function buildItemDto(overrides: Partial<WishlistItemDTO['item']> = {}): WishlistItemDTO['item'] {
@@ -47,6 +52,7 @@ function buildItemDto(overrides: Partial<WishlistItemDTO['item']> = {}): Wishlis
         openedWith: null, opens: [],
         openApCost: null, openSuccessRate: null, technicianOpenCpCost: null,
         catapultEffect: null,
+        actionEffects: [], reloadCharges: null, watchImpact: 0, bagCapacityBonus: null, bagExclusiveGroup: null,
         bankCount: 0, wishListCount: 0, dropRateNotPraf: 0, dropRatePraf: 0,
         ...overrides
     };
@@ -98,6 +104,63 @@ describe('WishlistComponent', (): void => {
         const row_ids: string[] = Array.from(fixture.nativeElement.querySelectorAll('tbody tr:first-child td') as NodeListOf<HTMLElement>).map(columnClass);
 
         expect(row_ids).toEqual(header_ids);
+    });
+
+    it('précède du tag d\'emote les objets qui en ont un, au format forum', (): void => {
+        const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+        const http: HttpTestingController = TestBed.inject(HttpTestingController);
+        const locale: string = moment.locale();
+        fixture.detectChanges();
+        http.expectOne((request: HttpRequest<unknown>): boolean => request.url.endsWith('/Fetcher/ItemEmotes')).flush({ 'wire_#00': ':item_wire:' });
+
+        const label = (uid: string): string => testable.forumLabel(Object.assign(new Item(), { uid, label: { [locale]: 'Objet' } }));
+
+        expect(label('wire_#00')).toBe(':item_wire: Objet');
+        expect(label('wood2_#00')).toBe('Objet');
+    });
+
+    describe('copie au format forum', (): void => {
+        /** Texte copié pour une liste contenant les lignes données. */
+        function copiedText(rows: WishlistItemDTO[]): string {
+            const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+            const copy_spy: MockInstance<ClipboardService['copy']> = vi.spyOn(TestBed.inject(ClipboardService), 'copy').mockImplementation((): void => undefined);
+            testable.wishlist_info.set(new WishlistInfo({
+                wishList: rows,
+                lastUpdateInfo: { updateTime: new Date(), userId: '1', userName: 'Bob', userKey: 'k' }
+            }));
+            testable.shareWishlistForum();
+            return copy_spy.mock.calls[0][0];
+        }
+
+        it('met en italique les objets à déposer dans la zone de rapatriement et l\'explique en légende', (): void => {
+            const text: string = copiedText([{ ...buildRowDto(1, 0, 5), depot: 1 }, buildRowDto(2, 0, 1)]);
+
+            expect(text).toContain(':middot:[i]Objet 1 (x5)[/i]\n');
+            expect(text).toContain(':middot:Objet 2 (x1)\n');
+            expect(text).not.toContain('Zone de rappatriement');
+            expect(text).toContain('Légende : [i]Zone de rapatriement[/i]');
+        });
+
+        it('ajoute à la légende les objets à signaler, seulement s\'il y en a', (): void => {
+            expect(copiedText([{ ...buildRowDto(1, 0, 5), shouldSignal: true }]))
+                .toContain('Légende : [bad]Objet à signaler[/bad]:warning:\n');
+        });
+
+        it('réunit les deux légendes sur une ligne', (): void => {
+            expect(copiedText([{ ...buildRowDto(1, 0, 5), depot: 1 }, { ...buildRowDto(2, 0, 1), shouldSignal: true }]))
+                .toContain('Légende : [i]Zone de rapatriement[/i] · [bad]Objet à signaler[/bad]:warning:\n');
+        });
+
+        it('termine la ligne par sa zone en PA, sauf pour la zone infinie', (): void => {
+            const text: string = copiedText([buildRowDto(1, 0, 10), { ...buildRowDto(1, 2, 3), depot: 1 }]);
+
+            expect(text).toContain(':middot:Objet 1 (x10)\n');
+            expect(text).toContain(':middot:[i]Objet 1 (x3) – zone 2:ap:[/i]\n');
+        });
+
+        it('n\'ajoute pas de légende sans objet à déposer dans la zone de rapatriement ni à signaler', (): void => {
+            expect(copiedText([buildRowDto(1, 0, 5)])).not.toContain('Légende');
+        });
     });
 
     it('exporte la quantité souhaitée de chaque ligne, pas le wishlist_count de l\'objet', (): void => {
@@ -372,6 +435,50 @@ describe('WishlistComponent', (): void => {
             testable.addItemToWishlist(3);
 
             expect(proposedIds()).toEqual([2, 3]);
+        });
+    });
+
+    it('affiche ∞ pour la zone infinie hors mode édition', async (): Promise<void> => {
+        const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+        testable.wishlist_info.set(new WishlistInfo({ wishList: [buildRowDto(1, 0, 1), buildRowDto(2, 2, 1)], lastUpdateInfo: null }));
+        fixture.detectChanges();
+        for (const block of await fixture.getDeferBlocks()) {
+            await block.render(DeferBlockState.Complete);
+        }
+        fixture.detectChanges();
+
+        const zones: string[] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('tbody td.mat-column-zone_x_pa'))
+            .map((cell: HTMLElement): string => cell.textContent?.trim() ?? '');
+        expect(zones).toEqual(['∞', '2']);
+    });
+
+    describe('colonne Carte', (): void => {
+        beforeEach(async (): Promise<void> => {
+            const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
+            testable.wishlist_info.set(new WishlistInfo({ wishList: [{ ...buildRowDto(1, 0, 1), mapCellItemCount: 3 }, buildRowDto(2, 0, 1)], lastUpdateInfo: null }));
+            fixture.detectChanges();
+            for (const block of await fixture.getDeferBlocks()) {
+                await block.render(DeferBlockState.Complete);
+            }
+            fixture.detectChanges();
+        });
+
+        function mapCells(): HTMLElement[] {
+            return Array.from((fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('tbody td.mat-column-map_cell_item_count'));
+        }
+
+        it('garde le nombre du serveur et ouvre au survol la carte de la ville quand des objets sont au sol', (): void => {
+            TestBed.inject(HttpTestingController).expectOne((request: HttpRequest<unknown>): boolean => request.url.includes('/Fetcher/map?'))
+                .flush({ townId: 1, townX: 1, townY: 0, mapHeight: 1, mapWidth: 3, isChaos: false, isDevasted: false, isDoorOpen: true, waterWell: 0, day: 1, cells: [] });
+            fixture.detectChanges();
+
+            const [with_items, without_items]: HTMLElement[] = mapCells();
+            expect(with_items.textContent?.trim()).toBe('3');
+            const item_map: ItemMapComponent = fixture.debugElement.query(By.directive(ItemMapComponent)).componentInstance as ItemMapComponent;
+            expect(item_map.itemId()).toBe(1);
+            expect(item_map.map()?.map_width).toBe(3);
+            expect(without_items.textContent?.trim()).toBe('0');
+            expect(without_items.querySelector('mho-item-map')).toBeNull();
         });
     });
 });

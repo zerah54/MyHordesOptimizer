@@ -51,14 +51,43 @@ final class SourceFetcherTest extends TestCase
         self::assertSame($this->racine . '/.source/abc123def456', $chemin);
         self::assertFileExists($chemin . '/_source.json');
 
-        // 1 appel d'API + 4 archives
-        self::assertCount(5, $urlsDemandees);
+        // 1 appel d'API + 4 archives + 3 fichiers de traduction
+        self::assertCount(8, $urlsDemandees);
         foreach (['path=src', 'path=packages/myhordes-fixtures', 'path=packages/myhordes-plugins', 'path=config/app'] as $attendu) {
             self::assertTrue(
                 (bool) array_filter($urlsDemandees, static fn (string $u): bool => str_contains(urldecode($u), $attendu)),
                 "Archive manquante : $attendu"
             );
         }
+        foreach (SourceFetcher::FICHIERS as $fichier) {
+            self::assertTrue(
+                (bool) array_filter($urlsDemandees, static fn (string $u): bool => str_contains(urldecode($u), "/repository/files/$fichier/raw")),
+                "Fichier manquant : $fichier"
+            );
+            self::assertFileExists($chemin . '/' . $fichier);
+        }
+    }
+
+    public function testCompleteUneSourceEnCacheSansSesFichiersIsoles(): void
+    {
+        $transport = static function (string $url): string {
+            if (str_contains($url, '/repository/commits/')) {
+                return json_encode([
+                    'id' => 'abc123def456',
+                    'short_id' => 'abc123d',
+                    'created_at' => '2026-07-20T19:19:05.000+02:00',
+                ], JSON_THROW_ON_ERROR);
+            }
+
+            return self::archiveFactice('mh-abc123/marqueur.txt', 'contenu');
+        };
+        $config = Config::load($this->racine);
+        $chemin = (new SourceFetcher($config, $transport))->recuperer();
+        unlink($chemin . '/' . SourceFetcher::FICHIERS[0]);
+
+        (new SourceFetcher($config, $transport))->recuperer();
+
+        self::assertFileExists($chemin . '/' . SourceFetcher::FICHIERS[0]);
     }
 
     public function testNeRetelechargePasQuandLeShaEstDejaEnCache(): void

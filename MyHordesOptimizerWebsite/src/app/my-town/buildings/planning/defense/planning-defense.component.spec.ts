@@ -64,6 +64,22 @@ describe('PlanningDefenseComponent', (): void => {
         expect(fake.draft()?.defenseSources.map((source: PlanDefenseSourceDTO): string => source.label)).toEqual(['Gratuit', '']);
     });
 
+    it('ajoute une perte sur un chantier construit au soir, affiche son effet et la supprime', async (): Promise<void> => {
+        await render();
+
+        root().querySelector<HTMLButtonElement>('button[data-action="add-loss"]')?.click();
+        expect(fake.draft()?.losses).toEqual([{ buildingId: 3, kind: 'destroyed' }]);
+
+        fixture.detectChanges();
+        const row: HTMLElement | null = root().querySelector('tr.loss');
+        expect(row?.getAttribute('data-building')).toBe('3');
+        expect(row?.querySelector('.loss-def')?.textContent).toContain('−5');
+        expect(row?.querySelector('.loss-def')?.textContent).toContain('dès demain');
+
+        root().querySelector<HTMLButtonElement>('tr.loss button[data-action="remove-loss"]')?.click();
+        expect(fake.draft()?.losses).toEqual([]);
+    });
+
     it('lecture seule : les contrôles sont désactivés', async (): Promise<void> => {
         await render();
         fake.can_edit.set(false);

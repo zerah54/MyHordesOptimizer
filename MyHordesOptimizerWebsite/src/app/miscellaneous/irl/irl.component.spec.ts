@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DataSet, DataView } from 'vis-data/peer';
 import { Network } from 'vis-network/peer';
-import { setupVitestCanvasMock } from 'vitest-canvas-mock';
 
 import { ChartsThemingService } from '../../_core/services/charts-theming.service';
 import { ThemeService } from '../../_core/services/theme.service';
@@ -17,12 +16,62 @@ interface IrlNodeForTest {
     towns: string[];
 }
 
+type CanvasMockModule = typeof import('vitest-canvas-mock');
+type SavedProperties = Map<string, PropertyDescriptor | undefined>;
+
+/** Ce que `vitest-canvas-mock` remplace, dès son import, sur le prototype des canvas et sur `window`. */
+const CANVAS_PROTOTYPE_KEYS: readonly string[] = ['getContext', 'toBlob', 'toDataURL'];
+const CANVAS_WINDOW_KEYS: readonly string[] = [
+    'Path2D', 'CanvasGradient', 'CanvasPattern', 'CanvasRenderingContext2D', 'DOMMatrix', 'ImageData', 'TextMetrics', 'ImageBitmap', 'createImageBitmap'
+];
+
+/**
+ * Relève des propriétés propres d'un objet.
+ * @param {object} target Objet observé.
+ * @param {readonly string[]} keys Propriétés à relever.
+ * @returns {SavedProperties} Descripteurs, `undefined` pour une propriété absente.
+ */
+function saveProperties(target: object, keys: readonly string[]): SavedProperties {
+    return new Map(keys.map((key: string): [string, PropertyDescriptor | undefined] => [key, Object.getOwnPropertyDescriptor(target, key)]));
+}
+
+/**
+ * Remet des propriétés relevées par `saveProperties`, en supprimant celles qui n'existaient pas.
+ * @param {object} target Objet à rétablir.
+ * @param {SavedProperties} saved Relevé.
+ */
+function restoreProperties(target: object, saved: SavedProperties): void {
+    saved.forEach((descriptor: PropertyDescriptor | undefined, key: string): void => {
+        if (descriptor === undefined) {
+            Reflect.deleteProperty(target, key);
+        } else {
+            Object.defineProperty(target, key, descriptor);
+        }
+    });
+}
+
 describe('IrlComponent', (): void => {
     let fixture: ComponentFixture<IrlComponent>;
     let component: IrlComponent;
+    let canvas_mock: CanvasMockModule;
+    let saved_prototype: SavedProperties;
+    let saved_window: SavedProperties;
+
+    // Les fichiers de test partagent leur environnement (Vitest non isolé) : le faux canvas, chargé à la demande puis
+    // retiré, ne doit pas fuir vers les fichiers suivants (Chart.js y obtiendrait un contexte et exigerait ResizeObserver).
+    beforeAll(async (): Promise<void> => {
+        saved_prototype = saveProperties(HTMLCanvasElement.prototype, CANVAS_PROTOTYPE_KEYS);
+        saved_window = saveProperties(window, CANVAS_WINDOW_KEYS);
+        canvas_mock = await import('vitest-canvas-mock');
+    });
+
+    afterAll((): void => {
+        restoreProperties(HTMLCanvasElement.prototype, saved_prototype);
+        restoreProperties(window, saved_window);
+    });
 
     beforeEach(async (): Promise<void> => {
-        setupVitestCanvasMock();
+        canvas_mock.setupVitestCanvasMock();
         await TestBed.configureTestingModule({
             imports: [IrlComponent]
         }).compileComponents();

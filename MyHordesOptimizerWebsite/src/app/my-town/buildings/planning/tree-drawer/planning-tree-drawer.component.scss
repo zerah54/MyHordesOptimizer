@@ -112,6 +112,10 @@
         font-size: 0.85em;
     }
 
+    .def.loss {
+        color: var(--mho-danger);
+    }
+
     .dash,
     .empty {
         opacity: 0.6;

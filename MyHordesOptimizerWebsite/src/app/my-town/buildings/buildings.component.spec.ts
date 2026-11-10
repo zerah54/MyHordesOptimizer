@@ -4,9 +4,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
-import { of } from 'rxjs';
+import { firstValueFrom, of, Subject } from 'rxjs';
 import type { Mock } from 'vitest';
 
+import { RealtimeBuildingPlansService } from '../../_abstract_model/realtime-services/realtime-building-plans.service';
+import { CitizenFilterSortStore } from '../../_shared/citizen-filters/citizen-filter-sort.store';
 import { BuildingsComponent } from './buildings.component';
 import { CitizenFiltersStore } from './planning/citizen-filters.store';
 import { PlanningItemValuesDialogComponent } from './planning/item-values-dialog/planning-item-values-dialog.component';
@@ -19,15 +21,21 @@ describe('BuildingsComponent', (): void => {
     let fake: FakePlanningStore;
     let fixture: ComponentFixture<BuildingsComponent>;
     let open: Mock;
+    let users: Subject<number[]>;
+    let join_presence: Mock;
+    let leave_presence: Mock;
 
     async function render(plan: BuildingPlanContentDTO = emptyPlanContent()): Promise<void> {
         fake = createFakeStore(plan);
         open = vi.fn().mockReturnValue({ afterClosed: (): unknown => of(undefined) });
+        users = new Subject<number[]>();
+        join_presence = vi.fn().mockResolvedValue([]);
+        leave_presence = vi.fn().mockResolvedValue(undefined);
         await TestBed.configureTestingModule({
             imports: [BuildingsComponent],
-            providers: [provideRouter([]), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
+            providers: [provideRouter([]), { provide: RealtimeBuildingPlansService, useValue: { users$: users.asObservable(), joinPresence: join_presence, leavePresence: leave_presence } }, { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         })
-            .overrideComponent(BuildingsComponent, { set: { providers: [{ provide: PlanningStore, useValue: fake.store }, CitizenFiltersStore] } })
+            .overrideComponent(BuildingsComponent, { set: { providers: [{ provide: PlanningStore, useValue: fake.store }, CitizenFilterSortStore, CitizenFiltersStore] } })
             .overrideProvider(MatDialog, { useValue: { open } })
             .compileComponents();
         fixture = TestBed.createComponent(BuildingsComponent);
@@ -43,8 +51,48 @@ describe('BuildingsComponent', (): void => {
     it('affiche le titre et lance le chargement', async (): Promise<void> => {
         await render();
 
-        expect(root().querySelector('mat-card-title')?.textContent?.trim()).toBe('Chantiers');
+        expect(root().querySelector('mat-card-title')?.textContent).toContain('Chantiers');
         expect(fake.actions['load']).toHaveBeenCalledTimes(1);
+    });
+
+    describe('modifications non enregistrées', (): void => {
+        it('enregistrement réussi : la page se quitte sans confirmation', async (): Promise<void> => {
+            await render();
+
+            const allowed: boolean = await firstValueFrom(fixture.componentInstance.canLeave());
+
+            expect(fake.actions['leave']).toHaveBeenCalledTimes(1);
+            expect(allowed).toBe(true);
+            expect(open).not.toHaveBeenCalled();
+        });
+
+        it('enregistrement impossible : quitter demande confirmation ; annuler retient la page', async (): Promise<void> => {
+            await render();
+            fake.actions['leave'].mockResolvedValue(false);
+            open.mockReturnValue({ afterClosed: (): unknown => of(false) });
+
+            const allowed: boolean = await firstValueFrom(fixture.componentInstance.canLeave());
+
+            expect(open).toHaveBeenCalledTimes(1);
+            expect(allowed).toBe(false);
+        });
+
+        it('fermer l\'onglet avec des modifications déclenche l\'alerte du navigateur', async (): Promise<void> => {
+            await render();
+            fake.dirty.set(true);
+            const event: Event = new Event('beforeunload', { cancelable: true });
+
+            window.dispatchEvent(event);
+
+            expect(event.defaultPrevented).toBe(true);
+        });
+    });
+
+    it('le bouton de partage est à côté du titre, comme sur les autres pages, et plus dans l\'en-tête des propositions', async (): Promise<void> => {
+        await render();
+
+        expect(root().querySelector('mat-card-title button[data-action="share"]')).not.toBeNull();
+        expect(root().querySelector('mho-planning-header button[data-action="share"]')).toBeNull();
     });
 
     describe('valeurs des objets (réglage de la ville)', (): void => {
@@ -200,9 +248,123 @@ describe('BuildingsComponent', (): void => {
         expect(root().querySelector('.past-day')).not.toBeNull();
     });
 
+    it('bannière de conflit conservé : texte inchangé', async (): Promise<void> => {
+        await render();
+        fake.conflict.set({ plan_id: 7, author: 'Bob', kept: true });
+        fixture.detectChanges();
+
+        expect(root().querySelector('.conflict')?.textContent).toContain('Vos modifications sont conservées');
+    });
+
+    it('bannière de conflit, main perdue : dit que les dernières modifications n\'ont pas été enregistrées', async (): Promise<void> => {
+        await render();
+        fake.conflict.set({ plan_id: 7, author: 'Bob', kept: false });
+        fixture.detectChanges();
+        const text: string = root().querySelector('.conflict')?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+
+        expect(text).toContain('Bob a pris la main sur cette proposition : vos dernières modifications n\'ont pas pu être enregistrées.');
+        expect(text).not.toContain('conservées');
+
+        fake.conflict.set({ plan_id: 7, author: null, kept: false });
+        fixture.detectChanges();
+
+        expect(root().querySelector('.conflict')?.textContent).toContain('Quelqu\'un a pris la main sur cette proposition');
+    });
+
+    describe('main sur la proposition', (): void => {
+        function banner(): HTMLElement | null {
+            return root().querySelector<HTMLElement>('[data-field="lock-banner"]');
+        }
+
+        it('absente quand la proposition est libre ou tenue par nous', async (): Promise<void> => {
+            await render();
+            expect(banner()).toBeNull();
+
+            fake.lock.set({ kind: 'mine' });
+            fixture.detectChanges();
+            expect(banner()).toBeNull();
+        });
+
+        it('une autre personne : son pseudo, et « Prendre la main » reprend la main', async (): Promise<void> => {
+            await render();
+            fake.lock.set({ kind: 'other', userId: 3, sameUser: false });
+            fixture.detectChanges();
+
+            expect(banner()?.textContent).toContain('Chloé');
+            expect(banner()?.textContent).toContain('modifie cette proposition');
+            banner()?.querySelector<HTMLButtonElement>('button[data-action="take-lock"]')?.click();
+            expect(fake.actions['takeLock']).toHaveBeenCalledTimes(1);
+        });
+
+        it('même joueur dans un autre onglet : texte dédié', async (): Promise<void> => {
+            await render();
+            fake.lock.set({ kind: 'other', userId: 1, sameUser: true });
+            fixture.detectChanges();
+
+            expect(banner()?.textContent).toContain('Tu modifies cette proposition dans un autre onglet');
+        });
+
+        it('« Prendre la main » est proposé à qui peut écrire, même quand can_edit est faux', async (): Promise<void> => {
+            await render();
+            fake.lock.set({ kind: 'other', userId: 3, sameUser: false });
+            fake.can_edit.set(false);
+            fixture.detectChanges();
+            expect(banner()?.querySelector('button[data-action="take-lock"]')).not.toBeNull();
+
+            fake.can_write.set(false);
+            fixture.detectChanges();
+            expect(banner()?.querySelector('button[data-action="take-lock"]')).toBeNull();
+        });
+    });
+
+    describe('présence', (): void => {
+        it('est déclarée à l\'ouverture, retirée à la destruction, et les présents alimentent l\'affichage', async (): Promise<void> => {
+            await render();
+            users.next([1, 3]);
+            fixture.detectChanges();
+
+            expect(join_presence).toHaveBeenCalledTimes(1);
+            expect(root().querySelectorAll('mho-active-citizens .citizen-avatar').length).toBe(2);
+
+            fixture.destroy();
+            await fixture.whenStable();
+            expect(leave_presence).toHaveBeenCalledTimes(1);
+        });
+
+        it('détruite avant la réponse du hub : le retrait attend la déclaration', async (): Promise<void> => {
+            await render();
+            fixture.destroy();
+            TestBed.resetTestingModule();
+            fake = createFakeStore();
+            let joined: (ids: number[]) => void = (): void => undefined;
+            join_presence = vi.fn().mockReturnValue(new Promise<number[]>((resolve: (ids: number[]) => void): void => {
+                joined = resolve;
+            }));
+            leave_presence = vi.fn().mockResolvedValue(undefined);
+            await TestBed.configureTestingModule({
+                imports: [BuildingsComponent],
+                providers: [provideRouter([]), { provide: RealtimeBuildingPlansService, useValue: { users$: users.asObservable(), joinPresence: join_presence, leavePresence: leave_presence } }, { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
+            })
+                .overrideComponent(BuildingsComponent, { set: { providers: [{ provide: PlanningStore, useValue: fake.store }, CitizenFilterSortStore, CitizenFiltersStore] } })
+                .compileComponents();
+            const late: ComponentFixture<BuildingsComponent> = TestBed.createComponent(BuildingsComponent);
+            late.detectChanges();
+
+            late.destroy();
+            await Promise.resolve();
+            expect(leave_presence).not.toHaveBeenCalled();
+
+            joined([]);
+            await new Promise<void>((resolve: () => void): void => {
+                setTimeout(resolve);
+            });
+            expect(leave_presence).toHaveBeenCalledTimes(1);
+        });
+    });
+
     it('bannière de conflit avec le nom de l\'auteur et fermeture', async (): Promise<void> => {
         await render();
-        fake.conflict.set({ author: 'Bob' });
+        fake.conflict.set({ plan_id: 7, author: 'Bob', kept: true });
         fixture.detectChanges();
 
         const banner: HTMLElement = root().querySelector<HTMLElement>('[role="alert"].conflict') as HTMLElement;

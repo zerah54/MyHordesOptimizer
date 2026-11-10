@@ -1,7 +1,8 @@
 import { computed, Signal, signal, WritableSignal } from '@angular/core';
 import type { Mock } from 'vitest';
 
-import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
+import { ItemEmotesDTO } from '../../../_abstract_model/dto/item.dto';
+import { DailyActionEnum, planningDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { Building } from '../../../_abstract_model/types/building.class';
@@ -11,13 +12,16 @@ import { Home } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { bannedPoolForced, bannedPoolShown } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
+import { BuildingUpgradesDTO } from './building-upgrades.types';
+import { neutralDefenseFactors } from './defense-gain.util';
 import { HomeUpgradeRef } from './home-upgrades.util';
 import { KeyedDebounce } from './keyed-debounce.util';
-import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanPool, PlanTaskDTO } from './plan.types';
 import { PlanAlert, planAlerts } from './plan-alerts.util';
 import { BuildingRef, CitizenRef, DayEvaluation, DayInput, evaluateDay, HomeLevelRef, WORKSHOP_UID } from './plan-evaluation.util';
-import { PlanningStore } from './planning.store';
+import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanPool, PlanTaskDTO } from './plan.types';
+import { PlanConflict, PlanLockState, PlanningStore, PlanSaveState } from './planning.store';
 import { ToggleContext } from './program-edit.util';
+import { ResourceCount } from './resources.util';
 import { taskLockKey } from './task-status.util';
 
 /** Chantiers de test : mur (reste à construire), atelier, porte construite et abîmée. */
@@ -41,9 +45,9 @@ export function fakeCatalog(): Building[] {
 
 /** Citoyens de test : un normal, un banni, un technicien. */
 export const FAKE_CITIZENS: CitizenRef[] = [
-    { userId: 1, name: 'Alice', banned: false, technician: false, homeLevel: null },
-    { userId: 2, name: 'Bob', banned: true, technician: false, homeLevel: null },
-    { userId: 3, name: 'Chloé', banned: false, technician: true, homeLevel: 1 }
+    { userId: 1, name: 'Alice', banned: false, technician: false, homeLevel: null, upgradeLevels: new Map<string, number>([['restLevel', 1]]) },
+    { userId: 2, name: 'Bob', banned: true, technician: false, homeLevel: null, upgradeLevels: new Map<string, number>([['restLevel', 0]]) },
+    { userId: 3, name: 'Chloé', banned: false, technician: true, homeLevel: 1, upgradeLevels: new Map<string, number>([['restLevel', 0]]) }
 ];
 
 /** Citoyens de test d'une ville sans banni. */
@@ -75,8 +79,8 @@ export const FAKE_UPGRADES: HomeUpgradeRef[] = [
 
 /** Niveaux de maison de test. */
 export const FAKE_HOMES: ReadonlyMap<number, HomeLevelRef> = new Map<number, HomeLevelRef>([
-    [1, { level: 1, label: 'Zelt', def: 1, ap: 2, apUrbanism: 2, resources: [] }],
-    [2, { level: 2, label: 'Baracke', def: 4, ap: 4, apUrbanism: 3, resources: [{ itemId: 5, count: 1 }] }]
+    [1, { level: 1, label: 'Zelt', def: 1, ap: 2, apUrbanism: 2, resources: [], resourcesUrbanism: [] }],
+    [2, { level: 2, label: 'Baracke', def: 4, ap: 4, apUrbanism: 3, resources: [{ itemId: 5, count: 1 }], resourcesUrbanism: [] }]
 ]);
 
 /**
@@ -105,7 +109,12 @@ export function fakeEvaluation(content: BuildingPlanContentDTO, overrides: Parti
         baseDefense: 1000,
         temporaryDefense: 0,
         homes: FAKE_HOMES,
+        homeUpgrades: new Map<string, ReadonlyMap<number, ResourceCount[]>>(),
         hardMode: false,
+        defenseFactors: neutralDefenseFactors(),
+        defenseItemIds: new Set<number>(),
+        upgrades: {},
+        buildingLevels: new Map<string, number>(),
         ...overrides
     });
 }
@@ -116,12 +125,14 @@ export interface FakePlanningStore {
     draft: WritableSignal<BuildingPlanContentDTO | null>;
     evaluation: WritableSignal<DayEvaluation | null>;
     can_edit: WritableSignal<boolean>;
+    can_write: WritableSignal<boolean>;
     can_edit_settings: WritableSignal<boolean>;
+    settings_version: WritableSignal<number | null>;
     dirty: WritableSignal<boolean>;
     saving: WritableSignal<boolean>;
     loading: WritableSignal<boolean>;
     load_failed: WritableSignal<boolean>;
-    conflict: WritableSignal<{ author: string | null } | null>;
+    conflict: WritableSignal<PlanConflict | null>;
     selected_plan: WritableSignal<BuildingPlanDTO | null>;
     plans_of_day: WritableSignal<BuildingPlanDTO[]>;
     is_citizen: WritableSignal<boolean>;
@@ -129,6 +140,8 @@ export interface FakePlanningStore {
     item_values: WritableSignal<ReadonlyMap<number, number>>;
     bank: WritableSignal<ReadonlyMap<number, number>>;
     items: WritableSignal<readonly Item[]>;
+    upgrades: WritableSignal<BuildingUpgradesDTO>;
+    item_emotes: WritableSignal<ItemEmotesDTO>;
     catalog: WritableSignal<readonly Building[]>;
     selected_day: WritableSignal<number>;
     citizens: WritableSignal<CitizenRef[]>;
@@ -137,7 +150,10 @@ export interface FakePlanningStore {
     pending_checks: WritableSignal<ReadonlySet<string>>;
     displayable_actions: WritableSignal<DailyActionEnum[]>;
     home_upgrades: WritableSignal<HomeUpgradeRef[]>;
-    actions: Record<'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'deletePlan' | 'setEffective' | 'save' | 'dismissConflict' | 'saveItemValues' | 'renamePlan' | 'setTaskDone', Mock>;
+    unlimited_home_levels: WritableSignal<boolean>;
+    lock: WritableSignal<PlanLockState>;
+    save_state: WritableSignal<PlanSaveState>;
+    actions: Record<'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'deletePlan' | 'setEffective' | 'save' | 'dismissConflict' | 'saveItemValues' | 'renamePlan' | 'setTaskDone' | 'takeLock' | 'leave', Mock>;
     updateDraft: Mock<(mutate: (content: BuildingPlanContentDTO) => void) => void>;
 }
 
@@ -153,12 +169,14 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         draft,
         evaluation: signal<DayEvaluation | null>(fakeEvaluation(content)),
         can_edit: signal(true),
+        can_write: signal(true),
         can_edit_settings: signal(true),
+        settings_version: signal<number | null>(1),
         dirty: signal(false),
         saving: signal(false),
         loading: signal(false),
         load_failed: signal(false),
-        conflict: signal<{ author: string | null } | null>(null),
+        conflict: signal<PlanConflict | null>(null),
         selected_plan: signal<BuildingPlanDTO | null>(plan),
         plans_of_day: signal<BuildingPlanDTO[]>([plan]),
         is_citizen: signal(true),
@@ -166,18 +184,24 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         item_values: signal<ReadonlyMap<number, number>>(new Map<number, number>([[5, 2]])),
         bank: signal<ReadonlyMap<number, number>>(new Map<number, number>([[5, 1]])),
         items: signal<readonly Item[]>([Object.assign(new Item(), { id: 5, uid: 'wood', label: { fr: 'Bois' }, img: 'item/item_wood.gif' })]),
+        upgrades: signal<BuildingUpgradesDTO>({}),
+        item_emotes: signal<ItemEmotesDTO>({}),
         catalog: signal<readonly Building[]>(fakeCatalog()),
         selected_day: signal(10),
         citizens: signal<CitizenRef[]>(FAKE_CITIZENS),
         citizens_full: signal<Citizen[]>(fakeFullCitizens()),
         can_track: signal(true),
         pending_checks: signal<ReadonlySet<string>>(new Set<string>()),
-        displayable_actions: signal<DailyActionEnum[]>(displayableDailyActions(new Set<string>(['small_gallery_#00', 'small_watchmen_#01']))),
-        home_upgrades: signal<HomeUpgradeRef[]>(FAKE_UPGRADES)
+        displayable_actions: signal<DailyActionEnum[]>(planningDailyActions(new Set<string>(['small_gallery_#00', 'small_watchmen_#01']))),
+        home_upgrades: signal<HomeUpgradeRef[]>(FAKE_UPGRADES),
+        unlimited_home_levels: signal(false),
+        lock: signal<PlanLockState>({ kind: 'free' }),
+        save_state: signal<PlanSaveState>('idle')
     };
     const actions: FakePlanningStore['actions'] = {
         load: vi.fn(), selectDay: vi.fn(), selectPlan: vi.fn(), createPlan: vi.fn(), duplicatePlan: vi.fn(),
-        deletePlan: vi.fn(), setEffective: vi.fn(), save: vi.fn(), dismissConflict: vi.fn(), saveItemValues: vi.fn(), renamePlan: vi.fn(), setTaskDone: vi.fn()
+        deletePlan: vi.fn(), setEffective: vi.fn(), save: vi.fn(), dismissConflict: vi.fn(), saveItemValues: vi.fn(), renamePlan: vi.fn(), setTaskDone: vi.fn(),
+        takeLock: vi.fn(), leave: vi.fn((): Promise<boolean> => Promise.resolve(true))
     };
     const update_draft: FakePlanningStore['updateDraft'] = vi.fn((mutate: (value: BuildingPlanContentDTO) => void): void => {
         const copy: BuildingPlanContentDTO = JSON.parse(JSON.stringify(draft())) as BuildingPlanContentDTO;

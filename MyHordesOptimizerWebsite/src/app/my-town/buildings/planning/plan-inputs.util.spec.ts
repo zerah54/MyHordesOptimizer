@@ -1,13 +1,14 @@
+import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { PlanningDay, PlanningStatic } from '../../../_abstract_model/services/planning-data.service';
 import { Building } from '../../../_abstract_model/types/building.class';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
-import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { Item } from '../../../_abstract_model/types/item.class';
-import { BuildingPlanContentDTO, emptyPlanContent } from './plan.types';
 import { CitizenRef, DayInput } from './plan-evaluation.util';
 import { buildDayInputs, PlanningContext } from './plan-inputs.util';
+import { BuildingPlanContentDTO, emptyPlanContent } from './plan.types';
 
 function wall(): Building {
     return new Building({
@@ -34,9 +35,11 @@ function context(overrides: Partial<PlanningContext> = {}, data_overrides: Parti
         },
         buildings: [wall()],
         items: [Object.assign(new Item(), { id: 5, uid: 'wood' })],
-        homes: { levels: [{ level: 1, label: 'Zelt', icon: '', def: 1, ap: 2, apUrbanism: 2, resources: [{ itemUid: 'wood', count: 1 }], resourcesUrbanism: [], buildingUid: null, allowsUpgrades: true, theft: false }], upgrades: [] },
+        homes: { levels: [{ level: 1, label: 'Zelt', icon: '', def: 1, ap: 2, apUrbanism: 2, resources: [{ itemUid: 'wood', count: 1 }], resourcesUrbanism: [], buildingUid: null, allowsUpgrades: true, theft: false }], upgrades: [{ name: 'lock', label: 'Schloss', description: '', levels: [{ level: 1, ap: 3, resources: [{ itemUid: 'wood', count: 2 }] }] }] },
         citizens: [Object.assign(new Citizen(), { id: 1, name: 'A', is_dead: false })],
         bank: [Object.assign(new Item(), { id: 5, bank_count: 3 })],
+        upgrades: {},
+        item_emotes: {},
         ...data_overrides
     };
     const days: Map<number, PlanningDay> = new Map<number, PlanningDay>([[10, { expeditions: [expedition(6, 1)], attack: 1400 }]]);
@@ -98,6 +101,7 @@ describe('buildDayInputs', (): void => {
         expect(first.citizens.map((citizen: CitizenRef): number => citizen.userId)).toEqual([1]);
         expect(first.buildings.get(1)?.label).toBe('Mur');
         expect(first.homes.get(1)?.resources).toEqual([{ itemId: 5, count: 1 }]);
+        expect(first.homeUpgrades.get(HomeEnum.HAS_LOCK.key)?.get(1)).toEqual([{ itemId: 5, count: 2 }]);
         expect(first.content).toBe(empty);
     });
 });

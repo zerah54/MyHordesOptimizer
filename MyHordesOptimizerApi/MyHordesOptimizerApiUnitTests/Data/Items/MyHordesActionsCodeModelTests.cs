@@ -41,7 +41,7 @@ namespace MyHordesOptimizerApiUnitTests.Data.Items
         }
 
         [Fact]
-        public void UnResultExprimeCommeUnObjetJson_DeserialiseEnListeVideSansException()
+        public void UnResultExprimeCommeUnObjetJson_DeserialiseAplatiSansException()
         {
             var json = """
             {
@@ -54,7 +54,9 @@ namespace MyHordesOptimizerApiUnitTests.Data.Items
 
             var actions = json.FromJson<Dictionary<string, MyHordesActionsCodeModel>>();
 
-            actions["load_lpointer"].Result.Should().BeEmpty();
+            actions["load_lpointer"].Result.Should().HaveCount(2);
+            actions["load_lpointer"].Result[0].Should().Be("consume_battery");
+            actions["load_lpointer"].Result[1].Should().BeOfType<JObject>();
         }
     }
 }

@@ -66,8 +66,14 @@ describe('ExpeditionOrderComponent', (): void => {
     it('follows a typed order with its note in italics, as plain text', (): void => {
         render(order({ kind: 'explore', note: 'attendre <b>X</b>' }));
 
-        expect(text(fixture, '.text')).toBe('Explorer la ruine (1 PA) — attendre <b>X</b>');
+        expect(text(fixture, '.text')).toBe('Explorer la ruine (1) — attendre <b>X</b>');
         expect(text(fixture, '.text i.note')).toBe('attendre <b>X</b>');
+    });
+
+    it('shows the action point of a ruin exploration as an icon', (): void => {
+        render(order({ kind: 'explore' }));
+
+        expect(fixture.nativeElement.querySelector('.text mho-icon-ap img')).not.toBeNull();
     });
 
     it('shows the heroic action picture and label', (): void => {

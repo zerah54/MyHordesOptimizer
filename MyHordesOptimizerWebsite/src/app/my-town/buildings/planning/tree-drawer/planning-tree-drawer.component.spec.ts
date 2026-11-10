@@ -8,6 +8,7 @@ import { TownDetails } from '../../../../_abstract_model/types/town-details.clas
 import { setTown } from '../../../../_core/utilities/localstorage.util';
 import { BuildingProgress } from '../building-progress.util';
 import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool } from '../plan.types';
+import { DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeCatalog, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { PlanningTreeDrawerComponent } from './planning-tree-drawer.component';
@@ -192,6 +193,17 @@ describe('PlanningTreeDrawerComponent', (): void => {
 
         expect(names()[0]).toBe('Mur');
         expect(row(1).querySelector('.ratio')?.textContent?.trim()).toBe('0.88');
+    });
+
+    it('défense réelle de l\'évaluation (cimetière, habitations fortifiées…), dans la colonne et le ratio', async (): Promise<void> => {
+        await render();
+        click('unlocked-only');
+        const evaluation: DayEvaluation = fake.evaluation() as DayEvaluation;
+        fake.evaluation.set({ ...evaluation, realDefense: new Map<number, number>([...evaluation.realDefense, [2, 20]]) });
+        fixture.detectChanges();
+
+        expect(row(2).querySelector('.def')?.textContent?.trim()).toBe('20');
+        expect(row(2).querySelector('.ratio')?.textContent?.trim()).not.toBe('—');
     });
 
     it('les ressources que la banque ne couvre pas sont signalées', async (): Promise<void> => {

@@ -70,7 +70,7 @@
         <div class="legal">
             <ng-container i18n>Développé par</ng-container>&nbsp;<a [href]="myhordes_url + 'jx/soul/6042'">Zerah</a>
             <span class="sep"> · </span><a href="https://discord.gg/ZQH7ZPWcCm" target="_blank" rel="noopener">Discord</a>
-            <span class="sep"> · </span><a href="https://crowdin.com/project/myhordes-optimizer/invite?h=48c7b7811f6a618b31fd08945414e12d1646847"
+            <span class="sep"> · </span><a href="https://crowdin.com/project/myhordes-optimizer/invite?h=fe97bdc978efa946fbd82cd5eb5d4bcb2926785"
                                            target="_blank" rel="noopener">Crowdin</a>
             <!--            <span class="sep"> · </span><a href="#" (click)="$event.preventDefault(); openThanks()" i18n>Remerciements</a>-->
             <br>
@@ -98,6 +98,9 @@
             <div style="width: 100%;">
                 @if (route.children && route.children.length > 0) {
                     <mat-icon>{{ route.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
+                }
+                @if (route.icon) {
+                    <img class="page-icon" [src]="HORDES_IMG_REPO + route.icon" alt="">
                 }
                 {{ resolveLabel(route) }}
                 @if (route.spoil) {

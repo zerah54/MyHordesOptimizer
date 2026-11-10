@@ -1,3 +1,4 @@
+import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { Item } from '../../../_abstract_model/types/item.class';
@@ -18,6 +19,17 @@ export function itemLabel(items: readonly Item[], item_id: number, locale: strin
 }
 
 /**
+ * Chemin complet de l'icône d'un objet.
+ * @param {readonly Item[]} items Objets connus.
+ * @param {number} item_id Identifiant de l'objet.
+ * @returns {string} Chemin de l'icône, vide pour un objet inconnu ou sans image.
+ */
+export function itemIcon(items: readonly Item[], item_id: number): string {
+    const img: string = items.find((candidate: Item): boolean => candidate.id === item_id)?.img ?? '';
+    return img === '' ? '' : HORDES_IMG_REPO + img;
+}
+
+/**
  * Rapport défense / coût affiché : deux décimales, « ∞ » pour un coût nul avec de la défense, « — » sans rapport.
  * @param {number | null} ratio Rapport calculé.
  * @returns {string} Texte affichable.
@@ -30,8 +42,8 @@ export function ratioLabel(ratio: number | null): string {
 }
 
 /**
- * Texte d'une étape de programme selon son mode : terminer, laisser à N PA, réparer entièrement, pour passer la nuit ou
- * jusqu'à N PV (ces deux derniers avec leur coût estimé).
+ * Texte d'une étape de programme selon son mode : chantier à terminer (consigne par défaut, son seul nom), laisser à N PA, réparer
+ * entièrement, pour passer la nuit ou jusqu'à N PV (ces deux derniers avec leur coût estimé).
  * @param {string} label Libellé du chantier.
  * @param {StepResult} result Étape évaluée.
  * @param {number} max_life PV max du chantier.
@@ -42,16 +54,14 @@ export function stepLabel(label: string, result: StepResult, max_life: number): 
     const mode: PlanStepMode = stepMode(step);
     const cost: number = result.paCost;
     if (step.kind === 'build') {
-        return mode === 'leave'
-            ? $localize`Laisser ${label}:label: à ${step.targetRemaining}:remaining: :ap:`
-            : $localize`Terminer ${label}:label:`;
+        return mode === 'leave' ? $localize`Laisser ${label}:label: à ${step.targetRemaining}:remaining::ap:` : label;
     }
     if (mode === 'survive') {
-        return $localize`Réparer ${label}:label: pour passer la nuit (≈ ${cost}:cost: :ap:)`;
+        return $localize`Réparer ${label}:label: pour passer la nuit (≈ ${cost}:cost::ap:)`;
     }
     if (mode === 'leave') {
         const life: number = Math.max(0, max_life - step.targetRemaining);
-        return $localize`Réparer ${label}:label: jusqu'à ${life}:life:/${max_life}:max: PV (≈ ${cost}:cost: :ap:)`;
+        return $localize`Réparer ${label}:label: jusqu'à ${life}:life:/${max_life}:max: PV (≈ ${cost}:cost::ap:)`;
     }
     return $localize`Réparer entièrement ${label}:label:`;
 }
@@ -68,7 +78,8 @@ export function taskLabel(task: PlanTaskDTO, homes: ReadonlyMap<number, HomeLeve
         return task.level === undefined || task.level === null ? '—' : (homes.get(task.level)?.label ?? `#${task.level}`);
     }
     if (task.kind === 'action') {
-        return DailyActionEnum.getByKey<DailyActionEnum>(task.ref ?? '')?.getLabel() ?? task.ref ?? '—';
+        const label: string = DailyActionEnum.getByKey<DailyActionEnum>(task.ref ?? '')?.getLabel() ?? task.ref ?? '—';
+        return typeof task.count === 'number' && task.count > 1 ? `${label} ×${task.count}` : label;
     }
     const upgrade: HomeEnum | undefined = task.kind === 'homeUpgrade' && typeof task.ref === 'string' ? HomeEnum.getByKey<HomeEnum>(task.ref) : undefined;
     if (upgrade !== undefined) {

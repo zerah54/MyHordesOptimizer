@@ -1,6 +1,6 @@
 <mat-card-header class="mho-expeditions-header">
     <mat-card-title>
-        <ng-container i18n>Expéditions</ng-container>
+        <mho-page-title page="townExpeditions"/>
         <button mat-icon-button type="button" (click)="shareExpeditionForum()" matTooltip="Copier au format forum" i18n-matTooltip>
             <mat-icon>share</mat-icon>
         </button>
@@ -165,7 +165,7 @@
                                             </td>
                                             <td class="sp" matTooltip="PE au départ" i18n-matTooltip>
                                                 <div class="flex">
-                                                    <ng-container i18n>PE</ng-container>
+                                                    <mho-icon-ep/>
                                                 </div>
                                             </td>
                                             <td class="shoes" [matTooltip]="shoe_label()">
@@ -280,7 +280,7 @@
                                                         }
                                                     </td>
                                                     <td class="sp">
-                                                        <span class="cell-label"><ng-container i18n>PE</ng-container></span>
+                                                        <span class="cell-label"><mho-icon-ep/></span>
                                                         @if (edition_mode() && editable()) {
                                                             @let sp_operator = spOperator(expedition_citizen);
                                                             <div class="flex">

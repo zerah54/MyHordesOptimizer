@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -106,6 +107,13 @@ namespace MyHordesOptimizerApi.Data.Items
     {
         public string? MorphSourceType { get; set; }
         public bool? BreakSource { get; set; }
+        public bool? ConsumeSource { get; set; }
+        /// <summary>Autre objet consommé par l'action (eau, pile, jerrycan…).</summary>
+        public string? ConsumeItem { get; set; }
+        public int? ConsumeItemCount { get; set; }
+        public bool? MorphSource { get; set; }
+        public int? SpawnCount { get; set; }
+        public JArray? Spawn { get; set; }
     }
 
     /// <summary>
@@ -125,6 +133,7 @@ namespace MyHordesOptimizerApi.Data.Items
     {
         public const string StatusEffectAtomType = "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Effect\\StatusEffect";
         public const string ItemEffectAtomType = "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Effect\\ItemEffect";
+        public const string BuildingRequirementAtomType = "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Requirement\\BuildingRequirement";
         public const string ZoneEffectAtomType = "MyHordes\\Fixtures\\DTO\\Actions\\Atoms\\Effect\\ZoneEffect";
 
         /// <summary>
@@ -163,5 +172,17 @@ namespace MyHordesOptimizerApi.Data.Items
             atom.IsZoneEffect() && atom.Payload is JObject payload
                 ? payload.ToObject<ZoneEffectPayload>()
                 : null;
+
+        /// <summary>Décode un prérequis de chantier : payload <c>{"building_&lt;uid&gt;": bool}</c> vers (uid, construit).</summary>
+        public static (string Uid, bool Built)? AsBuildingRequirement(this MetaResultAtom atom)
+        {
+            if (atom.Atom != BuildingRequirementAtomType || atom.Payload is not JObject payload)
+            {
+                return null;
+            }
+
+            var property = payload.Properties().FirstOrDefault(p => p.Name.StartsWith("building_") && p.Value.Type == JTokenType.Boolean);
+            return property is null ? null : (property.Name.Substring("building_".Length), (bool)property.Value);
+        }
     }
 }

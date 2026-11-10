@@ -58,7 +58,7 @@
                             }
                             <span class="spacer"></span>
                             @if (step.ap !== null) {
-                                <span class="ap">{{ step.ap }}<small>PA</small></span>
+                                <span class="ap"><mho-icon-ap [value]="step.ap"/></span>
                             }
                         </div>
                         @for (line of step.orders; track line.key) {

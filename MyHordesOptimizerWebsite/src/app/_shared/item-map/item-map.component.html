@@ -1,0 +1,19 @@
+<span class="origin" cdkOverlayOrigin #origin="cdkOverlayOrigin" tabindex="0"
+      (mouseenter)="open.set(true)" (mouseleave)="open.set(false)" (focus)="open.set(true)" (blur)="open.set(false)"><ng-content/></span>
+<ng-template cdkConnectedOverlay [cdkConnectedOverlayOrigin]="origin" [cdkConnectedOverlayOpen]="open() && map() !== null"
+             [cdkConnectedOverlayPositions]="positions" [cdkConnectedOverlayViewportMargin]="8" [cdkConnectedOverlayPush]="true">
+    <div class="item-map" role="tooltip">
+        <div class="grid" [style.--mho-map-columns]="map()?.map_width ?? 0" [style.--mho-map-rows]="map()?.map_height ?? 0">
+            @for (cell of cells(); track cell.key) {
+                <span class="mini-cell" [attr.data-cell]="cell.key" [class.town]="cell.town" [class.spot]="cell.count > 0" [class.broken]="cell.broken">
+                    @if (cell.count > 0) {
+                        <span class="count">{{ cell.count }}</span>
+                    }
+                </span>
+            }
+        </div>
+        @if (has_broken()) {
+            <span class="legend"><span class="broken-sample" aria-hidden="true"></span><ng-container i18n>au moins un exemplaire cassé</ng-container></span>
+        }
+    </div>
+</ng-template>

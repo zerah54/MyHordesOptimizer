@@ -5,13 +5,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
-import { dailyActionAp, DailyActionEnum } from '../../../../_abstract_model/enum/daily-action.enum';
+import { dailyActionAp, DailyActionEnum, dailyActionMaxUses } from '../../../../_abstract_model/enum/daily-action.enum';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
+import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { bulkAddTask, BulkTaskTemplate } from '../bulk-task.util';
-import { HomeUpgradeRef } from '../home-upgrades.util';
+import { cascadeAp, HomeUpgradeRef } from '../home-upgrades.util';
 import { BuildingPlanContentDTO, PlanTaskKind } from '../plan.types';
-import { HomeLevelRef } from '../plan-evaluation.util';
+import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
 
@@ -28,7 +29,7 @@ export interface PlanningBulkTaskDialogData {
     templateUrl: './planning-bulk-task-dialog.component.html',
     styleUrls: ['./planning-bulk-task-dialog.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...material_modules]
+    imports: [IconApComponent, ...material_modules]
 })
 export class PlanningBulkTaskDialogComponent {
 
@@ -68,7 +69,7 @@ export class PlanningBulkTaskDialogComponent {
             case 'homeUpgrade':
                 return this.upgrade() !== undefined && this.level() !== null;
             case 'home':
-                return this.level() !== null;
+                return this.level() !== null || !this.store.unlimited_home_levels();
             default:
                 return this.label().trim() !== '';
         }
@@ -98,9 +99,11 @@ export class PlanningBulkTaskDialogComponent {
         }
         const template: BulkTaskTemplate = this.template();
         const pa_of: (user_id: number) => number = this.paOf();
+        const count_of: ((user_id: number) => number) | undefined = this.countOf();
+        const level_of: ((user_id: number) => number | null) | undefined = this.levelOf();
         let added: number = 0;
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
-            added = bulkAddTask(content, this.data.user_ids, template, pa_of);
+            added = bulkAddTask(content, this.data.user_ids, template, pa_of, count_of, level_of);
         });
         this.dialog_ref.close(added);
     }
@@ -123,25 +126,80 @@ export class PlanningBulkTaskDialogComponent {
     }
 
     /**
-     * PA de la consigne pour un citoyen : selon son métier pour une action, du référentiel pour la maison et les améliorations.
+     * Utilisations prévues d'une action pour un citoyen : toutes celles que permet son métier (fouilles des galeries du Fouineur).
+     * @returns {((user_id: number) => number) | undefined} Calcul des utilisations, absent hors action.
+     */
+    private countOf(): ((user_id: number) => number) | undefined {
+        const action: DailyActionEnum | undefined = this.kind() === 'action' ? DailyActionEnum.getByKey<DailyActionEnum>(this.action_key() ?? '') : undefined;
+        if (action === undefined) {
+            return undefined;
+        }
+        const jobs: Map<number, string | null> = this.jobsByUser();
+        return (user_id: number): number => dailyActionMaxUses(action, jobs.get(user_id) ?? null);
+    }
+
+    /**
+     * Métier de chaque citoyen vivant.
+     * @returns {Map<number, string | null>} Clé `JobEnum` par identifiant de joueur.
+     */
+    private jobsByUser(): Map<number, string | null> {
+        return new Map<number, string | null>(this.store.citizens_full().map((citizen: Citizen): [number, string | null] => [citizen.id, citizen.job?.key ?? null]));
+    }
+
+    /**
+     * Niveau visé de chaque citoyen pour un travail de maison : le suivant du sien pour un agrandissement hors chaos et Pandémonium,
+     * sinon le niveau choisi ; nul pour qui l'a déjà atteint ou dont le niveau suivant est inconnu.
+     * @returns {((user_id: number) => number | null) | undefined} Calcul du niveau, absent hors travaux de maison.
+     */
+    private levelOf(): ((user_id: number) => number | null) | undefined {
+        const kind: PlanTaskKind = this.kind();
+        if (kind !== 'home' && kind !== 'homeUpgrade') {
+            return undefined;
+        }
+        const upgrade_key: string | null = kind === 'home' ? null : this.upgrade_key();
+        const target: number | null = this.level();
+        const homes: ReadonlyMap<number, HomeLevelRef> = this.store.homes();
+        const next_only: boolean = kind === 'home' && !this.store.unlimited_home_levels();
+        return (user_id: number): number | null => {
+            const current: number | null = currentHomeLevel(this.citizenRef(user_id), upgrade_key);
+            if (next_only) {
+                return current !== null && homes.has(current + 1) ? current + 1 : null;
+            }
+            return target === null || (current !== null && current >= target) ? null : target;
+        };
+    }
+
+    /**
+     * Citoyen retenu dans le budget.
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {CitizenRef | undefined} Citoyen, absent s'il est inconnu.
+     */
+    private citizenRef(user_id: number): CitizenRef | undefined {
+        return this.store.citizens().find((citizen: CitizenRef): boolean => citizen.userId === user_id);
+    }
+
+    /**
+     * PA de la consigne pour un citoyen : selon son métier pour une action, des niveaux manquants au référentiel pour la maison et les améliorations.
      * @returns {(user_id: number) => number} Calcul des PA.
      */
     private paOf(): (user_id: number) => number {
-        const level: number = this.level() ?? 0;
+        const level_of: ((user_id: number) => number | null) | undefined = this.levelOf();
         switch (this.kind()) {
             case 'action': {
                 const action: DailyActionEnum | undefined = DailyActionEnum.getByKey<DailyActionEnum>(this.action_key() ?? '');
-                const jobs: Map<number, string | null> = new Map<number, string | null>(this.store.citizens_full()
-                    .map((citizen: Citizen): [number, string | null] => [citizen.id, citizen.job?.key ?? null]));
+                const jobs: Map<number, string | null> = this.jobsByUser();
                 return (user_id: number): number => (action === undefined ? 0 : dailyActionAp(action, jobs.get(user_id) ?? null));
             }
             case 'homeUpgrade': {
-                const ap: number = this.upgrade()?.levels.find((candidate: { level: number; ap: number }): boolean => candidate.level === level)?.ap ?? 0;
-                return (): number => ap;
+                const upgrade: HomeUpgradeRef | undefined = this.upgrade();
+                const ap_of: (value: number) => number = (value: number): number => upgrade?.levels.find((candidate: { level: number; ap: number }): boolean => candidate.level === value)?.ap ?? 0;
+                return (user_id: number): number =>
+                    cascadeAp(ap_of, currentHomeLevel(this.citizenRef(user_id), upgrade?.key ?? null), level_of?.(user_id) ?? 0);
             }
             case 'home': {
-                const ap: number = this.store.homes().get(level)?.ap ?? 0;
-                return (): number => ap;
+                const homes: ReadonlyMap<number, HomeLevelRef> = this.store.homes();
+                return (user_id: number): number =>
+                    cascadeAp((value: number): number => homes.get(value)?.ap ?? 0, currentHomeLevel(this.citizenRef(user_id), null), level_of?.(user_id) ?? 0);
             }
             default: {
                 const pa: number = this.pa();

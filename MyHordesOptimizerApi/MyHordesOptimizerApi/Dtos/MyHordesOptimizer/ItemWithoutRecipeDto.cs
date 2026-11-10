@@ -53,6 +53,24 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer
         /// <summary>Effet catapulte réel de l'objet. <c>null</c> si l'objet n'est pas catapultable.</summary>
         public CatapultEffectDto CatapultEffect { get; set; } = null!;
 
+        /// <summary>Ouvrir, Découper, Purifier, Attaquer et devenir en veille, avec leurs issues probabilisées.</summary>
+        public List<ItemActionEffectsDto> ActionEffects { get; set; } = new();
+
+        /// <summary>
+        /// Arme à charges : nombre de tirs obtenus à la recharge, avec leur probabilité, posé sur la
+        /// forme vide et sur ses formes chargées. <c>null</c> sinon.
+        /// </summary>
+        public List<ChargeChanceDto>? ReloadCharges { get; set; }
+
+        /// <summary>Bonus (ou malus, si négatif) en points de % de chances de survie en veille de nuit. 0 si aucun impact.</summary>
+        public int WatchImpact { get; set; }
+
+        /// <summary>Emplacements de sac gagnés en portant l'objet. <c>null</c> si ce n'est pas une extension de sac.</summary>
+        public int? BagCapacityBonus { get; set; }
+
+        /// <summary>Extensions de sac de même type, l'objet compris, dont une seule peut être portée. <c>null</c> sans extension de sac.</summary>
+        public List<ItemSummaryDto>? BagExclusiveGroup { get; set; }
+
         public int WishListCount { get; set; }
         public int BankCount { get; set; }
         /// <summary>Quantité totale dans les sacs des citoyens vivants de la ville.</summary>
