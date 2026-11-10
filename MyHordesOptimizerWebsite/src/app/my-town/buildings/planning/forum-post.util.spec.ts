@@ -315,7 +315,15 @@ describe('forum-post.util', (): void => {
             const text: string = joined(programPost(context(plan())));
 
             expect(text).toContain('[big][b]Programme chantiers · J10[/b][/big]');
-            expect(text).toContain('[collapse=Consignes individuelles]');
+            expect(text).toContain('[collapse=Consignes individuelles pour @Alice:1 @Chloé:3]');
+            expect(text).toContain('[collapse=Consignes individuelles pour @Bob:2]');
+            expect(balanced(text)).toBe(true);
+        });
+
+        it('sans consigne : aucun bloc « Consignes individuelles »', (): void => {
+            const text: string = joined(programPost(context({ ...plan(), citizens: [] })));
+
+            expect(text).not.toContain('Consignes individuelles');
             expect(balanced(text)).toBe(true);
         });
 
@@ -350,6 +358,7 @@ describe('forum-post.util', (): void => {
 
             expect(text).toMatch(/@Alice:1 @Chloé:3/);
             expect(text.match(/RDE/g)?.length).toBe(1);
+            expect(text).not.toMatch(/@Alice:1 @Chloé:3\n/);
             expect(text).toContain('@Bob:2');
         });
 
@@ -385,7 +394,7 @@ describe('forum-post.util', (): void => {
             const text: string = joined(programPost(context(content)));
 
             expect(text).not.toContain('@Alice');
-            expect(text).toContain('Aucune consigne individuelle.');
+            expect(text).not.toContain('Consignes individuelles');
         });
 
         it('programme dans l\'ordre d\'exécution : bannis puis non-bannis, cibles et inconnus', (): void => {

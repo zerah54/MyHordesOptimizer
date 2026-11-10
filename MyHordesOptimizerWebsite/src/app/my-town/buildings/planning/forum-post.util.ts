@@ -97,7 +97,7 @@ export function programPost(context: PostContext, ping: boolean = true): string[
     const blocks: string[] = [
         $localize`[big][b]Programme chantiers · J${context.day}:day:[/b][/big]`,
         dayInstructions(context),
-        collapse($localize`Consignes individuelles`, [instructionGroups(context, ping)]),
+        ...instructionGroups(context, ping),
         `[b]${$localize`Programme chantiers dans l'ordre`}[/b]\n${orderedProgram(context)}`,
         defenseSummary(context),
         lossBlock(context),
@@ -383,12 +383,12 @@ function taskLine(context: PostContext, task: PlanTaskDTO): string {
 }
 
 /**
- * Consignes individuelles : une ligne de citoyens par ensemble de tâches identique, suivie de ces tâches.
+ * Consignes individuelles : un bloc repliable par ensemble de tâches identique, titré par les citoyens concernés.
  * @param {PostContext} context Contexte du post.
  * @param {boolean} ping Vrai : mentions `@pseudo:id` séparées par une espace ; faux : pseudos simples séparés par une virgule.
- * @returns {string} Bloc des consignes.
+ * @returns {string[]} Blocs des consignes (aucun sans consigne).
  */
-function instructionGroups(context: PostContext, ping: boolean): string {
+function instructionGroups(context: PostContext, ping: boolean): string[] {
     const groups: Map<string, { tasks: PlanTaskDTO[]; mentions: string[] }> = new Map<string, { tasks: PlanTaskDTO[]; mentions: string[] }>();
     for (const entry of context.content.citizens.filter((candidate: PlanCitizenDTO): boolean => candidate.tasks.length > 0)) {
         const citizen: CitizenRef | undefined = context.citizens.find((candidate: CitizenRef): boolean => candidate.userId === entry.userId);
@@ -401,12 +401,11 @@ function instructionGroups(context: PostContext, ping: boolean): string {
         groups.set(key, group);
     }
     if (groups.size === 0) {
-        return $localize`Aucune consigne individuelle.`;
+        return [];
     }
     return Array.from(groups.values())
         .map((group: { tasks: PlanTaskDTO[]; mentions: string[] }): string =>
-            [group.mentions.join(ping ? ' ' : ', '), ...group.tasks.map((task: PlanTaskDTO): string => taskLine(context, task))].join('\n'))
-        .join('\n\n');
+            collapse(`${$localize`Consignes individuelles pour`} ${group.mentions.join(ping ? ' ' : ', ')}`, group.tasks.map((task: PlanTaskDTO): string => taskLine(context, task))));
 }
 
 /** Bloc « Consignes du jour », vide (donc omis) sans consigne. */
