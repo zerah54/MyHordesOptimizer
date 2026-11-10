@@ -33,7 +33,7 @@ public class ApiExceptionFilter : ExceptionFilterAttribute
         }
         else if (exception is WebApiException)
         {
-            Logger.LogError(exception, $"WebApiException exception : {exception}");
+            Logger.LogError(exception, "WebApiException exception");
             var result = new ObjectResult(exception.ToString());
             result.StatusCode = (int)HttpStatusCode.FailedDependency;
             context.Result = result;
@@ -82,7 +82,7 @@ public class ApiExceptionFilter : ExceptionFilterAttribute
         }
         else
         {
-            Logger.LogError(exception, $"Erreur inatendue ! : {exception}", exception);
+            Logger.LogError(exception, "Erreur inattendue !");
             var result = new ObjectResult(null);
             result.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Result = result;
