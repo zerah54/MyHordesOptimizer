@@ -191,8 +191,7 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(dest => dest.MapCellDigs, opt => opt.Ignore())
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.TownCadavers, opt => opt.Ignore())
-                .ForMember(dest => dest.TownCitizens, opt => opt.Ignore())
-                .ForMember(dest => dest.WishlistCategories, opt => opt.Ignore());
+                .ForMember(dest => dest.TownCitizens, opt => opt.Ignore());
 
             // Les colonnes nullables sont écrites SOUS GARDE : les chaînes `fields=` ne font pas
             // partie du contrat, et ce DTO sert à quatre projections différentes (map.cadavers,

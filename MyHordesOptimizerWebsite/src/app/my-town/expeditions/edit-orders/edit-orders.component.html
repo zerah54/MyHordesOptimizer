@@ -13,7 +13,7 @@
     <mat-dialog-content>
         <div class="rows" cdkDropList (cdkDropListDropped)="drop($event)">
             @for (order of orders; track order; let order_index = $index) {
-                <div class="row" cdkDrag cdkDragBoundary=".rows" cdkDragLockAxis="y">
+                <div class="row" cdkDrag cdkDragPreviewContainer="parent" cdkDragBoundary=".rows" cdkDragLockAxis="y">
                     <div class="row-main">
                         <div class="row-header">
                             <mat-button-toggle-group [(value)]="order.type" hideSingleSelectionIndicator>

@@ -8,7 +8,6 @@ using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Jobs;
 using MyHordesOptimizerApi.Data.Ruins;
-using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -255,8 +254,6 @@ namespace MyHordesOptimizerApiUnitTests.Camping
             public List<MyHordesCauseOfDeathModel> GetCausesOfDeath() => throw new NotSupportedException();
             public List<MyHordesCleanUpTypeModel> GetCleanUpTypes() => throw new NotSupportedException();
             public Dictionary<string, MyHordesRecipeCodeModel> GetRecipes() => throw new NotSupportedException();
-            public List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories() => throw new NotSupportedException();
-            public List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists() => throw new NotSupportedException();
             public Dictionary<string, BuildingCodeModel> GetBuildings() => throw new NotSupportedException();
             public Dictionary<string, BuildingHardResourcesCodeModel> GetBuildingHardResources() => throw new NotSupportedException();
             public Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades() => throw new NotSupportedException();

@@ -21,5 +21,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public int Depot { get; set; }
         public bool ShouldSignal { get; set; }
         public bool IsWorkshop { get; set; }
+        /// <summary>Uid du groupe de la liste auquel l'objet appartient, null si hors groupe.</summary>
+        public string? GroupUid { get; set; }
     }
 }

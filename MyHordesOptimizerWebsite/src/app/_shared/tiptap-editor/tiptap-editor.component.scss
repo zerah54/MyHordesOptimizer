@@ -1,7 +1,22 @@
 :host {
     display: contents;
 
+    .mho-tiptap-editor {
+        border: 1px solid var(--mat-sys-outline);
+        border-radius: var(--mat-sys-corner-extra-small);
+        overflow: hidden;
+
+        &:focus-within {
+            border-color: var(--mat-sys-primary);
+            box-shadow: 0 0 0 1px var(--mat-sys-primary);
+        }
+    }
+
     ::ng-deep .ProseMirror {
+        min-height: 6rem;
+        padding: .5rem .75rem;
+        outline: none;
+
         p.is-editor-empty:first-child::before {
             content: attr(data-placeholder);
             color: var(--mat-sys-outline);

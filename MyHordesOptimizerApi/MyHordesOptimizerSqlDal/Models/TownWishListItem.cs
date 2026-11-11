@@ -35,6 +35,11 @@ public partial class TownWishListItem
     [Column("shouldSignal")]
     public bool? ShouldSignal { get; set; }
 
+    /// <summary>Uid du TownWishListGroup de la ville auquel la ligne est rattachée, null si hors groupe.</summary>
+    [Column("groupUid")]
+    [MaxLength(36)]
+    public string? GroupUid { get; set; }
+
     [ForeignKey("IdItem")]
     [InverseProperty("TownWishListItems")]
     public virtual Item IdItemNavigation { get; set; } = null!;

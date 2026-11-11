@@ -60,17 +60,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 }))
                 .ForMember(dest => dest.Properties, opt => opt.MapFrom(src => src.PropertyNames.Select(prop => prop.Name)))
                 .ForMember(dest => dest.Uid, opt => opt.MapFrom(src => src.Uid))
-                .ForMember(dest => dest.WishListCount, opt => opt.MapFrom((src, dest, srcMember, context) =>
-                {
-                    if (src.TownWishListItems.FirstOrDefault() == null)
-                    {
-                        return 0;
-                    }
-                    else
-                    {
-                        return src.TownWishListItems.First().Count;
-                    }
-                }))
+                // Nombre de lignes de la ville pour l'objet : 0 = absent de la liste (un groupe au stock 0 compte).
+                .ForMember(dest => dest.WishListCount, opt => opt.MapFrom(src => src.TownWishListItems.Count))
                 .Include<Item, ItemDto>();
 
             CreateMap<Item, ItemDto>()
@@ -112,7 +103,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.ActionNames, opt => opt.Ignore())
                 .ForMember(dest => dest.BagItems, opt => opt.Ignore())
                 .ForMember(dest => dest.Deco, opt => opt.MapFrom(src => src.Value.Deco))
-                .ForMember(dest => dest.DefaultWishlistItems, opt => opt.Ignore())
                 .ForMember(dest => dest.DescriptionDe, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Description, "de")))
                 .ForMember(dest => dest.DescriptionEn, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Description, "en")))
                 .ForMember(dest => dest.DescriptionEs, opt => opt.MapFrom(src => LabelOrGerman(src.Value.Description, "es")))
@@ -120,7 +110,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Items
                 .ForMember(dest => dest.DropRateNotPraf, opt => opt.Ignore())
                 .ForMember(dest => dest.DropRatePraf, opt => opt.Ignore())
                 .ForMember(dest => dest.Guard, opt => opt.MapFrom(src => src.Value.Guard))
-                .ForMember(dest => dest.IdCategories, opt => opt.Ignore())
                 .ForMember(dest => dest.IdCategory, opt => opt.ConvertUsing<DeutchNameToCategoryIdConverter, string>(src => src.Value.Category!["de"]))
                 .ForMember(dest => dest.IdCategoryNavigation, opt => opt.Ignore())
                 // La clé appartient à MHO et n'est PAS celle de MyHordes : celle-ci n'est qu'un

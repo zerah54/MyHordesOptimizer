@@ -16,8 +16,6 @@ namespace MyHordesOptimizerApi.Services.Interfaces.Import
         Task ImportCategoriesAsync();
         Task ImportItemsAsync();
         Task ImportAllAsync(Action<ImportStepProgress>? onStep = null);
-        void ImportWishlistCategorie();
-        void ImportDefaultWishlists();
         /// <param name="resume">
         /// Ignore les villes déjà importées depuis le classement (<c>Town.rankingImportedAt</c>).
         /// Indispensable pour venir à bout d'une saison ancienne, que le quota MyHordes ne laisse pas

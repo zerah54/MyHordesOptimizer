@@ -78,9 +78,10 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             context.SaveChanges();
 
             var wishListService = scope.ServiceProvider.GetRequiredService<IWishListService>();
-            wishListService.PutWishList(mapId, userId, new List<WishListPutResquestDto>
+            wishListService.PutWishList(mapId, userId, new WishListPutBodyDto
             {
-                new WishListPutResquestDto { Id = item.IdItem, Count = 5 }
+                Items = new List<WishListPutResquestDto> { new WishListPutResquestDto { Id = item.IdItem, Count = 5 } },
+                Groups = new List<WishListGroupDto>()
             });
 
             var dto = wishListService.GetWishList(mapId);

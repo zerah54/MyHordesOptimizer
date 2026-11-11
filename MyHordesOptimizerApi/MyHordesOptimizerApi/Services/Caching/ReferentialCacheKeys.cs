@@ -18,8 +18,6 @@ namespace MyHordesOptimizerApi.Services.Caching
         public const string CleanUpTypes = "referentiel:cleanuptypes";
         public const string Recipes = "referentiel:recipes";
         public const string Parameters = "referentiel:parameters";
-        public const string WishListCategories = "referentiel:wishlistcategories";
-        public const string WishListTemplates = "referentiel:wishlisttemplates";
 
         // Groupe B (TTL, voir TownController) mais avec un point d'écriture identifiable
         // (Admin/seasons/{season}/finish|unfinish) : centralisées ici pour la même raison que le

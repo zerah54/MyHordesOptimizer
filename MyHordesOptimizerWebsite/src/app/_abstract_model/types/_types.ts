@@ -48,4 +48,18 @@ export interface ListForAddRemove {
     counts?: ReadonlyMap<number, number>;
 }
 
+/** Groupe proposé par le segment « Groupes » du menu d'ajout. */
+export interface AddMenuGroup {
+    /** `game:<clé>` ou `user:<id>` */
+    key: string;
+    label: string;
+    /** Rubrique : `game` (groupes du jeu) ou `user` (mes groupes) */
+    section: string;
+    items: Item[];
+    /** Objets du groupe déjà présents dans la zone d'ajout */
+    placed_item_ids: ReadonlySet<number>;
+    /** Modifiable et supprimable (⋮) */
+    manageable: boolean;
+}
+
 export type LogLevel = 'Verbose' | 'Debug' | 'Information' | 'Warning' | 'Error' | 'Fatal';

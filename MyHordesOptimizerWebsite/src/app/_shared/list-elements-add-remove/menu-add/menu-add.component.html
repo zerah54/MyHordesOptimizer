@@ -8,7 +8,50 @@
             </mat-form-field>
         </div>
         <div (click)="keepOpen() && $event.stopPropagation()" class="items">
-            @if (lists.length > 1) {
+            @let groups_list = groups();
+            @if (groups_list) {
+                <div class="segmented views" (click)="$event.stopPropagation()">
+                    <mat-button-toggle-group [value]="view()" (change)="view.set($event.value)" hideSingleSelectionIndicator aria-label="Type d'ajout"
+                                             i18n-aria-label>
+                        <mat-button-toggle value="items" i18n>Objets</mat-button-toggle>
+                        <mat-button-toggle value="groups" i18n>Groupes</mat-button-toggle>
+                    </mat-button-toggle-group>
+                </div>
+            }
+            @if (groups_list && view() === 'groups') {
+                @for (section of sections; track section.key) {
+                    @let section_groups = visibleGroups(groups_list, section.key, searchItem.value);
+                    @if (section_groups.length > 0) {
+                        <div class="category-label">{{ section.label }}</div>
+                        @for (group of section_groups; track group.key) {
+                            @let placed = placedCount(group);
+                            <div class="gline" [class.full]="placed === group.items.length" (click)="onGroupClick(group)">
+                                <div class="gname">{{ group.label }}<span class="gcount">{{ group.items.length }}</span>
+                                    @if (placed > 0) {
+                                        <span class="warn" [title]="placedTitle(group)">⚠ {{ placed }}/{{ group.items.length }}</span>
+                                    }
+                                    @if (group.manageable) {
+                                        <button class="manage" type="button" mat-icon-button [class.pushed]="placed === 0" [matMenuTriggerFor]="manage"
+                                                [matMenuTriggerData]="{key: group.key}" (click)="$event.stopPropagation()" aria-label="Actions" i18n-aria-label>
+                                            <mat-icon>more_vert</mat-icon>
+                                        </button>
+                                    }
+                                </div>
+                                <div class="item-grid">
+                                    @for (item of group.items; track item.id) {
+                                        <span class="tile" [class.placed]="group.placed_item_ids.has(item.id)">
+                                            <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="labelOf(item)" height="16" width="16">
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                }
+                <div class="adv" (click)="advanced.emit()">
+                    <ng-container i18n>Ajout avancé…</ng-container>
+                </div>
+            } @else if (lists.length > 1) {
                 <!-- Plusieurs listes : un sélecteur segmenté plutôt que des onglets, qui débordaient de la largeur du menu. -->
                 @let selected_index = selected_list() < lists.length ? selected_list() : 0;
                 <div class="segmented lists" (click)="$event.stopPropagation()">
@@ -74,7 +117,8 @@
         <ng-template #itemTile let-item let-counts="counts">
             @if (searchItem.value === '' || $any(item.label[$any(locale)] ? item.label[$any(locale)] : item.label).toLowerCase().indexOf(searchItem.value.toLowerCase()) > -1) {
                 <span class="tile" (click)="add.emit(item.id)">
-                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? (item.label[$any(locale)] || '') : item.label)" height="16"
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="$any(item.label[$any(locale)] ? (item.label[$any(locale)] || '') : item.label)"
+                         height="16"
                          width="16">
                     @if (counts?.get(item.id); as count) {
                         <span class="count">{{ count }}</span>
@@ -82,5 +126,17 @@
                 </span>
             }
         </ng-template>
+    </ng-template>
+</mat-menu>
+
+<!-- Actions d'un groupe personnel ; clé reçue via matMenuTriggerData. -->
+<mat-menu #manage="matMenu" class="mho-menu-add-manage">
+    <ng-template let-key="key" matMenuContent>
+        <button mat-menu-item type="button" (click)="editGroup.emit(key)">
+            <ng-container i18n>Modifier</ng-container>
+        </button>
+        <button mat-menu-item type="button" (click)="deleteGroup.emit(key)">
+            <ng-container i18n>Supprimer</ng-container>
+        </button>
     </ng-template>
 </mat-menu>

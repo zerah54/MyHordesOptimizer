@@ -25,9 +25,6 @@ namespace MyHordesOptimizerApiUnitTests.Caching
         private static ParametersController NewParametersController(FakeParametersServiceForCaching service, IMemoryCache cache)
             => new(NullLogger<AbstractMyHordesOptimizerControllerBase>.Instance, new FakeUserInfoProvider(), service, cache);
 
-        private static WishListController NewWishListController(FakeWishListServiceForCaching service, IMemoryCache cache)
-            => new(NullLogger<AbstractMyHordesOptimizerControllerBase>.Instance, new FakeUserInfoProvider(), service, cache);
-
         private static MyHordesDataImportController NewImportController(FakeImportServiceForCaching service, IMemoryCache cache)
             => new(NullLogger<AbstractMyHordesOptimizerControllerBase>.Instance, new FakeUserInfoProvider(), service, cache);
 
@@ -141,30 +138,6 @@ namespace MyHordesOptimizerApiUnitTests.Caching
             controller.GetParameters();
 
             service.GetParametersCallCount.Should().Be(1);
-        }
-
-        [Fact]
-        public void GetWishListCategories_NeMappelleLeServiceQuUneFois()
-        {
-            var service = new FakeWishListServiceForCaching();
-            var controller = NewWishListController(service, new MemoryCache(new MemoryCacheOptions()));
-
-            controller.GetWishListCategories();
-            controller.GetWishListCategories();
-
-            service.GetWishListCategoriesCallCount.Should().Be(1);
-        }
-
-        [Fact]
-        public void GetWishListTemplates_NeMappelleLeServiceQuUneFois()
-        {
-            var service = new FakeWishListServiceForCaching();
-            var controller = NewWishListController(service, new MemoryCache(new MemoryCacheOptions()));
-
-            controller.GetWishListTemplates();
-            controller.GetWishListTemplates();
-
-            service.GetWishListTemplatesCallCount.Should().Be(1);
         }
 
         #endregion
@@ -334,40 +307,6 @@ namespace MyHordesOptimizerApiUnitTests.Caching
         }
 
         [Fact]
-        public void ImportWishlistCategorie_InvalideLeCacheWishListCategories()
-        {
-            var cache = new MemoryCache(new MemoryCacheOptions());
-            var wishListService = new FakeWishListServiceForCaching();
-            var wishListController = NewWishListController(wishListService, cache);
-            var importController = NewImportController(new FakeImportServiceForCaching(), cache);
-
-            wishListController.GetWishListCategories();
-            wishListService.GetWishListCategoriesCallCount.Should().Be(1);
-
-            importController.ImportWishlistCategorie();
-
-            wishListController.GetWishListCategories();
-            wishListService.GetWishListCategoriesCallCount.Should().Be(2);
-        }
-
-        [Fact]
-        public void ImportDefaultWishlist_InvalideLeCacheWishListTemplates()
-        {
-            var cache = new MemoryCache(new MemoryCacheOptions());
-            var wishListService = new FakeWishListServiceForCaching();
-            var wishListController = NewWishListController(wishListService, cache);
-            var importController = NewImportController(new FakeImportServiceForCaching(), cache);
-
-            wishListController.GetWishListTemplates();
-            wishListService.GetWishListTemplatesCallCount.Should().Be(1);
-
-            importController.ImportDefaultWishlist();
-
-            wishListController.GetWishListTemplates();
-            wishListService.GetWishListTemplatesCallCount.Should().Be(2);
-        }
-
-        [Fact]
         public void PostParameters_InvalideLeCacheParameters()
         {
             var cache = new MemoryCache(new MemoryCacheOptions());
@@ -390,9 +329,7 @@ namespace MyHordesOptimizerApiUnitTests.Caching
             // actions dédiées : toutes les clés du groupe A doivent retomber après cet import global.
             var cache = new MemoryCache(new MemoryCacheOptions());
             var fetcherService = new FakeFetcherServiceForCaching();
-            var wishListService = new FakeWishListServiceForCaching();
             var fetcherController = NewFetcherController(fetcherService, cache);
-            var wishListController = NewWishListController(wishListService, cache);
             var importController = NewImportController(new FakeImportServiceForCaching(), cache);
 
             fetcherController.GetItems(null);
@@ -402,8 +339,6 @@ namespace MyHordesOptimizerApiUnitTests.Caching
             fetcherController.GetCausesOfDeath();
             fetcherController.GetCleanUpTypes();
             fetcherController.GetRecipes();
-            wishListController.GetWishListCategories();
-            wishListController.GetWishListTemplates();
 
             importController.ImportAll("some-user-key").GetAwaiter().GetResult();
 
@@ -414,8 +349,6 @@ namespace MyHordesOptimizerApiUnitTests.Caching
             fetcherController.GetCausesOfDeath();
             fetcherController.GetCleanUpTypes();
             fetcherController.GetRecipes();
-            wishListController.GetWishListCategories();
-            wishListController.GetWishListTemplates();
 
             fetcherService.GetItemsCallCount.Should().Be(2);
             fetcherService.GetRuinsCallCount.Should().Be(2);
@@ -424,8 +357,6 @@ namespace MyHordesOptimizerApiUnitTests.Caching
             fetcherService.GetCausesOfDeathCallCount.Should().Be(2);
             fetcherService.GetCleanUpTypesCallCount.Should().Be(2);
             fetcherService.GetRecipesCallCount.Should().Be(2);
-            wishListService.GetWishListCategoriesCallCount.Should().Be(2);
-            wishListService.GetWishListTemplatesCallCount.Should().Be(2);
         }
 
         [Fact]

@@ -3,7 +3,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using MyHordesOptimizerApi;
 
 namespace MyHordesOptimizerApiIntegrationTests.ApplicationFactory
@@ -30,18 +33,49 @@ namespace MyHordesOptimizerApiIntegrationTests.ApplicationFactory
                })
                 .ConfigureTestServices(services =>
                 {
-                    services.AddDbContext<MhoContext>(options => options.AddInterceptors(_cleanupInterceptor));
+                    // AddDbContext fait un TryAdd des options : sans ce retrait, la configuration
+                    // de Program.cs l'emporte et l'interceptor n'est jamais attaché.
+                    services.RemoveAll<DbContextOptions<MhoContext>>();
+                    services.AddDbContext<MhoContext>(options => options.AddInterceptors(_cleanupInterceptor), ServiceLifetime.Transient);
                 });
+        }
+
+        // UserInfoProvider.UserId vaut 0 tant qu'aucun JWT n'est lu : les services écrivent alors
+        // LastUpdateInfo.idUser = 0 (FK vers Users). Cette ligne technique est la seule laissée en base :
+        // jamais supprimée, car plusieurs classes de tests s'exécutent en parallèle et en dépendent.
+        protected override IHost CreateHost(IHostBuilder builder)
+        {
+            var host = base.CreateHost(builder);
+            using var scope = host.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            context.Database.ExecuteSqlRaw("INSERT IGNORE INTO `Users` (`idUser`, `name`, `nbTownsPlayed`) VALUES (0, 'mho-tests-default-user', 0)");
+            return host;
+        }
+
+        // xUnit 2.6 démonte les fixtures via IDisposable.Dispose, jamais DisposeAsync : le nettoyage
+        // doit donc aussi s'exécuter ici (idempotent, la liste tracée est vidée au premier passage).
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                CleanupAsync().GetAwaiter().GetResult();
+            }
+            base.Dispose(disposing);
         }
 
         public override async ValueTask DisposeAsync()
         {
-            await _cleanupInterceptor.CleanupAsync(async () =>
+            await CleanupAsync();
+            await base.DisposeAsync();
+        }
+
+        private Task CleanupAsync()
+        {
+            return _cleanupInterceptor.CleanupAsync(() =>
             {
                 var scope = Services.CreateScope();
-                return scope.ServiceProvider.GetRequiredService<MhoContext>();
+                return Task.FromResult<DbContext>(scope.ServiceProvider.GetRequiredService<MhoContext>());
             });
-            await base.DisposeAsync();
         }
     }
 }

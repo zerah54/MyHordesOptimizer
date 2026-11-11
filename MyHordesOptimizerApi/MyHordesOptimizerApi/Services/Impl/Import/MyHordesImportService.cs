@@ -88,9 +88,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 ("cleanup-types", () => { ImportCleanUpTypes(); return Task.CompletedTask; }),
                 ("buildings", ImportBuildingAsync),
                 ("ruins", () => { ImportRuins(); return Task.CompletedTask; }),
-                ("pictos", () => { ImportPictos(); return Task.CompletedTask; }),
-                ("wishlist-categories", () => { ImportWishlistCategorie(); return Task.CompletedTask; }),
-                ("default-wishlists", () => { ImportDefaultWishlists(); return Task.CompletedTask; })
+                ("pictos", () => { ImportPictos(); return Task.CompletedTask; })
             };
 
             for (var i = 0; i < steps.Count; i++)
@@ -1196,73 +1194,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #endregion
 
-        #region Wishlist
-
-        public void ImportWishlistCategorie()
-        {
-            // Écrit WishlistCategorie.IdItems, une table de jonction globale sans IdTown : même
-            // ReferentialImportLock que les autres imports référentiels. Méthode synchrone (comme
-            // le reste de l'interface d'import) : bloquer le thread appelant le temps de
-            // l'acquisition est sans risque de deadlock, absence de SynchronizationContext sous
-            // Kestrel (même principe que TownSyncLockSyncExtensions.AcquireTownBlocking).
-            ReferentialImportLock.WaitAsync().GetAwaiter().GetResult();
-            try
-            {
-                ImportWishlistCategorieWithinLock();
-            }
-            finally
-            {
-                ReferentialImportLock.Release();
-            }
-        }
-
-        private void ImportWishlistCategorieWithinLock()
-        {
-            var wishlistCategories = MyHordesCodeRepository.GetWishlistItemCategories();
-            var models = Mapper.Map<List<WishlistCategorie>>(wishlistCategories, opt => opt.SetDbContext(DbContext));
-
-            var wishListCategoriesFromDb = DbContext.WishlistCategories
-                .Include(wishListCategorie => wishListCategorie.IdItems)
-                .ToList();
-            var wishListCategoryComparer = EqualityComparerFactory.Create<WishlistCategorie>(wlc => wlc.IdCategory.GetHashCode(), (a, b) => a.IdCategory == b.IdCategory);
-            DbContext.Patch(wishListCategoriesFromDb, models, wishListCategoryComparer);
-
-            // Les objets de chaque catégorie sont écrits ICI, et pas par le Patch ci-dessus.
-            //
-            // `UpdateAllButKeysProperties` saute délibérément les navigations dont la clé étrangère
-            // est une clé primaire, et `IdItems` porte justement `[ForeignKey("IdCategory")]` avec
-            // `IdCategory` en `[Key]`. Résultat : sur une catégorie DÉJÀ EN BASE — donc sur les neuf
-            // que compte le fichier dès le deuxième import — la liste d'objets n'était jamais
-            // écrite. Les catégories existaient, vides, et le site n'en montrait aucun objet.
-            // Les objets voulus sont figés AVANT toute écriture : pour une catégorie que le Patch
-            // vient d'ajouter, l'entité suivie et le modèle sont le MÊME objet, et vider la
-            // collection viderait du même coup la source qu'on s'apprête à recopier.
-            var objetsVoulus = models.ToDictionary(
-                categorie => categorie.IdCategory,
-                categorie => categorie.IdItems.ToList());
-
-            var categoriesEnBase = DbContext.WishlistCategories
-                .Include(categorie => categorie.IdItems)
-                .ToList();
-            var rattachements = 0;
-            foreach (var categorie in categoriesEnBase)
-            {
-                if (!objetsVoulus.TryGetValue(categorie.IdCategory, out var objets))
-                {
-                    continue;
-                }
-                categorie.IdItems.Clear();
-                foreach (var item in objets)
-                {
-                    categorie.IdItems.Add(item);
-                }
-                rattachements += objets.Count;
-            }
-            DbContext.SaveChanges();
-            Logger.LogInformation("ImportWishlistCategorie : {Categories} catégories, {Objets} rattachements d'objets.",
-                categoriesEnBase.Count, rattachements);
-        }
-
         #region Towns
 
         public Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress>? onStep = null)
@@ -1945,79 +1876,6 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
 
         #endregion
 
-        public void ImportDefaultWishlists()
-        {
-            var defaultWishlists = MyHordesCodeRepository.GetDefaultWishlists();
-
-            // Les listes par défaut désignent les objets par leur IDENTITÉ. La clé MHO se résout
-            // ici, à l'import : elle n'appartient pas au fichier, et l'y écrire l'exposerait à
-            // devenir fausse au premier objet créé sous une nouvelle clé.
-            var clesParUid = DbContext.Items
-                .Where(item => item.Uid != null)
-                .ToDictionary(item => item.Uid!, item => item.IdItem);
-
-            var modeles = new List<DefaultWishlistItem>();
-            foreach (var wishlist in defaultWishlists)
-            {
-                foreach (var item in wishlist.Items)
-                {
-                    if (!clesParUid.TryGetValue(item.Uid ?? string.Empty, out var idItem))
-                    {
-                        // Un objet retiré du jeu, ou une coquille dans le fichier : on écarte la
-                        // ligne en la nommant, plutôt que de rattacher la liste à un objet au
-                        // hasard ou de faire échouer tout l'import pour une entrée.
-                        Logger.LogWarning("ImportDefaultWishlists : objet « {Uid} » inconnu dans la liste {Liste}, entrée ignorée.",
-                            item.Uid, wishlist.Id);
-                        continue;
-                    }
-                    modeles.Add(new DefaultWishlistItem()
-                    {
-                        IdDefaultWishlist = wishlist.Id,
-                        IdItem = idItem,
-                        Name = wishlist.Name["fr"],
-                        LabelFr = wishlist.Name["fr"],
-                        LabelEn = wishlist.Name["en"],
-                        LabelEs = wishlist.Name["es"],
-                        LabelDe = wishlist.Name["de"],
-                        Count = item.Count,
-                        Depot = Convert.ToBoolean(item.Depot),
-                        ShouldSignal = item.ShouldSignal,
-                        Priority = item.Priority,
-                        ZoneXpa = item.ZoneXPa
-                    });
-                }
-                foreach (var categorie in wishlist.Categories)
-                {
-                    var wishlistCategorie = DbContext.WishlistCategories
-                        .Include(wlc => wlc.IdItems)
-                        .Single(x => x.IdCategory == categorie.CategorieId);
-                    foreach (var item in wishlistCategorie.IdItems)
-                    {
-                        modeles.Add(new DefaultWishlistItem()
-                        {
-                            IdDefaultWishlist = wishlist.Id,
-                            IdItem = item.IdItem,
-                            Name = wishlist.Name["fr"],
-                            LabelFr = wishlist.Name["fr"],
-                            LabelEn = wishlist.Name["en"],
-                            LabelEs = wishlist.Name["es"],
-                            LabelDe = wishlist.Name["de"],
-                            Count = categorie.Count,
-                            Priority = categorie.Priority,
-                            ZoneXpa = categorie.ZoneXPa
-                        });
-                    }
-                }
-            }
-            var modelsFromDb = DbContext.DefaultWishlistItems
-                .ToList();
-            var defaultWishlistItemComparer = EqualityComparerFactory.Create<DefaultWishlistItem>(dwi => HashCode.Combine(dwi.IdDefaultWishlist, dwi.IdItem),
-                (a, b) => a.IdDefaultWishlist == b.IdDefaultWishlist
-                && a.IdItem == b.IdItem);
-            DbContext.Patch(modelsFromDb, modeles, defaultWishlistItemComparer);
-        }
-
-        #endregion
 
         #region Reprise des identifiants MyHordes
 

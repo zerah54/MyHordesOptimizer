@@ -296,6 +296,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownAttackSetting WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownAttackRefinement WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownWishListItem WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownWishListGroup WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBankItem WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownCitizenDailyAction WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownCadaver WHERE idTown = {0}", townId);

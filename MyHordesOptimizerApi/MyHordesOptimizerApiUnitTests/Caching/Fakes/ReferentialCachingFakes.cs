@@ -102,30 +102,6 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
         public void UpdateParameter(ParametersDto parameter) => UpdateParameterCallCount++;
     }
 
-    /// <summary>Fake de IWishListService : compte les lectures des référentiels Categories/Templates.</summary>
-    public class FakeWishListServiceForCaching : IWishListService
-    {
-        public int GetWishListCategoriesCallCount { get; private set; }
-        public int GetWishListTemplatesCallCount { get; private set; }
-
-        public List<WishlistCategorieDto> GetWishListCategories()
-        {
-            GetWishListCategoriesCallCount++;
-            return new List<WishlistCategorieDto>();
-        }
-
-        public List<WishlistTemplateDto> GetWishListTemplates()
-        {
-            GetWishListTemplatesCallCount++;
-            return new List<WishlistTemplateDto>();
-        }
-
-        public WishListLastUpdateDto GetWishList(int townId) => throw new NotSupportedException();
-        public WishListLastUpdateDto PutWishList(int townId, int userId, List<WishListPutResquestDto> wishList) => throw new NotSupportedException();
-        public WishListLastUpdateDto CreateFromTemplate(int townId, int userId, int templateId) => throw new NotSupportedException();
-        public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa) => throw new NotSupportedException();
-    }
-
     /// <summary>
     /// Fake de IMyHordesImportService : les imports ne font rien, seule l'invalidation de cache
     /// déclenchée par le contrôleur appelant importe pour ces tests. <see cref="ShouldThrow"/> simule
@@ -153,8 +129,6 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
         public Task ImportCategoriesAsync() => Task.CompletedTask;
         public Task ImportItemsAsync() { ThrowIfConfigured(); return Task.CompletedTask; }
         public Task ImportAllAsync(Action<ImportStepProgress>? onStep = null) { ThrowIfConfigured(); return Task.CompletedTask; }
-        public void ImportWishlistCategorie() => ThrowIfConfigured();
-        public void ImportDefaultWishlists() => ThrowIfConfigured();
         public Task ImportTownsAsync(int? season = null, bool resume = false, Action<ImportStepProgress>? onStep = null) => Task.CompletedTask;
         public Task ImportSingleTownAsync(int townId) => Task.CompletedTask;
         public Task RefreshUserNamesAsync(int? limit = null) => Task.CompletedTask;

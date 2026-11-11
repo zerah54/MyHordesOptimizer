@@ -5,4 +5,5 @@ export interface ShortWishlistItemDTO {
     depot: number;
     zoneXPa: number;
     shouldSignal: boolean;
+    groupUid: string | null;
 }

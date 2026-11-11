@@ -165,37 +165,6 @@ namespace MyHordesOptimizerApi.Controllers
         }
 
         [HttpPost]
-        [Route("WishlistCategories")]
-        public ActionResult ImportWishlistCategorie()
-        {
-            try
-            {
-                MyHordesImportService.ImportWishlistCategorie();
-            }
-            finally
-            {
-                _cache.Remove(ReferentialCacheKeys.WishListCategories);
-            }
-            return Ok();
-        }
-
-        [HttpPost]
-        [Route("DefaultWishlist")]
-        public ActionResult ImportDefaultWishlist()
-        {
-            try
-            {
-                MyHordesImportService.ImportDefaultWishlists();
-            }
-            finally
-            {
-                _cache.Remove(ReferentialCacheKeys.WishListTemplates);
-            }
-            return Ok();
-        }
-
-
-        [HttpPost]
         [Route("Buildings")]
         public async Task<ActionResult> ImportBuildingAsync([FromQuery] string userKey)
         {
@@ -229,8 +198,6 @@ namespace MyHordesOptimizerApi.Controllers
             _cache.Remove(ReferentialCacheKeys.HeroSkills);
             _cache.Remove(ReferentialCacheKeys.CausesOfDeath);
             _cache.Remove(ReferentialCacheKeys.CleanUpTypes);
-            _cache.Remove(ReferentialCacheKeys.WishListCategories);
-            _cache.Remove(ReferentialCacheKeys.WishListTemplates);
         }
 
         [HttpPost]

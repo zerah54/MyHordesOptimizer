@@ -4,6 +4,7 @@ import { Dictionary } from './types/_types';
 export const EXTERNAL_APP_ID_KEY: string = 'external_app_id';
 export const BANK_CONDENSED_DISPLAY_KEY: string = 'bank_condensed_display';
 export const WISHLIST_EDITION_MODE_KEY: string = 'wishlist_edition_mode';
+export const WISHLIST_EXPANDED_GROUPS_KEY: string = 'wishlist_expanded_groups';
 export const EXPEDITIONS_EDITION_MODE_KEY: string = 'expeditions_edition_mode';
 export const EXPEDITIONS_ITEMS_SORT_KEY: string = 'expeditions_items_sort';
 export const CITIZENS_LIST_DISPLAY_MODE_KEY: string = 'citizens_list_display_mode';

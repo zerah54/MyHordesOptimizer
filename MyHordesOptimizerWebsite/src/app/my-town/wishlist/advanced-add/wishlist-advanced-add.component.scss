@@ -1,0 +1,112 @@
+:host {
+    display: block;
+}
+
+.advanced-add {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: min(460px, 80vw);
+}
+
+.criterion {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.criterion-name {
+    min-width: 90px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.criterion-select {
+    flex: 1;
+}
+
+.and {
+    font-size: 11px;
+    color: var(--mho-text-muted);
+}
+
+.preview {
+    border-top: 1px solid var(--mho-border, currentColor);
+    padding-top: 10px;
+}
+
+.preview-head {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 12px;
+}
+
+.item-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.tile {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: var(--mho-radius-s);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--mho-accent-soft);
+    }
+
+    img {
+        display: block;
+    }
+
+    &.placed {
+        opacity: .35;
+    }
+
+    &.excluded {
+        opacity: .5;
+
+        &::after {
+            content: '';
+            position: absolute;
+            left: 1px;
+            right: 1px;
+            top: 50%;
+            border-top: 2px solid var(--mho-warning);
+            transform: rotate(-35deg);
+        }
+    }
+}
+
+.legend {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--mho-text-muted);
+}
+
+.picker {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+/* Rubriques par catégorie, comme dans le menu d'ajout. */
+.category-label {
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mho-text-muted);
+}
+
+.fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}

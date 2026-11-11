@@ -37,7 +37,6 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<CauseOfDeath> CauseOfDeaths { get; set; }
 
-    public virtual DbSet<DefaultWishlistItem> DefaultWishlistItems { get; set; }
 
     public virtual DbSet<Expedition> Expeditions { get; set; }
 
@@ -113,6 +112,8 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownWishListItem> TownWishListItems { get; set; }
 
+    public virtual DbSet<TownWishListGroup> TownWishListGroups { get; set; }
+
     public virtual DbSet<Season> Seasons { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -129,9 +130,10 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<UserMapTheme> UserMapThemes { get; set; }
 
+    public virtual DbSet<UserWishListGroup> UserWishListGroups { get; set; }
+
     public virtual DbSet<UserMapThemePreference> UserMapThemePreferences { get; set; }
 
-    public virtual DbSet<WishlistCategorie> WishlistCategories { get; set; }
 
     public virtual DbSet<MinesweeperGame> MinesweeperGames { get; set; }
 
@@ -274,23 +276,6 @@ public partial class MhoContext : DbContext
             entity.HasKey(e => e.Dtype).HasName("PRIMARY");
 
             entity.Property(e => e.Dtype).ValueGeneratedNever();
-        });
-
-        modelBuilder.Entity<DefaultWishlistItem>(entity =>
-        {
-            entity.HasKey(e => new { e.IdDefaultWishlist, e.IdItem })
-                .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-
-            entity.Property(e => e.Count).HasDefaultValueSql("'0'");
-            entity.Property(e => e.Depot).HasDefaultValueSql("b'0'");
-            entity.Property(e => e.Priority).HasDefaultValueSql("'0'");
-            entity.Property(e => e.ShouldSignal).HasDefaultValueSql("b'0'");
-            entity.Property(e => e.ZoneXpa).HasDefaultValueSql("'0'");
-
-            entity.HasOne(d => d.IdItemNavigation).WithMany(p => p.DefaultWishlistItems)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("DefaultWishlistItem_ibfk_1");
         });
 
         modelBuilder.Entity<Expedition>(entity =>
@@ -838,39 +823,6 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdPictoNavigation).WithMany(p => p.TownCitizenPictos)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_towncitizenpicto_picto");
-        });
-
-        modelBuilder.Entity<WishlistCategorie>(entity =>
-        {
-            entity.HasKey(e => e.IdCategory).HasName("PRIMARY");
-
-            entity.HasOne(d => d.IdUserAuthorNavigation).WithMany(p => p.WishlistCategories).HasConstraintName("WishlistCategorie_ibfk_1");
-
-            entity.HasMany(d => d.IdItems).WithMany(p => p.IdCategories)
-                .UsingEntity<Dictionary<string, object>>(
-                    "WishlistCategorieItem",
-                    r => r.HasOne<Item>().WithMany()
-                        .HasForeignKey("IdItem")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("WishlistCategorieItem_ibfk_1"),
-                    l => l.HasOne<WishlistCategorie>().WithMany()
-                        .HasForeignKey("IdCategory")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("WishlistCategorieItem_ibfk_2"),
-                    j =>
-                    {
-                        j.HasKey("IdCategory", "IdItem")
-                            .HasName("PRIMARY")
-                            .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-                        j.ToTable("WishlistCategorieItem");
-                        j.HasIndex(new[] { "IdItem" }, "idItem");
-                        j.IndexerProperty<int>("IdCategory")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("idCategory");
-                        j.IndexerProperty<int>("IdItem")
-                            .HasColumnType("int(11)")
-                            .HasColumnName("idItem");
-                    });
         });
 
         modelBuilder.Entity<Season>(entity =>

@@ -204,38 +204,6 @@ namespace MyHordesOptimizerApi.Controllers
             return Ok();
         }
 
-        [HttpPost("import/wishlist-categories")]
-        [Authorize]
-        [AdminOnly]
-        public ActionResult ImportWishlistCategories()
-        {
-            try
-            {
-                _importService.ImportWishlistCategorie();
-            }
-            finally
-            {
-                _cache.Remove(ReferentialCacheKeys.WishListCategories);
-            }
-            return Ok();
-        }
-
-        [HttpPost("import/default-wishlists")]
-        [Authorize]
-        [AdminOnly]
-        public ActionResult ImportDefaultWishlists()
-        {
-            try
-            {
-                _importService.ImportDefaultWishlists();
-            }
-            finally
-            {
-                _cache.Remove(ReferentialCacheKeys.WishListTemplates);
-            }
-            return Ok();
-        }
-
         [HttpPost("import/buildings")]
         [Authorize]
         [AdminOnly]
@@ -303,8 +271,6 @@ namespace MyHordesOptimizerApi.Controllers
             _cache.Remove(ReferentialCacheKeys.HeroSkills);
             _cache.Remove(ReferentialCacheKeys.CausesOfDeath);
             _cache.Remove(ReferentialCacheKeys.CleanUpTypes);
-            _cache.Remove(ReferentialCacheKeys.WishListCategories);
-            _cache.Remove(ReferentialCacheKeys.WishListTemplates);
         }
 
         private ActionResult<ImportJobState> StartImportJob(string job, Func<IMyHordesImportService, Action<ImportStepProgress>, Task> work)

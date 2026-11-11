@@ -69,8 +69,6 @@ export class DataImportComponent implements OnInit {
         { key: 'buildings', label: $localize`Chantiers`, icon: 'apartment', fn: () => this.adminService.importBuildings() },
         { key: 'causes-of-death', label: $localize`Causes de mort`, icon: 'skull', fn: () => this.adminService.importCausesOfDeath() },
         { key: 'cleanup-types', label: $localize`Types de nettoyage`, icon: 'cleaning_services', fn: () => this.adminService.importCleanupTypes() },
-        { key: 'wishlist-categories', label: $localize`Catégories de liste de souhaits`, icon: 'checklist', fn: () => this.adminService.importWishlistCategories() },
-        { key: 'default-wishlists', label: $localize`Listes de souhaits par défaut`, icon: 'playlist_add', fn: () => this.adminService.importDefaultWishlists() },
     ];
     private readonly townService: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);

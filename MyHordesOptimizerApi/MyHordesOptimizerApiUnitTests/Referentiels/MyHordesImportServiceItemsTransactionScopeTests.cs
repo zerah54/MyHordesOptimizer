@@ -12,7 +12,6 @@ using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Jobs;
 using MyHordesOptimizerApi.Data.Ruins;
-using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Building;
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
@@ -112,8 +111,6 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
             public List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities() => throw new NotSupportedException();
             public List<MyHordesCauseOfDeathModel> GetCausesOfDeath() => throw new NotSupportedException();
             public List<MyHordesCleanUpTypeModel> GetCleanUpTypes() => throw new NotSupportedException();
-            public List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories() => throw new NotSupportedException();
-            public List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists() => throw new NotSupportedException();
             public MyHordesCampingBonusModel GetCampingBonus() => throw new NotSupportedException();
             public List<MyHordesCampingResultModel> GetCampingResults() => throw new NotSupportedException();
             public Dictionary<string, BuildingCodeModel> GetBuildings() => throw new NotSupportedException();

@@ -4,7 +4,7 @@ import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { By } from '@angular/platform-browser';
 
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
-import { ListForAddRemove } from '../../../_abstract_model/types/_types';
+import { AddMenuGroup, ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Category } from '../../../_abstract_model/types/category.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { ItemsSortMode } from '../items-sort-mode';
@@ -16,7 +16,8 @@ import { MenuAddComponent } from './menu-add.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
         <div class="opener" [matMenuTriggerFor]="menuAdd.menu()" [matMenuTriggerData]="{lists: lists, menuLabel: menuLabel}"></div>
-        <mho-menu-add #menuAdd="menuAdd" [keepOpen]="keepOpen()" [lists]="inputLists()" [(sortMode)]="sortMode" (add)="added.push($event)"></mho-menu-add>
+        <mho-menu-add #menuAdd="menuAdd" [keepOpen]="keepOpen()" [lists]="inputLists()" [(sortMode)]="sortMode" [groups]="groups()" (add)="added.push($event)"
+                      (addGroup)="addedGroups.push($event)" (advanced)="advancedCount = advancedCount + 1" (editGroup)="edited.push($event)" (deleteGroup)="deleted.push($event)"></mho-menu-add>
     `
 })
 class MenuAddHostComponent {
@@ -26,6 +27,11 @@ class MenuAddHostComponent {
     public sortMode: WritableSignal<ItemsSortMode> = signal('category');
     public menuLabel: string = 'Ajouter un objet';
     public added: (number | string)[] = [];
+    public groups: WritableSignal<AddMenuGroup[] | undefined> = signal(undefined);
+    public addedGroups: string[] = [];
+    public advancedCount: number = 0;
+    public edited: string[] = [];
+    public deleted: string[] = [];
 }
 
 describe('MenuAddComponent', (): void => {
@@ -310,5 +316,133 @@ describe('MenuAddComponent', (): void => {
         fixture.detectChanges();
 
         expect(fixture.componentInstance.added).toEqual([StatusEnum.TIRED.id]);
+    });
+
+    describe('segment Groupes', (): void => {
+        const category: Category = createCategory(1, 0, 'Nourriture');
+
+        function group(key: string, label: string, ids: number[], placed: number[] = [], section: string = 'game', manageable: boolean = false): AddMenuGroup {
+            return { key, label, section, manageable, items: ids.map((id: number): Item => createItem(id, `Objet ${id}`, category)), placed_item_ids: new Set(placed) };
+        }
+
+        function openGroups(groups: AddMenuGroup[]): void {
+            fixture.componentInstance.inputLists.set([{ label: '', list: [createItem(1, 'Pomme', category)] }]);
+            fixture.componentInstance.groups.set(groups);
+            openMenu();
+            Array.from(document.querySelectorAll<HTMLButtonElement>('.mat-mdc-menu-panel .views button'))
+                .find((button: HTMLButtonElement): boolean => button.textContent?.trim() === 'Groupes')?.click();
+            fixture.detectChanges();
+        }
+
+        function lines(): HTMLElement[] {
+            return Array.from(document.querySelectorAll<HTMLElement>('.mat-mdc-menu-panel .gline'));
+        }
+
+        function lineNames(): string[] {
+            return lines().map((line: HTMLElement): string => line.querySelector('.gname')!.firstChild!.textContent!.trim());
+        }
+
+        function search(text: string): void {
+            const input: HTMLInputElement = document.querySelector<HTMLInputElement>('.mat-mdc-menu-panel input')!;
+            input.value = text;
+            input.dispatchEvent(new Event('input'));
+            fixture.detectChanges();
+        }
+
+        /** Entrées actives du sous-menu ⋮ ouvert (le premier item, factice, est désactivé). */
+        function manageEntries(): HTMLElement[] {
+            return Array.from(document.querySelectorAll<HTMLElement>('.mho-menu-add-manage button[mat-menu-item]:not([disabled])'));
+        }
+
+        afterEach((): void => {
+            document.querySelectorAll('.cdk-overlay-container').forEach((container: Element): void => { container.innerHTML = ''; });
+        });
+
+        it('n\'affiche pas le segment Objets | Groupes sans groups', (): void => {
+            fixture.componentInstance.inputLists.set([{ label: '', list: [createItem(1, 'Pomme', category)] }]);
+            openMenu();
+
+            expect(document.querySelector('.mat-mdc-menu-panel .views')).toBeNull();
+        });
+
+        it('affiche le segment avec groups, les objets restant par défaut', (): void => {
+            fixture.componentInstance.inputLists.set([{ label: '', list: [createItem(1, 'Pomme', category)] }]);
+            fixture.componentInstance.groups.set([group('game:b6', 'B6', [1, 2])]);
+            openMenu();
+
+            expect(document.querySelector('.mat-mdc-menu-panel .views')).not.toBeNull();
+            expect(displayedTitles()).toEqual(['Pomme']);
+        });
+
+        it('grise les objets placés et affiche le compteur 4/16', (): void => {
+            const ids: number[] = Array.from({ length: 16 }, (_: unknown, index: number): number => index + 1);
+            openGroups([group('game:b6', 'B6', ids, [1, 2, 3, 4])]);
+
+            expect(lines()[0].querySelectorAll('.tile.placed').length).toBe(4);
+            expect(lines()[0].querySelector('.warn')?.textContent).toContain('4/16');
+        });
+
+        it('émet addGroup au clic sur un groupe', (): void => {
+            openGroups([group('game:b6', 'B6', [1, 2])]);
+
+            lines()[0].click();
+
+            expect(fixture.componentInstance.addedGroups).toEqual(['game:b6']);
+        });
+
+        it('n\'émet rien pour un groupe entièrement placé', (): void => {
+            openGroups([group('game:b6', 'B6', [1, 2], [1, 2])]);
+
+            lines()[0].click();
+
+            expect(lines()[0].classList).toContain('full');
+            expect(fixture.componentInstance.addedGroups).toEqual([]);
+        });
+
+        it('filtre par nom de groupe ou nom d\'objet', (): void => {
+            openGroups([group('game:b6', 'B6', [1]), group('game:water', 'Eau', [2])]);
+
+            search('eau');
+            expect(lineNames()).toEqual(['Eau']);
+
+            search('objet 1');
+            expect(lineNames()).toEqual(['B6']);
+        });
+
+        it('affiche le ⋮ uniquement pour les groupes manageable', (): void => {
+            openGroups([group('game:b6', 'B6', [1]), group('user:3', 'Kit', [2], [], 'user', true)]);
+
+            expect(lines()[0].querySelector('.manage')).toBeNull();
+            expect(lines()[1].querySelector('.manage')).not.toBeNull();
+        });
+
+        it('émet editGroup depuis le ⋮, sans ajouter le groupe', (): void => {
+            openGroups([group('user:3', 'Kit', [2], [], 'user', true)]);
+
+            lines()[0].querySelector<HTMLElement>('.manage')!.click();
+            fixture.detectChanges();
+            manageEntries()[0].click();
+
+            expect(fixture.componentInstance.edited).toEqual(['user:3']);
+            expect(fixture.componentInstance.addedGroups).toEqual([]);
+        });
+
+        it('émet deleteGroup depuis le ⋮', (): void => {
+            openGroups([group('user:3', 'Kit', [2], [], 'user', true)]);
+
+            lines()[0].querySelector<HTMLElement>('.manage')!.click();
+            fixture.detectChanges();
+            manageEntries()[1].click();
+
+            expect(fixture.componentInstance.deleted).toEqual(['user:3']);
+        });
+
+        it('émet advanced au clic sur « Ajout avancé… »', (): void => {
+            openGroups([group('game:b6', 'B6', [1])]);
+
+            document.querySelector<HTMLElement>('.mat-mdc-menu-panel .adv')!.click();
+
+            expect(fixture.componentInstance.advancedCount).toBe(1);
+        });
     });
 });

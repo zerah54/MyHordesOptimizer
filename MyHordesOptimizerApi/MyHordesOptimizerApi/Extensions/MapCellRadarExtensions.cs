@@ -45,6 +45,21 @@ namespace MyHordesOptimizerApi.Extensions
         }
 
         /// <summary>
+        /// Borne basse du nombre réel de zombies. MyHordes renvoie exactement 0 pour une case sans zombie :
+        /// une estimation non nulle garantit donc au moins 1 zombie.
+        /// </summary>
+        public static int GetScoutEstimationMin(int estimation, int? scoutZoneLevel)
+        {
+            return estimation <= 0 ? 0 : Math.Max(1, estimation - GetScoutEstimationRange(scoutZoneLevel));
+        }
+
+        /// <summary>Borne haute du nombre réel de zombies.</summary>
+        public static int GetScoutEstimationMax(int estimation, int? scoutZoneLevel)
+        {
+            return estimation + GetScoutEstimationRange(scoutZoneLevel);
+        }
+
+        /// <summary>
         /// Applique à la carte les relevés effectués depuis la case (<paramref name="x"/>, <paramref name="y"/>),
         /// exprimée en coordonnées absolues de la base.
         /// </summary>

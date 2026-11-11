@@ -1,0 +1,184 @@
+<h2 mat-dialog-title>
+    @if (edit_mode) {
+        <ng-container i18n>Modifier le groupe</ng-container>
+    } @else {
+        <ng-container i18n>Ajout avancé</ng-container>
+    }
+</h2>
+<div mat-dialog-content class="advanced-add">
+    @for (kind of kinds(); track kind; let first = $first) {
+        @if (!first) {
+            <div class="and" i18n>ET</div>
+        }
+        <div class="criterion">
+            <span class="criterion-name">
+                @switch (kind) {
+                    @case ('action') {
+                        <ng-container i18n>Action</ng-container>
+                    }
+                    @case ('property') {
+                        <ng-container i18n>Propriété</ng-container>
+                    }
+                    @case ('category') {
+                        <ng-container i18n>Catégorie</ng-container>
+                    }
+                    @case ('heavy') {
+                        <ng-container i18n>Encombrant</ng-container>
+                    }
+                }
+            </span>
+            @switch (kind) {
+                @case ('action') {
+                    <mat-form-field subscriptSizing="dynamic" class="criterion-select">
+                        <mat-select multiple [value]="action_keys()" (selectionChange)="setActionKeys($event.value)">
+                            @for (option of action_options; track option.value) {
+                                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+                @case ('property') {
+                    <mat-form-field subscriptSizing="dynamic" class="criterion-select">
+                        <mat-select multiple [value]="property_keys()" (selectionChange)="setPropertyKeys($event.value)">
+                            @for (option of property_options; track option.value) {
+                                <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+                @case ('category') {
+                    <mat-form-field subscriptSizing="dynamic" class="criterion-select">
+                        <mat-select multiple [value]="category_ids()" (selectionChange)="setCategoryIds($event.value)">
+                            @for (option of category_options; track option.id) {
+                                <mat-option [value]="option.id">{{ option.label | localizedLabel }}</mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                }
+                @case ('heavy') {
+                    <mat-form-field subscriptSizing="dynamic" class="criterion-select">
+                        <mat-select [value]="heavy()" (selectionChange)="setHeavy($event.value)">
+                            <mat-option [value]="true" i18n>Oui</mat-option>
+                            <mat-option [value]="false" i18n>Non</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                }
+            }
+            <button mat-icon-button type="button" (click)="removeCriterion(kind)" aria-label="Retirer le critère" i18n-aria-label>
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    }
+    @if (available_kinds().length > 0) {
+        <div class="add-criterion">
+            <ng-container i18n>+ Ajouter un critère :</ng-container>
+            @for (kind of available_kinds(); track kind) {
+                <button mat-button type="button" (click)="addCriterion(kind)">
+                    @switch (kind) {
+                        @case ('action') {
+                            <ng-container i18n>Action</ng-container>
+                        }
+                        @case ('property') {
+                            <ng-container i18n>Propriété</ng-container>
+                        }
+                        @case ('category') {
+                            <ng-container i18n>Catégorie</ng-container>
+                        }
+                        @case ('heavy') {
+                            <ng-container i18n>Encombrant</ng-container>
+                        }
+                    }
+                </button>
+            }
+        </div>
+    }
+
+    <div class="preview">
+        <div class="preview-head">
+            <b>{{ selected_count() }}
+                <ng-container i18n>objets correspondent</ng-container>
+            </b>
+            <span>{{ to_add_count() }}
+                <ng-container i18n>seront ajoutés</ng-container></span>
+        </div>
+        <div class="item-grid">
+            @for (item of preview(); track item.id) {
+                <span class="tile" [class.placed]="placed_ids().has(item.id)" [class.excluded]="excluded_ids().has(item.id)"
+                      (click)="toggleExcluded(item)">
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="labelOf(item)" height="16" width="16">
+                </span>
+            }
+            <span class="tile add-tile" (click)="picking.set(!picking())" [title]="add_title" role="button">
+                <mat-icon>add</mat-icon>
+            </span>
+        </div>
+        <div class="legend" i18n>Grisé : déjà dans la liste pour cette zone. Barré : retiré à la main (clic sur l'icône pour retirer ou remettre).</div>
+        @if (picking()) {
+            <div class="picker">
+                <mat-form-field subscriptSizing="dynamic">
+                    <mat-label i18n>Rechercher un objet</mat-label>
+                    <input matInput [ngModel]="search()" (ngModelChange)="search.set($event)">
+                </mat-form-field>
+                @for (category of pickable() | itemsGroupByCategory; track category.category.id_category) {
+                    <div class="category">
+                        <div class="category-label">{{ category.category.label | localizedLabel:'Sans catégorie' }}</div>
+                        <div class="item-grid">
+                            @for (item of category.items; track item.id) {
+                                <span class="tile" (click)="pick(item)">
+                                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="labelOf(item)" height="16" width="16">
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="fields">
+        <mat-form-field subscriptSizing="dynamic">
+            <mat-label i18n>Nom du groupe</mat-label>
+            <input matInput type="text" [ngModel]="name()" (ngModelChange)="name.set($event)">
+        </mat-form-field>
+        @if (!edit_mode) {
+            @if (count() === -1) {
+                <mat-checkbox class="count-infinite" [checked]="true" (change)="count.set($event.checked ? -1 : 1)">
+                    <ng-container i18n>Stock souhaité</ng-container>&nbsp;:&nbsp;∞
+                </mat-checkbox>
+            } @else {
+                <mat-form-field subscriptSizing="dynamic" class="count-field">
+                    <mat-label i18n>Stock souhaité</mat-label>
+                    <input matInput type="number" min="0" [ngModel]="count()" (ngModelChange)="count.set($event)">
+                    <mat-icon matSuffix (click)="count.set(-1)">all_inclusive</mat-icon>
+                </mat-form-field>
+            }
+            @if (zone() === 0) {
+                <mat-checkbox class="zone-infinite" [checked]="true" (change)="zone.set($event.checked ? 0 : 1)">
+                    <ng-container i18n>Zone en PA</ng-container>&nbsp;:&nbsp;∞
+                </mat-checkbox>
+            } @else {
+                <mat-form-field subscriptSizing="dynamic" class="zone-field">
+                    <mat-label i18n>Zone en PA</mat-label>
+                    <input matInput type="number" min="1" [ngModel]="zone()" (ngModelChange)="zone.set($event)">
+                    <mat-icon matSuffix (click)="zone.set(0)">all_inclusive</mat-icon>
+                </mat-form-field>
+            }
+        }
+    </div>
+    @if (!edit_mode) {
+        <mat-checkbox [checked]="save_as_user_group()" (change)="save_as_user_group.set($event.checked)">
+            <ng-container i18n>Enregistrer aussi dans mes groupes</ng-container>
+        </mat-checkbox>
+    }
+</div>
+<div mat-dialog-actions>
+    <button mat-button type="button" (click)="cancel()" i18n>Annuler</button>
+    <button mat-flat-button type="button" class="submit" [disabled]="!can_submit()" (click)="submit()">
+        @if (edit_mode) {
+            <ng-container i18n>Enregistrer</ng-container>
+        } @else {
+            <ng-container i18n>Ajouter</ng-container> {{ to_add_count() }}
+            <ng-container i18n>objets à la liste</ng-container>
+        }
+    </button>
+</div>

@@ -71,3 +71,69 @@
     line-height: 1;
     font-variant-numeric: tabular-nums;
 }
+
+/* Segment Groupes : une ligne par groupe (nom, nombre, icônes), cliquable en entier. */
+.gline {
+    margin: 0 -6px 2px;
+    padding: 4px 6px;
+    border-radius: var(--mho-radius-s);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--mho-accent-soft);
+    }
+
+    &.full {
+        cursor: default;
+        opacity: .6;
+
+        &:hover {
+            background-color: transparent;
+        }
+    }
+}
+
+.gname {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.gcount {
+    font-weight: 400;
+    color: var(--mho-text-muted);
+}
+
+.warn {
+    margin-left: auto;
+    font-weight: 400;
+    color: var(--mho-warning);
+}
+
+/* Objet déjà dans la liste pour la zone : grisé, il ne sera pas réajouté. */
+.tile.placed {
+    opacity: .35;
+}
+
+/* ⋮ compact : ne grossit pas la ligne du groupe. */
+.manage {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    margin: -4px 0;
+    --mat-icon-button-state-layer-size: 24px;
+
+    &.pushed {
+        margin-left: auto;
+    }
+}
+
+.adv {
+    margin-top: 10px;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}

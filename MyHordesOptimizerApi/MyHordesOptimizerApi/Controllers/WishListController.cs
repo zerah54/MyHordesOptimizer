@@ -19,14 +19,17 @@ namespace MyHordesOptimizerApi.Controllers
     {
         private readonly IWishListService _wishListService;
         private readonly IMemoryCache _cache;
+        private readonly IUserWishListGroupService _userGroupService;
 
         public WishListController(ILogger<AbstractMyHordesOptimizerControllerBase> logger,
             IUserInfoProvider userKeyProvider,
             IWishListService wishListService,
-            IMemoryCache cache) : base(logger, userKeyProvider)
+            IMemoryCache cache,
+            IUserWishListGroupService userGroupService) : base(logger, userKeyProvider)
         {
             _wishListService = wishListService;
             _cache = cache;
+            _userGroupService = userGroupService;
         }
 
         [HttpGet]
@@ -42,7 +45,7 @@ namespace MyHordesOptimizerApi.Controllers
         // citoyen de la ville.
         [HttpPut]
         [Authorize]
-        public ActionResult<WishListLastUpdateDto> PutWishList(int townId, List<WishListPutResquestDto> request)
+        public ActionResult<WishListLastUpdateDto> PutWishList(int townId, [FromBody] WishListPutBodyDto request)
         {
             if (request == null)
             {
@@ -69,39 +72,39 @@ namespace MyHordesOptimizerApi.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        [Route("Categories")]
-        public ActionResult<List<WishlistCategorieDto>> GetWishListCategories()
-        {
-            var categories = _cache.GetOrCreate(ReferentialCacheKeys.WishListCategories,
-                _ => _wishListService.GetWishListCategories());
-            return categories!;
-        }
-
-        [HttpGet]
-        [Route("Templates")]
-        public ActionResult<List<WishlistTemplateDto>> GetWishListTemplates()
-        {
-            var templates = _cache.GetOrCreate(ReferentialCacheKeys.WishListTemplates,
-                _ => _wishListService.GetWishListTemplates());
-            return templates!;
-        }
-
         [HttpPost]
-        [Route("Template/{templateId}")]
+        [Route("Group")]
         [Authorize]
-        public ActionResult<WishListLastUpdateDto> CreateFromTemplate(int? townId, int? templateId)
+        public ActionResult<WishListLastUpdateDto> AddGroupToWishList(int townId, [FromBody] WishListGroupAddRequestDto request)
         {
-            if (!townId.HasValue)
+            if (request == null)
             {
-                return BadRequest($"{nameof(townId)} cannot be null");
+                return BadRequest($"{nameof(request)} cannot be null");
             }
-            if (!templateId.HasValue)
-            {
-                return BadRequest($"{nameof(templateId)} cannot be null");
-            }
-            var wishList = _wishListService.CreateFromTemplate(townId.Value, UserInfoProvider.UserId, templateId.Value);
-            return wishList;
+            return Ok(_wishListService.AddGroupToWishList(townId, UserInfoProvider.UserId, request));
+        }
+
+        [HttpGet("MyGroups")]
+        [Authorize]
+        public ActionResult<List<UserWishListGroupDto>> GetMyGroups()
+            => Ok(_userGroupService.GetMine(UserInfoProvider.UserId));
+
+        [HttpPost("MyGroups")]
+        [Authorize]
+        public ActionResult<UserWishListGroupDto> CreateMyGroup([FromBody] UpsertUserWishListGroupRequestDto request)
+            => Ok(_userGroupService.Create(UserInfoProvider.UserId, request));
+
+        [HttpPut("MyGroups/{groupId:int}")]
+        [Authorize]
+        public ActionResult<UserWishListGroupDto> UpdateMyGroup([FromRoute] int groupId, [FromBody] UpsertUserWishListGroupRequestDto request)
+            => Ok(_userGroupService.Update(UserInfoProvider.UserId, groupId, request));
+
+        [HttpDelete("MyGroups/{groupId:int}")]
+        [Authorize]
+        public ActionResult DeleteMyGroup([FromRoute] int groupId)
+        {
+            _userGroupService.Delete(UserInfoProvider.UserId, groupId);
+            return NoContent();
         }
     }
 }

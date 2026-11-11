@@ -132,6 +132,22 @@ a {
     padding: 0 13px;
 }
 
+// Toutes les modales : surface plus claire, liseré et ombre marqués pour les détacher du fond sombre.
+// Global car le panneau du dialog est attaché sous <body>.
+.mat-mdc-dialog-container {
+    --mat-dialog-container-color: var(--mat-sys-surface-container-highest);
+
+    .mat-mdc-dialog-surface {
+        border: 1px solid var(--mat-sys-outline-variant);
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+    }
+}
+
+// Voile renforcé derrière les modales (les menus/selects utilisent un fond transparent, non concernés).
+.cdk-overlay-dark-backdrop {
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
 // Tiroir latéral de la page Chantiers (MatDialog ancré à droite, voir buildings.component.ts, openDrawer()) :
 // global car le panneau du dialog est attaché sous <body>. Angles droits, toute la hauteur.
 .mho-side-sheet {

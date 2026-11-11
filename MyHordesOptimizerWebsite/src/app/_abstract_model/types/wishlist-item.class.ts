@@ -20,6 +20,8 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
     public depot!: WishlistDepot;
     public should_signal!: boolean;
     public zone_x_pa!: number;
+    /** Uid du groupe de rattachement, null pour une ligne seule. */
+    public group_uid: string | null = null;
 
     public constructor(dto?: WishlistItemDTO) {
         super();
@@ -39,7 +41,8 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             chestCitizens: this.chest_citizens,
             mapCellItemCount: this.map_cell_item_count,
             zoneXPa: this.zone_x_pa,
-            shouldSignal: this.should_signal
+            shouldSignal: this.should_signal,
+            groupUid: this.group_uid
         };
     }
 
@@ -51,7 +54,8 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             count: this.count,
             depot: this.depot.value.count,
             zoneXPa: this.zone_x_pa,
-            shouldSignal: this.should_signal
+            shouldSignal: this.should_signal,
+            groupUid: this.group_uid
         };
     }
 
@@ -69,6 +73,7 @@ export class WishlistItem extends CommonModel<WishlistItemDTO> {
             this.chest_citizens = dto.chestCitizens ?? [];
             this.map_cell_item_count = dto.mapCellItemCount;
             this.zone_x_pa = dto.zoneXPa;
+            this.group_uid = dto.groupUid ?? null;
         }
     }
 }

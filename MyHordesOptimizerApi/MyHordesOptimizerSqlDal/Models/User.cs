@@ -81,9 +81,6 @@ public partial class User
     [InverseProperty("IdUserWishListUpdaterNavigation")]
     public virtual ICollection<Town> Towns { get; set; } = new List<Town>();
 
-    [InverseProperty("IdUserAuthorNavigation")]
-    public virtual ICollection<WishlistCategorie> WishlistCategories { get; set; } = new List<WishlistCategorie>();
-
     [InverseProperty("IdUserNavigation")]
     public virtual ICollection<UserPicto> UserPictos { get; set; } = new List<UserPicto>();
 

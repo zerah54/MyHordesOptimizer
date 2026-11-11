@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
+using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
@@ -17,6 +18,8 @@ namespace MyHordesOptimizerApi.Services.Impl
 {
     public class WishListService : IWishListService
     {
+        private const int GroupNameMaxLength = 64;
+
         protected ILogger<MyHordesFetcherService> Logger { get; set; }
 
         protected IUserInfoProvider UserInfoProvider { get; set; }
@@ -108,6 +111,10 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .ThenInclude(town => town.IdUserWishListUpdaterNavigation)
                         .AsSplitQuery()
                 .ToList();
+            var groups = Mapper.Map<List<WishListGroupDto>>(DbContext.TownWishListGroups
+                .Where(group => group.IdTown == townId)
+                .OrderBy(group => group.Name)
+                .ToList());
             if (wishListItems.Any())
             {
                 var itemsDto = Mapper.Map<List<WishListItemDto>>(wishListItems);
@@ -119,17 +126,18 @@ namespace MyHordesOptimizerApi.Services.Impl
                         UserName = wishListItems.First().IdTownNavigation.IdUserWishListUpdaterNavigation!.Name,
                         UpdateTime = wishListItems.First().IdTownNavigation.WishlistDateUpdate!.Value
                     },
-                    WishList = itemsDto
+                    WishList = itemsDto,
+                    Groups = groups
                 };
                 return dto;
             }
             else
             {
-                return new WishListLastUpdateDto();
+                return new WishListLastUpdateDto { Groups = groups };
             }
         }
 
-        public WishListLastUpdateDto PutWishList(int townId, int userId, List<WishListPutResquestDto> wishListPutRequest)
+        public WishListLastUpdateDto PutWishList(int townId, int userId, WishListPutBodyDto body)
         {
             // Clé de verrou = mapId brut, jamais le townId résolu (cf. commentaire sur MhoContext.ResolveTownId
             // et le verrou de synchro/login sur -mapId) : sans ça, une synchro concurrente sur la même ville
@@ -138,44 +146,90 @@ namespace MyHordesOptimizerApi.Services.Impl
             var mapId = townId;
             townId = DbContext.ResolveTownId(townId);
             TownAccessService.EnsureCanWriteTown(townId, mapId);
-            var items = Mapper.Map<List<TownWishListItem>>(wishListPutRequest);
+
+            var groupsByUid = ValidateGroups(body.Groups);
+            ValidateItemReferences(body.Items);
+            var items = new List<TownWishListItem>();
+            foreach (var request in body.Items)
+            {
+                var item = Mapper.Map<TownWishListItem>(request);
+                if (request.GroupUid != null)
+                {
+                    if (!Guid.TryParse(request.GroupUid, out var guid) || !groupsByUid.TryGetValue(guid.ToString(), out var group))
+                    {
+                        throw new MhoBadRequestException($"Groupe inconnu : {request.GroupUid}");
+                    }
+                    item.GroupUid = group.Uid;
+                    item.ZoneXpa = group.ZoneXpa;
+                    item.Depot = group.Depot;
+                    item.Priority = group.Priority;
+                    item.Count = group.Count;
+                }
+                items.Add(item);
+            }
+            if (items.GroupBy(item => (item.IdItem, item.ZoneXpa)).Any(duplicates => duplicates.Count() > 1))
+            {
+                throw new MhoConflictException("Un même objet ne peut figurer qu'une fois par zone.");
+            }
+            var usedGroupUids = items.Where(item => item.GroupUid != null).Select(item => item.GroupUid!).ToHashSet();
+            var groups = groupsByUid.Values.Where(group => usedGroupUids.Contains(group.Uid)).ToList();
+            foreach (var group in groups)
+            {
+                group.IdTown = townId;
+            }
+
             using var transaction = DbContext.Database.BeginTransaction();
+            DbContext.TownWishListGroups.RemoveRange(DbContext.TownWishListGroups.Where(group => group.IdTown == townId));
             DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
+            DbContext.SaveChanges();
             var town = DbContext.Towns
                 .Where(town => town.IdTown == townId)
-                .Include(town => town.TownWishListItems)
                 .Single();
-            town.TownWishListItems = items;
+            DbContext.TownWishListGroups.AddRange(groups);
+            foreach (var item in items)
+            {
+                item.IdTown = townId;
+            }
+            DbContext.TownWishListItems.AddRange(items);
             town.IdUserWishListUpdater = userId;
             town.WishlistDateUpdate = DateTime.UtcNow;
-            DbContext.Update(town);
             DbContext.SaveChanges();
             transaction.Commit();
             return GetWishListByResolvedTownId(townId);
         }
 
-        public WishListLastUpdateDto CreateFromTemplate(int townId, int userId, int templateId)
+        /// <summary>Valide uid (Guid, unique) et nom (1 à 64 caractères) des groupes ; renvoie les groupes normalisés par uid canonique.</summary>
+        private static Dictionary<string, TownWishListGroup> ValidateGroups(List<WishListGroupDto> groups)
         {
-            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
-            var mapId = townId;
-            townId = DbContext.ResolveTownId(townId);
-            TownAccessService.EnsureCanWriteTown(townId, mapId);
-            using var transaction = DbContext.Database.BeginTransaction();
-            DbContext.TownWishListItems.RemoveRange(DbContext.TownWishListItems.Where(townWishListItem => townWishListItem.IdTown == townId));
-            var templateWishList = DbContext.DefaultWishlistItems.Where(defaultWishListitem => defaultWishListitem.IdDefaultWishlist == templateId)
-                .ToList();
-            var items = Mapper.Map<List<TownWishListItem>>(templateWishList);
-            var town = DbContext.Towns
-               .Where(town => town.IdTown == townId)
-               .Include(town => town.TownWishListItems)
-               .Single();
-            town.TownWishListItems = items;
-            town.IdUserWishListUpdater = userId;
-            town.WishlistDateUpdate = DateTime.UtcNow;
-            DbContext.Update(town);
-            DbContext.SaveChanges();
-            transaction.Commit();
-            return GetWishListByResolvedTownId(townId);
+            var result = new Dictionary<string, TownWishListGroup>();
+            foreach (var dto in groups)
+            {
+                if (dto == null || !Guid.TryParse(dto.Uid, out var guid))
+                {
+                    throw new MhoBadRequestException("Uid de groupe invalide.");
+                }
+                var name = dto.Name?.Trim();
+                if (string.IsNullOrEmpty(name) || name.Length > GroupNameMaxLength)
+                {
+                    throw new MhoBadRequestException($"Le nom d'un groupe doit comporter de 1 à {GroupNameMaxLength} caractères.");
+                }
+                var uid = guid.ToString();
+                if (!result.TryAdd(uid, new TownWishListGroup { Uid = uid, Name = name, Priority = dto.Priority, ZoneXpa = dto.ZoneXPa, Depot = dto.Depot, Count = dto.Count }))
+                {
+                    throw new MhoBadRequestException($"Uid de groupe en double : {uid}");
+                }
+            }
+            return result;
+        }
+
+        private void ValidateItemReferences(List<WishListPutResquestDto> items)
+        {
+            var ids = items.Select(item => item.Id).Distinct().ToList();
+            var known = DbContext.Items.Where(item => ids.Contains(item.IdItem)).Select(item => item.IdItem).ToHashSet();
+            if (ids.Any(id => !known.Contains(id)))
+            {
+                throw new MhoBadRequestException($"Objet inconnu : {ids.First(id => !known.Contains(id))}");
+            }
         }
 
         public void AddItemToWishList(int townId, int userId, int itemId, int zoneXPa)
@@ -189,6 +243,10 @@ namespace MyHordesOptimizerApi.Services.Impl
              .Where(town => town.IdTown == townId)
              .Include(town => town.TownWishListItems)
              .Single();
+            if (town.TownWishListItems.Any(wishItem => wishItem.IdItem == itemId && wishItem.ZoneXpa == zoneXPa))
+            {
+                throw new MhoConflictException("Cet objet figure déjà dans la liste pour cette zone.");
+            }
             town.TownWishListItems.Add(new TownWishListItem()
             {
                 ZoneXpa = zoneXPa,
@@ -202,64 +260,46 @@ namespace MyHordesOptimizerApi.Services.Impl
             transaction.Commit();
         }
 
-        public List<WishlistCategorieDto> GetWishListCategories()
+        public WishListLastUpdateDto AddGroupToWishList(int townId, int userId, WishListGroupAddRequestDto request)
         {
-            var models = DbContext.WishlistCategories
-                .Include(wshlstCategorie => wshlstCategorie.IdItems)
-                .ToList();
-            var dtos = Mapper.Map<List<WishlistCategorieDto>>(models);
-            return dtos;
-        }
+            using var townLock = TownSyncLock.AcquireTownBlocking(-townId);
+            var mapId = townId;
+            townId = DbContext.ResolveTownId(townId);
+            TownAccessService.EnsureCanWriteTown(townId, mapId);
 
-        public List<WishlistTemplateDto> GetWishListTemplates()
-        {
-            // L'objet est CHARGÉ, sinon la navigation reste nulle et chaque entrée sort avec
-            // « item: null » — un modèle de liste de courses sans aucun objet identifiable.
-            // Catégorie, propriétés et actions suivent parce que le DTO d'objet les expose, comme
-            // sur les autres chemins qui le produisent.
-            var models = DbContext.DefaultWishlistItems
-                .Include(model => model.IdItemNavigation)
-                    .ThenInclude(item => item.IdCategoryNavigation)
-                .Include(model => model.IdItemNavigation)
-                    .ThenInclude(item => item.PropertyNames)
-                .Include(model => model.IdItemNavigation)
-                    .ThenInclude(item => item.ActionNames)
-                .AsSplitQuery()
-                .ToList();
+            var itemIds = request.ItemIds.Distinct().ToList();
+            var groupDto = new WishListGroupDto { Uid = Guid.NewGuid().ToString(), Name = request.Name, ZoneXPa = request.ZoneXPa, Count = request.Count };
+            var group = ValidateGroups(new List<WishListGroupDto> { groupDto }).Values.Single();
+            ValidateItemReferences(itemIds.Select(id => new WishListPutResquestDto { Id = id }).ToList());
 
-            // Regroupement sur des valeurs SCALAIRES uniquement. La version précédente incluait un
-            // Dictionary dans la clé anonyme : les dictionnaires se comparant par référence, chaque
-            // ligne formait son propre groupe — d'où 35 modèles d'un objet là où le fichier n'en
-            // décrit qu'un seul de 35 objets.
-            var templates = models.GroupBy(model => new
+            using var transaction = DbContext.Database.BeginTransaction();
+            // Le premier placé garde l'objet : on ignore ceux déjà présents dans la zone.
+            var placed = DbContext.TownWishListItems
+                .Where(wishItem => wishItem.IdTown == townId && wishItem.ZoneXpa == group.ZoneXpa)
+                .Select(wishItem => wishItem.IdItem)
+                .ToHashSet();
+            var newItemIds = itemIds.Where(id => !placed.Contains(id)).ToList();
+            if (newItemIds.Count > 0)
             {
-                model.IdDefaultWishlist,
-                model.IdUserAuthor,
-                model.Name,
-                model.LabelFr,
-                model.LabelEn,
-                model.LabelEs,
-                model.LabelDe
-            });
-            var dtos = new List<WishlistTemplateDto>();
-            foreach (var group in templates)
-            {
-                dtos.Add(new WishlistTemplateDto()
+                group.IdTown = townId;
+                DbContext.TownWishListGroups.Add(group);
+                DbContext.TownWishListItems.AddRange(newItemIds.Select(id => new TownWishListItem
                 {
-                    IdTemplate = group.Key.IdDefaultWishlist,
-                    IdUserAuthor = group.Key.IdUserAuthor,
-                    Labels = new Dictionary<string, string>()
-                    {
-                        { "fr", group.Key.LabelFr! },
-                        { "en", group.Key.LabelEn! },
-                        { "es", group.Key.LabelEs! },
-                        { "de", group.Key.LabelDe! }
-                    },
-                    Name = group.Key.Name,
-                    Items = Mapper.Map<List<WishListItemDto>>(group.ToList())
-                });
+                    IdTown = townId,
+                    IdItem = id,
+                    ZoneXpa = group.ZoneXpa,
+                    Depot = group.Depot,
+                    Priority = group.Priority,
+                    Count = group.Count,
+                    GroupUid = group.Uid
+                }));
+                var town = DbContext.Towns.Single(town => town.IdTown == townId);
+                town.IdUserWishListUpdater = userId;
+                town.WishlistDateUpdate = DateTime.UtcNow;
+                DbContext.SaveChanges();
             }
-            return dtos;
+            transaction.Commit();
+            return GetWishListByResolvedTownId(townId);
         }
     }
 }

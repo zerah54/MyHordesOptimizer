@@ -85,5 +85,20 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             dto.ChestCount.Should().Be(2);
             dto.MapCellItemCount.Should().Be(4);
         }
+
+        [Fact]
+        public void GetItems_ObjetDansUnGroupeAuStock0_WishListCountVaut1()
+        {
+            var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var (townId, _) = SeedTownAndCitizen(context);
+            var item = context.Items.First(i => i.IsObsolete != true);
+            context.TownWishListItems.Add(new TownWishListItem { IdTown = townId, IdItem = item.IdItem, ZoneXpa = 0, Count = 0 });
+            context.SaveChanges();
+
+            var itemsDto = scope.ServiceProvider.GetRequiredService<IMyHordesFetcherService>().GetItems(townId).ToList();
+
+            itemsDto.Should().ContainSingle(i => i.Id == item.IdItem).Which.WishListCount.Should().Be(1);
+        }
     }
 }

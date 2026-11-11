@@ -268,6 +268,7 @@ builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 builder.Services.AddScoped<IDirectorySearchService, DirectorySearchService>();
 builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IMapThemeService, MapThemeService>();
+builder.Services.AddScoped<IUserWishListGroupService, UserWishListGroupService>();
 builder.Services.AddScoped<IETagVersionService, ETagVersionService>();
 
 // Add the discord client to services

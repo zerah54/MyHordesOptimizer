@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Extensions;
@@ -13,18 +12,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
     {
         public WishListMappingProfile()
         {
-            CreateMap<MyHordesOptimizerWishlistItemCategorie, WishlistCategorie>()
-                .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.IdUserAuthor, opt => opt.Ignore())
-                .ForMember(dest => dest.IdItems, opt => opt.MapFrom(src => src.Items))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name["fr"]))
-                .ForMember(dest => dest.LabelFr, opt => opt.MapFrom(src => src.Name["fr"]))
-                .ForMember(dest => dest.LabelEs, opt => opt.MapFrom(src => src.Name["es"]))
-                .ForMember(dest => dest.LabelEn, opt => opt.MapFrom(src => src.Name["en"]))
-                .ForMember(dest => dest.LabelDe, opt => opt.MapFrom(src => src.Name["de"]));
-            CreateMap<string, Item>()
-                .ConvertUsing<UidToItemConverter>();
-
             CreateMap<TownWishListItem, WishListItemDto>()
                .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
                .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
@@ -56,9 +43,14 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
                     .Where(mapCellItem => mapCellItem.IdCellNavigation.IdTown == src.IdTown)
                     .Sum(mapCellItem => mapCellItem.Count)))
                .ForMember(dest => dest.IsWorkshop, opt => opt.Ignore())
+               .ForMember(dest => dest.GroupUid, opt => opt.MapFrom(src => src.GroupUid))
                .ForMember(dest => dest.Item, opt => opt.MapFrom(src => src.IdItemNavigation));
 
+            CreateMap<TownWishListGroup, WishListGroupDto>()
+               .ForMember(dest => dest.ZoneXPa, opt => opt.MapFrom(src => src.ZoneXpa));
+
             CreateMap<WishListPutResquestDto, TownWishListItem>()
+              .ForMember(dest => dest.GroupUid, opt => opt.Ignore())
               .ForMember(dest => dest.IdTown, opt => opt.Ignore())
               .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.Id))
               .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
@@ -67,42 +59,6 @@ namespace MyHordesOptimizerApi.MappingProfiles.Wishlists
               .ForMember(dest => dest.ZoneXpa, opt => opt.MapFrom(src => src.ZoneXPa))
               .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
 
-            CreateMap<DefaultWishlistItem, TownWishListItem>()
-             .ForMember(dest => dest.IdTown, opt => opt.Ignore())
-             .ForMember(dest => dest.IdItem, opt => opt.MapFrom(src => src.IdItem))
-             .ForMember(dest => dest.Depot, opt => opt.MapFrom(src => src.Depot))
-             .ForMember(dest => dest.ShouldSignal, opt => opt.MapFrom(src => src.ShouldSignal))
-             .ForMember(dest => dest.Priority, opt => opt.MapFrom(src => src.Priority))
-             .ForMember(dest => dest.ZoneXpa, opt => opt.MapFrom(src => src.ZoneXpa))
-             .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count));
-
-            CreateMap<WishlistCategorie, WishlistCategorieDto>()
-                 .ForMember(dest => dest.IdCategory, opt => opt.MapFrom(src => src.IdCategory))
-                 .ForMember(dest => dest.IdUserAuthor, opt => opt.MapFrom(src => src.IdUserAuthor))
-                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
-                 .ForMember(dest => dest.Labels, opt => opt.MapFrom(src => new Dictionary<string, string>() { { "fr", src.LabelFr! }, { "en", src.LabelEn! }, { "es", src.LabelEs! }, { "de", src.LabelDe! } }))
-                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.IdItems.Select(item => item.IdItem).ToList()));                   
-        }
-
-        /// <summary>
-        /// Résout un objet par son IDENTITÉ (« table_#00 »), telle que la portent les fichiers de
-        /// catégories saisis à la main.
-        /// </summary>
-        /// <remarks>
-        /// Remplace une résolution par identifiant numérique : celui-ci n'est qu'un auto-incrément
-        /// de fixtures côté MyHordes, et une renumérotation de leur part aurait fait pointer chaque
-        /// catégorie sur d'autres objets, sans la moindre erreur.
-        /// </remarks>
-        private class UidToItemConverter : ITypeConverter<string, Item>
-        {
-            public Item Convert(string source, Item destination, ResolutionContext context)
-            {
-                var dbContext = context.GetDbContext();
-                // `Single` et non `SingleOrDefault` : une catégorie qui désigne un objet inexistant
-                // est une erreur du fichier, pas un cas à absorber en silence. La contrainte
-                // d'unicité sur `uid` garantit par ailleurs qu'il n'y a jamais deux candidats.
-                return dbContext.Items.Single(item => item.Uid == source);
-            }
         }
     }
 }

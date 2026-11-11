@@ -7,7 +7,9 @@ import { map, switchMap, tap } from 'rxjs/operators';
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
 import { ShortWishlistItemDTO } from '../dto/short-wishlist-item.dto';
+import { UserWishlistGroupDTO } from '../dto/user-wishlist-group.dto';
 import { WishlistInfoDTO } from '../dto/wishlist-info.dto';
+import { WishlistPutDTO } from '../dto/wishlist-put.dto';
 import { WishlistDepot } from '../enum/wishlist-depot.enum';
 import { Item } from '../types/item.class';
 import { WishlistInfo } from '../types/wishlist-info.class';
@@ -50,7 +52,7 @@ export class WishlistService extends GlobalService {
      */
     public updateWishlist(wishlist_info: WishlistInfo): Observable<WishlistInfo> {
         return new Observable((sub: Subscriber<WishlistInfo>) => {
-            super.put<WishlistInfoDTO>(this.API_URL + `/wishlist?townId=${getTown()?.town_id}&userId=${getUserId()}`, wishlist_info.toListItem())
+            super.put<WishlistInfoDTO>(this.API_URL + `/wishlist?townId=${getTown()?.town_id}&userId=${getUserId()}`, wishlist_info.toPutDto())
                 .subscribe({
                     next: (response: HttpResponse<WishlistInfoDTO>) => {
                         sub.next(new WishlistInfo(response.body));
@@ -86,7 +88,7 @@ export class WishlistService extends GlobalService {
                 if (missing.length === 0) {
                     return of(current);
                 }
-                const body: ShortWishlistItemDTO[] = [
+                const items: ShortWishlistItemDTO[] = [
                     ...current_items.map((wishlist_item: WishlistItem): ShortWishlistItemDTO => wishlist_item.toShortDto()),
                     ...missing.map((item_id: number): ShortWishlistItemDTO => ({
                         id: item_id,
@@ -94,9 +96,11 @@ export class WishlistService extends GlobalService {
                         count: -1,
                         depot: WishlistDepot.BANK.value.count,
                         zoneXPa: 0,
-                        shouldSignal: false
+                        shouldSignal: false,
+                        groupUid: null
                     }))
                 ];
+                const body: WishlistPutDTO = { items, groups: current.toPutDto().groups };
                 return super.put<WishlistInfoDTO>(this.API_URL + `/wishlist?townId=${getTown()?.town_id}&userId=${getUserId()}`, body)
                     .pipe(
                         map((response: HttpResponse<WishlistInfoDTO>): WishlistInfo => new WishlistInfo(response.body)),
@@ -129,5 +133,36 @@ export class WishlistService extends GlobalService {
         });
     }
 
-}
+    /**
+     * Crée un groupe d'objets dans la liste de courses de la ville.
+     *
+     * @returns {Observable<WishlistInfo>} la liste à jour
+     */
+    public addGroupToWishlist(name: string, item_ids: readonly number[], zone: number, count: number): Observable<WishlistInfo> {
+        return super.post<WishlistInfoDTO>(this.API_URL + `/wishlist/group?townId=${getTown()?.town_id}`, JSON.stringify({ name, itemIds: item_ids, zoneXPa: zone, count }))
+            .pipe(map((response: WishlistInfoDTO): WishlistInfo => new WishlistInfo(response)));
+    }
 
+    /** Récupère les groupes personnels de l'utilisateur. */
+    public getMyGroups(): Observable<UserWishlistGroupDTO[]> {
+        return super.get<UserWishlistGroupDTO[]>(this.API_URL + '/wishlist/MyGroups')
+            .pipe(map((response: HttpResponse<UserWishlistGroupDTO[]>): UserWishlistGroupDTO[] => response.body ?? []));
+    }
+
+    /** Crée un groupe personnel. */
+    public createMyGroup(name: string, item_uids: readonly string[]): Observable<UserWishlistGroupDTO> {
+        return super.post<UserWishlistGroupDTO>(this.API_URL + '/wishlist/MyGroups', JSON.stringify({ name, itemUids: item_uids }));
+    }
+
+    /** Met à jour un groupe personnel. */
+    public updateMyGroup(id: number, name: string, item_uids: readonly string[]): Observable<UserWishlistGroupDTO> {
+        return super.put<UserWishlistGroupDTO>(this.API_URL + `/wishlist/MyGroups/${id}`, { name, itemUids: item_uids })
+            .pipe(map((response: HttpResponse<UserWishlistGroupDTO>): UserWishlistGroupDTO => response.body as UserWishlistGroupDTO));
+    }
+
+    /** Supprime un groupe personnel. */
+    public deleteMyGroup(id: number): Observable<void> {
+        return super.delete<void>(this.API_URL + `/wishlist/MyGroups/${id}`)
+            .pipe(map((): void => undefined));
+    }
+}

@@ -3,7 +3,6 @@ using MyHordesOptimizerApi.Data.Citizens;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
-using MyHordesOptimizerApi.Data.Wishlist;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using MyHordesOptimizerApi.Data.Camping;
@@ -26,8 +25,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         List<MyHordesCauseOfDeathModel> GetCausesOfDeath();
         List<MyHordesCleanUpTypeModel> GetCleanUpTypes();
         Dictionary<string, MyHordesRecipeCodeModel> GetRecipes();
-        List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories();
-        List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists();
         MyHordesCampingBonusModel GetCampingBonus();
         List<MyHordesCampingResultModel> GetCampingResults();
         Dictionary<string, BuildingCodeModel> GetBuildings();

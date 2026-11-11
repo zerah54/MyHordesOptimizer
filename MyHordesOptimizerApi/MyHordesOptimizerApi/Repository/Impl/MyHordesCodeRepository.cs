@@ -3,7 +3,6 @@ using MyHordesOptimizerApi.Data.Citizens;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Ruins;
-using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using System.Collections.Generic;
@@ -154,22 +153,6 @@ namespace MyHordesOptimizerApi.Repository.Impl
             var json = File.ReadAllText(path);
             var dico = json.FromJson<Dictionary<string, MyHordesRecipeCodeModel>>();
             return dico;
-        }
-
-        public List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories()
-        {
-            var path = "Data/Wishlist/WishlistItemCategories.json";
-            var json = File.ReadAllText(path);
-            var list = json.FromJson<List<MyHordesOptimizerWishlistItemCategorie>>();
-            return list;
-        }
-
-        public List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists()
-        {
-            var path = "Data/Wishlist/DefaultWishlist.json";
-            var json = File.ReadAllText(path);
-            var list = json.FromJson<List<MyHordesOptimizerDefaultWishlist>>();
-            return list;
         }
 
         public MyHordesCampingBonusModel GetCampingBonus()

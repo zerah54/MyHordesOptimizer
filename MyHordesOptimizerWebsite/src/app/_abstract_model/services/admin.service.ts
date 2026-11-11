@@ -79,14 +79,6 @@ export class AdminService extends GlobalService {
         return super.post<void>(`${this.API_URL}/admin/import/categories`);
     }
 
-    public importWishlistCategories(): Observable<void> {
-        return super.post<void>(`${this.API_URL}/admin/import/wishlist-categories`);
-    }
-
-    public importDefaultWishlists(): Observable<void> {
-        return super.post<void>(`${this.API_URL}/admin/import/default-wishlists`);
-    }
-
     public importBuildings(): Observable<void> {
         return super.post<void>(`${this.API_URL}/admin/import/buildings`);
     }

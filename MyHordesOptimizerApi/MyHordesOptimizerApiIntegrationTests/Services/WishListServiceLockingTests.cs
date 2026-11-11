@@ -16,7 +16,7 @@ using Xunit;
 namespace MyHordesOptimizerApiIntegrationTests.Services
 {
     /// <summary>
-    /// PutWishList/CreateFromTemplate/AddItemToWishList n'acquéraient aucun TownSyncLock (seule la
+    /// PutWishList/AddItemToWishList n'acquéraient aucun TownSyncLock (seule la
     /// transaction SQL protégeait) : deux requêtes concurrentes sur la même ville pouvaient s'écraser.
     /// Représentant de la famille « écriture simple » du chantier TownSyncLock.
     /// </summary>
@@ -51,7 +51,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             context.SaveChanges();
 
             var externalLock = await townSyncLock.AcquireTownAsync(-mapId);
-            var putTask = Task.Run(() => service.PutWishList(mapId, userId, new List<WishListPutResquestDto>()));
+            var putTask = Task.Run(() => service.PutWishList(mapId, userId, new WishListPutBodyDto { Items = new List<WishListPutResquestDto>(), Groups = new List<WishListGroupDto>() }));
 
             // Course contre un délai généreux plutôt que "délai fixe court puis assertion instantanée" :
             // un process froid (première requête MySQL contre le serveur distant partagé) peut dépasser

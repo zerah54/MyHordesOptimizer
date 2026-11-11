@@ -3,7 +3,6 @@ using MyHordesOptimizerApi.Data.Camping;
 using MyHordesOptimizerApi.Data.CauseOfDeath;
 using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
-using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Camping;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.Models;

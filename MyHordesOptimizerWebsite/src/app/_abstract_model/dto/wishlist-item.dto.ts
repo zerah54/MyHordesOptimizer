@@ -16,4 +16,5 @@ export interface WishlistItemDTO {
     depot: number;
     shouldSignal: boolean;
     zoneXPa: number;
+    groupUid?: string | null;
 }

@@ -99,6 +99,8 @@ builder.Services.AddScoped<INoteService, NoteService>();
 
 // Requis par MapThemeServiceTests.
 builder.Services.AddScoped<IMapThemeService, MapThemeService>();
+// Requis par UserWishListGroupServiceTests.
+builder.Services.AddScoped<IUserWishListGroupService, UserWishListGroupService>();
 
 // Requis par ETagCacheHttpTests / ETagVersionServiceTests (mécanisme ETag, famille 1).
 builder.Services.AddScoped<IETagVersionService, ETagVersionService>();

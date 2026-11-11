@@ -65,11 +65,11 @@ namespace MyHordesOptimizerApi.MappingProfiles.Maps
                 // L'estimation de l'Éclaireur est bruitée : seul l'encadrement est exploitable
                 .ForMember(dto => dto.ScoutEstimationMin, opt => opt.MapFrom(model =>
                     model.ScoutEstimationZombie.HasValue
-                        ? (int?)Math.Max(0, model.ScoutEstimationZombie.Value - MapCellRadarExtensions.GetScoutEstimationRange(model.ScoutZoneLevel))
+                        ? (int?)MapCellRadarExtensions.GetScoutEstimationMin(model.ScoutEstimationZombie.Value, model.ScoutZoneLevel)
                         : (int?)null))
                 .ForMember(dto => dto.ScoutEstimationMax, opt => opt.MapFrom(model =>
                     model.ScoutEstimationZombie.HasValue
-                        ? (int?)(model.ScoutEstimationZombie.Value + MapCellRadarExtensions.GetScoutEstimationRange(model.ScoutZoneLevel))
+                        ? (int?)MapCellRadarExtensions.GetScoutEstimationMax(model.ScoutEstimationZombie.Value, model.ScoutZoneLevel)
                         : (int?)null))
                 .ForMember(dto => dto.ScoutEstimationLastUpdateInfo, opt => opt.MapFrom(model => model.IdScoutEstimationLastUpdateInfoNavigation))
                 .ForMember(dto => dto.TotalSucces, opt => opt.Ignore())

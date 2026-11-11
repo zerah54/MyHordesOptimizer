@@ -1,9 +1,10 @@
-import { CdkDrag, CdkDragDrop, CdkDragPreview, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragMove, CdkDragPreview, CdkDropList } from '@angular/cdk/drag-drop';
 import { CdkScrollable } from '@angular/cdk/scrolling';
 import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { DebugElement, EventEmitter, WritableSignal } from '@angular/core';
 import { ComponentFixture, DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
@@ -11,36 +12,61 @@ import moment from 'moment';
 import { of, Subject, throwError } from 'rxjs';
 import type { MockInstance } from 'vitest';
 
+import { WISHLIST_EXPANDED_GROUPS_KEY } from '../../_abstract_model/const';
+import { UserWishlistGroupDTO } from '../../_abstract_model/dto/user-wishlist-group.dto';
+import { WishlistGroupDTO } from '../../_abstract_model/dto/wishlist-group.dto';
 import { WishlistInfoDTO } from '../../_abstract_model/dto/wishlist-info.dto';
 import { WishlistItemDTO } from '../../_abstract_model/dto/wishlist-item.dto';
 import { StatusEnum } from '../../_abstract_model/enum/status.enum';
 import { WishlistService } from '../../_abstract_model/services/wishlist.service';
-import { ListForAddRemove } from '../../_abstract_model/types/_types';
+import { AddMenuGroup, ListForAddRemove } from '../../_abstract_model/types/_types';
 import { Item } from '../../_abstract_model/types/item.class';
+import { WishlistGroup } from '../../_abstract_model/types/wishlist-group.class';
 import { WishlistInfo } from '../../_abstract_model/types/wishlist-info.class';
 import { WishlistItem } from '../../_abstract_model/types/wishlist-item.class';
 import { ClipboardService } from '../../_core/services/clipboard.service';
 import { DeferredCellComponent } from '../../_shared/deferred-cell/deferred-cell.component';
 import { ItemMapComponent } from '../../_shared/item-map/item-map.component';
+import { WishlistAdvancedAddData, WishlistAdvancedAddResult } from './advanced-add/wishlist-advanced-add.component';
 import { WishlistComponent } from './wishlist.component';
+import { WishlistRow } from './wishlist-rows.util';
 
 interface TestableComponent {
     wishlist_info: WritableSignal<WishlistInfo | null>;
     edition_mode: WritableSignal<boolean>;
-    datasource: MatTableDataSource<WishlistItem>;
+    datasource: MatTableDataSource<WishlistRow>;
     items: WritableSignal<Item[]>;
     current_zone_xp_pa_add_item: WritableSignal<number>;
     add_lists(): ListForAddRemove[];
+    add_groups(): AddMenuGroup[];
+    my_groups: WritableSignal<UserWishlistGroupDTO[]>;
+    addGroup(key: string): void;
+    deleteGroup(key: string): void;
+    openAdvancedAdd(): void;
+    editGroup(key: string): void;
     selected(): Set<string>;
     wishlist_filters_change: EventEmitter<void>;
     addItemToWishlist(item_id: number): void;
-    sortWishlist(event: CdkDragDrop<MatTableDataSource<WishlistItem>>): void;
+    sortWishlist(event: CdkDragDrop<MatTableDataSource<WishlistRow>>): void;
     unsaved_duplicates(): string[];
     auto_save$: Subject<WishlistInfo>;
     triggerSave(): void;
-    buildExcelRows(items: WishlistItem[]): Record<string, string | number>[];
+    setGroupCount(group: WishlistGroup, count: number | null): void;
+    setGroupZone(group: WishlistGroup, zone: number | null): void;
+    buildExcelRows(items: WishlistItem[], groups?: WishlistGroup[]): Record<string, string | number>[];
+    rowsToWishlist(rows: Record<string, string | number>[]): WishlistInfo;
+    item_emotes: WritableSignal<Record<string, string>>;
     forumLabel(item: Item): string;
     shareWishlistForum(): void;
+    expanded_groups: WritableSignal<Set<string>>;
+    drop_group_uid: WritableSignal<string | null>;
+    toggleGroup(uid: string): void;
+    setAllGroupsExpanded(expanded: boolean): void;
+    changeGroupSettings(group: WishlistGroup): void;
+    takeOutOfGroup(item: WishlistItem): void;
+    removeGroup(group: WishlistGroup): void;
+    joinGroup(item: WishlistItem, group: WishlistGroup): void;
+    trackDropTarget(row: WishlistRow, event: CdkDragMove): void;
 }
 
 function buildItemDto(overrides: Partial<WishlistItemDTO['item']> = {}): WishlistItemDTO['item'] {
@@ -121,11 +147,12 @@ describe('WishlistComponent', (): void => {
 
     describe('copie au format forum', (): void => {
         /** Texte copié pour une liste contenant les lignes données. */
-        function copiedText(rows: WishlistItemDTO[]): string {
+        function copiedText(rows: WishlistItemDTO[], groups: WishlistGroupDTO[] = []): string {
             const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
             const copy_spy: MockInstance<ClipboardService['copy']> = vi.spyOn(TestBed.inject(ClipboardService), 'copy').mockImplementation((): void => undefined);
             testable.wishlist_info.set(new WishlistInfo({
                 wishList: rows,
+                groups,
                 lastUpdateInfo: { updateTime: new Date(), userId: '1', userName: 'Bob', userKey: 'k' }
             }));
             testable.shareWishlistForum();
@@ -160,6 +187,117 @@ describe('WishlistComponent', (): void => {
 
         it('n\'ajoute pas de légende sans objet à déposer dans la zone de rapatriement ni à signaler', (): void => {
             expect(copiedText([buildRowDto(1, 0, 5)])).not.toContain('Légende');
+        });
+
+        describe('groupes', (): void => {
+            /** Membre du groupe g1 : objet `id` de balise `:item_x:`, encombrant ou non. */
+            function member(id: number, extra: Partial<WishlistItemDTO> = {}, heavy: boolean = false): WishlistItemDTO {
+                const base: WishlistItemDTO = buildRowDto(id, 5, 30);
+                return { ...base, item: { ...base.item, uid: `u${id}`, isHeaver: heavy }, groupUid: 'g1', ...extra };
+            }
+            const group: WishlistGroupDTO = { uid: 'g1', name: 'B6', priority: 5, zoneXPa: 5, depot: 0, count: 30 };
+
+            beforeEach((): void => {
+                (fixture.componentInstance as unknown as TestableComponent).item_emotes.set({ u1: ':item_a:', u2: ':item_b:' });
+            });
+
+            it('résume un groupe en une seule ligne', (): void => {
+                const text: string = copiedText([member(1), member(2)], [group]);
+
+                expect(text).toContain(':middot:B6 : :item_a: :item_b: (x30) – zone 5:ap:\n');
+            });
+
+            it('met en [bad] le membre signalé et termine la ligne par :warning:', (): void => {
+                const text: string = copiedText([member(1), member(2, { shouldSignal: true })], [group]);
+
+                expect(text).toContain(':middot:B6 : :item_a: [bad]:item_b:[/bad] (x30) – zone 5:ap::warning:\n');
+            });
+
+            it('range un groupe entièrement encombrant sous « Encombrants »', (): void => {
+                const text: string = copiedText([member(1, {}, true), member(2, {}, true)], [group]);
+
+                expect(text).toMatch(/\[collapse=Encombrants\]\n:middot:B6 [^\n]*\n\[\/collapse\]/);
+                expect(text).not.toContain('[collapse=Non-Encombrants]');
+            });
+
+            it('range un groupe mixte sous « Non-Encombrants »', (): void => {
+                const text: string = copiedText([member(1, {}, true), member(2)], [group]);
+
+                expect(text).toMatch(/\[collapse=Non-Encombrants\]\n:middot:B6 [^\n]*\n\[\/collapse\]/);
+                expect(text).not.toContain('[collapse=Encombrants]');
+            });
+
+            it('range un groupe « Ne pas ramener » sous « Ne pas rapporter »', (): void => {
+                const text: string = copiedText([member(1, { priority: -1, depot: -2 })], [{ ...group, priority: -1, depot: -2 }]);
+
+                expect(text).toMatch(/\[collapse=Ne pas rapporter\]\n:middot:B6 : :item_a:\n\[\/collapse\]/);
+            });
+        });
+    });
+
+    describe('Excel avec groupes', (): void => {
+        let testable: TestableComponent;
+
+        beforeEach((): void => {
+            testable = fixture.componentInstance as unknown as TestableComponent;
+            testable.items.set([1, 2, 3].map((id: number): Item => new Item(buildItemDto({ id }))));
+        });
+
+        function groupedInfo(): WishlistInfo {
+            return new WishlistInfo({
+                wishList: [
+                    { ...buildRowDto(3, 0, 1), priority: 9 },
+                    { ...buildRowDto(1, 5, 30), priority: 5, depot: 1, groupUid: 'g1' },
+                    { ...buildRowDto(2, 5, 30), priority: 5, depot: 1, groupUid: 'g1' }
+                ],
+                groups: [{ uid: 'g1', name: 'B6', priority: 5, zoneXPa: 5, depot: 1, count: 30 }],
+                lastUpdateInfo: null
+            });
+        }
+
+        it('reconstitue après aller-retour un groupe de même nom, stock, zone, dépôt et membres', (): void => {
+            const source: WishlistInfo = groupedInfo();
+
+            const result: WishlistInfo = testable.rowsToWishlist(testable.buildExcelRows(source.wishlist_items, source.groups));
+
+            expect(result.groups.length).toBe(1);
+            const [group] = result.groups;
+            expect([group.name, group.count, group.zone_x_pa, group.depot.value.count]).toEqual(['B6', 30, 5, 1]);
+            expect(result.membersOf(group.uid).map((row: WishlistItem): number => row.item.id).sort()).toEqual([1, 2]);
+            expect(result.wishlist_items.filter((row: WishlistItem): boolean => row.group_uid === null).map((row: WishlistItem): number => row.item.id)).toEqual([3]);
+        });
+
+        it('garde deux groupes de même nom situés dans des zones différentes', (): void => {
+            const result: WishlistInfo = testable.rowsToWishlist([
+                { Identifiant: 1, 'Zone de dépôt': 0, Zone: 0, 'Quantité souhaitée': 4, Groupe: 'B6' },
+                { Identifiant: 2, 'Zone de dépôt': 0, Zone: 0, 'Quantité souhaitée': 4, Groupe: 'B6' },
+                { Identifiant: 1, 'Zone de dépôt': 0, Zone: 5, 'Quantité souhaitée': 4, Groupe: 'B6' },
+                { Identifiant: 2, 'Zone de dépôt': 0, Zone: 5, 'Quantité souhaitée': 4, Groupe: 'B6' }
+            ]);
+
+            expect(result.groups.map((group: WishlistGroup): number => group.zone_x_pa).sort()).toEqual([0, 5]);
+            expect(result.groups.every((group: WishlistGroup): boolean => result.membersOf(group.uid).length === 2)).toBe(true);
+        });
+
+        it('conserve dans le corps du PUT les membres d\'un groupe à stock 0', (): void => {
+            const source: WishlistInfo = groupedInfo();
+            source.groups[0].count = 0;
+            source.applyGroupSettings(source.groups[0]);
+
+            const result: WishlistInfo = testable.rowsToWishlist(testable.buildExcelRows(source.wishlist_items, source.groups));
+
+            expect(result.toPutDto().items.filter((row: { groupUid: string | null }): boolean => row.groupUid !== null).length).toBe(2);
+        });
+
+        it('importe en lignes seules un fichier sans colonne « Groupe »', (): void => {
+            const result: WishlistInfo = testable.rowsToWishlist([
+                { Identifiant: 1, 'Zone de dépôt': 0, Zone: 0, 'Quantité souhaitée': 4 },
+                { Identifiant: 2, 'Zone de dépôt': 0, Zone: 3, 'Quantité souhaitée': 2 }
+            ]);
+
+            expect(result.groups).toEqual([]);
+            expect(result.wishlist_items.map((row: WishlistItem): number => row.item.id)).toEqual([1, 2]);
+            expect(result.wishlist_items.every((row: WishlistItem): boolean => row.group_uid === null)).toBe(true);
         });
     });
 
@@ -223,7 +361,7 @@ describe('WishlistComponent', (): void => {
         testable.datasource.filter = JSON.stringify({ items: 'Objet 1', depot: [] });
         const dragged: WishlistItem = (testable.wishlist_info() as WishlistInfo).wishlist_items[0];
 
-        testable.sortWishlist({ item: { data: dragged }, previousIndex: 0, currentIndex: 1 } as unknown as CdkDragDrop<MatTableDataSource<WishlistItem>>);
+        testable.sortWishlist({ item: { data: dragged }, previousIndex: 0, currentIndex: 1 } as unknown as CdkDragDrop<MatTableDataSource<WishlistRow>>);
 
         const ids: number[] = (testable.wishlist_info() as WishlistInfo).wishlist_items.map((row: WishlistItem): number => row.item.id);
         expect(ids).toEqual([2, 11, 1, 3]);
@@ -256,7 +394,7 @@ describe('WishlistComponent', (): void => {
 
         /** Simule le dépôt de la ligne `row` glissée de `previous_index` à `current_index` (index affichés). */
         function drop(row: WishlistItem, previous_index: number, current_index: number): void {
-            testable.sortWishlist({ item: { data: row }, previousIndex: previous_index, currentIndex: current_index } as unknown as CdkDragDrop<MatTableDataSource<WishlistItem>>);
+            testable.sortWishlist({ item: { data: row }, previousIndex: previous_index, currentIndex: current_index } as unknown as CdkDragDrop<MatTableDataSource<WishlistRow>>);
         }
 
         beforeEach(async (): Promise<void> => {
@@ -438,6 +576,154 @@ describe('WishlistComponent', (): void => {
         });
     });
 
+    describe('groupes du menu d\'ajout', (): void => {
+        let testable: TestableComponent;
+        let wishlist_service: WishlistService;
+
+        function itemWith(id: number, extra: Partial<WishlistItemDTO['item']> = {}): Item {
+            return new Item(buildItemDto({ id, uid: `uid_${id}`, label: { fr: `Objet ${id}` }, ...extra }));
+        }
+
+        beforeEach((): void => {
+            testable = fixture.componentInstance as unknown as TestableComponent;
+            wishlist_service = TestBed.inject(WishlistService);
+            fixture.detectChanges();
+            testable.items.set([itemWith(1, { actions: ['eat_6ap'] }), itemWith(2, { actions: ['eat_6ap'] }), itemWith(3, { actions: ['eat_6ap'] }), itemWith(4)]);
+            testable.wishlist_info.set(new WishlistInfo({ wishList: [buildRowDto(1, 8, 1), buildRowDto(4, 8, 1), buildRowDto(2, 0, 1)], lastUpdateInfo: null }));
+            testable.current_zone_xp_pa_add_item.set(8);
+        });
+
+        function group(key: string): AddMenuGroup {
+            return testable.add_groups().find((candidate: AddMenuGroup): boolean => candidate.key === key)!;
+        }
+
+        it('liste les groupes du jeu avec les seuls objets du groupe déjà placés dans la zone', (): void => {
+            const b6: AddMenuGroup = group('game:b6');
+
+            expect(b6.section).toBe('game');
+            expect(b6.manageable).toBe(false);
+            expect(b6.items.map((item: Item): number => item.id)).toEqual([1, 2, 3]);
+            expect([...b6.placed_item_ids]).toEqual([1]);
+        });
+
+        it('liste mes groupes, modifiables, par uid d\'objet', (): void => {
+            testable.my_groups.set([{ id: 3, name: 'Kit', itemUids: ['uid_2', 'uid_4'], updatedAt: '' }]);
+
+            const kit: AddMenuGroup = group('user:3');
+
+            expect(kit.section).toBe('user');
+            expect(kit.manageable).toBe(true);
+            expect(kit.label).toBe('Kit');
+            expect(kit.items.map((item: Item): number => item.id)).toEqual([2, 4]);
+            expect([...kit.placed_item_ids]).toEqual([4]);
+        });
+
+        it('ajoute un groupe du jeu sans ses objets déjà placés, puis recharge', (): void => {
+            const refreshed: WishlistInfo = new WishlistInfo({ wishList: [buildRowDto(1, 8, 1), buildRowDto(2, 8, -1), buildRowDto(3, 8, -1)], lastUpdateInfo: null });
+            const add_spy: MockInstance<WishlistService['addGroupToWishlist']> = vi.spyOn(wishlist_service, 'addGroupToWishlist').mockReturnValue(of(refreshed));
+
+            testable.addGroup('game:b6');
+
+            expect(add_spy).toHaveBeenCalledWith('B6', [2, 3], 8, -1);
+            expect(testable.wishlist_info()).toBe(refreshed);
+        });
+
+        it('supprime mon groupe confirmé', (): void => {
+            testable.my_groups.set([{ id: 3, name: 'Kit', itemUids: [], updatedAt: '' }]);
+            vi.spyOn(TestBed.inject(MatDialog), 'open').mockReturnValue({ afterClosed: () => of(true) } as ReturnType<MatDialog['open']>);
+            const delete_spy: MockInstance<WishlistService['deleteMyGroup']> = vi.spyOn(wishlist_service, 'deleteMyGroup').mockReturnValue(of(undefined));
+
+            testable.deleteGroup('user:3');
+
+            expect(delete_spy).toHaveBeenCalledWith(3);
+            expect(testable.my_groups()).toEqual([]);
+        });
+
+        describe('ajout avancé', (): void => {
+            function mockDialog(result: WishlistAdvancedAddResult | undefined): MockInstance<MatDialog['open']> {
+                return vi.spyOn(TestBed.inject(MatDialog), 'open').mockReturnValue({ afterClosed: () => of(result) } as ReturnType<MatDialog['open']>);
+            }
+
+            it('ouvre la fenêtre avec les objets, les placés de la zone et la zone', (): void => {
+                const open_spy: MockInstance<MatDialog['open']> = mockDialog(undefined);
+
+                testable.openAdvancedAdd();
+
+                const data: WishlistAdvancedAddData = open_spy.mock.calls[0][1]!.data as WishlistAdvancedAddData;
+                expect(data.zone).toBe(8);
+                expect(data.edit).toBeNull();
+                expect(data.items.length).toBe(4);
+                expect([...data.placedIdsInZone(8)]).toEqual([1, 4]);
+            });
+
+            it('enregistre le groupe perso puis l\'ajoute à la liste, sans les objets déjà placés', (): void => {
+                mockDialog({ name: 'Kit', item_ids: [1, 2, 3], count: 5, zone: 8, save_as_user_group: true });
+                const created: UserWishlistGroupDTO = { id: 9, name: 'Kit', itemUids: ['uid_1', 'uid_2', 'uid_3'], updatedAt: '' };
+                const create_spy: MockInstance<WishlistService['createMyGroup']> = vi.spyOn(wishlist_service, 'createMyGroup').mockReturnValue(of(created));
+                const refreshed: WishlistInfo = new WishlistInfo({ wishList: [buildRowDto(2, 8, 5)], lastUpdateInfo: null });
+                const add_spy: MockInstance<WishlistService['addGroupToWishlist']> = vi.spyOn(wishlist_service, 'addGroupToWishlist').mockReturnValue(of(refreshed));
+
+                testable.openAdvancedAdd();
+
+                expect(create_spy).toHaveBeenCalledWith('Kit', ['uid_1', 'uid_2', 'uid_3']);
+                expect(add_spy).toHaveBeenCalledWith('Kit', [2, 3], 8, 5);
+                expect(testable.my_groups()).toEqual([created]);
+                expect(testable.wishlist_info()).toBe(refreshed);
+            });
+
+            it('n\'enregistre pas de groupe perso sans la case', (): void => {
+                mockDialog({ name: 'Kit', item_ids: [2], count: -1, zone: 8, save_as_user_group: false });
+                const create_spy: MockInstance<WishlistService['createMyGroup']> = vi.spyOn(wishlist_service, 'createMyGroup');
+                const add_spy: MockInstance<WishlistService['addGroupToWishlist']> = vi.spyOn(wishlist_service, 'addGroupToWishlist')
+                    .mockReturnValue(of(new WishlistInfo({ wishList: [], lastUpdateInfo: null })));
+
+                testable.openAdvancedAdd();
+
+                expect(create_spy).not.toHaveBeenCalled();
+                expect(add_spy).toHaveBeenCalledWith('Kit', [2], 8, -1);
+            });
+
+            it('garde le groupe de la ville dans la liste même si l\'enregistrement de mon groupe échoue', (): void => {
+                mockDialog({ name: 'Kit', item_ids: [2, 3], count: 5, zone: 8, save_as_user_group: true });
+                vi.spyOn(wishlist_service, 'createMyGroup').mockReturnValue(throwError((): Error => new Error('409')));
+                const refreshed: WishlistInfo = new WishlistInfo({ wishList: [buildRowDto(2, 8, 5)], lastUpdateInfo: null });
+                const add_spy: MockInstance<WishlistService['addGroupToWishlist']> = vi.spyOn(wishlist_service, 'addGroupToWishlist').mockReturnValue(of(refreshed));
+
+                testable.openAdvancedAdd();
+
+                expect(add_spy).toHaveBeenCalledWith('Kit', [2, 3], 8, 5);
+                expect(testable.wishlist_info()).toBe(refreshed);
+            });
+
+            it('en modification, ouvre la fenêtre préremplie et ne fait que mettre à jour le groupe perso', (): void => {
+                testable.my_groups.set([{ id: 3, name: 'Kit', itemUids: ['uid_2'], updatedAt: '' }]);
+                const open_spy: MockInstance<MatDialog['open']> = mockDialog({ name: 'Kit 2', item_ids: [2, 3], count: -1, zone: 8, save_as_user_group: true });
+                const updated: UserWishlistGroupDTO = { id: 3, name: 'Kit 2', itemUids: ['uid_2', 'uid_3'], updatedAt: '' };
+                const update_spy: MockInstance<WishlistService['updateMyGroup']> = vi.spyOn(wishlist_service, 'updateMyGroup').mockReturnValue(of(updated));
+                const create_spy: MockInstance<WishlistService['createMyGroup']> = vi.spyOn(wishlist_service, 'createMyGroup');
+                const add_spy: MockInstance<WishlistService['addGroupToWishlist']> = vi.spyOn(wishlist_service, 'addGroupToWishlist');
+
+                testable.editGroup('user:3');
+
+                expect((open_spy.mock.calls[0][1]!.data as WishlistAdvancedAddData).edit).toEqual({ name: 'Kit', item_uids: ['uid_2'] });
+                expect(update_spy).toHaveBeenCalledWith(3, 'Kit 2', ['uid_2', 'uid_3']);
+                expect(create_spy).not.toHaveBeenCalled();
+                expect(add_spy).not.toHaveBeenCalled();
+                expect(testable.my_groups()).toEqual([updated]);
+            });
+        });
+
+        it('ne supprime pas mon groupe si la confirmation est refusée', (): void => {
+            testable.my_groups.set([{ id: 3, name: 'Kit', itemUids: [], updatedAt: '' }]);
+            vi.spyOn(TestBed.inject(MatDialog), 'open').mockReturnValue({ afterClosed: () => of(false) } as ReturnType<MatDialog['open']>);
+            const delete_spy: MockInstance<WishlistService['deleteMyGroup']> = vi.spyOn(wishlist_service, 'deleteMyGroup');
+
+            testable.deleteGroup('user:3');
+
+            expect(delete_spy).not.toHaveBeenCalled();
+        });
+    });
+
     it('affiche ∞ pour la zone infinie hors mode édition', async (): Promise<void> => {
         const testable: TestableComponent = fixture.componentInstance as unknown as TestableComponent;
         testable.wishlist_info.set(new WishlistInfo({ wishList: [buildRowDto(1, 0, 1), buildRowDto(2, 2, 1)], lastUpdateInfo: null }));
@@ -479,6 +765,324 @@ describe('WishlistComponent', (): void => {
             expect(item_map.map()?.map_width).toBe(3);
             expect(without_items.textContent?.trim()).toBe('0');
             expect(without_items.querySelector('mho-item-map')).toBeNull();
+        });
+    });
+
+    describe('groupes', (): void => {
+        let testable: TestableComponent;
+
+        /** Liste : ligne 8 (priorité 9), groupe g1 (priorité 5, zone 4, objets `member_ids`), ligne 9 (priorité 1). */
+        function buildGroupedInfo(member_ids: number[] = [2, 3], extra_lines: WishlistItemDTO[] = []): WishlistInfo {
+            return new WishlistInfo({
+                wishList: [
+                    { ...buildRowDto(8, 0, 1), priority: 9 },
+                    ...member_ids.map((id: number): WishlistItemDTO => ({ ...buildRowDto(id, 4, 10), priority: 5, groupUid: 'g1', shouldSignal: id === 2 })),
+                    { ...buildRowDto(9, 0, 1), priority: 1 },
+                    ...extra_lines
+                ],
+                groups: [{ uid: 'g1', name: 'B6', priority: 5, zoneXPa: 4, depot: 0, count: 10 }],
+                lastUpdateInfo: null
+            });
+        }
+
+        function info(): WishlistInfo {
+            return testable.wishlist_info() as WishlistInfo;
+        }
+
+        function itemOf(id: number): WishlistItem {
+            return info().wishlist_items.find((row: WishlistItem): boolean => row.item.id === id) as WishlistItem;
+        }
+
+        function ids(): number[] {
+            return info().wishlist_items.map((row: WishlistItem): number => row.item.id);
+        }
+
+        function kinds(): string[] {
+            return testable.datasource.data.map((row: WishlistRow): string => row.kind);
+        }
+
+        beforeEach((): void => {
+            localStorage.removeItem(WISHLIST_EXPANDED_GROUPS_KEY);
+            testable = fixture.componentInstance as unknown as TestableComponent;
+            testable.wishlist_info.set(buildGroupedInfo());
+            fixture.detectChanges();
+        });
+
+        it('ignore une saisie vidée sur le stock ou la zone d\'un groupe', (): void => {
+            const group: WishlistGroup = info().groups[0];
+
+            testable.setGroupCount(group, null);
+            testable.setGroupZone(group, null);
+
+            expect([group.count, group.zone_x_pa]).toEqual([10, 4]);
+            expect(itemOf(2).count).toBe(10);
+        });
+
+        it('continue d\'enregistrer après une erreur du PUT', (): void => {
+            vi.useFakeTimers();
+            try {
+                const update_spy: MockInstance<WishlistService['updateWishlist']> = vi.spyOn(TestBed.inject(WishlistService), 'updateWishlist')
+                    .mockReturnValueOnce(throwError((): Error => new Error('400')))
+                    .mockReturnValue(of(buildGroupedInfo()));
+
+                testable.auto_save$.next(buildGroupedInfo());
+                vi.advanceTimersByTime(600);
+                testable.auto_save$.next(buildGroupedInfo());
+                vi.advanceTimersByTime(600);
+
+                expect(update_spy).toHaveBeenCalledTimes(2);
+            } finally {
+                vi.useRealTimers();
+            }
+        });
+
+        it('affiche 0 et non ∞ pour un groupe au stock 0 hors mode édition', async (): Promise<void> => {
+            const group: WishlistGroup = info().groups[0];
+            group.count = 0;
+            info().applyGroupSettings(group);
+            testable.wishlist_info.set(info());
+            fixture.detectChanges();
+            for (const block of await fixture.getDeferBlocks()) {
+                await block.render(DeferBlockState.Complete);
+            }
+            fixture.detectChanges();
+
+            const cells: string[] = Array.from((fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('tbody td.mat-column-count'))
+                .map((cell: HTMLElement): string => cell.textContent?.trim() ?? '');
+            expect(cells[1]).toBe('0');
+        });
+
+        it('affiche un groupe replié par défaut, puis ses membres une fois déplié', (): void => {
+            expect(kinds()).toEqual(['item', 'group', 'item']);
+
+            testable.expanded_groups.set(new Set(['g1']));
+            fixture.detectChanges();
+
+            expect(kinds()).toEqual(['item', 'group', 'member', 'member', 'item']);
+        });
+
+        it('écrit dans le stockage local les uid des groupes dépliés', (): void => {
+            testable.toggleGroup('g1');
+
+            expect(JSON.parse(localStorage.getItem(WISHLIST_EXPANDED_GROUPS_KEY) as string)).toEqual(['g1']);
+
+            testable.toggleGroup('g1');
+
+            expect(JSON.parse(localStorage.getItem(WISHLIST_EXPANDED_GROUPS_KEY) as string)).toEqual([]);
+        });
+
+        it('déplie ou replie tous les groupes', (): void => {
+            testable.setAllGroupsExpanded(true);
+
+            expect([...testable.expanded_groups()]).toEqual(['g1']);
+
+            testable.setAllGroupsExpanded(false);
+
+            expect(testable.expanded_groups().size).toBe(0);
+        });
+
+        it('suspend l\'enregistrement quand la zone du groupe crée un doublon', (): void => {
+            testable.wishlist_info.set(buildGroupedInfo([2, 3], [buildRowDto(2, 7, 1)]));
+            const next_spy: MockInstance<(value: WishlistInfo) => void> = vi.spyOn(testable.auto_save$, 'next');
+            const group: WishlistGroup = info().groups[0];
+            group.zone_x_pa = 7;
+
+            testable.changeGroupSettings(group);
+
+            expect(testable.unsaved_duplicates()).toEqual(['Objet 2']);
+            expect(next_spy).not.toHaveBeenCalled();
+        });
+
+        it('sort un objet du groupe : ligne seule juste après le groupe, stock ∞ comme un ajout unitaire, zone et signalement conservés', (): void => {
+            testable.takeOutOfGroup(info().membersOf('g1').find((row: WishlistItem): boolean => row.item.id === 2) as WishlistItem);
+
+            const out: WishlistItem = itemOf(2);
+            expect(out.group_uid).toBeNull();
+            expect(out.count).toBe(-1);
+            expect(out.zone_x_pa).toBe(4);
+            expect(out.should_signal).toBe(true);
+            expect(ids()).toEqual([8, 3, 2, 9]);
+            expect(info().groups.length).toBe(1);
+        });
+
+        it('supprime le groupe quand son dernier objet sort', (): void => {
+            testable.wishlist_info.set(buildGroupedInfo([2]));
+
+            testable.takeOutOfGroup(info().membersOf('g1')[0]);
+
+            expect(info().groups).toEqual([]);
+            expect(ids()).toEqual([8, 2, 9]);
+        });
+
+        it('retire le groupe et ses objets après confirmation', (): void => {
+            vi.spyOn(TestBed.inject(MatDialog), 'open').mockReturnValue({ afterClosed: () => of(true) } as ReturnType<MatDialog['open']>);
+
+            testable.removeGroup(info().groups[0]);
+
+            expect(info().groups).toEqual([]);
+            expect(ids()).toEqual([8, 9]);
+        });
+
+        it('ne change rien si la suppression du groupe est refusée', (): void => {
+            vi.spyOn(TestBed.inject(MatDialog), 'open').mockReturnValue({ afterClosed: () => of(false) } as ReturnType<MatDialog['open']>);
+            const before: number[] = ids();
+
+            testable.removeGroup(info().groups[0]);
+
+            expect(info().groups.length).toBe(1);
+            expect(ids()).toEqual(before);
+        });
+
+        it('fait rejoindre le groupe à un objet seul, avec zone, dépôt, priorité et stock du groupe', (): void => {
+            testable.joinGroup(itemOf(9), info().groups[0]);
+
+            const joined: WishlistItem = itemOf(9);
+            const group: WishlistGroup = info().groups[0];
+            expect(joined.group_uid).toBe('g1');
+            expect(joined.zone_x_pa).toBe(group.zone_x_pa);
+            expect(joined.count).toBe(group.count);
+            expect(joined.depot.value.count).toBe(group.depot.value.count);
+            expect(joined.priority).toBe(group.priority);
+        });
+
+        describe('dépôt d\'un objet seul dans un groupe déplié', (): void => {
+            /** Lignes affichées : 8, groupe g1, membre 2, membre 3, 9 (index 0 à 4). */
+            function dropAt(id: number, previous_index: number, current_index: number): void {
+                testable.setAllGroupsExpanded(true);
+                fixture.detectChanges();
+                testable.sortWishlist({ item: { data: itemOf(id) }, previousIndex: previous_index, currentIndex: current_index } as unknown as CdkDragDrop<MatTableDataSource<WishlistRow>>);
+            }
+
+            it('entre deux objets du groupe, en remontant : l\'objet rejoint le groupe', (): void => {
+                dropAt(9, 4, 3);
+                expect(itemOf(9).group_uid).toBe('g1');
+                expect(itemOf(9).zone_x_pa).toBe(4);
+            });
+
+            it('entre deux objets du groupe, en descendant : l\'objet rejoint le groupe', (): void => {
+                dropAt(8, 0, 2);
+                expect(itemOf(8).group_uid).toBe('g1');
+            });
+
+            it('juste sous la ligne du groupe : l\'objet rejoint le groupe', (): void => {
+                dropAt(9, 4, 2);
+                expect(itemOf(9).group_uid).toBe('g1');
+            });
+
+            /** Coche les lignes de clés données. */
+            function select(keys: string[]): void {
+                (fixture.componentInstance as unknown as { selected: WritableSignal<Set<string>> }).selected.set(new Set(keys));
+            }
+
+            it('une sélection de lignes seules déposée entre deux objets du groupe : toutes rejoignent le groupe', (): void => {
+                select(['8_0', '9_0']);
+                dropAt(9, 4, 3);
+                expect(itemOf(8).group_uid).toBe('g1');
+                expect(itemOf(9).group_uid).toBe('g1');
+                expect(testable.selected().size).toBe(0);
+            });
+
+            it('une sélection contenant un groupe n\'entre pas dans un groupe : simple réordonnement', (): void => {
+                select(['8_0', 'group:g1']);
+                dropAt(8, 0, 3);
+                expect(itemOf(8).group_uid).toBeNull();
+            });
+
+            it('après le dernier objet du groupe : simple réordonnement, l\'objet reste seul', (): void => {
+                dropAt(8, 0, 3);
+                expect(itemOf(8).group_uid).toBeNull();
+            });
+        });
+
+        it('déplace un groupe avec ses objets : leur priorité suit celle du groupe', (): void => {
+            testable.sortWishlist({ item: { data: info().groups[0] }, previousIndex: 1, currentIndex: 0 } as unknown as CdkDragDrop<MatTableDataSource<WishlistRow>>);
+
+            expect(info().groups[0].priority).toBe(999);
+            expect(itemOf(2).priority).toBe(999);
+            expect(itemOf(3).priority).toBe(999);
+            expect(itemOf(8).priority).toBe(998);
+            expect(itemOf(9).priority).toBe(997);
+        });
+
+        it('ne coche que les lignes seules et les groupes, jamais les objets d\'un groupe déplié', async (): Promise<void> => {
+            testable.edition_mode.set(true);
+            testable.setAllGroupsExpanded(true);
+            fixture.detectChanges();
+            for (const block of await fixture.getDeferBlocks()) {
+                await block.render(DeferBlockState.Complete);
+            }
+            fixture.detectChanges();
+
+            const boxes: NodeListOf<HTMLInputElement> = fixture.nativeElement.querySelectorAll('td.mat-column-select input[type="checkbox"]');
+            expect(boxes.length).toBe(3);
+            boxes[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            fixture.detectChanges();
+
+            expect([...testable.selected()]).toEqual(['group:g1']);
+        });
+
+        it('ne se saisit que par la poignée, y compris après un repli puis un dépli', async (): Promise<void> => {
+            /** Nombre de poignées enregistrées par chaque ligne déplaçable (0 = toute la ligne se saisit). */
+            const handleCounts: () => number[] = (): number[] => fixture.debugElement.queryAll(By.directive(CdkDrag))
+                .map((element: DebugElement): CdkDrag => element.injector.get(CdkDrag))
+                .filter((drag: CdkDrag): boolean => !drag.disabled)
+                .map((drag: CdkDrag): number => (drag._dragRef as unknown as { _handles: unknown[] })._handles.length);
+            const render: () => Promise<void> = async (): Promise<void> => {
+                fixture.detectChanges();
+                for (const block of await fixture.getDeferBlocks()) {
+                    await block.render(DeferBlockState.Complete);
+                }
+                fixture.detectChanges();
+            };
+
+            testable.edition_mode.set(true);
+            await render();
+            expect(handleCounts().length).toBeGreaterThan(0);
+            expect(handleCounts()).toEqual(handleCounts().map((): number => 1));
+
+            testable.setAllGroupsExpanded(true);
+            await render();
+            testable.setAllGroupsExpanded(false);
+            await render();
+            expect(handleCounts()).toEqual(handleCounts().map((): number => 1));
+        });
+
+        describe('dépôt sur une ligne de groupe', (): void => {
+            /** Fait pointer `document.elementFromPoint` sur une ligne de groupe de hauteur 40 en haut 100. */
+            function pointAtGroupRow(): void {
+                const row: HTMLElement = document.createElement('tr');
+                row.dataset['groupUid'] = 'g1';
+                row.getBoundingClientRect = (): DOMRect => ({ top: 100, height: 40, bottom: 140 } as DOMRect);
+                const cell: HTMLElement = row.appendChild(document.createElement('td'));
+                Object.defineProperty(document, 'elementFromPoint', { configurable: true, value: (): Element => cell });
+            }
+
+            function move(y: number): void {
+                testable.trackDropTarget({ kind: 'item', item: itemOf(9) }, { pointerPosition: { x: 5, y } } as CdkDragMove);
+            }
+
+            afterEach((): void => {
+                delete (document as unknown as Record<string, unknown>)['elementFromPoint'];
+            });
+
+            it('ne surligne le groupe que sur la moitié centrale de la ligne', (): void => {
+                pointAtGroupRow();
+
+                move(120);
+                expect(testable.drop_group_uid()).toBe('g1');
+
+                move(102);
+                expect(testable.drop_group_uid()).toBeNull();
+            });
+
+            it('fait rejoindre le groupe au lâcher et efface le surlignage', (): void => {
+                testable.drop_group_uid.set('g1');
+
+                testable.sortWishlist({ item: { data: itemOf(9) }, previousIndex: 2, currentIndex: 1 } as unknown as CdkDragDrop<MatTableDataSource<WishlistRow>>);
+
+                expect(itemOf(9).group_uid).toBe('g1');
+                expect(testable.drop_group_uid()).toBeNull();
+            });
         });
     });
 });

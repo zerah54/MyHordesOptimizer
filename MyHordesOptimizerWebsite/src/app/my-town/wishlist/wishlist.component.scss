@@ -80,6 +80,48 @@
                     }
                 }
 
+                /* Ligne de groupe : même hauteur que les autres, fond teinté. */
+                tr.group-row > td {
+                    background: color-mix(in srgb, var(--mat-sys-primary) 10%, transparent);
+                    font-weight: 600;
+
+                    .group-toggle {
+                        --mat-icon-button-state-layer-size: 28px;
+                        width: 28px;
+                        height: 28px;
+                        padding: 2px;
+                    }
+
+                    .pill {
+                        margin-left: 0.5em;
+                        padding: 0 7px;
+                        border-radius: 10px;
+                        font-size: 0.8em;
+                        font-weight: 400;
+                        background: color-mix(in srgb, var(--mat-sys-on-surface) 12%, transparent);
+                    }
+                }
+
+                /* Objets d'un groupe : décalés, liseré à gauche. */
+                tr.member-row {
+                    > td:first-child {
+                        border-left: 4px solid var(--mat-sys-primary);
+                    }
+
+                    > td.mat-column-name {
+                        padding-left: 2em;
+                    }
+
+                    .muted {
+                        opacity: 0.45;
+                    }
+                }
+
+                tr.drop-target > td {
+                    outline: 2px dashed var(--mat-sys-primary);
+                    outline-offset: -2px;
+                }
+
                 .bag-count-cell {
                     display: inline-flex;
                     align-items: center;

@@ -109,7 +109,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             using var factory = _factory.WithWebHostBuilder(UseRealTownAccess);
             var town = SeedTown(factory);
 
-            var response = await CreateClient(factory, town.OutsiderUserId).PutAsync($"/WishList?townId={town.TownId}&userId={town.AliveUserId}", Json("[]"));
+            var response = await CreateClient(factory, town.OutsiderUserId).PutAsync($"/WishList?townId={town.TownId}&userId={town.AliveUserId}", Json("{\"items\":[],\"groups\":[]}"));
 
             response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
@@ -121,7 +121,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var town = SeedTown(factory);
 
             // userId de query volontairement faux : il est ignoré.
-            var response = await CreateClient(factory, town.DeadUserId).PutAsync($"/WishList?townId={town.TownId}&userId={town.OutsiderUserId}", Json("[]"));
+            var response = await CreateClient(factory, town.DeadUserId).PutAsync($"/WishList?townId={town.TownId}&userId={town.OutsiderUserId}", Json("{\"items\":[],\"groups\":[]}"));
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             using var scope = factory.Services.CreateScope();

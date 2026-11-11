@@ -46,12 +46,6 @@
 //        void AddItemToWishlist(int townId, int itemId, int userId, int zoneXPa);
 //        void PutWishList(int townId, int userId, IEnumerable<TownWishListItem> items);
 //        WishListLastUpdateDto GetWishList(int townId);
-//        void PatchWishlistCategories(List<WishlistCategorie> categories);
-//        void PatchWishlistItemCategories(List<Item> itemsCategorie);
-//        WishlistCategorie GetWishListCategories();
-//        void PatchDefaultWishlistItems(List<DefaultWishlistItem> modeles);
-//        IEnumerable<DefaultWishlistItem> GetWishListTemplate(int templateId);
-//        IEnumerable<DefaultWishlistItem> GetWishListTemplates();
 
 //        void PatchRuins(IEnumerable<MyHordesOptimizerRuinDto> jsonRuins);
 //        IEnumerable<MyHordesOptimizerRuinDto> GetRuins();

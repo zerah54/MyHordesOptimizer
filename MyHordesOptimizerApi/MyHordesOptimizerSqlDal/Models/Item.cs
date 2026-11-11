@@ -135,9 +135,6 @@ public partial class Item
     public virtual ICollection<BuildingRessource> BuildingRessources { get; set; } = new List<BuildingRessource>();
 
     [InverseProperty("IdItemNavigation")]
-    public virtual ICollection<DefaultWishlistItem> DefaultWishlistItems { get; set; } = new List<DefaultWishlistItem>();
-
-    [InverseProperty("IdItemNavigation")]
     public virtual ICollection<ExpeditionBagItem> ExpeditionBagItems { get; set; } = new List<ExpeditionBagItem>();
 
     [ForeignKey("IdCategory")]
@@ -165,10 +162,6 @@ public partial class Item
     [ForeignKey("IdItem")]
     [InverseProperty("IdItems")]
     public virtual ICollection<Action> ActionNames { get; set; } = new List<Action>();
-
-    [ForeignKey("IdItem")]
-    [InverseProperty("IdItems")]
-    public virtual ICollection<WishlistCategorie> IdCategories { get; set; } = new List<WishlistCategorie>();
 
     [ForeignKey("IdItem")]
     [InverseProperty("IdItems")]

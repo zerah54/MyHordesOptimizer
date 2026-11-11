@@ -12,7 +12,6 @@ using MyHordesOptimizerApi.Data.Heroes;
 using MyHordesOptimizerApi.Data.Items;
 using MyHordesOptimizerApi.Data.Jobs;
 using MyHordesOptimizerApi.Data.Ruins;
-using MyHordesOptimizerApi.Data.Wishlist;
 using MyHordesOptimizerApi.Dtos.MyHordes;
 using MyHordesOptimizerApi.Dtos.MyHordes.Building;
 using MyHordesOptimizerApi.Dtos.MyHordes.Items;
@@ -75,8 +74,6 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
             public List<MyHordesHerosCapacitiesCodeModel> GetHeroCapacities() => throw new NotSupportedException();
             public List<MyHordesCauseOfDeathModel> GetCausesOfDeath() => throw new NotSupportedException();
             public List<MyHordesCleanUpTypeModel> GetCleanUpTypes() => throw new NotSupportedException();
-            public List<MyHordesOptimizerWishlistItemCategorie> GetWishlistItemCategories() => throw new NotSupportedException();
-            public List<MyHordesOptimizerDefaultWishlist> GetDefaultWishlists() => throw new NotSupportedException();
             public MyHordesCampingBonusModel GetCampingBonus() => throw new NotSupportedException();
             public List<MyHordesCampingResultModel> GetCampingResults() => throw new NotSupportedException();
             public Dictionary<string, BuildingCodeModel> GetBuildings() => throw new NotSupportedException();
@@ -201,29 +198,6 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
 
             Func<Task> act = () => ruinsTask;
             await act.Should().ThrowAsync<NotSupportedException>("EmptyApiRepository.GetRuins n'est atteint qu'une fois le verrou obtenu");
-        }
-
-        [Fact]
-        public async Task ImportWishlistCategorie_VerrouReferentielDejaTenu_AttendLaLiberationAvantDeContinuer()
-        {
-            var referentialImportLock = new ReferentialImportLock();
-            await referentialImportLock.WaitAsync();
-
-            // ImportWishlistCategorie est synchrone : Task.Run pour pouvoir le soumettre à
-            // Task.WhenAny sans bloquer le thread du test pendant l'attente du verrou.
-            var wishlistTask = Task.Run(() => NewService(referentialImportLock).ImportWishlistCategorie());
-
-            // EmptyCodeRepository.GetWishlistItemCategories (premier appel du corps de la méthode,
-            // avant tout accès BDD) lève NotSupportedException. Si wishlistTask gagnait avant 2s,
-            // ReferentialImportLock ne serait plus tenu en tête de méthode.
-            var winner = await Task.WhenAny(wishlistTask, Task.Delay(TimeSpan.FromSeconds(2)));
-            winner.Should().NotBeSameAs(wishlistTask,
-                "ImportWishlistCategorie ne doit pas pouvoir progresser tant que ReferentialImportLock est tenu ailleurs");
-
-            referentialImportLock.Release();
-
-            Func<Task> act = () => wishlistTask;
-            await act.Should().ThrowAsync<NotSupportedException>("EmptyCodeRepository.GetWishlistItemCategories n'est atteint qu'une fois le verrou obtenu");
         }
     }
 }
