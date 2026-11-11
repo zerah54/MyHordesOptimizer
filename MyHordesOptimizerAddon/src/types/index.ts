@@ -210,10 +210,23 @@ export interface WishlistItem {
     zoneXPa: number;
     isWorkshop: boolean;
     shouldSignal: boolean;
+    /** Groupe de la liste de courses auquel appartient la ligne, absent pour une ligne seule. */
+    groupUid?: string | null;
+}
+
+/** Groupe d'objets de la liste de courses : priorité, zone, dépôt et stock communs. */
+export interface WishlistGroup {
+    uid: string;
+    name: string;
+    priority: number;
+    zoneXPa: number;
+    depot: number;
+    count: number;
 }
 
 export interface ApiWishlist {
     wishList?: WishlistItem[];
+    groups?: WishlistGroup[];
     lastUpdateInfo?: { updateTime: string; userName: string };
 }
 

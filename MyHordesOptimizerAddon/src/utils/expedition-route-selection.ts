@@ -46,8 +46,12 @@ export function routeOptions(parts: readonly MyExpeditionPart[], routes: readonl
     ];
 }
 
-/** Entrée suivie : celle enregistrée ; `null` sans choix valide (rien n'est alors affiché). */
+/** Entrée suivie : celle enregistrée ; sans choix enregistré, ma seule expédition s'il n'y en a qu'une ; sinon `null` (rien n'est alors affiché). */
 export function chosenOption(options: readonly RouteOption[], stored: string | undefined): RouteOption | null {
+    if (stored === undefined) {
+        const parts: RouteOption[] = options.filter((option: RouteOption): boolean => option.kind === 'part');
+        return parts.length === 1 ? parts[0] : null;
+    }
     return options.find((option: RouteOption): boolean => option.value === stored) ?? null;
 }
 

@@ -274,7 +274,7 @@ function getDepotPillColor(depotValue: number): string {
 }
 
 /** Bandeau "Stock souhaité : X — [Dépôt]" affiché quand l'objet est dans la wishlist de la zone. */
-function createWishlistGoalRow(item_in_wishlist: WishlistItem): HTMLDivElement {
+function createWishlistGoalRow(item_in_wishlist: WishlistItem, group_name?: string): HTMLDivElement {
     const goal_row: HTMLDivElement = document.createElement('div');
     goal_row.classList.add('mho-wishlist-goal');
     goal_row.style.display = 'flex';
@@ -284,7 +284,7 @@ function createWishlistGoalRow(item_in_wishlist: WishlistItem): HTMLDivElement {
     goal_row.style.marginBottom = '0.35em';
 
     const wanted: HTMLSpanElement = document.createElement('span');
-    wanted.innerText = getI18N(wishlist_headers.find((header: { label: I18nLabel; id: string }) => header.id === 'bank_needed').label) + ' : ' + (item_in_wishlist.count < 0 ? '∞' : item_in_wishlist.count);
+    wanted.innerText = getI18N(wishlist_headers.find((header: { label: I18nLabel; id: string }) => header.id === 'bank_needed').label) + ' : ' + (group_name ? group_name + ' · ' : '') + (item_in_wishlist.count < 0 ? '∞' : item_in_wishlist.count);
     goal_row.appendChild(wanted);
 
     const depot: HTMLSpanElement = document.createElement('span');
@@ -361,7 +361,7 @@ export function createAdvancedProperties(content, item, tooltip) {
         const item_in_wishlist: WishlistItem = wishlist_for_zone?.find((iwfz) => item.id === iwfz.item.id);
 
         if (item_in_wishlist !== undefined) {
-            stock_div.appendChild(createWishlistGoalRow(item_in_wishlist));
+            stock_div.appendChild(createWishlistGoalRow(item_in_wishlist, state.wishlist?.groups?.find((g) => g.uid === item_in_wishlist.groupUid)?.name));
         }
 
         stock_div.appendChild(createStockChipsRow(item));

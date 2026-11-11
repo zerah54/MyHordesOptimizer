@@ -2,7 +2,7 @@ import { getWishlist } from '../api/wishlist';
 import { mh_optimizer_icon, repo_img_hordes_url } from '../config/constants';
 import { texts, wishlist_depot, wishlist_headers, wishlist_title } from '../i18n/texts';
 import { state } from '../state';
-import type { MhoItem, WishlistItem } from '../types';
+import type { ApiWishlist, MhoItem, WishlistGroup, WishlistItem } from '../types';
 import { getI18N } from '../utils/i18n';
 import { getItemFromImg } from '../utils/item-lookup';
 import { fixMhCompiledImg } from '../utils/misc';
@@ -33,20 +33,70 @@ const wishlist_header_icons: Record<string, string> = {
     map_cell_item_count: 'icons/item_map.gif',
 };
 
+/** Ligne affichée : ligne seule, ou ligne de groupe portant le nom et les objets présents du groupe */
+export type WishlistDisplayRow = WishlistItem & { group_name?: string; group_items?: MhoItem[] };
+
 /** Contenu de chaque colonne de données, indexé sur l'`id` de `wishlist_headers` */
-const wishlist_cell_renderers: Record<string, (item: WishlistItem) => string> = {
-    label: (item: WishlistItem): string =>
-        `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`,
-    depot: (item: WishlistItem): string =>
+const wishlist_cell_renderers: Record<string, (item: WishlistDisplayRow) => string> = {
+    label: (item: WishlistDisplayRow): string => item.group_name !== undefined
+        ? item.group_items.map((member: MhoItem) => `<img src="${repo_img_hordes_url + member.img}" style="margin-right: 2px" />`).join('') + `<span class="small" style="margin-left: 3px">${escapeHtml(item.group_name)}</span>`
+        : `<img src="${repo_img_hordes_url + item.item.img}" style="margin-right: 5px" /><span class="small">${getI18N(item.item.label)}</span>`,
+    depot: (item: WishlistDisplayRow): string =>
         `<span class="small">${getI18N(wishlist_depot.find((depot) => item.depot === depot.value).label)}</span>`,
-    bank_count: (item: WishlistItem): string => `<span class="small">${item.bankCount ?? 0}</span>`,
-    bag_count: (item: WishlistItem): string => `<span class="small">${item.bagCount ?? 0}</span>`,
-    chest_count: (item: WishlistItem): string => `<span class="small">${item.chestCount ?? 0}</span>`,
-    map_cell_item_count: (item: WishlistItem): string => `<span class="small">${item.mapCellItemCount ?? 0}</span>`,
-    bank_needed: (item: WishlistItem): string => `<span class="small">${item.count >= 0 ? item.count : '∞'}</span>`,
-    diff: (item: WishlistItem): string =>
+    bank_count: (item: WishlistDisplayRow): string => `<span class="small">${item.bankCount ?? 0}</span>`,
+    bag_count: (item: WishlistDisplayRow): string => `<span class="small">${item.bagCount ?? 0}</span>`,
+    chest_count: (item: WishlistDisplayRow): string => `<span class="small">${item.chestCount ?? 0}</span>`,
+    map_cell_item_count: (item: WishlistDisplayRow): string => `<span class="small">${item.mapCellItemCount ?? 0}</span>`,
+    bank_needed: (item: WishlistDisplayRow): string => `<span class="small">${item.count >= 0 ? item.count : '∞'}</span>`,
+    diff: (item: WishlistDisplayRow): string =>
         `<span class="small">${item.count >= 0 ? (item.count - (item.bankCount ?? 0) - (item.bagCount ?? 0)) : '∞'}</span>`,
 };
+
+/** Échappe le texte saisi par l'utilisateur avant insertion dans du HTML. */
+function escapeHtml(text: string): string {
+    const span: HTMLSpanElement = document.createElement('span');
+    span.textContent = text;
+    return span.innerHTML;
+}
+
+/**
+ * Fusionne les lignes d'un même groupe en une seule : compteurs sommés sur tous les membres
+ * du groupe de la liste complète, objets présents conservés pour les icônes.
+ */
+export function collapseGroupRows(list_to_display: WishlistItem[], wishlist: ApiWishlist): WishlistDisplayRow[] {
+    const groups: WishlistGroup[] = wishlist.groups ?? [];
+    const rows: WishlistDisplayRow[] = [];
+    const collapsed: Map<string, WishlistDisplayRow> = new Map<string, WishlistDisplayRow>();
+
+    list_to_display.forEach((item: WishlistItem) => {
+        const group: WishlistGroup | undefined = item.groupUid ? groups.find((g: WishlistGroup) => g.uid === item.groupUid) : undefined;
+        if (!group) {
+            rows.push(item);
+            return;
+        }
+        const existing: WishlistDisplayRow | undefined = collapsed.get(group.uid);
+        if (existing) {
+            existing.group_items.push(item.item);
+            return;
+        }
+        const members: WishlistItem[] = (wishlist.wishList ?? []).filter((m: WishlistItem) => m.groupUid === group.uid);
+        const sum = (key: 'bankCount' | 'bagCount' | 'chestCount' | 'mapCellItemCount'): number => members.reduce((total: number, m: WishlistItem) => total + (m[key] ?? 0), 0);
+        const row: WishlistDisplayRow = {
+            ...item,
+            count: group.count,
+            bankCount: sum('bankCount'),
+            bagCount: sum('bagCount'),
+            chestCount: sum('chestCount'),
+            mapCellItemCount: sum('mapCellItemCount'),
+            group_name: group.name,
+            group_items: [item.item]
+        };
+        collapsed.set(group.uid, row);
+        rows.push(row);
+    });
+
+    return rows;
+}
 
 /** Repose la section et les priorités */
 function refreshWishlistDisplay(): void {
@@ -83,9 +133,9 @@ function bindWishlistSignals(): void {
  * Décrit les lignes affichées, compteurs compris : deux appels produisant la même
  * signature n'ont aucune raison de reconstruire la section.
  */
-function buildContentSignature(is_workshop: boolean, list_to_display: WishlistItem[]): string {
+function buildContentSignature(is_workshop: boolean, list_to_display: WishlistDisplayRow[]): string {
     const rows: string[] = list_to_display
-        .map((item: WishlistItem) => `${item.item.id}/${item.depot}/${item.bankCount}/${item.bagCount}/${item.chestCount}/${item.mapCellItemCount}/${item.count}`)
+        .map((item: WishlistDisplayRow) => `${item.group_name ?? ''}/${item.group_items?.length ?? 0}/${item.item.id}/${item.depot}/${item.bankCount}/${item.bagCount}/${item.chestCount}/${item.mapCellItemCount}/${item.count}`)
         .sort();
 
     return `${is_workshop ? 'w' : 'd'}|${rows.join(';')}`;
@@ -149,13 +199,15 @@ export function displayWishlistInApp() {
          */
         const item_ids_in_cell: Set<number> = is_workshop ? new Set<number>() : getItemIdsInCell();
 
-        const list_to_display: WishlistItem[] = used_wishlist.filter((item: WishlistItem) => {
+        const filtered_list: WishlistItem[] = used_wishlist.filter((item: WishlistItem) => {
             if (is_workshop) {
                 return item.isWorkshop;
             } else {
                 return item_ids_in_cell.has(item.item.id);
             }
         });
+
+        const list_to_display: WishlistDisplayRow[] = collapseGroupRows(filtered_list, state.wishlist);
 
         if (is_workshop && list_to_display.length === 0) return;
 
@@ -226,7 +278,7 @@ export function displayWishlistInApp() {
                 });
 
             list_to_display
-                .forEach((item: WishlistItem) => {
+                .forEach((item: WishlistDisplayRow) => {
                     const list_item: HTMLDivElement = document.createElement('div');
                     list_item.classList.add('row-flex');
                     list.appendChild(list_item);

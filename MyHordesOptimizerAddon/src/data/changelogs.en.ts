@@ -1,4 +1,10 @@
 export const changelogs: Record<string, string> = {
+    '1.1.65': `
+        [Improvement] Shopping list: item groups are shown on a single row (combined counts), and the group is shown in the tooltip
+        [Improvement] Expeditions: if you only have one expedition, it is followed automatically
+
+        [Fix] Expeditions: better layout of the route selector
+        `,
     '1.1.64': `
         [New] My program: new window with your expedition, your constructions, today's instructions and the evolutions voted tonight
         [New] Expeditions: route tracking in the desert (direction to take, cell instructions, next cell with instructions)

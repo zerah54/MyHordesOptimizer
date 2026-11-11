@@ -69,6 +69,17 @@ describe('expedition-route-selection', (): void => {
         expect(selection.chosenOption(options, undefined)).toBeNull();
     });
 
+    it('chosenOption : sans choix enregistré, la seule expédition où je suis inscrit est suivie par défaut', async (): Promise<void> => {
+        const selection: SelectionModule = await freshModule();
+        const one: RouteOption[] = selection.routeOptions([myPart(12, 0)], [townRoute(5)], town);
+        const two: RouteOption[] = selection.routeOptions([myPart(12, 0), myPart(13, 5)], [], town);
+
+        expect(selection.chosenOption(one, undefined)?.value).toBe('part:12');
+        expect(selection.chosenOption(one, '')).toBeNull();
+        expect(selection.chosenOption(two, undefined)).toBeNull();
+        expect(selection.chosenOption(selection.routeOptions([], [townRoute(5)], town), undefined)).toBeNull();
+    });
+
     it('chosenOption : un choix devenu invalide ne suit aucun tracé', async (): Promise<void> => {
         const selection: SelectionModule = await freshModule();
 

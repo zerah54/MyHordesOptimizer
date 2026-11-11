@@ -1,4 +1,10 @@
 export const changelogs: Record<string, string> = {
+    '1.1.65': `
+        [Verbesserung] Einkaufsliste: Gegenstandsgruppen werden in einer einzigen Zeile angezeigt (summierte Zähler), und die Gruppe wird im Tooltip angegeben
+        [Verbesserung] Expeditionen: Wenn du nur eine Expedition hast, wird sie automatisch verfolgt
+
+        [Korrektur] Expeditionen: bessere Darstellung der Routenauswahl
+        `,
     '1.1.64': `
         [Neu] Mein Programm: neues Fenster mit deiner Expedition, deinen Bauprojekten, den heutigen Anweisungen und den heute Abend gewählten Entwicklungen
         [Neu] Expeditionen: Routenverfolgung in der Wüste (einzuschlagende Richtung, Anweisungen des Feldes, nächstes Feld mit Anweisungen)

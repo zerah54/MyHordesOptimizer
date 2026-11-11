@@ -1,4 +1,10 @@
 export const changelogs: Record<string, string> = {
+    '1.1.65': `
+        [Mejora] Lista de compras: los grupos de objetos se muestran en una sola fila (contadores sumados) y el grupo se indica en el tooltip
+        [Mejora] Expediciones: si solo tienes una expedición, se sigue automáticamente
+
+        [Corrección] Expediciones: mejor diseño del selector de trazado
+        `,
     '1.1.64': `
         [Novedad] Mi programa: nueva ventana con tu expedición, tus obras, las consignas del día y las evoluciones votadas esta noche
         [Novedad] Expediciones: seguimiento del recorrido en el desierto (dirección a tomar, consignas de la casilla, próxima casilla con consignas)

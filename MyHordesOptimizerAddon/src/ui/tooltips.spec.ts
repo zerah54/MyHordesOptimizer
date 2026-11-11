@@ -102,6 +102,21 @@ describe('createAdvancedProperties — zone quantités (souhaité/dépôt, banqu
         expect(chips.map((chip) => chip.querySelector('span').innerText)).toEqual(['5', '4', '3', '2']);
     });
 
+    it('préfixe le stock souhaité du nom du groupe pour un objet de groupe', () => {
+        state.mho_parameters = { enhanced_tooltips_item_quantities: true };
+        state.mh_user = undefined;
+        state.wishlist = {
+            wishList: [wishlistItem({ count: 5, groupUid: 'g1' })],
+            groups: [{ uid: 'g1', name: 'B6', priority: 0, zoneXPa: 0, depot: 0, count: 5 }]
+        };
+
+        const content: HTMLDivElement = document.createElement('div');
+        createAdvancedProperties(content, baseItem({ id: 1 }), document.createElement('div'));
+
+        const goal_row = content.children[0].querySelector('.mho-wishlist-goal') as HTMLElement;
+        expect((goal_row.children[0] as HTMLElement).innerText).toContain('B6 · ');
+    });
+
     it('n\'ajoute qu\'une seule séparation (bas), pas de bordure supplémentaire au-dessus du bandeau objectif', () => {
         state.mho_parameters = { enhanced_tooltips_item_quantities: true };
         state.mh_user = undefined;

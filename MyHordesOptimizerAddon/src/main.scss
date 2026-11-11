@@ -1754,7 +1754,21 @@ $mho-route-arrow-stroke: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org
         gap: 0.5em;
     }
 
+    .mho-expedition-route-title {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .mho-expedition-route-choice {
+        flex: 1;
+        min-width: 0;
+        width: auto;
+    }
+
     .mho-expedition-route-icon {
+        flex: none;
         width: 24px;
         height: 24px;
         margin-right: 0.5em;

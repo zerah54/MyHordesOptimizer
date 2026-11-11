@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { state } from '../state';
 import type { MhoItem, WishlistItem } from '../types';
-import { displayWishlistInApp, getItemIdsInCell } from './wishlist';
+import { collapseGroupRows, displayWishlistInApp, getItemIdsInCell } from './wishlist';
 
 /** `pageIsDesert()`/`pageIsWorkshop()` lisent `document.URL` : mockées pour piloter le scénario atelier */
 vi.mock('../utils/page', () => ({
@@ -93,5 +93,74 @@ describe('displayWishlistInApp — tableau in-game (atelier)', () => {
         const row_count: number = document.querySelectorAll('.row-flex:not(.mho-header) > .cell').length;
 
         expect(row_count).toBe(header_count);
+    });
+});
+
+describe('collapseGroupRows', () => {
+    const b6a: MhoItem = { id: 10, img: 'item/b6a.png' } as any;
+    const b6b: MhoItem = { id: 11, img: 'item/b6b.png' } as any;
+
+    function row(item: MhoItem, overrides: Partial<WishlistItem> = {}): WishlistItem {
+        return {
+            item, count: 5, bankCount: 1, bagCount: 1, chestCount: 1, chestCitizens: [], mapCellItemCount: 1,
+            depot: 0, priority: 0, zoneXPa: 0, isWorkshop: false, shouldSignal: false, ...overrides
+        };
+    }
+
+    it('fusionne les membres présents en une ligne, compteurs sommés sur tous les membres du groupe', () => {
+        const a: WishlistItem = row(b6a, { groupUid: 'g1', bankCount: 2, bagCount: 1 });
+        const b: WishlistItem = row(b6b, { groupUid: 'g1', bankCount: 3, bagCount: 0 });
+        const wishlist = { wishList: [a, b], groups: [{ uid: 'g1', name: 'B6', priority: 0, zoneXPa: 0, depot: 0, count: 5 }] };
+
+        const rows = collapseGroupRows([a, b], wishlist);
+
+        expect(rows.length).toBe(1);
+        expect(rows[0].group_name).toBe('B6');
+        expect(rows[0].group_items.length).toBe(2);
+        expect(rows[0].bankCount).toBe(5);
+        expect(rows[0].bagCount).toBe(1);
+        expect(rows[0].chestCount).toBe(2);
+        expect(rows[0].mapCellItemCount).toBe(2);
+    });
+
+    it('somme aussi les membres absents de la case', () => {
+        const a: WishlistItem = row(b6a, { groupUid: 'g1', bankCount: 2 });
+        const b: WishlistItem = row(b6b, { groupUid: 'g1', bankCount: 3 });
+        const wishlist = { wishList: [a, b], groups: [{ uid: 'g1', name: 'B6', priority: 0, zoneXPa: 0, depot: 0, count: 5 }] };
+
+        const rows = collapseGroupRows([a], wishlist);
+
+        expect(rows.length).toBe(1);
+        expect(rows[0].group_items.length).toBe(1);
+        expect(rows[0].bankCount).toBe(5);
+    });
+
+    it('laisse les lignes seules et une liste sans groupes inchangées', () => {
+        const a: WishlistItem = row(b6a);
+        const b: WishlistItem = row(b6b, { groupUid: 'g1' });
+
+        expect(collapseGroupRows([a], { wishList: [a] })).toEqual([a]);
+        expect(collapseGroupRows([b], { wishList: [b] })).toEqual([b]);
+    });
+});
+
+describe('displayWishlistInApp — ligne de groupe', () => {
+    it('affiche le nom du groupe et le manquant = stock du groupe − (banque + sacs)', () => {
+        const b6a: MhoItem = { id: 10, img: 'item/b6a.png', label: { fr: 'A' } } as any;
+        const b6b: MhoItem = { id: 11, img: 'item/b6b.png', label: { fr: 'B' } } as any;
+        const base = { count: 10, chestCount: 0, chestCitizens: [], mapCellItemCount: 0, depot: 0, priority: 0, zoneXPa: 0, isWorkshop: true, shouldSignal: false, groupUid: 'g1' };
+        const a: WishlistItem = { ...base, item: b6a, bankCount: 2, bagCount: 1 };
+        const b: WishlistItem = { ...base, item: b6b, bankCount: 3, bagCount: 0 };
+        document.body.innerHTML = '<div class="row-table"></div>';
+        state.mho_parameters = { display_wishlist: true };
+        state.wishlist = { wishList: [a, b], groups: [{ uid: 'g1', name: 'B6', priority: 0, zoneXPa: 0, depot: 0, count: 10 }] };
+
+        displayWishlistInApp();
+
+        const rows = document.querySelectorAll('.row-flex:not(.mho-header)');
+        expect(rows.length).toBe(1);
+        const cells = Array.from(rows[0].querySelectorAll('.cell')) as HTMLElement[];
+        expect(cells[0].textContent).toContain('B6');
+        expect(cells[cells.length - 1].textContent).toBe('4');
     });
 });

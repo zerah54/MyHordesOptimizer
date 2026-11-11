@@ -1,4 +1,10 @@
 export const changelogs: Record<string, string> = {
+    '1.1.65': `
+        [Amélioration] Liste de courses : les groupes d'objets sont affichés sur une seule ligne (compteurs cumulés), et le groupe est indiqué dans le tooltip
+        [Amélioration] Expéditions : si vous n'avez qu'une seule expédition, elle est suivie automatiquement
+
+        [Correctif] Expéditions : meilleure mise en page du sélecteur de tracé
+        `,
     '1.1.64': `
         [Nouveauté] Mon programme : nouvelle fenêtre avec votre expédition, vos chantiers, vos consignes du jour et les évolutions votées ce soir
         [Nouveauté] Expéditions : suivi du tracé dans le désert (direction à prendre, consignes de la case, prochaine case à consignes)
