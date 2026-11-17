@@ -188,10 +188,6 @@
 
                                         .job {
                                             width: 60px;
-
-                                            .mat-mdc-form-field {
-                                                width: 60px;
-                                            }
                                         }
 
                                         .pseudo {
@@ -213,10 +209,10 @@
                                             > div {
                                                 gap: 0;
                                             }
+                                        }
 
-                                            .mat-mdc-form-field {
-                                                width: 60px;
-                                            }
+                                        .job .mat-mdc-form-field, .pdc .mat-mdc-form-field {
+                                            width: 60px;
                                         }
 
                                         .citizen-orders {
@@ -224,10 +220,6 @@
 
                                             .no-order {
                                                 display: none;
-                                            }
-
-                                            .checked {
-                                                text-decoration: line-through !important;
                                             }
                                         }
 
@@ -326,6 +318,7 @@
                                             display: flex;
                                             align-items: center;
                                             gap: 4px;
+                                            order: 2;
                                         }
 
                                         .cell-label {
@@ -339,10 +332,6 @@
                                             content: '';
                                             flex-basis: 100%;
                                             order: 1;
-                                        }
-
-                                        .is-thirsty, .base-ap, .sp, .shoes, .pdc {
-                                            order: 2;
                                         }
 
                                         .heroic, .citizen-orders, .bag {
@@ -375,10 +364,6 @@
                                     color: rgba(0, 0, 0, 0.75);
                                     font-weight: bold;
                                     font-style: italic;
-                                }
-
-                                .checked {
-                                    text-decoration: line-through !important;
                                 }
                             }
 
