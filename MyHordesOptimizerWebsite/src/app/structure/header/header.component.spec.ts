@@ -1,7 +1,9 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 import type { MockInstance } from 'vitest';
 
@@ -9,8 +11,9 @@ import { environment } from '../../../environments/environment';
 import { environment as dev_environment } from '../../../environments/environment.dev';
 import { environment as prod_environment } from '../../../environments/environment.prod';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
+import { PreTownService } from '../../_abstract_model/services/pre-town.service';
 import { Me } from '../../_abstract_model/types/me.class';
-import { setTown, setUser } from '../../_core/utilities/localstorage.util';
+import { setExternalAppId, setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { HeaderComponent } from './header.component';
 import { HeaderService } from './header.service';
 
@@ -197,5 +200,96 @@ describe('HeaderComponent', (): void => {
             expect(localStorage.getItem('external_app_id')).toBe('');
             expect(reloadSpy).toHaveBeenCalled();
         });
+    });
+});
+
+describe('HeaderComponent - pré-villes', (): void => {
+    let unseen: WritableSignal<number>;
+    let refresh: ReturnType<typeof vi.fn>;
+    let fixture: ComponentFixture<HeaderComponent>;
+
+    function login(): void {
+        setExternalAppId('KEY');
+        setUser({ id: 7, username: 'Bob', town_details: {} } as unknown as Me);
+    }
+
+    async function render(): Promise<void> {
+        await TestBed.configureTestingModule({
+            imports: [HeaderComponent],
+            providers: [
+                provideHttpClient(withXhr()),
+                provideHttpClientTesting(),
+                provideRouter([]),
+                { provide: PreTownService, useValue: { unseenPreTownCount: unseen.asReadonly(), refreshUnseenCount: refresh } }
+            ]
+        }).compileComponents();
+        fixture = TestBed.createComponent(HeaderComponent);
+        fixture.detectChanges();
+    }
+
+    function openMenu(): void {
+        (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('button.profil-button')?.click();
+        fixture.detectChanges();
+    }
+
+    function preTownItem(): HTMLElement | null {
+        return document.querySelector<HTMLElement>('a[mat-menu-item][href="/pre-town"]');
+    }
+
+    function visibleBadges(root: ParentNode): HTMLElement[] {
+        return Array.from(root.querySelectorAll<HTMLElement>('.mat-badge-content')).filter((badge: HTMLElement): boolean => !badge.closest('.mat-badge-hidden'));
+    }
+
+    beforeEach((): void => {
+        localStorage.clear();
+        setUser(null);
+        setTown(null);
+        unseen = signal<number>(0);
+        refresh = vi.fn();
+    });
+
+    afterEach((): void => {
+        document.querySelectorAll('.cdk-overlay-container').forEach((overlay: Element): void => overlay.replaceChildren());
+        localStorage.clear();
+        setUser(null);
+        setTown(null);
+    });
+
+    it('propose « Mes pré-villes » dans le menu utilisateur, vers /pre-town', async (): Promise<void> => {
+        login();
+        await render();
+
+        openMenu();
+
+        expect(preTownItem()?.textContent).toContain('Mes pré-villes');
+    });
+
+    it('affiche le compteur sur l\'entrée et sur le bouton de profil, et le masque à 0', async (): Promise<void> => {
+        login();
+        unseen.set(3);
+        await render();
+        openMenu();
+
+        expect(visibleBadges(fixture.nativeElement as HTMLElement).map((badge: HTMLElement): string | undefined => badge.textContent?.trim())).toEqual(['3']);
+        expect(visibleBadges(preTownItem() as HTMLElement).map((badge: HTMLElement): string | undefined => badge.textContent?.trim())).toEqual(['3']);
+
+        unseen.set(0);
+        fixture.detectChanges();
+
+        expect(visibleBadges(fixture.nativeElement as HTMLElement).length).toBe(0);
+        expect(visibleBadges(preTownItem() as HTMLElement).length).toBe(0);
+    });
+
+    it('demande le compteur une fois pour un utilisateur connecté', async (): Promise<void> => {
+        login();
+        await render();
+
+        expect(refresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('ne demande pas le compteur sans utilisateur connecté', async (): Promise<void> => {
+        await render();
+
+        expect(refresh).not.toHaveBeenCalled();
     });
 });

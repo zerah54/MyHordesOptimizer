@@ -229,7 +229,7 @@ namespace MyHordesOptimizerApi.Controllers
         [Authorize]
         public ActionResult<LastUpdateInfoDto> UpdateGhoulStatus([FromQuery] int townId, [FromBody] UpdateGhoulStatusDto request)
         {
-            var lastUpdateInfo = ExternalToolsService.UpdateGhoulStatus(townId, UserInfoProvider.UserId, request);
+            var lastUpdateInfo = ExternalToolsService.UpdateGhoulStatus(townId, request.UserId ?? UserInfoProvider.UserId, request);
             return Ok(lastUpdateInfo);
         }
     }

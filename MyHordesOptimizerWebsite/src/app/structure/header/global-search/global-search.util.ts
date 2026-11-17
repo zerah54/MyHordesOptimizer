@@ -335,6 +335,17 @@ export function pageEntries(routes: readonly SidenavLinks[],
     return entries.filter((entry: GlobalSearchEntry): boolean => entry.folded !== '');
 }
 
+/**
+ * Page hors menu latéral (entrée du menu utilisateur), proposée comme une page du site.
+ * @param {string} path Chemin relatif de la page.
+ * @param {string} label Libellé affiché.
+ * @param {string | null} img Icône relative à `HORDES_IMG_REPO`, `null` sans icône.
+ * @returns {GlobalSearchEntry} Entrée du groupe des pages.
+ */
+export function standalonePageEntry(path: string, label: string, img: string | null): GlobalSearchEntry {
+    return createEntry('pages', path, label, '', img, '', { path, query_params: null });
+}
+
 /** Icône du type de ville, relative à `HORDES_IMG_REPO` (mêmes icônes que l'annuaire). */
 const TOWN_TYPE_IMG: Readonly<Record<TownTypeId, string>> = {
     RNE: 'building/small_falsecity.gif',

@@ -72,6 +72,11 @@
         }
     }
 
+    .pre-town-alias {
+        margin-left: 0.5em;
+        color: var(--mat-sys-on-surface-variant);
+    }
+
     .state-cell {
         display: flex;
         align-items: center;

@@ -20,5 +20,6 @@ export interface TownListItemDTO {
     isChaos: boolean;
     isDevasted: boolean;
     isFinished: boolean;
+    preTownAlias: string | null;
     citizens: TownPublicCitizenDTO[];
 }

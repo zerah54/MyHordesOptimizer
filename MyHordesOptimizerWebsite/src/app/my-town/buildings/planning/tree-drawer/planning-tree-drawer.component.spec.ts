@@ -7,8 +7,8 @@ import { Building } from '../../../../_abstract_model/types/building.class';
 import { TownDetails } from '../../../../_abstract_model/types/town-details.class';
 import { setTown } from '../../../../_core/utilities/localstorage.util';
 import { BuildingProgress } from '../building-progress.util';
-import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool } from '../plan.types';
 import { DayEvaluation } from '../plan-evaluation.util';
+import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool } from '../plan.types';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeCatalog, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { PlanningTreeDrawerComponent } from './planning-tree-drawer.component';
@@ -94,6 +94,25 @@ describe('PlanningTreeDrawerComponent', (): void => {
         expect(names()).toEqual(['Mur', 'Porte']);
         click('unlocked-only');
         expect(names()).toEqual(['Mur', 'Atelier', 'Porte']);
+    });
+
+    it('signale les chantiers temporaires et montre le plan requis à droite du nom', async (): Promise<void> => {
+        const catalog: Building[] = fakeCatalog();
+        Object.assign(catalog.find((building: Building): boolean => building.id === 1) as Building, { temporary: true, rarity: 3 });
+        await render('regular', content(), catalog);
+
+        expect(row(1).querySelector('.label-cell .temporary')).not.toBeNull();
+        expect(row(1).querySelector('.label-cell img.blueprint')?.getAttribute('src')).toContain('item_bplan_r.gif');
+        expect(row(3).querySelector('.label-cell .temporary')).toBeNull();
+        expect(row(3).querySelector('.label-cell img.blueprint')).toBeNull();
+    });
+
+    it('masque les anciennes décharges devenues des évolutions, même si l\'API les renvoie', async (): Promise<void> => {
+        const catalog: Building[] = fakeCatalog();
+        Object.assign(catalog.find((building: Building): boolean => building.id === 1) as Building, { uid: 'small_trash_#03' });
+        await render('regular', content(), catalog);
+
+        expect(names()).toEqual(['Porte']);
     });
 
     it('la case reflète la présence du chantier dans la section ouverte', async (): Promise<void> => {

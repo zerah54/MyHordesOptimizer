@@ -1,5 +1,6 @@
 using FluentAssertions;
 using MyHordesOptimizerApi.Services.Impl.BuildingPlans;
+using MyHordesOptimizerApi.Services.Impl.Locks;
 using System;
 using System.Linq;
 using Xunit;
@@ -18,8 +19,8 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
         }
 
         private static readonly PlanLockKey Key = new(1, 10);
-        private static readonly PlanLockHolder Alice = new("conn-a", 100);
-        private static readonly PlanLockHolder Bob = new("conn-b", 200);
+        private static readonly LockHolder Alice = new("conn-a", 100);
+        private static readonly LockHolder Bob = new("conn-b", 200);
 
         private readonly ManualTimeProvider _time = new();
         private readonly BuildingPlanLockRegistry _registry;
@@ -59,7 +60,7 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
             _registry.TryAcquire(Key, Alice);
 
             _registry.TryAcquire(Key, Bob).Should().Be(Alice);
-            _registry.TryAcquire(Key, new PlanLockHolder("conn-a2", Alice.UserId)).Should().Be(Alice);
+            _registry.TryAcquire(Key, new LockHolder("conn-a2", Alice.UserId)).Should().Be(Alice);
             _registry.IsHeldBy(Key, Alice.ConnectionId).Should().BeTrue();
         }
 

@@ -6,7 +6,8 @@ export type SitePageId =
     | 'directory' | 'directoryCitizens' | 'directoryTowns'
     | 'wiki' | 'wikiItems' | 'wikiRecipes' | 'wikiHeroSkills' | 'wikiRuins' | 'wikiBuildings' | 'wikiMiscellaneousInfo' | 'wikiPrivateTowns'
     | 'tutorials'
-    | 'games' | 'games368Pictos' | 'gamesMinesweeper';
+    | 'games' | 'games368Pictos' | 'gamesMinesweeper'
+    | 'preTowns';
 
 /** Libellé et icône d'une page, partagés par le menu, la recherche globale et l'en-tête de la page. */
 export interface SitePage {
@@ -66,6 +67,7 @@ function sitePages(): Record<SitePageId, SitePage> {
         tutorials: { label: $localize`Tutoriels`, icon: undefined },
         games: { label: $localize`Mini-Jeux`, icon: undefined },
         games368Pictos: { label: $localize`368 Pictos`, icon: undefined },
-        gamesMinesweeper: { label: $localize`Démineur`, icon: undefined }
+        gamesMinesweeper: { label: $localize`Démineur`, icon: undefined },
+        preTowns: { label: $localize`Mes pré-villes`, icon: undefined }
     };
 }

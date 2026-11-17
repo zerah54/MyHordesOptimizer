@@ -18,9 +18,13 @@ import { GlobalService } from './_global.service';
 @Injectable({ providedIn: 'root' })
 export class BuildingPlanService extends GlobalService {
 
-    /** Propositions de la ville, valeurs d'objets et droits de l'utilisateur. */
-    public getPlans(): Observable<BuildingPlansDTO> {
-        return this.get<BuildingPlansDTO>(this.baseUrl()).pipe(map(BuildingPlanService.body));
+    /**
+     * Propositions de la ville, valeurs d'objets et droits de l'utilisateur.
+     * @param {number} [map_id] Ville de la page appelante ; par défaut celle du contexte au moment de l'appel.
+     * @returns {Observable<BuildingPlansDTO>} Propositions, réglages et droits.
+     */
+    public getPlans(map_id?: number): Observable<BuildingPlansDTO> {
+        return this.get<BuildingPlansDTO>(this.baseUrl(map_id)).pipe(map(BuildingPlanService.body));
     }
 
     /** Niveaux de maison et améliorations (référentiel statique du jeu). */
@@ -42,21 +46,23 @@ export class BuildingPlanService extends GlobalService {
     /**
      * État synchronisé des chantiers et défense de la ville.
      * @param {boolean} silent Sans loader ni message d'erreur (appel d'appoint dont l'échec est toléré).
+     * @param {number} [map_id] Ville de la page appelante ; par défaut celle du contexte au moment de l'appel.
      * @returns {Observable<BuildingPlanStateDTO>} État.
      */
-    public getState(silent: boolean = false): Observable<BuildingPlanStateDTO> {
-        return this.get<BuildingPlanStateDTO>(`${this.baseUrl()}/state`, silent, undefined, silent).pipe(map(BuildingPlanService.body));
+    public getState(silent: boolean = false, map_id?: number): Observable<BuildingPlanStateDTO> {
+        return this.get<BuildingPlanStateDTO>(`${this.baseUrl(map_id)}/state`, silent, undefined, silent).pipe(map(BuildingPlanService.body));
     }
 
     /**
      * Crée (sans `id`) ou modifie une proposition. Les 409 et 423 d'une modification sont sans message : le store affiche sa bannière.
      * @param {BuildingPlanRequestDTO} request Proposition ; `version` obligatoire pour une modification.
      * @param {string | null} connection_id Connexion au hub de l'appelant (verrou, exclusion de la diffusion).
+     * @param {number} [map_id] Ville de la page appelante : l'enregistrement de sortie part après un changement de contexte.
      * @returns {Observable<BuildingPlanDTO>} Proposition enregistrée.
      */
-    public savePlan(request: BuildingPlanRequestDTO, connection_id: string | null = null): Observable<BuildingPlanDTO> {
+    public savePlan(request: BuildingPlanRequestDTO, connection_id: string | null = null, map_id?: number): Observable<BuildingPlanDTO> {
         const silent_status: readonly number[] | null = request.id !== null && request.id !== undefined ? [409, 423] : null;
-        return this.put<BuildingPlanDTO>(`${this.baseUrl()}/plans`, request, undefined, false, silent_status, BuildingPlanService.connectionHeaders(connection_id))
+        return this.put<BuildingPlanDTO>(`${this.baseUrl(map_id)}/plans`, request, undefined, false, silent_status, BuildingPlanService.connectionHeaders(connection_id))
             .pipe(map(BuildingPlanService.body));
     }
 
@@ -64,20 +70,22 @@ export class BuildingPlanService extends GlobalService {
      * Supprime une proposition.
      * @param {number} plan_id Identifiant de la proposition.
      * @param {string | null} connection_id Connexion au hub de l'appelant (verrou, exclusion de la diffusion).
+     * @param {number} [map_id] Ville de la page appelante ; par défaut celle du contexte au moment de l'appel.
      * @returns {Observable<void>} Complète une fois la proposition supprimée.
      */
-    public deletePlan(plan_id: number, connection_id: string | null = null): Observable<void> {
-        return this.delete<void>(`${this.baseUrl()}/plans/${plan_id}`, BuildingPlanService.connectionHeaders(connection_id)).pipe(map((): void => undefined));
+    public deletePlan(plan_id: number, connection_id: string | null = null, map_id?: number): Observable<void> {
+        return this.delete<void>(`${this.baseUrl(map_id)}/plans/${plan_id}`, BuildingPlanService.connectionHeaders(connection_id)).pipe(map((): void => undefined));
     }
 
     /**
      * Rend une proposition effective pour son jour.
      * @param {number} plan_id Identifiant de la proposition.
      * @param {string | null} connection_id Connexion au hub de l'appelant (exclue de la diffusion).
+     * @param {number} [map_id] Ville de la page appelante ; par défaut celle du contexte au moment de l'appel.
      * @returns {Observable<BuildingPlanDTO>} Proposition devenue effective.
      */
-    public setEffective(plan_id: number, connection_id: string | null = null): Observable<BuildingPlanDTO> {
-        return this.put<BuildingPlanDTO>(`${this.baseUrl()}/plans/${plan_id}/effective`, {}, undefined, false, null, BuildingPlanService.connectionHeaders(connection_id))
+    public setEffective(plan_id: number, connection_id: string | null = null, map_id?: number): Observable<BuildingPlanDTO> {
+        return this.put<BuildingPlanDTO>(`${this.baseUrl(map_id)}/plans/${plan_id}/effective`, {}, undefined, false, null, BuildingPlanService.connectionHeaders(connection_id))
             .pipe(map(BuildingPlanService.body));
     }
 
@@ -85,10 +93,11 @@ export class BuildingPlanService extends GlobalService {
      * Enregistre la valeur en PA des objets.
      * @param {BuildingPlanSettingsRequestDTO} request Valeurs et version lue.
      * @param {string | null} connection_id Connexion au hub de l'appelant (exclue de la diffusion).
+     * @param {number} [map_id] Ville de la page appelante ; par défaut celle du contexte au moment de l'appel.
      * @returns {Observable<BuildingPlansDTO>} Plans et réglages à jour.
      */
-    public saveSettings(request: BuildingPlanSettingsRequestDTO, connection_id: string | null = null): Observable<BuildingPlansDTO> {
-        return this.put<BuildingPlansDTO>(`${this.baseUrl()}/settings`, request, undefined, false, null, BuildingPlanService.connectionHeaders(connection_id))
+    public saveSettings(request: BuildingPlanSettingsRequestDTO, connection_id: string | null = null, map_id?: number): Observable<BuildingPlansDTO> {
+        return this.put<BuildingPlansDTO>(`${this.baseUrl(map_id)}/settings`, request, undefined, false, null, BuildingPlanService.connectionHeaders(connection_id))
             .pipe(map(BuildingPlanService.body));
     }
 
@@ -101,8 +110,13 @@ export class BuildingPlanService extends GlobalService {
         return connection_id !== null && connection_id !== '' ? { 'Mho-Hub-Connection': connection_id } : {};
     }
 
-    private baseUrl(): string {
-        return `${this.API_URL}/BuildingPlans/${getTown()?.town_id}`;
+    /**
+     * URL des plans d'une ville.
+     * @param {number} [map_id] Ville visée ; par défaut celle du contexte au moment de l'appel.
+     * @returns {string} URL de base.
+     */
+    private baseUrl(map_id: number | undefined = getTown()?.town_id): string {
+        return `${this.API_URL}/BuildingPlans/${map_id}`;
     }
 
     private static body<T>(response: HttpResponse<T>): T {

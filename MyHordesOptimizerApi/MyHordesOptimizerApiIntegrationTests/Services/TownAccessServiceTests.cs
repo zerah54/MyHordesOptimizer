@@ -50,7 +50,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         [Fact]
         public void EnsureCanWriteTown_VilleDuJeton_Accepte()
         {
-            var townId = new Random().Next(1, int.MaxValue);
+            var townId = new Random().Next(1, PreTownIds.Offset);
 
             System.Action act = () => NewService(userId: 0, tokenMapId: townId).EnsureCanWriteTown(townId, townId);
 
@@ -60,7 +60,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         [Fact]
         public void EnsureCanWriteTown_VilleProvisoireDuJeton_Accepte()
         {
-            var mapId = new Random().Next(1, int.MaxValue);
+            var mapId = new Random().Next(1, PreTownIds.Offset);
 
             System.Action act = () => NewService(userId: 0, tokenMapId: mapId).EnsureCanWriteTown(-mapId, mapId: null);
 

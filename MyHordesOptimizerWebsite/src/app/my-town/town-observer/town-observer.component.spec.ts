@@ -45,7 +45,7 @@ describe('TownObserverComponent', (): void => {
         return {
             id: 1, mapId: 42, name: 'Ma ville', width: 10, height: 10, townType: null,
             season: null, phase: null, language: null, score: null, isChaos: false,
-            isDevasted: false, isFinished: false, citizens: [], ...overrides
+            isDevasted: false, isFinished: false, preTownAlias: null, citizens: [], ...overrides
         };
     }
 

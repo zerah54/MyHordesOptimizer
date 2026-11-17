@@ -119,7 +119,7 @@ export class MapCellOrdersComponent {
     }));
 
     protected toggleDone(entry: CellOrderEntry, done: boolean): Promise<void> {
-        return this.order_editor.toggleDone(entry.order, done);
+        return this.order_editor.toggleDone(entry.order, done, this.citizens());
     }
 
     protected add(part: ExpeditionPart): void {

@@ -1,8 +1,8 @@
 import { Item } from '../../../_abstract_model/types/item.class';
 import { StepResult } from './building-progress.util';
-import { PlanStepDTO } from './plan.types';
 import { HomeLevelRef } from './plan-evaluation.util';
-import { itemIcon, itemLabel, ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
+import { PlanStepDTO } from './plan.types';
+import { itemIcon, itemLabel, ratioLabel, stepLabel, taskIcon, taskLabel } from './planning-labels.util';
 
 describe('planning-labels.util', (): void => {
     const items: Item[] = [Object.assign(new Item(), { id: 5, uid: 'wood', label: { fr: 'Bois', en: 'Wood' }, img: 'item/item_wood.gif' })];
@@ -67,5 +67,22 @@ describe('taskLabel', (): void => {
     it('amélioration au format libre et maison : inchangés', (): void => {
         expect(taskLabel({ kind: 'homeUpgrade', label: 'Rideau', pa: 4 }, homes)).toBe('Rideau');
         expect(taskLabel({ kind: 'home', level: 3, pa: 4 }, homes)).toBe('Taudis');
+    });
+});
+
+describe('taskIcon', (): void => {
+    it('niveau de maison : icône de l\'habitation visée', (): void => {
+        expect(taskIcon({ kind: 'home', level: 2, pa: 4 })).toBe('home/home_lv2.gif');
+        expect(taskIcon({ kind: 'home', pa: 0 })).toBe('home/home_lv0.gif');
+    });
+
+    it('amélioration : icône de l\'amélioration ; action : icône de l\'action', (): void => {
+        expect(taskIcon({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 1, pa: 6 })).toBe('home/kitchen.gif');
+        expect(taskIcon({ kind: 'action', ref: 'trash', pa: 1 })).toBe('emotes/trash.gif');
+    });
+
+    it('consigne libre ou référence inconnue : aucune icône', (): void => {
+        expect(taskIcon({ kind: 'free', label: 'Veiller', pa: 0 })).toBe('');
+        expect(taskIcon({ kind: 'action', ref: 'inconnue', pa: 0 })).toBe('');
     });
 });

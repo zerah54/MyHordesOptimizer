@@ -26,12 +26,23 @@ export class TownContextService {
     private readonly _observed_town_name: WritableSignal<string | null> = signal<string | null>(null);
     private readonly _observed_access: WritableSignal<MapRouteAccess | null> = signal<MapRouteAccess | null>(null);
 
+    /** `null` hors pré-ville ; sinon `true` tant que la pré-ville est modifiable, `false` une fois liée (archive gelée). */
+    private readonly _pre_town_editable: WritableSignal<boolean | null> = signal<boolean | null>(null);
+    private readonly _simulated_citizens: WritableSignal<number | null> = signal<number | null>(null);
+
+    /** Nombre de citoyens simulés de la pré-ville affichée ; `null` hors pré-ville. */
+    public readonly simulatedCitizens: Signal<number | null> = this._simulated_citizens.asReadonly();
+
     public readonly observedTown: Signal<TownDetails | null> = this._observed_town.asReadonly();
 
     /** Nom de la ville observée (absent de TownDetails), pour l'affichage dans le menu/bandeau. */
     public readonly observedTownName: Signal<string | null> = this._observed_town_name.asReadonly();
 
-    public readonly isReadonly: Signal<boolean> = computed(() => this._observed_town() !== null);
+    /** Le contexte est celui d'une pré-ville (pseudo-mapId). */
+    public readonly isPreTown: Signal<boolean> = computed((): boolean => this._pre_town_editable() !== null);
+
+    /** Une pré-ville non liée se modifie comme sa propre ville ; liée, elle est gelée comme une ville observée. */
+    public readonly isReadonly: Signal<boolean> = computed((): boolean => this._observed_town() !== null && this._pre_town_editable() !== true);
 
     /** Citoyen de la ville affichée : la sienne, ou la ville observée dont il est (ou a été) citoyen. */
     public readonly isCitizen: Signal<boolean> = computed((): boolean => !this.isReadonly() || this._observed_access()?.is_citizen === true);
@@ -59,7 +70,25 @@ export class TownContextService {
         this._observed_access.set(access);
     }
 
+    /**
+     * Marque le contexte observé comme celui d'une pré-ville.
+     * @param {boolean} editable Vrai tant que la pré-ville n'est pas liée.
+     */
+    public setPreTownEditable(editable: boolean): void {
+        this._pre_town_editable.set(editable);
+    }
+
+    /**
+     * Pose le nombre de citoyens simulés de la pré-ville affichée.
+     * @param {number} count Nombre de citoyens simulés.
+     */
+    public setSimulatedCitizens(count: number): void {
+        this._simulated_citizens.set(count);
+    }
+
     public clear(): void {
+        this._pre_town_editable.set(null);
+        this._simulated_citizens.set(null);
         setObservedTown(null);
         this._observed_town.set(null);
         this._observed_town_name.set(null);

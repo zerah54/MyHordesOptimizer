@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import type { Mock } from 'vitest';
 
 import { SnackbarService } from '../../_core/services/snackbar.service';
+import { TownContextService } from '../../_core/services/town-context.service';
 import { setObservedTown, setTown } from '../../_core/utilities/localstorage.util';
 import { BuildingPlanDTO, BuildingPlansDTO } from '../../my-town/buildings/planning/plan.types';
 import { AuthenticationService } from '../services/authentication.service';
@@ -271,5 +272,115 @@ describe('RealtimeBuildingPlansService', () => {
         await flush();
 
         expect(reconnections).toBe(1);
+    });
+
+    describe('pré-ville (UseTown)', () => {
+        const PRE_TOWN_MAP_ID: number = 1_000_000_005;
+        let context: TownContextService;
+
+        function enterPreTown(editable: boolean): void {
+            context.setObservedTown(Object.assign(new TownDetails(), { town_id: PRE_TOWN_MAP_ID }), 'PV');
+            context.setPreTownEditable(editable);
+        }
+
+        function methods(): string[] {
+            return invokeHub().mock.calls.map((call: unknown[]): string => `${call[0]}${call[1] === undefined ? '' : ':' + String(call[1])}`);
+        }
+
+        beforeEach(() => {
+            context = TestBed.inject(TownContextService);
+            context.clear();
+            invokeHub().mockClear();
+        });
+
+        afterEach(() => context.clear());
+
+        it('sans pré-ville : aucun UseTown', async () => {
+            await service.ensureTown();
+            await service.joinPresence();
+            await service.getPlanLocks();
+
+            expect(methods().some((m: string): boolean => m.startsWith('UseTown'))).toBe(false);
+        });
+
+        it('pré-ville modifiable : UseTown(pseudo-mapId) précède JoinPresence', async () => {
+            enterPreTown(true);
+            await service.joinPresence();
+
+            expect(methods()).toEqual([`UseTown:${PRE_TOWN_MAP_ID}`, 'JoinPresence']);
+        });
+
+        it('UseTown n\'est pas répété sur la même connexion', async () => {
+            enterPreTown(true);
+            await service.joinPresence();
+            await service.getPlanLocks();
+
+            expect(methods().filter((m: string): boolean => m.startsWith('UseTown')).length).toBe(1);
+        });
+
+        it('UseTown refusé : la présence n\'est pas déclarée sur la ville du jeton', async () => {
+            enterPreTown(true);
+            invokeHub().mockRejectedValueOnce(new Error('HubException: Forbidden'));
+
+            await expect(service.joinPresence()).rejects.toThrow();
+            expect(methods()).toEqual([`UseTown:${PRE_TOWN_MAP_ID}`]);
+        });
+
+        it('après une reconnexion (nouvelle connexion), UseTown est rejoué avant la présence', async () => {
+            enterPreTown(true);
+            await service.joinPresence();
+            invokeHub().mockClear();
+            vi.spyOn(hub, 'connectionId', 'get').mockReturnValue('conn-2');
+
+            (<Handler>hub.reconnected)();
+            await flush();
+
+            expect(methods()).toEqual([`UseTown:${PRE_TOWN_MAP_ID}`, 'JoinPresence']);
+        });
+
+        it('pré-ville liée (gelée) : ensureTown ne lit ni n\'écrit les verrous, et getPlanLocks ne contacte pas le hub', async () => {
+            enterPreTown(false);
+            await service.ensureTown();
+
+            expect(await service.getPlanLocks()).toEqual([]);
+            expect(methods()).toEqual([`UseTown:${PRE_TOWN_MAP_ID}`]);
+        });
+
+        it('pré-ville gelée : un UseTown refusé ne lève pas dans ensureTown (pas de boucle d\'erreurs)', async () => {
+            enterPreTown(false);
+            invokeHub().mockRejectedValueOnce(new Error('HubException: Forbidden'));
+            vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+            await expect(service.ensureTown()).resolves.toBeUndefined();
+        });
+
+        it('retour à la ville du jeton : UseTown(ville du jeton) restaure le défaut', async () => {
+            enterPreTown(true);
+            await service.joinPresence();
+            invokeHub().mockClear();
+            context.clear();
+
+            await service.ensureTown();
+
+            expect(methods()).toEqual(['UseTown:42']);
+        });
+
+        it('un changement de route pendant un UseTown en cours ne laisse pas le hub sur la mauvaise ville', async () => {
+            enterPreTown(true);
+            let release_first!: () => void;
+            invokeHub().mockImplementationOnce((): Promise<void> => new Promise<void>((resolve: () => void): void => {
+                release_first = resolve;
+            }));
+            const first: Promise<void> = service.ensureTown();
+            await flush();
+            context.clear();
+            const second: Promise<void> = service.ensureTown();
+            await flush();
+
+            release_first();
+            await Promise.all([first, second]);
+
+            expect(methods()).toEqual([`UseTown:${PRE_TOWN_MAP_ID}`, 'UseTown:42']);
+        });
     });
 });

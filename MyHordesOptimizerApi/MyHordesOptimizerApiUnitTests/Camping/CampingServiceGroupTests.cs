@@ -268,6 +268,7 @@ namespace MyHordesOptimizerApiUnitTests.Camping
             public Dictionary<string, Newtonsoft.Json.Linq.JArray> GetResultGroups() => throw new NotSupportedException();
             public Dictionary<string, MyHordesMetaResultCodeModel> GetMetaRequirements() => throw new NotSupportedException();
             public Dictionary<string, string> GetItemsNightwatch() => throw new NotSupportedException();
+            public MyHordesOptimizerApi.Data.Nightwatch.NightwatchReferentialCodeModel GetNightwatchReferential() => throw new NotSupportedException();
         }
     }
 }

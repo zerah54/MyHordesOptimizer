@@ -31,4 +31,13 @@ describe('buildSidenavLinks', (): void => {
 
         expect(entry?.authorized()).toBe(false);
     });
+
+    it('ne propose plus « Mes pré-villes » dans le menu latéral (il vit dans le menu utilisateur)', (): void => {
+        const links: SidenavLinks[] = buildSidenavLinks(
+            { isReadonly: (): boolean => false } as unknown as TownContextService,
+            { visible: (): boolean => true } as unknown as ProgramMenuService
+        );
+
+        expect(links.map((link: SidenavLinks): string | undefined => link.path)).not.toContain('pre-town');
+    });
 });

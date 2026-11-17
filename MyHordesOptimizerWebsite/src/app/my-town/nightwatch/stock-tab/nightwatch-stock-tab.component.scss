@@ -1,0 +1,77 @@
+@use '../nightwatch-shared' as shared;
+
+:host {
+    display: block;
+    padding-top: 1em;
+
+    @include shared.kpis;
+    @include shared.compact-field;
+
+    .stock-tab {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+    }
+
+    .table-scroll {
+        overflow: auto;
+    }
+
+    table.summary {
+        width: 100%;
+
+        tr.missing .remaining {
+            color: var(--mho-danger);
+            font-weight: 600;
+        }
+    }
+
+    .manual {
+        width: 6rem;
+    }
+
+    // Taille NON fixée : sprites pixel art.
+    .item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4em;
+    }
+
+    .item-icon {
+        flex: 0 0 auto;
+    }
+
+    .chest-date {
+        display: block;
+        font-size: 0.85em;
+        opacity: 0.85;
+    }
+
+    .badges {
+        display: block;
+    }
+
+    .cost {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        h3 {
+            margin: 0;
+        }
+    }
+
+    .buildings {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        h3 {
+            margin: 0;
+        }
+    }
+
+    .empty {
+        opacity: 0.85;
+    }
+}

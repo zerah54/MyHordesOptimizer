@@ -2,6 +2,31 @@
     display: contents;
 
     .mho-nightwatch {
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 2em;
+        }
 
+        .past-day,
+        .load-failed {
+            opacity: 0.85;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin: 0.5em 0;
+        }
+
+        .banner {
+            display: flex;
+            align-items: center;
+            gap: 0.75em;
+            margin: 0.5em 0;
+            padding: 0.5em 0.75em;
+            border: 1px solid var(--mho-accent);
+            border-radius: 4px;
+        }
     }
 }

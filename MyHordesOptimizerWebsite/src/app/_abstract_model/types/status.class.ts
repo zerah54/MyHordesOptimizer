@@ -8,9 +8,10 @@ export class Status extends CommonModel<StatusDTO> {
     private content!: Dictionary<boolean>;
     public icons!: StatusEnum[];
     public update_info!: UpdateInfo;
-    private is_ghoul!: boolean;
+    /** Goule : saisie à la main depuis la liste des citoyens, jamais relevée par l'addon. */
+    public is_ghoul!: boolean;
     private ghoul_voracity!: number;
-    private ghoul_status_update_info!: UpdateInfo;
+    public ghoul_status_update_info!: UpdateInfo;
 
     public constructor(dto?: StatusDTO) {
         super();
@@ -31,7 +32,9 @@ export class Status extends CommonModel<StatusDTO> {
     protected dtoToModel(dto?: StatusDTO): void {
         if (dto) {
             this.content = dto.content;
-            this.icons = dto.icons ? <StatusEnum[]>dto.icons.filter((icon: string) => icon !== 'ghoul').map((icon: string) => StatusEnum.getByKey(icon)) : [];
+            const icons: StatusEnum[] = dto.icons ? <StatusEnum[]>dto.icons.filter((icon: string) => icon !== StatusEnum.GHOUL.key).map((icon: string) => StatusEnum.getByKey(icon)) : [];
+            // « Goule » suit l'état renseigné à la main, pas la liste d'icônes du serveur.
+            this.icons = dto.isGhoul === true ? [...icons, StatusEnum.GHOUL] : icons;
             this.update_info = new UpdateInfo(dto.lastUpdateInfo);
             this.ghoul_status_update_info = new UpdateInfo(dto.ghoulStatusLastUpdateInfo);
             this.ghoul_voracity = dto.ghoulVoracity;

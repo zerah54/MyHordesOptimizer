@@ -23,6 +23,12 @@
             flex-direction: column;
             gap: 0.5em;
         }
+
+        .lock-label {
+            margin: 0 0 0.5em;
+            font-style: italic;
+            color: var(--mho-text-muted);
+        }
     }
 
 

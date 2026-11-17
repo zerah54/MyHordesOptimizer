@@ -41,6 +41,49 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
             BuildingPlanValidator.SerializeContent(new BuildingPlanContentDto()).Should().Contain("\"BasePa\":19");
         }
 
+        public static IEnumerable<object[]> InvalidSimpleBudgetContents()
+        {
+            yield return new object[] { new BuildingPlanContentDto { BudgetMode = "autre" } };
+            yield return new object[] { new BuildingPlanContentDto { BasePaTier = "b8" } };
+            yield return new object[] { new BuildingPlanContentDto { ExpeditionRab = -1 } };
+            yield return new object[] { new BuildingPlanContentDto { ExpeditionRab = 100001 } };
+            yield return new object[] { new BuildingPlanContentDto { ValidatedBudget = new ValidatedBudgetDto { Pools = { { "autre", new ValidatedPoolDto() } } } } };
+            yield return new object[] { new BuildingPlanContentDto { ValidatedBudget = new ValidatedBudgetDto { Steps = { new ValidatedStepDto { BuildingId = 1, Kind = "instruction" } } } } };
+            yield return new object[] { new BuildingPlanContentDto { ValidatedBudget = new ValidatedBudgetDto { Steps = { new ValidatedStepDto { BuildingId = 1, Kind = "build", Pool = "autre" } } } } };
+            yield return new object[] { new BuildingPlanContentDto { ValidatedBudget = new ValidatedBudgetDto { Steps = { new ValidatedStepDto { BuildingId = 1, Kind = "build", Invested = -1 } } } } };
+            yield return new object[] { new BuildingPlanContentDto { ValidatedBudget = new ValidatedBudgetDto { Steps = { new ValidatedStepDto { BuildingId = 1, Kind = "build", Invested = 100001 } } } } };
+            yield return new object[] { new BuildingPlanContentDto { ValidatedBudget = new ValidatedBudgetDto { Steps = { new ValidatedStepDto { BuildingId = 1, Kind = "repair", Life = -1 } } } } };
+            yield return new object[] { new BuildingPlanContentDto { ValidatedBudget = new ValidatedBudgetDto { Steps = { new ValidatedStepDto { BuildingId = 1, Kind = "repair", Life = 100001 } } } } };
+            yield return new object[] { new BuildingPlanContentDto { ValidatedBudget = new ValidatedBudgetDto { Steps = Enumerable.Range(0, 501).Select(i => new ValidatedStepDto { BuildingId = i, Kind = "build" }).ToList() } } };
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidSimpleBudgetContents))]
+        public void SerializeContent_RejectsInvalidSimpleBudgetFields(BuildingPlanContentDto content)
+        {
+            var act = () => BuildingPlanValidator.SerializeContent(content);
+            act.Should().Throw<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public void SerializeContent_AcceptsValidSimpleBudgetFields()
+        {
+            var content = new BuildingPlanContentDto
+            {
+                BudgetMode = "simple",
+                BasePaTier = "b6",
+                ExpeditionRab = 100000,
+                ValidatedBudget = new ValidatedBudgetDto
+                {
+                    ValidatedAt = "2026-11-13T10:00:00Z",
+                    Pools = { { "banned", new ValidatedPoolDto { Budget = 1, Cost = 1 } }, { "regular", new ValidatedPoolDto() } },
+                    Steps = { new ValidatedStepDto { BuildingId = 1, Kind = "repair", Pool = "banned", PaCost = 5, Invested = 100000, Life = 100000 } }
+                }
+            };
+            var act = () => BuildingPlanValidator.SerializeContent(content);
+            act.Should().NotThrow();
+        }
+
         [Fact]
         public void SerializeContent_RejectsNull()
         {

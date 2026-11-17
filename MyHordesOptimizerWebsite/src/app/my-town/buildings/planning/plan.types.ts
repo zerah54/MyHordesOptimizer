@@ -1,6 +1,12 @@
 /** Poche de budget : citoyens bannis ou non-bannis. */
 export type PlanPool = 'banned' | 'regular';
 
+/** Mode de budget d'une proposition : simple (ouvriers + reste d'expédition) ou détaillé (PA citoyen par citoyen). */
+export type PlanBudgetMode = 'simple' | 'detailed';
+
+/** Palier de PA de base du mode simple : repas à 6 PA (b6) ou à 7 PA (b7). */
+export type BasePaTier = 'b6' | 'b7';
+
 /** Nature d'une étape : construire un chantier ou le réparer. */
 export type PlanStepKind = 'build' | 'repair';
 
@@ -49,6 +55,19 @@ export interface PlanCitizenDTO {
     userId: number;
     basePaOverride?: number | null;
     tasks: PlanTaskDTO[];
+    /** Mode simple : le citoyen travaille sur les chantiers. */
+    worker?: boolean;
+    /** Goule simulée dans ce plan (malus de PA) ; absent ou nul = état renseigné dans la page citoyens. */
+    ghoul?: boolean | null;
+    /** Bannissement simulé dans ce plan ; absent ou nul = état réel du citoyen. */
+    banned?: boolean | null;
+}
+
+/** Budget et chantiers figés à la validation d'une proposition. */
+export interface ValidatedBudgetDTO {
+    validatedAt: string;
+    pools: Record<PlanPool, { budget: number; cost: number }>;
+    steps: { buildingId: number; kind: PlanStepKind; pool: PlanPool; paCost: number; invested: number; life?: number }[];
 }
 
 /** Ligne de budget de la ville : positive = PA ajoutés, négative = PA retirés. */
@@ -91,6 +110,14 @@ export interface BuildingPlanContentDTO {
     /** Gestion des bannis activée à la main sur cette proposition. */
     manageBanned: boolean;
     basePa: number;
+    /** Mode de budget ; absent = détaillé. */
+    budgetMode?: PlanBudgetMode | null;
+    /** Palier de PA de base du mode simple. */
+    basePaTier?: BasePaTier | null;
+    /** Mode simple : PA restants des expéditions, ajoutés au budget de la poche normale. */
+    expeditionRab?: number;
+    /** Mode simple : budget figé à la validation. */
+    validatedBudget?: ValidatedBudgetDTO | null;
     citizens: PlanCitizenDTO[];
     townLines: PlanTownLineDTO[];
     programs: PlanProgramsDTO;
@@ -184,6 +211,15 @@ export interface TownDefenseStateDTO {
 export interface BuildingPlanStateDTO {
     buildings: TownBuildingStateDTO[];
     defense: TownDefenseStateDTO | null;
+}
+
+/**
+ * Mode de budget d'une proposition.
+ * @param {BuildingPlanContentDTO} content Contenu de la proposition.
+ * @returns {PlanBudgetMode} Mode du contenu ; détaillé si absent.
+ */
+export function budgetModeOf(content: BuildingPlanContentDTO): PlanBudgetMode {
+    return content.budgetMode === 'simple' ? 'simple' : 'detailed';
 }
 
 /**

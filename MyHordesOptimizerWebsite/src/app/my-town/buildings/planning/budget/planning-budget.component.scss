@@ -30,4 +30,26 @@
         color: var(--mho-accent);
         font-weight: 600;
     }
+
+    .validation {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75em;
+        margin-bottom: 1em;
+    }
+
+    table.diff td {
+        text-align: right;
+
+        &.negative {
+            color: var(--mho-accent);
+            font-weight: 600;
+        }
+    }
+
+    ul.diff-steps {
+        margin: 0 0 1em;
+        padding-left: 1.25em;
+    }
 }

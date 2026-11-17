@@ -86,7 +86,12 @@
                         </mat-form-field>
                     </th>
                     <td *matCellDef="let row; table: table" mat-cell>
-                        <mho-deferred-cell>{{ row.name ?? '—' }}</mho-deferred-cell>
+                        <mho-deferred-cell>
+                            {{ row.name ?? '—' }}
+                            @if (row.preTownAlias) {
+                                <span class="pre-town-alias">{{ row.preTownAlias }}</span>
+                            }
+                        </mho-deferred-cell>
                     </td>
                 </ng-container>
 

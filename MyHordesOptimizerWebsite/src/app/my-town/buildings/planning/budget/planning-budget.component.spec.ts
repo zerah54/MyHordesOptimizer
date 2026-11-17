@@ -125,6 +125,7 @@ describe('PlanningBudgetComponent', (): void => {
     it('lecture seule : les lignes de la ville ne se modifient pas', async (): Promise<void> => {
         await render();
         fake.can_edit.set(false);
+        fake.can_validate_budget.set(false);
         fixture.detectChanges();
         await fixture.whenStable();
         fixture.detectChanges();
@@ -132,5 +133,79 @@ describe('PlanningBudgetComponent', (): void => {
         const controls: HTMLElement[] = Array.from(root().querySelectorAll<HTMLElement>('button, input'));
         expect(controls.length).toBeGreaterThan(0);
         expect(controls.every((control: HTMLElement): boolean => (control as HTMLButtonElement).disabled)).toBe(true);
+    });
+
+    it('modèles de lignes ajoutés comme lignes ordinaires (mode simple)', async (): Promise<void> => {
+        await render({ ...content(), budgetMode: 'simple' });
+        const internals: { addPreset(preset: 'guitar' | 'dice' | 'cs'): void } = fixture.componentInstance as unknown as { addPreset(preset: 'guitar' | 'dice' | 'cs'): void };
+
+        internals.addPreset('guitar');
+        internals.addPreset('dice');
+        internals.addPreset('cs');
+
+        expect(fake.draft()?.townLines.slice(1)).toEqual([
+            { label: 'Guitare artisanale', pool: 'regular', pa: 0 },
+            { label: 'Dés / Cartes', pool: 'regular', pa: 0 },
+            { label: 'Coin sieste', pool: 'regular', pa: 0 }
+        ]);
+    });
+
+    it('le bouton de modèles n\'existe qu\'en mode simple et se désactive en lecture seule', async (): Promise<void> => {
+        await render();
+        expect(root().querySelector('[data-action="add-preset"]')).toBeNull();
+
+        fake.draft.set({ ...content(), budgetMode: 'simple' });
+        fixture.detectChanges();
+        expect(root().querySelector<HTMLButtonElement>('[data-action="add-preset"]')?.disabled).toBe(false);
+
+        fake.can_edit.set(false);
+        fixture.detectChanges();
+        expect(root().querySelector<HTMLButtonElement>('[data-action="add-preset"]')?.disabled).toBe(true);
+    });
+
+    describe('budget validé', (): void => {
+        it('le bouton est inactif sans possibilité de valider, et déclenche la validation sinon', async (): Promise<void> => {
+            await render();
+            const button: HTMLButtonElement = root().querySelector<HTMLButtonElement>('[data-action="validate-budget"]') as HTMLButtonElement;
+            expect(button.disabled).toBe(false);
+            expect(button.textContent?.trim()).toBe('Valider le budget');
+            button.click();
+            expect(fake.actions['validateBudget']).toHaveBeenCalledTimes(1);
+
+            fake.can_validate_budget.set(false);
+            fixture.detectChanges();
+            expect(root().querySelector<HTMLButtonElement>('[data-action="validate-budget"]')?.disabled).toBe(true);
+        });
+
+        it('le libellé devient « Revalider » et la date s\'affiche une fois validé ; pas d\'écart sans diff', async (): Promise<void> => {
+            await render({ ...content(), validatedBudget: { validatedAt: '2026-11-13T10:00:00Z', pools: { banned: { budget: 0, cost: 0 }, regular: { budget: 0, cost: 0 } }, steps: [] } });
+
+            expect(root().querySelector('[data-action="validate-budget"]')?.textContent?.trim()).toBe('Revalider le budget');
+            expect(root().querySelector('[data-field="validated-at"]')).not.toBeNull();
+            expect(root().querySelector('[data-section="budget-diff"]')).toBeNull();
+        });
+
+        it('affiche les écarts par poche et la liste des étapes ajoutées, retirées et modifiées', async (): Promise<void> => {
+            await render();
+            fake.budget_diff.set({
+                pools: { banned: { budget: 0, cost: 0, remaining: 0 }, regular: { budget: 2, cost: 30, remaining: -28 } },
+                steps: [
+                    { buildingId: 1, kind: 'build', change: 'added', delta: 30 },
+                    { buildingId: 2, kind: 'build', change: 'removed', delta: -20 },
+                    { buildingId: 3, kind: 'repair', change: 'changed', delta: 5 }
+                ]
+            });
+            fixture.detectChanges();
+
+            const text = (selector: string): string | undefined => root().querySelector(selector)?.textContent?.trim();
+            expect(text('[data-section="budget-diff"] tr[data-pool="regular"] [data-diff-field="budget"]')).toContain('+2');
+            expect(text('[data-section="budget-diff"] tr[data-pool="regular"] [data-diff-field="cost"]')).toContain('+30');
+            expect(text('[data-section="budget-diff"] tr[data-pool="regular"] [data-diff-field="remaining"]')).toContain('-28');
+            expect(root().querySelector('tr[data-pool="regular"] [data-diff-field="remaining"]')?.classList).toContain('negative');
+            expect(text('[data-diff="added"]')).toContain('Mur');
+            expect(text('[data-diff="removed"]')).toContain('Atelier');
+            expect(text('[data-diff="changed"]')).toContain('Porte');
+            expect(text('[data-diff="removed"]')).toContain('-20');
+        });
     });
 });

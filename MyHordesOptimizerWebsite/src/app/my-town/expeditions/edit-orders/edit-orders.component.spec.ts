@@ -1,6 +1,6 @@
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
@@ -41,6 +41,45 @@ describe('EditOrdersComponent', (): void => {
         expect(fixture.nativeElement.querySelector('angular-editor')).toBeNull();
         const editable: HTMLElement | null = fixture.nativeElement.querySelector('.ProseMirror');
         expect(editable?.textContent).toBe('hello');
+    });
+
+    it('read only: shows the orders and their holder, without any edit control nor save button', (): void => {
+        const order: ExpeditionOrder = new ExpeditionOrder();
+        order.type = 'text';
+        order.text = '<p>hello</p>';
+        configure({ orders: [order], holder_label: signal<string | null>('Bob') });
+        const element: HTMLElement = fixture.nativeElement;
+
+        const buttons: NodeListOf<HTMLButtonElement> = element.querySelectorAll('button');
+        expect(buttons.length).toBe(1);
+        expect(buttons[0].textContent?.trim()).toBe('Fermer');
+        expect(element.querySelector('mho-tiptap-editor')).toBeNull();
+        expect(element.querySelector('mat-button-toggle-group')).toBeNull();
+        expect(element.querySelector('[cdkDrag], .row-reorder')).toBeNull();
+        expect(element.querySelector('.rows')?.textContent).toContain('hello');
+        expect(element.querySelector('.lock-label')?.textContent).toContain('Bob');
+    });
+
+    it('lock taken by another while open: switches to read only, keeping the local edits', async (): Promise<void> => {
+        vi.useFakeTimers();
+        const order: ExpeditionOrder = new ExpeditionOrder();
+        order.type = 'text';
+        order.text = '<p>avant</p>';
+        const holder_label: WritableSignal<string | null> = signal<string | null>(null);
+        configure({ orders: [order], holder_label });
+        await vi.advanceTimersByTimeAsync(0);
+        fixture.detectChanges();
+        const element: HTMLElement = fixture.nativeElement;
+        expect(Array.from(element.querySelectorAll('button')).some((button: HTMLButtonElement): boolean => button.textContent?.trim() === 'Enregistrer')).toBe(true);
+        (fixture.componentInstance as unknown as { orders: ExpeditionOrder[] }).orders[0].text = '<p>saisie locale</p>';
+
+        holder_label.set('En cours de modification par Bob');
+        fixture.detectChanges();
+
+        expect(Array.from(element.querySelectorAll('button')).map((button: HTMLButtonElement): string | undefined => button.textContent?.trim())).toEqual(['Fermer']);
+        expect(element.querySelector('.lock-label')?.textContent).toContain('Bob');
+        expect(element.querySelector('.rows')?.textContent).toContain('saisie locale');
+        expect(element.querySelector('mho-tiptap-editor')).toBeNull();
     });
 
     describe('addOrder / deleteOrder / drop (mutation manuelle de orders)', (): void => {

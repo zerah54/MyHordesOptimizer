@@ -1,10 +1,10 @@
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
-import { TECHNICIAN_CP } from './budget.util';
-import { BuildingPlanContentDTO, PlanCitizenDTO, PlanPool, PlanTaskDTO } from './plan.types';
+import { detailedBasePa, GHOUL_PA_MALUS, resolveGhoul, TECHNICIAN_CP } from './budget.util';
 import { CitizenRef, DayEvaluation } from './plan-evaluation.util';
+import { budgetModeOf, BuildingPlanContentDTO, PlanCitizenDTO, PlanPool, PlanTaskDTO } from './plan.types';
 
 /** Catégorie d'une ligne de la ventilation du budget. */
-export type BudgetCategory = 'basePa' | 'expeditions' | 'technicianCp' | 'program' | 'home' | 'homeUpgrade' | `action:${string}` | 'free' | 'townLines' | 'overCommitted';
+export type BudgetCategory = 'basePa' | 'ghouls' | 'expeditionRab' | 'expeditions' | 'technicianCp' | 'program' | 'home' | 'homeUpgrade' | `action:${string}` | 'free' | 'townLines' | 'overCommitted';
 
 /** Ligne de la ventilation : PA apportés (positifs) ou dépensés (négatifs) par poche. */
 export interface BudgetRow {
@@ -16,6 +16,7 @@ export interface BudgetRow {
  * Ventilation du budget de la journée par poche : PA de base, expéditions, PC du technicien, puis dépenses (programme, maisons,
  * actions, consignes libres), lignes de la ville et PA qu'un citoyen surengagé ne peut pas fournir ; la somme de chaque poche
  * égale son reste. Une ligne nulle dans les deux poches est omise, sauf les PA de base.
+ * En mode simple : PA de base des ouvriers, malus des goules, rab d'expédition global, programme et lignes de la ville.
  * @param {BuildingPlanContentDTO} content Contenu du plan.
  * @param {readonly CitizenRef[]} citizens Citoyens retenus dans le budget.
  * @param {DayEvaluation} evaluation Évaluation de la journée.
@@ -29,27 +30,42 @@ export function budgetBreakdown(content: BuildingPlanContentDTO, citizens: reado
         rows.set(category, row);
     };
 
+    const simple: boolean = budgetModeOf(content) === 'simple';
+    const pools: PlanPool[] = ['banned', 'regular'];
     rows.set('basePa', { banned: 0, regular: 0 });
     for (const citizen of citizens) {
         const pool: PlanPool = citizen.banned ? 'banned' : 'regular';
         const entry: PlanCitizenDTO | undefined = content.citizens.find((candidate: PlanCitizenDTO): boolean => candidate.userId === citizen.userId);
+        if (simple) {
+            if (entry?.worker === true) {
+                add('basePa', pool, content.basePa);
+                add('ghouls', pool, resolveGhoul(entry, citizen.ghoul) ? -Math.min(content.basePa, GHOUL_PA_MALUS) : 0);
+            }
+            continue;
+        }
         add('basePa', pool, entry?.basePaOverride ?? content.basePa);
+        add('ghouls', pool, detailedBasePa(content, entry, resolveGhoul(entry, citizen.ghoul)) - (entry?.basePaOverride ?? content.basePa));
         add('expeditions', pool, -(evaluation.expeditionPa.get(citizen.userId) ?? 0));
         add('technicianCp', pool, citizen.technician ? TECHNICIAN_CP : 0);
     }
-    const pools: PlanPool[] = ['banned', 'regular'];
     for (const pool of pools) {
         add('program', pool, -evaluation.budgets[pool].cost);
     }
-    for (const citizen of citizens) {
-        const pool: PlanPool = citizen.banned ? 'banned' : 'regular';
-        const tasks: PlanTaskDTO[] = content.citizens.find((candidate: PlanCitizenDTO): boolean => candidate.userId === citizen.userId)?.tasks ?? [];
-        for (const task of tasks) {
-            add(taskCategory(task), pool, -task.pa);
+    if (!simple) {
+        for (const citizen of citizens) {
+            const pool: PlanPool = citizen.banned ? 'banned' : 'regular';
+            const tasks: PlanTaskDTO[] = content.citizens.find((candidate: PlanCitizenDTO): boolean => candidate.userId === citizen.userId)?.tasks ?? [];
+            for (const task of tasks) {
+                add(taskCategory(task), pool, -task.pa);
+            }
         }
     }
+    const rab: number = simple ? content.expeditionRab ?? 0 : 0;
+    if (simple) {
+        add('expeditionRab', 'regular', rab);
+    }
     for (const pool of pools) {
-        add('townLines', pool, evaluation.budgets[pool].lines);
+        add('townLines', pool, evaluation.budgets[pool].lines - (pool === 'regular' ? rab : 0));
     }
 
     const ordered: BudgetRow[] = orderRows(rows);
@@ -81,7 +97,7 @@ function taskCategory(task: PlanTaskDTO): BudgetCategory {
  */
 function orderRows(rows: ReadonlyMap<BudgetCategory, Record<PlanPool, number>>): BudgetRow[] {
     const actions: BudgetCategory[] = DailyActionEnum.getAllValues<DailyActionEnum>().map((action: DailyActionEnum): BudgetCategory => `action:${action.key}`);
-    const known: BudgetCategory[] = ['basePa', 'expeditions', 'technicianCp', 'program', 'home', 'homeUpgrade', ...actions];
+    const known: BudgetCategory[] = ['basePa', 'ghouls', 'expeditionRab', 'expeditions', 'technicianCp', 'program', 'home', 'homeUpgrade', ...actions];
     const unknown_actions: BudgetCategory[] = Array.from(rows.keys())
         .filter((category: BudgetCategory): boolean => category.startsWith('action:') && !known.includes(category));
     const categories: BudgetCategory[] = [...known, ...unknown_actions, 'free', 'townLines'];

@@ -11,6 +11,8 @@ namespace MyHordesOptimizerApi.Services.Caching
         public const string Ruins = "referentiel:ruins";
         public const string Buildings = "referentiel:buildings";
         public const string HomeReferential = "referentiel:home";
+        /// <summary>Dépend de Item.IdItem : invalidée avec <see cref="Items"/>.</summary>
+        public const string NightwatchReferential = "referentiel:nightwatch";
         public const string BuildingUpgrades = "referentiel:building-upgrades";
         public const string ItemEmotes = "referentiel:item-emotes";
         public const string HeroSkills = "referentiel:heroskills";

@@ -18,5 +18,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Fakes
         public Task<bool> CanWriteTownAsync(int resolvedIdTown, int? mapId) => Task.FromResult(true);
 
         public Task EnsureCanWriteMapAsync(int mapId) => Task.CompletedTask;
+
+        public Task<bool> CanReadPreTownAsync(int mapId) => Task.FromResult(true);
     }
 }

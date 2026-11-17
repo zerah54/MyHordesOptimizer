@@ -78,6 +78,13 @@
                                     <img class="building-icon" [src]="row.icon" alt="">
                                 }
                                 <span class="name">{{ row.name }}</span>
+                                @if (row.building.temporary) {
+                                    <mat-icon class="temporary" i18n-matTooltip matTooltip="Chantier temporaire">warning</mat-icon>
+                                }
+                                @if (row.building.blueprint?.value?.img; as blueprint_img) {
+                                    <img class="blueprint" [src]="HORDES_IMG_REPO + blueprint_img" [alt]="row.building.blueprint?.value?.label"
+                                         [matTooltip]="row.building.blueprint?.value?.label ?? ''">
+                                }
                                 @if (row.parentName) {
                                     <span class="parent-hint">← {{ row.parentName }}</span>
                                 }

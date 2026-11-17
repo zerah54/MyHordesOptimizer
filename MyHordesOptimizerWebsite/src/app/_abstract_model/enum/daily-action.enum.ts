@@ -1,11 +1,16 @@
 import { HeroSkillFamily, HeroSkillLevels } from '../types/hero-skill-levels';
+import { Home, HomeWithValue } from '../types/home.class';
 import { CommonEnum, CommonEnumData } from './_common.enum';
+import { HomeEnum } from './home.enum';
 import { JobEnum } from './job.enum';
 
 const HOME_POOL_DATA: DailyActionEnumData = { label: $localize`Prendre un bain`, img: 'building/small_pool.gif', building: 'small_pool_#00' };
 const HOME_SHOWER_DATA: DailyActionEnumData = { label: $localize`Se doucher`, img: 'building/small_shower.gif', building: 'small_shower_#00' };
 const HOME_CLEAN_DATA: DailyActionEnumData = { label: $localize`Ranger mon habitat`, img: 'building/small_trashclean.gif' };
-const HOME_REST_DATA: DailyActionEnumData = { label: $localize`Faire une sieste`, img: 'home/rest.gif' };
+/** `home_rest_1/2/3` : exige l'amélioration `rest` (Coin sieste) de la maison du citoyen. */
+const HOME_REST_DATA: DailyActionEnumData = {
+    label: $localize`Faire une sieste`, img: 'home/rest.gif', home_upgrade: { element: HomeEnum.REST_LEVEL, min_level: 1 }
+};
 const HOME_DEFBUFF_DATA: DailyActionEnumData = {
     label: $localize`Organiser les défenses`, img: 'building/small_watchmen.gif', building: 'small_watchmen_#00', ap: 2, job_ap: { job: JobEnum.GUARDIAN.key, ap: 1 }
 };
@@ -17,9 +22,13 @@ const HOME_SCAVENGE_DATA: DailyActionEnumData = {
 };
 /** `BeyondController::trash_api` : 1 PA, `TrashSearchLimit` 3, +1 Fouineur, +1 avec `super_recluse2` (groupe R, Expert). */
 const TRASH_DATA: DailyActionEnumData = {
-    label: $localize`Fouiller les déchets`, img: 'icons/small_trash.gif', ap: 1, max_uses: 3, planning_only: true,
+    label: $localize`Fouiller les déchets`, img: 'emotes/trash.gif', ap: 1, max_uses: 3, planning_only: true,
     job_ap: { job: JobEnum.SCAVENGER.key, ap: 1, max_uses: 4 }, hero_bonus: { family: 'r', min_level: 3, uses: 1 }
 };
+/** Objets à usage unique par jour (`special_dice`, `special_card`, `play_soccer_1/2`) : toujours proposées, l'addon ne les détecte pas. */
+const ITEM_DICE_DATA: DailyActionEnumData = { label: $localize`Lancer : Dés`, img: 'item/item_dice.gif' };
+const ITEM_CARDS_DATA: DailyActionEnumData = { label: $localize`Piocher : Jeu de cartes incomplet`, img: 'item/item_cards.gif' };
+const ITEM_SOCCER_DATA: DailyActionEnumData = { label: $localize`Utiliser : Ballon de foot`, img: 'item/item_soccer.gif' };
 /** `home_heal_1` (blessure) et `home_heal_2` / `home_heal_3` (infection) : 5 PA chacune, une fois par jour. */
 const HOME_HEAL_DATA: DailyActionEnumData = {
     label: $localize`Se soigner`, img: 'building/small_infirmary.gif', building: 'small_infirmary_#00', ap: 5, max_uses: 2, default_uses: 1, planning_only: true
@@ -38,6 +47,9 @@ export class DailyActionEnum extends CommonEnum {
     public static HOME_SCAVENGE: DailyActionEnum = new DailyActionEnum('home_scavenge', HOME_SCAVENGE_DATA);
     public static TRASH: DailyActionEnum = new DailyActionEnum('trash', TRASH_DATA);
     public static HOME_HEAL: DailyActionEnum = new DailyActionEnum('home_heal', HOME_HEAL_DATA);
+    public static ITEM_DICE: DailyActionEnum = new DailyActionEnum('item_dice', ITEM_DICE_DATA);
+    public static ITEM_CARDS: DailyActionEnum = new DailyActionEnum('item_cards', ITEM_CARDS_DATA);
+    public static ITEM_SOCCER: DailyActionEnum = new DailyActionEnum('item_soccer', ITEM_SOCCER_DATA);
 
     public constructor(public override key: string, public override value: DailyActionEnumData) {
         super(key, value);
@@ -57,6 +69,8 @@ interface DailyActionEnumData extends CommonEnumData {
     img: string;
     /** Uid du chantier sans lequel l'action n'existe pas. */
     building?: string;
+    /** Amélioration de la maison du citoyen, à ce niveau au moins, sans laquelle l'action n'existe pas pour lui. */
+    home_upgrade?: { element: HomeEnum; min_level: number };
     /** PA dépensés par utilisation (0 si absent). */
     ap?: number;
     /** Utilisations par jour (1 si absent). */
@@ -72,6 +86,19 @@ interface DailyActionEnumData extends CommonEnumData {
      * 1 PA pour le Gardien ; jusqu'à 3 fouilles à 1 PA pour le Fouineur.
      */
     job_ap?: { job: string; ap: number; max_uses?: number };
+}
+
+/**
+ * L'action existe-t-elle pour ce citoyen, selon l'amélioration de maison qu'elle exige ?
+ * @param {DailyActionEnum} action Action.
+ * @param {{ home?: Home }} owner Maison du citoyen, indéfinie si inconnue.
+ * @returns {boolean} Vrai sans exigence ; sinon vrai seulement si l'exigence est connue et remplie (inconnue : faux).
+ */
+export function isDailyActionAvailable(action: DailyActionEnum, owner: { home?: Home }): boolean {
+    const upgrade: { element: HomeEnum; min_level: number } | undefined = action.value.home_upgrade;
+    if (upgrade === undefined) return true;
+    const entry: HomeWithValue | undefined = owner.home?.content?.find((content: HomeWithValue): boolean => content.element.key === upgrade.element.key);
+    return typeof entry?.value === 'number' && entry.value >= upgrade.min_level;
 }
 
 /**

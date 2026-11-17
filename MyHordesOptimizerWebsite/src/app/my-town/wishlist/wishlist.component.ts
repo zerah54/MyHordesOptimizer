@@ -660,6 +660,28 @@ export class WishlistComponent implements OnInit {
         this.refresh();
     }
 
+    /** Retire de la liste un objet d'un groupe ; un groupe vidé est supprimé. */
+    protected removeFromGroup(item: WishlistItem): void {
+        const info: WishlistInfo | null = this.wishlist_info();
+        if (!info || item.group_uid === null) return;
+
+        const group_uid: string = item.group_uid;
+        info.wishlist_items = info.wishlist_items.filter((candidate: WishlistItem): boolean => candidate !== item);
+        if (!info.wishlist_items.some((candidate: WishlistItem): boolean => candidate.group_uid === group_uid)) {
+            info.groups = info.groups.filter((group: WishlistGroup): boolean => group.uid !== group_uid);
+        }
+        this.refresh();
+    }
+
+    /** Renomme le groupe dans la liste uniquement (pas dans mes groupes) ; un nom vide est ignoré. */
+    protected renameGroup(group: WishlistGroup, name: string): void {
+        const trimmed: string = name.trim();
+        if (trimmed === '' || trimmed === group.name) return;
+
+        group.name = trimmed;
+        this.refresh();
+    }
+
     /** Supprime le groupe et tous ses objets, après confirmation. */
     protected removeGroup(group: WishlistGroup): void {
         this.dialog

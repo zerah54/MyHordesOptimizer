@@ -42,6 +42,7 @@ import { TownDTO } from '../dto/town.dto';
 import { TownListItemDTO } from '../dto/town-list-item.dto';
 import { TownListPageResultDTO, TownListQuery } from '../dto/town-list-page.dto';
 import { UpdateInfoDTO } from '../dto/update-info.dto';
+import { StatusEnum } from '../enum/status.enum';
 import { TownListMapper } from '../mapper/town-list-item.mapper';
 import { dtoToModelArray } from '../types/_common.class';
 import { ToolsToUpdate, TownState, TownTypeId } from '../types/_types';
@@ -321,9 +322,51 @@ export class TownService extends GlobalService {
         });
     }
 
+    /**
+     * Met à jour les états d'un citoyen. « Goule » est écrite à part, par la saisie manuelle : la liste des états
+     * (et donc l'addon) ne l'envoie jamais.
+     * @param {Citizen} citizen Citoyen dont les états ont changé.
+     * @returns {Observable<UpdateInfo>} Informations de mise à jour des états.
+     */
     public updateStatus(citizen: Citizen): Observable<UpdateInfo> {
         return new Observable((sub: Subscriber<UpdateInfo>) => {
+            const ghoul: boolean = citizen.status?.icons.some((icon: StatusEnum) => icon?.key === StatusEnum.GHOUL.key) === true;
+            const ghoul_changed: boolean = citizen.status !== undefined && ghoul !== (citizen.status.is_ghoul === true);
             super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Status?townId=${getOwnTown()?.town_id}`, JSON.stringify(citizen.toCitizenStatusDto()))
+                .subscribe({
+                    next: (response: UpdateInfoDTO) => {
+                        if (!ghoul_changed) {
+                            sub.next(new UpdateInfo(response));
+                            return;
+                        }
+                        this.updateGhoul(citizen.id, ghoul).subscribe({
+                            next: () => {
+                                if (citizen.status) {
+                                    citizen.status.is_ghoul = ghoul;
+                                }
+                                sub.next(new UpdateInfo(response));
+                            },
+                            error: (error: HttpErrorResponse) => {
+                                sub.error(error);
+                            }
+                        });
+                    },
+                    error: (error: HttpErrorResponse) => {
+                        sub.error(error);
+                    }
+                });
+        });
+    }
+
+    /**
+     * Renseigne à la main l'état goule d'un citoyen (tout citoyen de la ville, pour tous).
+     * @param {number} user_id Citoyen concerné.
+     * @param {boolean} is_ghoul Goule ou non.
+     * @returns {Observable<UpdateInfo>} Informations de mise à jour.
+     */
+    public updateGhoul(user_id: number, is_ghoul: boolean): Observable<UpdateInfo> {
+        return new Observable((sub: Subscriber<UpdateInfo>) => {
+            super.post<UpdateInfoDTO>(this.API_URL + `/ExternalTools/Ghoul?townId=${getOwnTown()?.town_id}`, JSON.stringify({ userId: user_id, isGhoul: is_ghoul }))
                 .subscribe({
                     next: (response: UpdateInfoDTO) => {
                         sub.next(new UpdateInfo(response));

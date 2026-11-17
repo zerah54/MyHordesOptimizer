@@ -72,6 +72,40 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
             restored.Instructions.Should().BeNull();
             restored.PlanTiers.Should().BeEmpty();
             restored.EveningSecondVoteBuildingId.Should().BeNull();
+            restored.BudgetMode.Should().BeNull();
+            restored.BasePaTier.Should().BeNull();
+            restored.ExpeditionRab.Should().Be(0);
+            restored.ValidatedBudget.Should().BeNull();
+        }
+
+        [Fact]
+        public void Content_RoundTripsSimpleBudgetFields()
+        {
+            var content = new BuildingPlanContentDto
+            {
+                BudgetMode = "simple",
+                BasePaTier = "b7",
+                ExpeditionRab = 12,
+                Citizens = { new PlanCitizenDto { UserId = 1, Worker = true, Ghoul = true } },
+                ValidatedBudget = new ValidatedBudgetDto
+                {
+                    ValidatedAt = "2026-11-13T10:00:00Z",
+                    Pools = { { "banned", new ValidatedPoolDto { Budget = 10, Cost = 8 } }, { "regular", new ValidatedPoolDto { Budget = 100, Cost = 90 } } },
+                    Steps = { new ValidatedStepDto { BuildingId = 12, Kind = "build", Pool = "banned", PaCost = 30, Invested = 12, Life = 7 } }
+                }
+            };
+
+            var restored = content.ToJson().FromJson<BuildingPlanContentDto>();
+
+            restored.Should().BeEquivalentTo(content);
+            restored.Citizens[0].Worker.Should().BeTrue();
+            restored.Citizens[0].Ghoul.Should().BeTrue();
+            restored.ValidatedBudget!.Pools["regular"].Cost.Should().Be(90);
+            restored.ValidatedBudget.Steps[0].Pool.Should().Be("banned");
+            restored.ValidatedBudget.Steps[0].Invested.Should().Be(12);
+            restored.ValidatedBudget.Steps[0].Life.Should().Be(7);
+            "{\"buildingId\":1,\"kind\":\"build\",\"paCost\":3}".FromJson<ValidatedStepDto>().Invested.Should().Be(0);
+            "{\"buildingId\":1,\"kind\":\"repair\",\"paCost\":3}".FromJson<ValidatedStepDto>().Life.Should().Be(0);
         }
     }
 }

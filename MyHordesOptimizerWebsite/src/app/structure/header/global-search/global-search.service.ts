@@ -12,7 +12,8 @@ import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { TownContextService } from '../../../_core/services/town-context.service';
-import { getOwnTown, town } from '../../../_core/utilities/localstorage.util';
+import { getOwnTown, town, user } from '../../../_core/utilities/localstorage.util';
+import { sitePage, SitePage } from '../../../_core/utilities/site-pages';
 import { ProgramMenuService } from '../../../my-town/program/program-menu.service';
 import { buildSidenavLinks, resolveSidenavLabel, resolveSidenavPath, SidenavLinks, townBasePath } from '../../menu/sidenav-links';
 import {
@@ -35,6 +36,7 @@ import {
     playerEntries,
     ruinEntries,
     searchIndex,
+    standalonePageEntry,
     townEntries
 } from './global-search.util';
 
@@ -117,11 +119,19 @@ export class GlobalSearchService {
      * Pages : recalculées quand la ville change. `authorized()` et les chemins de la section
      * « Ma ville » lisent des signaux (ville active, ville observée), que ce `computed` suit.
      */
-    private readonly pages: Signal<readonly GlobalSearchEntry[]> = computed((): GlobalSearchEntry[] => pageEntries(
-        this.sidenav_links,
-        (route: SidenavLinks): string | undefined => resolveSidenavPath(route, this.town_context),
-        (route: SidenavLinks): string => resolveSidenavLabel(route, this.town_context)
-    ));
+    private readonly pages: Signal<readonly GlobalSearchEntry[]> = computed((): GlobalSearchEntry[] => {
+        const entries: GlobalSearchEntry[] = pageEntries(
+            this.sidenav_links,
+            (route: SidenavLinks): string | undefined => resolveSidenavPath(route, this.town_context),
+            (route: SidenavLinks): string => resolveSidenavLabel(route, this.town_context)
+        );
+        // « Mes pré-villes » vit dans le menu utilisateur (connecté), pas dans le menu latéral.
+        if (user()?.id) {
+            const pre_towns: SitePage = sitePage('preTowns');
+            entries.push(standalonePageEntry('pre-town', pre_towns.label, pre_towns.icon ?? null));
+        }
+        return entries;
+    });
 
     /** Ville dont les citoyens doivent être proposés, `null` hors ville. */
     private readonly town_key: Signal<string | null> = computed((): string | null => {

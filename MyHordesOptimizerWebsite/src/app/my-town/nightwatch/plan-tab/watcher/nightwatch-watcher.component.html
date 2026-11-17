@@ -1,0 +1,156 @@
+<mat-card class="watcher" appearance="outlined" [attr.data-watcher]="row().user_id">
+    <mat-card-header class="watcher-head">
+        <mat-card-title class="head-title">
+            @if (job(); as job_value) {
+                <img class="job" [src]="HORDES_IMG_REPO + job_value.value.img" [alt]="job_value.value.label">
+            }
+            <strong class="name">{{ row().name }}</strong>
+        </mat-card-title>
+        <button mat-icon-button type="button" data-action="remove-watcher" [disabled]="!store.can_edit()" i18n-aria-label aria-label="Retirer le veilleur"
+                (click)="store.removeWatcher(row().user_id)">
+            <mat-icon>close</mat-icon>
+        </button>
+    </mat-card-header>
+
+    <mat-card-content class="body">
+        <mat-chip-listbox class="statuses" multiple [disabled]="!store.can_edit()" i18n-aria-label aria-label="Statuts prévus">
+            @for (status of status_options; track status.key) {
+                <mat-chip-option class="status" [attr.data-status]="status.key" [selected]="hasStatus(status.key)" [disabled]="!store.can_edit()"
+                                 (selectionChange)="onStatusChange(status.key, $event.isUserInput)">
+                    @if (status.img !== null) {
+                        <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
+                    }
+                    {{ status.label }}
+                </mat-chip-option>
+            }
+        </mat-chip-listbox>
+
+        <div class="items">
+            @for (assigned_item of assigned(); track assigned_item.item_id) {
+                <div class="assigned">
+                    <span class="item-label">
+                        @if (assigned_item.icon !== '') {
+                            <img class="item-icon" [src]="assigned_item.icon" alt="">
+                        }
+                        {{ assigned_item.label }}
+                    </span>
+                    <mat-form-field class="quantity" appearance="outline" subscriptSizing="dynamic">
+                        <input matInput type="number" min="0" step="1" [attr.data-item]="assigned_item.item_id" [value]="assigned_item.quantity"
+                               [disabled]="!store.can_edit()"
+                               i18n-aria-label aria-label="Quantité" #quantity (change)="setQuantity(assigned_item.item_id, quantity.value)">
+                    </mat-form-field>
+                    <button mat-icon-button type="button" [attr.data-action]="'remove-item-' + assigned_item.item_id" [disabled]="!store.can_edit()"
+                            i18n-aria-label aria-label="Retirer l'objet" (click)="store.setItem(row().user_id, assigned_item.item_id, 0)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            }
+            <div class="add-item">
+                <mat-form-field class="picker" appearance="outline" subscriptSizing="dynamic">
+                    <mat-select data-field="add-item" [value]="chosen_item()" [disabled]="!store.can_edit()" i18n-aria-label aria-label="Objet à attribuer"
+                                i18n-placeholder placeholder="Attribuer un objet…" (selectionChange)="chooseItem($event.value)">
+                        <mat-option [value]="null" i18n>Attribuer un objet…</mat-option>
+                        @for (item of assignable(); track item.id) {
+                            <mat-option [value]="item.id">{{ itemLabel(item.id) }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field class="quantity" appearance="outline" subscriptSizing="dynamic">
+                    <input matInput type="number" min="1" step="1" data-field="add-item-quantity" [value]="chosen_quantity()" [disabled]="!store.can_edit()"
+                           i18n-aria-label aria-label="Quantité à attribuer" #amount (input)="chooseQuantity(amount.value)">
+                </mat-form-field>
+                <button mat-stroked-button type="button" data-action="add-item" [disabled]="!store.can_edit() || chosen_item() === null" (click)="addItem()">
+                    <mat-icon>add</mat-icon>
+                    <ng-container i18n>Attribuer</ng-container>
+                </button>
+            </div>
+        </div>
+
+        <div class="options">
+            <mat-form-field class="past" appearance="outline" subscriptSizing="dynamic">
+                <mat-label i18n>Veilles passées</mat-label>
+                <input matInput type="number" min="0" step="1" data-field="past-watches" [value]="watcher()?.pastWatches ?? row().past_watches"
+                       [disabled]="!store.can_edit()"
+                       #past (change)="setPastWatches(past.value)">
+            </mat-form-field>
+            <mat-checkbox data-field="discourse" [checked]="watcher()?.hasDiscourse === true" [disabled]="!store.can_edit()"
+                          (change)="store.setDiscourse(row().user_id, $event.checked)">
+                <ng-container i18n>Discours rassurant multicolore</ng-container>
+            </mat-checkbox>
+            <mat-form-field class="note" appearance="outline" subscriptSizing="dynamic">
+                <mat-label i18n>Note</mat-label>
+                <input matInput type="text" maxlength="200" data-field="note" [value]="watcher()?.note ?? ''" [disabled]="!store.can_edit()" #note
+                       (change)="setNote(note.value)">
+            </mat-form-field>
+        </div>
+
+        <div class="computed">
+            <div class="stats">
+                <div class="stat" data-field="defense">
+                    <span class="title" i18n>Défense</span>
+                    <strong class="value">{{ row().defense }}</strong>
+                </div>
+                <div class="stat" data-field="risk">
+                    <span class="title" i18n>Risque</span>
+                    <strong class="value">{{ percent(row().risk) }} %</strong>
+                </div>
+            </div>
+            <p class="tier" data-field="tier">
+                @switch (row().tier) {
+                    @case ('certain') {
+                        <ng-container i18n>Debout sur les remparts de la ville, vous êtes très confiant quant à l’issue de cette soirée. Vous ne mourrez pas
+                            aujourd'hui !
+                        </ng-container>
+                    }
+                    @case ('t15') {
+                        <ng-container i18n>Du haut des remparts, vous vous sentez invincible. Rien ne vous fera chanceler cette nuit.</ng-container>
+                    }
+                    @case ('t30') {
+                        <ng-container i18n>Du haut des remparts, vous vous sentez serein. Vous comptez bien être encore en vie demain.</ng-container>
+                    }
+                    @case ('t45') {
+                        <ng-container i18n>Du haut des remparts, vous vous sentez confiant. Vous attendez la hordes, que vous apercevez déjà.</ng-container>
+                    }
+                    @case ('t60') {
+                        <ng-container i18n>Du haut des remparts, vous observez l'horizon. Vous espérez voir le soleil se lever demain, encore une fois.
+                        </ng-container>
+                    }
+                    @case ('t75') {
+                        <ng-container i18n>Du haut des remparts, Vous vous sentez hésitant et le moral faible. Il n'y aura peut-être pas de lendemain pour
+                            vous...
+                        </ng-container>
+                    }
+                    @case ('t90') {
+                        <ng-container i18n>Du haut des remparts, vous êtes chancelant et vous le moral au plus bas, vous ne savez pas si vous verrez la lumière
+                            du jour...
+                        </ng-container>
+                    }
+                    @case ('dire') {
+                        <ng-container i18n>Du haut des remparts, vous avez le cœur serré. Vous sentez que votre vie ne tient qu'à un fil...</ng-container>
+                    }
+                }
+            </p>
+        </div>
+
+        @if (row().alerts.length > 0) {
+            <ul class="alerts">
+                @for (alert of row().alerts; track $index) {
+                    <li class="alert" [attr.data-alert]="alert.kind">
+                        <mat-icon aria-hidden="true">warning</mat-icon>
+                        <span>
+                            @switch (alert.kind) {
+                                @case ('unknown_item') {
+                                    <ng-container
+                                        i18n>Objet absent du référentiel de veille (défense comptée à 0) :</ng-container> {{ itemLabel(alert.item_id ?? 0) }}
+                                }
+                                @case ('risk_above_zero') {
+                                    <ng-container i18n>Risque de mort non nul</ng-container>
+                                }
+                            }
+                        </span>
+                    </li>
+                }
+            </ul>
+        }
+    </mat-card-content>
+</mat-card>

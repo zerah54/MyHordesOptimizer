@@ -234,6 +234,45 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             }
         }
 
+        /// <summary>PreTown.LinkedIdTown ne s'appelle pas IdTown : la migration générique l'oubliait, cassant le lien (alias, contrôle « déjà liée »).</summary>
+        [Fact]
+        public async Task ImportSingleTownAsync_MigreLeLienDeLaPreVille()
+        {
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            var random = new Random();
+            var mapId = random.Next(1, int.MaxValue);
+            var newIdTown = random.Next(1, int.MaxValue);
+            var oldIdTown = -mapId;
+
+            var fakeRepo = new SingleTownMigrationRepository(newIdTown, mapId);
+            using var factory = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services => services.AddScoped<IMyHordesApiRepository>(_ => fakeRepo));
+            });
+            var scope = factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var importService = scope.ServiceProvider.GetRequiredService<IMyHordesImportService>();
+
+            var user = new User { IdUser = random.Next(1, int.MaxValue), Name = "test-user-" + suffix };
+            context.Towns.Add(new Town { IdTown = oldIdTown, Name = "test-town-" + suffix });
+            context.Users.Add(user);
+            context.SaveChanges();
+            var preTown = new PreTown { Alias = "test-" + suffix, IdCreator = user.IdUser, CreatedAt = DateTime.UtcNow, LinkedIdTown = oldIdTown, LinkedMapId = mapId, LinkedAt = DateTime.UtcNow, IdLinker = user.IdUser };
+            context.PreTowns.Add(preTown);
+            context.SaveChanges();
+
+            try
+            {
+                await Task.Run(() => importService.ImportSingleTownAsync(mapId));
+
+                context.PreTowns.AsNoTracking().Single(p => p.IdPreTown == preTown.IdPreTown).LinkedIdTown.Should().Be(newIdTown);
+            }
+            finally
+            {
+                context.PreTowns.Where(p => p.IdPreTown == preTown.IdPreTown).ExecuteDelete();
+            }
+        }
+
         /// <summary>Sert ImportSingleTownAsync(mapId) : /json/towns renvoie une ville dont l'Id diffère du mapId interrogé, déclenchant la migration. /json/map est ensuite appelé (try/catch qui absorbe l'échec) : on lève simplement, sans conséquence sur le test.</summary>
         private sealed class SingleTownMigrationRepository : IMyHordesApiRepository
         {

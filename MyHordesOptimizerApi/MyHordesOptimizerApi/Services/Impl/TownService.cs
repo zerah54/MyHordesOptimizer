@@ -219,7 +219,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         public List<SeasonDto> GetSeasons()
         {
-            var townSeasons = DbContext.Towns
+            var townSeasons = DbContext.Towns.ExcludingPreTowns()
                 .Where(t => t.Season.HasValue)
                 .Select(t => t.Season!.Value)
                 .Distinct()
@@ -243,7 +243,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         {
             var nativeId = (int)TownPhase.NATIVE;
 
-            var combos = DbContext.Towns
+            var combos = DbContext.Towns.ExcludingPreTowns()
                 .Where(t => t.Season.HasValue)
                 .Select(t => new { Season = t.Season!.Value, t.PhaseId })
                 .Distinct()
@@ -320,6 +320,8 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownDefense WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBuildingPlan WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBuildingPlanSettings WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownNightwatchPlan WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("UPDATE PreTown SET linkedIdTown = NULL, linkedMapId = NULL WHERE linkedIdTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM Town WHERE idTown = {0}", townId);
 
             DbContext.Database.ExecuteSqlRaw("SET FOREIGN_KEY_CHECKS = 1");
@@ -361,7 +363,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             var nativeId = (int)TownPhase.NATIVE;
 
             // Base = combinaison saison/phase. Sert aussi de référence aux options de filtres disponibles.
-            var baseQuery = DbContext.Towns.AsQueryable();
+            var baseQuery = DbContext.Towns.ExcludingPreTowns();
             if (query.PlayerId.HasValue)
             {
                 var playerId = query.PlayerId.Value;
@@ -449,6 +451,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                     Id = town.IdTown,
                     MapId = town.MapId,
                     Name = town.Name,
+                    // Unicité de PreTown.LinkedIdTown : au plus une ligne, pas de duplication de la page
+                    PreTownAlias = DbContext.PreTowns.Where(p => p.LinkedIdTown == town.IdTown).Select(p => p.Alias).FirstOrDefault(),
                     Width = town.Width > 0 ? town.Width : (int?)null,
                     Height = town.Height > 0 ? town.Height : (int?)null,
                     TownType = town.TownTypeId.HasValue ? (TownType)town.TownTypeId.Value : (TownType?)null,

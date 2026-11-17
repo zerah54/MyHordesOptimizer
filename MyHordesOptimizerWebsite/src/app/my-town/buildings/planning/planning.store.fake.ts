@@ -10,6 +10,7 @@ import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { Home } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { BudgetDiff } from './budget-diff.util';
 import { bannedPoolForced, bannedPoolShown } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { BuildingUpgradesDTO } from './building-upgrades.types';
@@ -124,6 +125,8 @@ export interface FakePlanningStore {
     store: PlanningStore;
     draft: WritableSignal<BuildingPlanContentDTO | null>;
     evaluation: WritableSignal<DayEvaluation | null>;
+    budget_diff: WritableSignal<BudgetDiff | null>;
+    can_validate_budget: WritableSignal<boolean>;
     can_edit: WritableSignal<boolean>;
     can_write: WritableSignal<boolean>;
     can_edit_settings: WritableSignal<boolean>;
@@ -153,7 +156,7 @@ export interface FakePlanningStore {
     unlimited_home_levels: WritableSignal<boolean>;
     lock: WritableSignal<PlanLockState>;
     save_state: WritableSignal<PlanSaveState>;
-    actions: Record<'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'deletePlan' | 'setEffective' | 'save' | 'dismissConflict' | 'saveItemValues' | 'renamePlan' | 'setTaskDone' | 'takeLock' | 'leave', Mock>;
+    actions: Record<'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'copyPlanBetweenDays' | 'deletePlan' | 'setEffective' | 'save' | 'dismissConflict' | 'saveItemValues' | 'renamePlan' | 'validateBudget' | 'setTaskDone' | 'takeLock' | 'leave', Mock>;
     updateDraft: Mock<(mutate: (content: BuildingPlanContentDTO) => void) => void>;
 }
 
@@ -168,6 +171,8 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
     const fake: Omit<FakePlanningStore, 'store' | 'actions' | 'updateDraft'> = {
         draft,
         evaluation: signal<DayEvaluation | null>(fakeEvaluation(content)),
+        budget_diff: signal<BudgetDiff | null>(null),
+        can_validate_budget: signal(true),
         can_edit: signal(true),
         can_write: signal(true),
         can_edit_settings: signal(true),
@@ -199,8 +204,8 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         save_state: signal<PlanSaveState>('idle')
     };
     const actions: FakePlanningStore['actions'] = {
-        load: vi.fn(), selectDay: vi.fn(), selectPlan: vi.fn(), createPlan: vi.fn(), duplicatePlan: vi.fn(),
-        deletePlan: vi.fn(), setEffective: vi.fn(), save: vi.fn(), dismissConflict: vi.fn(), saveItemValues: vi.fn(), renamePlan: vi.fn(), setTaskDone: vi.fn(),
+        load: vi.fn(), selectDay: vi.fn(), selectPlan: vi.fn(), createPlan: vi.fn(), duplicatePlan: vi.fn(), copyPlanBetweenDays: vi.fn(),
+        deletePlan: vi.fn(), setEffective: vi.fn(), save: vi.fn(), dismissConflict: vi.fn(), saveItemValues: vi.fn(), renamePlan: vi.fn(), validateBudget: vi.fn(), setTaskDone: vi.fn(),
         takeLock: vi.fn(), leave: vi.fn((): Promise<boolean> => Promise.resolve(true))
     };
     const update_draft: FakePlanningStore['updateDraft'] = vi.fn((mutate: (value: BuildingPlanContentDTO) => void): void => {

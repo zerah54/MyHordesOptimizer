@@ -120,7 +120,15 @@
                                                                 aria-label="Déplier ou replier le groupe" i18n-aria-label>
                                                             <mat-icon>{{ row.expanded ? 'expand_more' : 'chevron_right' }}</mat-icon>
                                                         </button>
-                                                        <span>{{ row.group.name }}</span>
+                                                        @if (edition_mode()) {
+                                                            <mat-form-field subscriptSizing="dynamic" appearance="outline">
+                                                                <input matInput #group_name [value]="row.group.name" maxlength="100"
+                                                                       (change)="renameGroup(row.group, group_name.value); group_name.value = row.group.name"
+                                                                       aria-label="Nom du groupe" i18n-aria-label>
+                                                            </mat-form-field>
+                                                        } @else {
+                                                            <span>{{ row.group.name }}</span>
+                                                        }
                                                         <span class="pill">{{ row.members.length }}&nbsp;<ng-container i18n>objets</ng-container></span>
                                                     </div>
                                                 } @else {
@@ -356,6 +364,10 @@
                                                     <button mat-icon-button type="button" (click)="takeOutOfGroup(row.item)"
                                                             matTooltip="Sortir du groupe" i18n-matTooltip>
                                                         <mat-icon>call_made</mat-icon>
+                                                    </button>
+                                                    <button mat-icon-button type="button" (click)="removeFromGroup(row.item)"
+                                                            matTooltip="Retirer de la liste" i18n-matTooltip>
+                                                        <mat-icon>close</mat-icon>
                                                     </button>
                                                 } @else {
                                                     <button mat-icon-button type="button" (click)="remove(row.item)">

@@ -4,7 +4,7 @@ import moment from 'moment';
 import { firstValueFrom } from 'rxjs';
 
 import { BURIED_RUIN_ID } from '../../../_abstract_model/const';
-import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-services/realtime-expeditions.service';
+import { hubLockHolder, RealtimeExpeditionsService } from '../../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
@@ -17,6 +17,7 @@ import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { Town } from '../../../_abstract_model/types/town.class';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { MapRouteContext } from '../../map/map-routes/map-route-detail';
+import { lockRefusedMessage } from '../expedition-locks/expedition-locks.util';
 import {
     ExpeditionOrderFormCell,
     ExpeditionOrderFormComponent,
@@ -80,19 +81,29 @@ export class ExpeditionOrderEditorService {
         if (!result) return;
         try {
             await this.apply(part, result, existing);
-        } catch {
-            this.snackbar.errorSnackbar($localize`La consigne n'a pas pu être enregistrée.`);
+        } catch (error: unknown) {
+            this.signalFailure(error, context.citizens, (): string => $localize`La consigne n'a pas pu être enregistrée.`);
         }
     }
 
-    /** Coche ou décoche une consigne (sur une copie : la liste affichée change au retour du hub). */
-    public async toggleDone(order: ExpeditionOrder, done: boolean): Promise<void> {
+    /** Coche ou décoche une consigne (sur une copie : la liste affichée change au retour du hub). `citizens` nomme le détenteur d'un refus. */
+    public async toggleDone(order: ExpeditionOrder, done: boolean, citizens: readonly Citizen[]): Promise<void> {
         const copy: ExpeditionOrder = cloneOrder(order);
         copy.is_done = done;
         try {
             await this.realtime_expeditions_service.updateExpeditionOrder(copy);
-        } catch {
-            this.snackbar.errorSnackbar($localize`La consigne n'a pas pu être cochée.`);
+        } catch (error: unknown) {
+            this.signalFailure(error, citizens, (): string => $localize`La consigne n'a pas pu être cochée.`);
+        }
+    }
+
+    /** Refus de verrou : avertit avec le détenteur ; autre échec : message d'erreur. */
+    private signalFailure(error: unknown, citizens: readonly Citizen[], failure: () => string): void {
+        const holder: number | null = hubLockHolder(error);
+        if (holder === null) {
+            this.snackbar.errorSnackbar(failure());
+        } else {
+            this.snackbar.warningSnackbar(lockRefusedMessage(holder, citizens));
         }
     }
 

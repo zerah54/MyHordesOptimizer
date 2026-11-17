@@ -53,6 +53,56 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             context.SaveChanges();
         }
 
+        private (INoteService service, MhoContext context, int preTownId, int member, int stranger) NewPreTownFixture()
+        {
+            var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            var random = new Random();
+            var member = new User { IdUser = random.Next(1, int.MaxValue), Name = "member-" + Guid.NewGuid().ToString("N")[..8] };
+            var stranger = new User { IdUser = random.Next(1, int.MaxValue), Name = "stranger-" + Guid.NewGuid().ToString("N")[..8] };
+            context.Users.AddRange(member, stranger);
+            context.SaveChanges();
+            var preTowns = new MyHordesOptimizerApi.Services.Impl.PreTowns.PreTownService(context, new MyHordesOptimizerApi.Providers.Impl.UserInfoProvider { UserId = member.IdUser }, TimeProvider.System, Array.Empty<IPreTownMerger>());
+            var preTownId = preTowns.CreateAsync("Pre").GetAwaiter().GetResult().PreTownId;
+            return (scope.ServiceProvider.GetRequiredService<INoteService>(), context, preTownId, member.IdUser, stranger.IdUser);
+        }
+
+        [Fact]
+        public void UpsertTownNote_MembreDePreVille_Ecrit()
+        {
+            var (service, context, preTownId, member, _) = NewPreTownFixture();
+
+            service.UpsertTownNote(member, PreTownIds.ToMapId(preTownId), "<p>pre</p>");
+
+            context.TownNotes.Count(n => n.IdUserAuthor == member && n.IdTown == PreTownIds.ToIdTown(preTownId)).Should().Be(1);
+        }
+
+        [Fact]
+        public void UpsertTownNote_NonMembreDePreVille_Refuse()
+        {
+            var (service, _, preTownId, _, stranger) = NewPreTownFixture();
+
+            service.Invoking(s => s.UpsertTownNote(stranger, PreTownIds.ToMapId(preTownId), "x")).Should().Throw<MhoForbiddenException>();
+        }
+
+        [Fact]
+        public void UpsertTownNote_PreVilleLiee_EcritureRefusee()
+        {
+            var (service, context, preTownId, member, _) = NewPreTownFixture();
+            var realTown = new Town { IdTown = new Random().Next(900_000_000, 999_999_999), Name = "test-real" };
+            realTown.MapId = realTown.IdTown;
+            context.Towns.Add(realTown);
+            context.SaveChanges();
+            var preTown = context.PreTowns.Single(p => p.IdPreTown == preTownId);
+            preTown.LinkedIdTown = realTown.IdTown;
+            preTown.LinkedMapId = realTown.MapId;
+            preTown.LinkedAt = DateTime.UtcNow;
+            preTown.IdLinker = member;
+            context.SaveChanges();
+
+            service.Invoking(s => s.UpsertTownNote(member, PreTownIds.ToMapId(preTownId), "x")).Should().Throw<MhoBadRequestException>();
+        }
+
         [Fact]
         public void UpsertTownNote_PremiereEcriture_CreeUneLigne()
         {

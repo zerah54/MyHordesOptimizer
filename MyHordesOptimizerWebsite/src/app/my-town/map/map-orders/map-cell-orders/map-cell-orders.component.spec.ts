@@ -147,7 +147,7 @@ describe('MapCellOrdersComponent', (): void => {
 
             (fixture.nativeElement.querySelectorAll('mat-checkbox input')[1] as HTMLInputElement).click();
 
-            expect(editor.toggleDone).toHaveBeenCalledWith(expect.objectContaining({ id: 2 }), true);
+            expect(editor.toggleDone).toHaveBeenCalledWith(expect.objectContaining({ id: 2 }), true, expect.anything());
         });
 
         it('edits an order from its line', (): void => {

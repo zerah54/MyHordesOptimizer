@@ -64,6 +64,8 @@ interface TestableComponent {
     setAllGroupsExpanded(expanded: boolean): void;
     changeGroupSettings(group: WishlistGroup): void;
     takeOutOfGroup(item: WishlistItem): void;
+    removeFromGroup(item: WishlistItem): void;
+    renameGroup(group: WishlistGroup, name: string): void;
     removeGroup(group: WishlistGroup): void;
     joinGroup(item: WishlistItem, group: WishlistGroup): void;
     trackDropTarget(row: WishlistRow, event: CdkDragMove): void;
@@ -912,6 +914,40 @@ describe('WishlistComponent', (): void => {
 
             expect(info().groups).toEqual([]);
             expect(ids()).toEqual([8, 2, 9]);
+        });
+
+        it('retire un objet du groupe et de la liste en une fois', (): void => {
+            testable.removeFromGroup(info().membersOf('g1').find((row: WishlistItem): boolean => row.item.id === 2) as WishlistItem);
+
+            expect(ids()).toEqual([8, 3, 9]);
+            expect(info().groups.length).toBe(1);
+        });
+
+        it('supprime le groupe quand son dernier objet est retiré de la liste', (): void => {
+            testable.wishlist_info.set(buildGroupedInfo([2]));
+
+            testable.removeFromGroup(info().membersOf('g1')[0]);
+
+            expect(info().groups).toEqual([]);
+            expect(ids()).toEqual([8, 9]);
+        });
+
+        it('renomme un groupe et enregistre', (): void => {
+            const next_spy: MockInstance<(value: WishlistInfo) => void> = vi.spyOn(testable.auto_save$, 'next');
+
+            testable.renameGroup(info().groups[0], '  Armes  ');
+
+            expect(info().groups[0].name).toBe('Armes');
+            expect(next_spy).toHaveBeenCalledTimes(1);
+        });
+
+        it('ignore un nom de groupe vide', (): void => {
+            const next_spy: MockInstance<(value: WishlistInfo) => void> = vi.spyOn(testable.auto_save$, 'next');
+
+            testable.renameGroup(info().groups[0], '   ');
+
+            expect(info().groups[0].name).toBe('B6');
+            expect(next_spy).not.toHaveBeenCalled();
         });
 
         it('retire le groupe et ses objets après confirmation', (): void => {

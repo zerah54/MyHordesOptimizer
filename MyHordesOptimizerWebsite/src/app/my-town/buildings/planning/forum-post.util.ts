@@ -1,7 +1,7 @@
 import { bannedPoolShown, CitizenCapacity } from './budget.util';
 import { BUILDING_EMOTES } from './building-emotes.const';
 import { StepResult } from './building-progress.util';
-import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from './plan.types';
+import { budgetModeOf, BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from './plan.types';
 import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef, PlannedLoss } from './plan-evaluation.util';
 import { ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
 
@@ -227,6 +227,10 @@ function budgetLines(context: PostContext): string[] {
             lines.push(`[b]${poolLabel(pool)}[/b]`);
         }
         lines.push(`:middot: ${$localize`Citoyens`} : ${budget.citizenCapacity}:ap:`);
+        const rab: number = context.content.expeditionRab ?? 0;
+        if (pool === 'regular' && budgetModeOf(context.content) === 'simple' && rab !== 0) {
+            lines.push(`:middot: ${$localize`Rab d'expé`} : ${signed(rab)}:ap:`);
+        }
         for (const line of context.content.townLines.filter((candidate: { pool: PlanPool }): boolean => candidate.pool === pool)) {
             lines.push(`:middot: ${line.label === '' ? '—' : line.label} : ${signed(line.pa)}:ap:`);
         }

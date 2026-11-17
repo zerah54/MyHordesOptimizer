@@ -1,5 +1,5 @@
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, Signal, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -27,6 +27,9 @@ const material_modules: Imports = [DragDropModule, MatButtonModule, MatButtonTog
 export class EditOrdersComponent {
     private data: EditOrdersData = inject<EditOrdersData>(MAT_DIALOG_DATA);
 
+    /** Message du détenteur ; renseigné, les consignes (saisie locale comprise) s'affichent sans contrôle d'édition. */
+    protected readonly holder_label: Signal<string | null> = this.data?.holder_label ?? signal<string | null>(null);
+    protected readonly read_only: Signal<boolean> = computed((): boolean => this.holder_label() !== null);
 
     protected orders: ExpeditionOrder[] = [];
 
@@ -54,4 +57,9 @@ export class EditOrdersComponent {
 export interface EditOrdersData {
     orders: ExpeditionOrder[];
     citizen_id?: number;
+    /**
+     * Détenteur du verrou, suivi en direct (« En cours de modification par X », ou « Toi, dans un autre onglet ») ;
+     * `null` : modifiables.
+     */
+    holder_label?: Signal<string | null>;
 }

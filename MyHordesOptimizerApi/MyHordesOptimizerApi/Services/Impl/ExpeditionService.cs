@@ -582,7 +582,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         #region ExpeditionCitizen
 
-        public async Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen)
+        public async Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen, bool canReplaceOccupant = false)
         {
             // Vérifié pour la création ET le déplacement (expeditionPartId = partie CIBLE dans les deux cas) :
             // sans ce garde-fou côté cible, un déplacement pourrait affecter un citoyen à une partie dont
@@ -590,7 +590,11 @@ namespace MyHordesOptimizerApi.Services.Impl
             var targetTown = EnsurePartWritable(expeditionPartId);
             await using var townLock = await TownSyncLock.AcquireTownAsync(targetTown.LockKey);
             await EnsureOrdersBelongToTownAsync(expeditionCitizen.OrdersId, targetTown.IdTown);
-            await EnsureBagBelongsToTownAsync(expeditionCitizen.BagId, targetTown.IdTown);
+            await EnsureBagIsOwnAsync(expeditionCitizen.BagId, expeditionCitizen.Id);
+            if (expeditionCitizen.Id.HasValue)
+            {
+                await EnsureOccupantNotReplacedAsync(expeditionCitizen, targetTown.IdTown, canReplaceOccupant);
+            }
             await using var transaction = await DbContext.Database.BeginTransactionAsync();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
             var newLastUpdate = DbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(DbContext))).Entity;
@@ -644,6 +648,29 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             await transaction.CommitAsync();
             return result;
+        }
+
+        /// <summary>
+        /// Refuse de remplacer un autre joueur sur une place prise, sauf verrou du bloc tenu par l'appelant ou
+        /// désinscription de soi-même. Une place d'une autre ville est ignorée ici (refusée ensuite, sans révéler
+        /// son occupant).
+        /// </summary>
+        private async Task EnsureOccupantNotReplacedAsync(ExpeditionCitizenRequestDto request, int idTown, bool canReplaceOccupant)
+        {
+            var occupant = await DbContext.ExpeditionCitizens.AsNoTracking()
+                .Where(citizen => citizen.IdExpeditionCitizen == request.Id!.Value
+                    && citizen.IdExpeditionPartNavigation!.IdExpeditionNavigation!.IdTown == idTown)
+                .Select(citizen => citizen.IdUser)
+                .SingleOrDefaultAsync();
+            if (!occupant.HasValue || occupant == request.IdUser || canReplaceOccupant)
+            {
+                return;
+            }
+            if (!request.IdUser.HasValue && occupant == UserInfoProvider.UserId)
+            {
+                return;
+            }
+            throw new MhoLockedException(occupant.Value);
         }
 
         public void DeleteExpeditionCitizen(int expeditionCitizenId)
@@ -1048,14 +1075,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 .SingleAsync(citizen => citizen.IdExpeditionCitizen == citizenId);
             if (expeditionBagDto.Id.HasValue)
             {
-                // Si l'id du sac du citizen a changer, on delete l'ancien sac
-                if (expeditionCitizen.IdExpeditionBag != expeditionBagDto.Id)
-                {
-                    // Sac d'un autre citoyen : il doit être de la même ville, sinon il serait modifié puis
-                    // partagé avec ce citoyen.
-                    await EnsureBagBelongsToTownAsync(expeditionBagDto.Id, targetTown.IdTown);
-                    DbContext.Remove(await DbContext.ExpeditionBags.SingleAsync(expeditionBag => expeditionBag.IdExpeditionBag == expeditionBagDto.Id));
-                }
+                await EnsureBagIsOwnAsync(expeditionBagDto.Id, citizenId);
                 // UpdateAsync : UpdateAllButKeysProperties recopie aussi les navigations (à leur valeur par
                 // défaut côté DTO), il faut restaurer ExpeditionCitizens sous peine de l'écraser et
                 // d'orpheliner le citoyen (ExpeditionCitizen_ibfk_4 est ON DELETE CASCADE).
@@ -1078,7 +1098,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var newEntity = DbContext.Add(expeditionBagModel).Entity;
                 expeditionCitizen.IdExpeditionBagNavigation = newEntity;
                 await DbContext.SaveChangesAsync();
-                if (oldBagId != null)
+                // Un ancien sac encore partagé (données antérieures) est laissé aux autres places.
+                if (oldBagId != null && !await DbContext.ExpeditionCitizens.AnyAsync(citizen => citizen.IdExpeditionBag == oldBagId))
                 {
                     DbContext.Remove(await DbContext.ExpeditionBags.SingleAsync(expeditionBag => expeditionBag.IdExpeditionBag == oldBagId));
                     await DbContext.SaveChangesAsync();
@@ -1412,23 +1433,20 @@ namespace MyHordesOptimizerApi.Services.Impl
         }
 
         /// <summary>
-        /// Un sac peut être partagé entre citoyens d'expédition (ExpeditionBag.ExpeditionCitizens) : tous
-        /// doivent être de la ville. Un sac sans citoyen, ou inexistant, est refusé faute de ville à vérifier.
+        /// Un sac est propre à une place : seul le sac actuel de la place (ou aucun) est accepté. Couvre aussi
+        /// le sac d'une autre ville.
         /// </summary>
-        private async Task EnsureBagBelongsToTownAsync(int? bagId, int idTown)
+        private async Task EnsureBagIsOwnAsync(int? bagId, int? citizenId)
         {
             if (!bagId.HasValue)
             {
                 return;
             }
-            var bagTownIds = await DbContext.ExpeditionCitizens
-                .Where(citizen => citizen.IdExpeditionBag == bagId.Value)
-                .Select(citizen => citizen.IdExpeditionPartNavigation!.IdExpeditionNavigation!.IdTown)
-                .Distinct()
-                .ToListAsync();
-            if (bagTownIds.Count != 1 || bagTownIds[0] != idTown)
+            var isOwn = citizenId.HasValue && await DbContext.ExpeditionCitizens
+                .AnyAsync(citizen => citizen.IdExpeditionCitizen == citizenId.Value && citizen.IdExpeditionBag == bagId.Value);
+            if (!isOwn)
             {
-                throw new MhoForbiddenException($"Le sac d'expédition {bagId} n'appartient pas à la ville {idTown}.");
+                throw new MhoForbiddenException($"Le sac d'expédition {bagId} n'est pas celui de la place {citizenId}.");
             }
         }
     }

@@ -50,7 +50,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
 
         private static int SeedTownAndCitizen(MhoContext context, string suffix)
         {
-            var townId = new Random().Next(1, int.MaxValue);
+            var townId = new Random().Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
             var userId = new Random().Next(1, int.MaxValue);
             context.Towns.Add(new Town
             {
@@ -80,7 +80,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         /// </summary>
         private static (int townId, int userAId, int userBId) SeedTownAndTwoCitizens(MhoContext context, string suffix)
         {
-            var townId = new Random().Next(1, int.MaxValue);
+            var townId = new Random().Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
             var userAId = new Random().Next(1, int.MaxValue);
             var userBId = new Random().Next(1, int.MaxValue);
 
@@ -150,6 +150,71 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
                 var response = await client.PostAsync($"/ExternalTools/Bag?townId={townId}", body);
 
                 response.StatusCode.Should().Be(HttpStatusCode.OK);
+            }
+        }
+
+        [Fact]
+        public async Task PostStatus_NeModifiePasLEtatGoule_SaisiAlaMain()
+        {
+            /// L'état goule n'est jamais relevé par l'addon : une mise à jour des états ne doit pas l'écraser.
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            (int townId, int userAId, int userBId) seedResult;
+            using (var scope = _factory.Services.CreateScope())
+            {
+                seedResult = SeedTownAndTwoCitizens(scope.ServiceProvider.GetRequiredService<MhoContext>(), suffix);
+            }
+            var (townId, userAId, _) = seedResult;
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                context.TownCitizens.Single(c => c.IdTown == townId && c.IdUser == userAId).IsGhoul = true;
+                context.SaveChanges();
+            }
+
+            var client = CreateClientFor(userAId);
+            var body = new StringContent($"{{\"userId\":{userAId},\"status\":[]}}", Encoding.UTF8, "application/json");
+            var response = await client.PostAsync($"/ExternalTools/Status?townId={townId}", body);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                context.TownCitizens.Single(c => c.IdTown == townId && c.IdUser == userAId).IsGhoul.Should().Be(true);
+            }
+        }
+
+        [Fact]
+        public async Task PostGhoul_UserIdDansLeCorps_ModifieCeCitoyen_SansToucherLaVoracite()
+        {
+            /// Saisie manuelle : tout citoyen de la ville renseigne l'état goule de n'importe quel citoyen,
+            /// comme pour /Status et /Home (userId dans le corps). La voracité absente n'est pas écrasée.
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            (int townId, int userAId, int userBId) seedResult;
+            using (var scope = _factory.Services.CreateScope())
+            {
+                seedResult = SeedTownAndTwoCitizens(scope.ServiceProvider.GetRequiredService<MhoContext>(), suffix);
+            }
+            var (townId, userAId, userBId) = seedResult;
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                context.TownCitizens.Single(c => c.IdTown == townId && c.IdUser == userBId).GhoulVoracity = 7;
+                context.SaveChanges();
+            }
+
+            var clientA = CreateClientFor(userAId);
+            var body = new StringContent($"{{\"userId\":{userBId},\"isGhoul\":true}}", Encoding.UTF8, "application/json");
+            var response = await clientA.PostAsync($"/ExternalTools/Ghoul?townId={townId}", body);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                var citizenB = context.TownCitizens.Single(c => c.IdTown == townId && c.IdUser == userBId);
+                citizenB.IsGhoul.Should().Be(true);
+                citizenB.GhoulVoracity.Should().Be(7);
+                var citizenA = context.TownCitizens.Single(c => c.IdTown == townId && c.IdUser == userAId);
+                citizenA.IsGhoul.Should().Be(false);
             }
         }
 

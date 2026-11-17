@@ -18,7 +18,7 @@ import {
     URBANISM_UID,
     WORKSHOP_UID
 } from './plan-evaluation.util';
-import { BuildingPlanContentDTO, emptyPlanContent, PlanStepDTO } from './plan.types';
+import { BuildingPlanContentDTO, emptyPlanContent, PlanCitizenDTO, PlanStepDTO } from './plan.types';
 import { ResourceCount } from './resources.util';
 
 function ref(overrides: Partial<BuildingRef>): BuildingRef {
@@ -161,6 +161,36 @@ describe('plan-evaluation.util', (): void => {
             expect(capacity?.capacity).toBe(0);
             expect(capacity?.overCommitted).toBe(true);
             expect(evaluation.expeditionPa.get(1)).toBe(25);
+        });
+
+        it('le bannissement simulé du plan l\'emporte sur l\'état réel, dans les deux sens', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ citizens: [{ userId: 1, banned: true, tasks: [] }, { userId: 2, banned: false, tasks: [] }] }));
+            const banned: (user_id: number) => boolean | undefined = (user_id: number): boolean | undefined =>
+                evaluation.capacities.find((c: CitizenCapacity): boolean => c.userId === user_id)?.banned;
+
+            expect(banned(1)).toBe(true);
+            expect(banned(2)).toBe(false);
+            expect(banned(3)).toBe(false);
+        });
+
+        it('mode détaillé : une goule perd 6 PA sur les PA par défaut, pas sur des PA saisis pour elle', (): void => {
+            const capacityOf = (entries: BuildingPlanContentDTO['citizens'], user_id: number): number | undefined =>
+                evaluateDay(input({ citizens: entries })).capacities.find((c: CitizenCapacity): boolean => c.userId === user_id)?.capacity;
+
+            expect(capacityOf([{ userId: 1, ghoul: true, tasks: [] }], 1)).toBe(13);
+            expect(capacityOf([{ userId: 1, ghoul: true, basePaOverride: 10, tasks: [] }], 1)).toBe(10);
+            expect(capacityOf([{ userId: 1, tasks: [] }], 1)).toBe(19);
+        });
+
+        it('goule d\'après la page citoyens : -6 PA sans saisie ; la saisie du plan l\'emporte dans les deux sens', (): void => {
+            const tracked: CitizenRef[] = [{ ...CITIZENS[0], ghoul: true }, CITIZENS[1], CITIZENS[2]];
+            const capacityOf = (entries: BuildingPlanContentDTO['citizens']): number | undefined =>
+                evaluateDay(input({ citizens: entries }, { citizens: tracked })).capacities.find((c: CitizenCapacity): boolean => c.userId === 1)?.capacity;
+
+            expect(capacityOf([])).toBe(13);
+            expect(capacityOf([{ userId: 1, ghoul: null, tasks: [] }])).toBe(13);
+            expect(capacityOf([{ userId: 1, ghoul: false, tasks: [] }])).toBe(19);
+            expect(capacityOf([{ userId: 1, ghoul: true, tasks: [] }])).toBe(13);
         });
 
         it('réparer la porte : la défense restaurée s\'ajoute à la projection', (): void => {
@@ -626,6 +656,54 @@ describe('plan-evaluation.util', (): void => {
             const [, second]: DayEvaluation[] = evaluateDays([day1, day2]);
             expect(second.progressBefore.get(1)?.paCurrent).toBe(40);
             expect(second.progressBefore.get(1)?.invested).toBe(20);
+        });
+    });
+
+    describe('evaluateDay en budget simple', (): void => {
+        const SIMPLE_CITIZENS: PlanCitizenDTO[] = [
+            { userId: 1, tasks: [], worker: true, ghoul: false },
+            { userId: 3, tasks: [], worker: true, ghoul: true }
+        ];
+
+        it('goule d\'après la page citoyens : déduite de la capacité d\'un ouvrier, sauf si le plan dit le contraire', (): void => {
+            const tracked: CitizenRef[] = [{ ...CITIZENS[0], ghoul: true }, CITIZENS[1], CITIZENS[2]];
+            const budget = (entries: PlanCitizenDTO[]): number =>
+                evaluateDay(input({ budgetMode: 'simple', citizens: entries }, { citizens: tracked })).budgets.regular.budget;
+
+            expect(budget([{ userId: 1, tasks: [], worker: true }])).toBe(13);
+            expect(budget([{ userId: 1, tasks: [], worker: true, ghoul: false }])).toBe(19);
+        });
+
+        it('compte les ouvriers (goule déduite), le reste des expéditions et les lignes ville', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({
+                budgetMode: 'simple',
+                citizens: SIMPLE_CITIZENS,
+                expeditionRab: 100,
+                townLines: [{ pool: 'regular', label: 'Ligne', pa: 40 }]
+            }));
+            expect(evaluation.budgets.regular.budget).toBe(19 + 13 + 100 + 40);
+        });
+
+        it('sans ouvrier, le budget est le reste des expéditions et les lignes', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({
+                budgetMode: 'simple',
+                citizens: [{ userId: 1, tasks: [], worker: false, ghoul: false }],
+                expeditionRab: 100,
+                townLines: [{ pool: 'regular', label: 'Ligne', pa: 40 }]
+            }));
+            expect(evaluation.budgets.regular.budget).toBe(140);
+        });
+
+        it('en détaillé, le reste d\'expédition est ignoré et les PA d\'expédition et de tâches comptent', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input(
+                {
+                    citizens: [{ userId: 1, tasks: [{ kind: 'free', pa: 3 }] }],
+                    expeditionRab: 100,
+                    townLines: [{ pool: 'regular', label: 'Ligne', pa: 40 }]
+                },
+                { expeditionPa: new Map<number, number>([[3, 5]]) }
+            ));
+            expect(evaluation.budgets.regular.budget).toBe((19 - 3) + (19 + 6 - 5) + 40);
         });
     });
 });

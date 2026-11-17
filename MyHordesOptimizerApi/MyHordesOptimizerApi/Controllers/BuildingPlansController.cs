@@ -8,6 +8,7 @@ using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Hubs;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.BuildingPlans;
+using MyHordesOptimizerApi.Services.Impl.Locks;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -65,7 +66,7 @@ namespace MyHordesOptimizerApi.Controllers
             var key = new PlanLockKey(mapId, plan.Id);
             if (request.Id is null)
             {
-                if (connectionId is not null && LockRegistry.TryAcquire(key, new PlanLockHolder(connectionId, UserInfoProvider.UserId)) is null)
+                if (connectionId is not null && LockRegistry.TryAcquire(key, new LockHolder(connectionId, UserInfoProvider.UserId)) is null)
                 {
                     await Broadcaster.PlanSavedAsync(mapId, plan, connectionId);
                     await Broadcaster.PlanLockChangedAsync(mapId, new PlanLockDto { PlanId = plan.Id, HolderUserId = UserInfoProvider.UserId, HolderConnectionId = connectionId });
@@ -127,7 +128,7 @@ namespace MyHordesOptimizerApi.Controllers
             {
                 // Droit d'écriture vérifié avant : un non-citoyen ne doit pas bloquer la proposition.
                 await TownAccessService.EnsureCanWriteMapAsync(mapId);
-                holder = LockRegistry.TryAcquire(key, new PlanLockHolder(connectionId, UserInfoProvider.UserId));
+                holder = LockRegistry.TryAcquire(key, new LockHolder(connectionId, UserInfoProvider.UserId));
                 if (holder is null)
                 {
                     await Broadcaster.PlanLockChangedAsync(mapId, new PlanLockDto { PlanId = planId, HolderUserId = UserInfoProvider.UserId, HolderConnectionId = connectionId });

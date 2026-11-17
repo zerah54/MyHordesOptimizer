@@ -168,6 +168,27 @@ describe('BuildingPlanService', (): void => {
         request.flush(<BuildingPlansDTO>{ access: { isCitizen: true, canEdit: true }, plans: [], itemValues: { '5': 2 }, settingsVersion: 2 });
     });
 
+    it('ville explicite : toutes les méthodes visent la ville donnée, pas celle du contexte', (): void => {
+        const PSEUDO_MAP_ID: number = 1_000_000_007;
+        const pseudo_base: string = `${environment.api_url}/BuildingPlans/${PSEUDO_MAP_ID}`;
+        service.getPlans(PSEUDO_MAP_ID).subscribe();
+        service.getState(false, PSEUDO_MAP_ID).subscribe();
+        service.savePlan({ day: 5, name: 'A', content: emptyPlanContent() }, null, PSEUDO_MAP_ID).subscribe();
+        service.deletePlan(3, null, PSEUDO_MAP_ID).subscribe();
+        service.setEffective(3, null, PSEUDO_MAP_ID).subscribe();
+        service.saveSettings({ itemValues: {}, version: 1 }, null, PSEUDO_MAP_ID).subscribe();
+
+        const requests: TestRequest[] = [
+            http_mock.expectOne(pseudo_base),
+            http_mock.expectOne(`${pseudo_base}/state`),
+            http_mock.expectOne(`${pseudo_base}/plans`),
+            http_mock.expectOne(`${pseudo_base}/plans/3`),
+            http_mock.expectOne(`${pseudo_base}/plans/3/effective`),
+            http_mock.expectOne(`${pseudo_base}/settings`)
+        ];
+        requests.forEach((request: TestRequest): void => request.flush(null));
+    });
+
     it('getHomeReferential GET /Fetcher/HomeReferential', (): void => {
         let result: HomeReferentialDTO | undefined;
         service.getHomeReferential().subscribe((referential: HomeReferentialDTO): void => {

@@ -25,6 +25,41 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
         public Dictionary<int, int> PlanTiers { get; set; } = new();
         /// <summary>Pertes prévues cette nuit : chantier laissé détruire ou bonus d'évolution perdu.</summary>
         public List<PlanLossDto> Losses { get; set; } = new();
+        /// <summary><c>simple</c> ou <c>detailed</c> ; null = détaillé.</summary>
+        public string? BudgetMode { get; set; }
+        /// <summary>Palier de PA de base du mode simple : <c>b6</c> ou <c>b7</c> ; null = non choisi.</summary>
+        public string? BasePaTier { get; set; }
+        /// <summary>PA de rab prévus pour les expéditions (mode simple).</summary>
+        public int ExpeditionRab { get; set; }
+        /// <summary>Budget figé à la validation du plan (tous modes de budget) ; null = non validé.</summary>
+        public ValidatedBudgetDto? ValidatedBudget { get; set; }
+    }
+    public class ValidatedBudgetDto
+    {
+        /// <summary>Date ISO de la validation.</summary>
+        public string ValidatedAt { get; set; } = "";
+        /// <summary>Budget et coût par poche (<c>banned</c> / <c>regular</c>).</summary>
+        public Dictionary<string, ValidatedPoolDto> Pools { get; set; } = new();
+        public List<ValidatedStepDto> Steps { get; set; } = new();
+    }
+    public class ValidatedPoolDto
+    {
+        public int Budget { get; set; }
+        public int Cost { get; set; }
+    }
+    public class ValidatedStepDto
+    {
+        /// <summary><c>Building.IdBuilding</c> du chantier.</summary>
+        public int BuildingId { get; set; }
+        /// <summary><c>build</c> ou <c>repair</c>.</summary>
+        public string Kind { get; set; } = "build";
+        /// <summary>Poche de l'étape : <c>banned</c> ou <c>regular</c>.</summary>
+        public string Pool { get; set; } = "regular";
+        public int PaCost { get; set; }
+        /// <summary>PA déjà investis dans le chantier au moment de la validation.</summary>
+        public int Invested { get; set; }
+        /// <summary>PV du chantier au moment de la validation (réparations) ; 0 pour une construction.</summary>
+        public int Life { get; set; }
     }
     public class PlanLossDto
     {
@@ -38,6 +73,12 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
     {
         public int UserId { get; set; }
         public int? BasePaOverride { get; set; }
+        /// <summary>Ouvrier (mode simple).</summary>
+        public bool Worker { get; set; }
+        /// <summary>Goule simulée dans ce plan ; null = état renseigné dans la page citoyens.</summary>
+        public bool? Ghoul { get; set; }
+        /// <summary>Bannissement simulé dans ce plan ; null = état réel du citoyen.</summary>
+        public bool? Banned { get; set; }
         public List<PlanTaskDto> Tasks { get; set; } = new();
     }
 

@@ -413,4 +413,23 @@
         width: 100px;
         min-width: 100px;
     }
+
+    /* Bloc tenu par un autre : grisé et inerte (attribut `inert` posé par la directive). */
+    .mho-locked-block {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .lock-host {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    .lock-label {
+        font-size: 12px;
+        font-style: italic;
+        color: var(--mho-text-muted);
+    }
 }

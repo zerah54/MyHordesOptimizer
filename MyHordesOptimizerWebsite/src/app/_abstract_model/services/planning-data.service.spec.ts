@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Observable, of, Subscriber, throwError } from 'rxjs';
 import type { Mock } from 'vitest';
 
+import { TownContextService } from '../../_core/services/town-context.service';
 import { BuildingUpgradesDTO } from '../../my-town/buildings/planning/building-upgrades.types';
 import { HomeReferentialDTO } from '../../my-town/buildings/planning/home-referential.types';
 import { BuildingPlansDTO, BuildingPlanStateDTO } from '../../my-town/buildings/planning/plan.types';
@@ -85,6 +86,19 @@ describe('PlanningDataService', (): void => {
         expect(result?.item_emotes).toBe(item_emotes);
         expect(get_plans).toHaveBeenCalledTimes(1);
         expect(get_bank).toHaveBeenCalledTimes(1);
+    });
+
+    it('loadStatic en pré-ville : citoyens simulés à la place des citoyens reçus', (): void => {
+        const context: TownContextService = TestBed.inject(TownContextService);
+        context.setPreTownEditable(true);
+        context.setSimulatedCitizens(3);
+        let result: PlanningStatic | undefined;
+        service.loadStatic().subscribe((loaded: PlanningStatic): void => {
+            result = loaded;
+        });
+
+        expect(result?.citizens.map((loaded: Citizen): number => loaded.id)).toEqual([-1, -2, -3]);
+        context.clear();
     });
 
     it('loadStatic émet même si les services ne complètent jamais leur flux', (): void => {

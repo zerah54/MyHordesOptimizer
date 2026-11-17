@@ -1,0 +1,77 @@
+:host {
+    display: contents;
+
+    .mho-pre-town-list-header {
+        margin-bottom: 0.5em;
+    }
+
+    .mho-pre-town-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+
+        .create {
+            display: flex;
+            align-items: center;
+            gap: 0.75em;
+            margin-bottom: 0.75em;
+
+            button {
+                display: flex;
+                align-items: center;
+                gap: 0.25em;
+            }
+        }
+
+        .list-loading {
+            display: flex;
+            justify-content: center;
+            padding: 1em;
+        }
+
+        .pre-town-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75em;
+            padding: 0.6em 0.9em;
+            border: 1px solid var(--mat-sys-outline-variant);
+            border-radius: 8px;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            text-align: left;
+            cursor: pointer;
+
+            &:hover {
+                background: var(--mat-sys-surface-container-high);
+            }
+
+            .alias {
+                flex: 1;
+                font-weight: 600;
+            }
+
+            .new-badge, .linked-badge {
+                padding: 0 0.5em;
+                border-radius: 999px;
+                font-size: 0.8em;
+            }
+
+            .new-badge {
+                background: var(--mat-sys-primary);
+                color: var(--mat-sys-on-primary);
+            }
+
+            .linked-badge {
+                background: var(--mat-sys-secondary-container);
+                color: var(--mat-sys-on-secondary-container);
+            }
+
+            .members {
+                display: flex;
+                align-items: center;
+                gap: 0.25em;
+            }
+        }
+    }
+}

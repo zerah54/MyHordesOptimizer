@@ -21,5 +21,11 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 
         /// <summary>Même règle qu'<see cref="EnsureCanWriteTown"/>, à partir du mapId envoyé par les clients (résolu ici).</summary>
         Task EnsureCanWriteMapAsync(int mapId);
+
+        /// <summary>
+        /// Lecture d'une pré-ville : vrai si <paramref name="mapId"/> est un pseudo-mapId dont l'utilisateur courant est
+        /// membre, liée (gelée) ou non. Faux pour une ville réelle. Même prédicat que le filtre HTTP de lecture.
+        /// </summary>
+        Task<bool> CanReadPreTownAsync(int mapId);
     }
 }

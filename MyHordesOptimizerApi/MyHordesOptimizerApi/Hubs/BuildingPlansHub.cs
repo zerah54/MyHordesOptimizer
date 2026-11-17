@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Impl.BuildingPlans;
+using MyHordesOptimizerApi.Services.Impl.Locks;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -25,7 +27,7 @@ namespace MyHordesOptimizerApi.Hubs
     }
 
     /// <summary>
-    /// Hub de la page Chantiers : présence et verrou de modification par proposition. La ville est celle du jeton ;
+    /// Hub de la page Chantiers : présence et verrou de modification par proposition. La ville est celle du jeton, sauf après <see cref="UseTown"/> (pré-ville) ;
     /// le groupe SignalR est <c>mapId.ToString()</c>.
     /// </summary>
     [Authorize]
@@ -51,7 +53,7 @@ namespace MyHordesOptimizerApi.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            var townId = CurrentTownId();
+            var townId = TokenTownId();
             if (townId > 0)
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, townId.ToString());
@@ -62,12 +64,13 @@ namespace MyHordesOptimizerApi.Hubs
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
-            var townId = CurrentTownId();
+            var tokenTownId = TokenTownId();
+            var activeTownId = ActiveTownId();
             foreach (var key in LockRegistry.ReleaseAll(connectionId))
             {
                 await SendLockChangedAsync(key.MapId, new PlanLockDto { PlanId = key.PlanId });
             }
-            if (townId > 0)
+            foreach (var townId in new[] { tokenTownId, activeTownId }.Where(id => id > 0).Distinct())
             {
                 await Groups.RemoveFromGroupAsync(connectionId, townId.ToString());
                 await LeavePresenceAsync(connectionId, UserInfoProvider.UserId, townId);
@@ -75,10 +78,53 @@ namespace MyHordesOptimizerApi.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-        /// <summary>Déclare la connexion présente sur la page ; renvoie la liste des présents de la ville. Sans ville, ne fait rien.</summary>
+        /// <summary>
+        /// Cible une pré-ville (pseudo-mapId, membre requis, liée ou non) pour les appels suivants de la connexion ; quitte
+        /// le groupe, la présence et les verrous de la précédente (y compris la ville du jeton). Appelée avec la ville du jeton, elle restaure le défaut ; toute autre
+        /// ville réelle est refusée.
+        /// </summary>
+        public async Task UseTown(int mapId)
+        {
+            if (PreTownIds.IsPreTownMapId(mapId))
+            {
+                if (!await TownAccessService.CanReadPreTownAsync(mapId))
+                {
+                    throw new MhoForbiddenException($"L'utilisateur {UserInfoProvider.UserId} n'est pas membre de la pré-ville {mapId - PreTownIds.Offset}.");
+                }
+            }
+            else if (mapId != TokenTownId())
+            {
+                throw new MhoForbiddenException("Seule la ville du jeton ou une pré-ville peut être ciblée");
+            }
+            var previous = ActiveTownId();
+            if (previous > 0 && previous != mapId)
+            {
+                // La connexion ne reçoit plus rien de la ville quittée (même celle du jeton) et n'y garde ni présence ni verrou.
+                await LeavePresenceAsync(Context.ConnectionId, UserInfoProvider.UserId, previous);
+                foreach (var key in LockRegistry.ReleaseAll(Context.ConnectionId, k => k.MapId == previous))
+                {
+                    await SendLockChangedAsync(key.MapId, new PlanLockDto { PlanId = key.PlanId });
+                }
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, previous.ToString());
+            }
+            if (mapId == TokenTownId())
+            {
+                Context.Items.Remove(ActiveMapIdKey);
+            }
+            else
+            {
+                Context.Items[ActiveMapIdKey] = mapId;
+            }
+            if (mapId > 0)
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, mapId.ToString());
+            }
+        }
+
+        /// <summary>Déclare la connexion présente sur la page ; renvoie la liste des présents de la ville active. Sans ville, ne fait rien.</summary>
         public async Task<List<int>> JoinPresence()
         {
-            var townId = CurrentTownId();
+            var townId = ActiveTownId();
             if (townId <= 0)
             {
                 return new List<int>();
@@ -93,7 +139,7 @@ namespace MyHordesOptimizerApi.Hubs
         /// <summary>Retire la présence de la connexion (page fermée) ; elle reste dans le groupe de sa ville.</summary>
         public async Task LeavePresence()
         {
-            await LeavePresenceAsync(Context.ConnectionId, UserInfoProvider.UserId, CurrentTownId());
+            await LeavePresenceAsync(Context.ConnectionId, UserInfoProvider.UserId, ActiveTownId());
         }
 
         /// <summary>Prend le verrou s'il est libre ; sinon renvoie le détenteur actuel, sans rien diffuser.</summary>
@@ -102,7 +148,7 @@ namespace MyHordesOptimizerApi.Hubs
             var townId = RequireTownId();
             await TownAccessService.EnsureCanWriteMapAsync(townId);
             var userId = UserInfoProvider.UserId;
-            var holder = LockRegistry.TryAcquire(new PlanLockKey(townId, planId), new PlanLockHolder(Context.ConnectionId, userId));
+            var holder = LockRegistry.TryAcquire(new PlanLockKey(townId, planId), new LockHolder(Context.ConnectionId, userId));
             if (holder is not null)
             {
                 Logger.LogInformation("BuildingPlanLock {Event} map {MapId} plan {PlanId} user {UserId} holder {HolderUserId}",
@@ -112,7 +158,7 @@ namespace MyHordesOptimizerApi.Hubs
             return await GrantAsync(townId, planId, userId);
         }
 
-        /// <summary>Renvoie les verrous actifs de la ville du jeton, sans rien diffuser.</summary>
+        /// <summary>Renvoie les verrous actifs de la ville active, sans rien diffuser.</summary>
         public async Task<List<PlanLockDto>> GetPlanLocks()
         {
             var townId = RequireTownId();
@@ -128,7 +174,7 @@ namespace MyHordesOptimizerApi.Hubs
             var townId = RequireTownId();
             await TownAccessService.EnsureCanWriteMapAsync(townId);
             var userId = UserInfoProvider.UserId;
-            var previous = LockRegistry.TakeOver(new PlanLockKey(townId, planId), new PlanLockHolder(Context.ConnectionId, userId));
+            var previous = LockRegistry.TakeOver(new PlanLockKey(townId, planId), new LockHolder(Context.ConnectionId, userId));
             if (previous is not null)
             {
                 Logger.LogInformation("BuildingPlanLock {Event} map {MapId} plan {PlanId} user {UserId} holder {HolderUserId}",
@@ -149,7 +195,7 @@ namespace MyHordesOptimizerApi.Hubs
         /// <summary>Signale aux autres clients de la ville que les tâches cochées de l'utilisateur ont changé.</summary>
         public async Task NotifyTaskChecks(int userId)
         {
-            await Clients.OthersInGroup(CurrentTownId().ToString()).SendAsync(BuildingPlansHubEvent.TaskChecksChanged.GetDescription(), userId);
+            await Clients.OthersInGroup(ActiveTownId().ToString()).SendAsync(BuildingPlansHubEvent.TaskChecksChanged.GetDescription(), userId);
         }
 
         // Diffusé à chaque octroi : un verrou périmé non balayé a pu changer de main sans que ExpireIdle le signale.
@@ -183,10 +229,10 @@ namespace MyHordesOptimizerApi.Hubs
             }
         }
 
-        /// <summary>Ville du jeton ; refuse l'appel si le jeton n'en porte pas.</summary>
+        /// <summary>Ville active ; refuse l'appel si la connexion n'en a pas.</summary>
         private int RequireTownId()
         {
-            var townId = CurrentTownId();
+            var townId = ActiveTownId();
             if (townId <= 0)
             {
                 throw new MhoForbiddenException("Aucune ville dans le jeton");
@@ -194,9 +240,17 @@ namespace MyHordesOptimizerApi.Hubs
             return townId;
         }
 
-        private int CurrentTownId()
+        private const string ActiveMapIdKey = "activeMapId";
+
+        private int TokenTownId()
         {
             return UserInfoProvider.TownDetail?.TownId ?? 0;
+        }
+
+        /// <summary>Pré-ville ciblée par <see cref="UseTown"/>, sinon ville du jeton.</summary>
+        private int ActiveTownId()
+        {
+            return Context.Items.TryGetValue(ActiveMapIdKey, out var active) && active is int mapId ? mapId : TokenTownId();
         }
     }
 

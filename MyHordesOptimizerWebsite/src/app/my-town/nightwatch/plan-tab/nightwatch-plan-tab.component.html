@@ -1,0 +1,75 @@
+@if (store.draft(); as draft) {
+    <div class="plan-tab">
+        <section class="totals">
+            @if (store.totals(); as totals) {
+                <div class="kpis">
+                    <div class="kpi" data-field="defense-total">
+                        <span class="title" i18n>Défense de veille</span>
+                        <span class="value">{{ totals.defense }}</span>
+                    </div>
+                    <div class="kpi" data-field="count" [class.negative]="store.over_cap()">
+                        <span class="title" i18n>Veilleurs</span>
+                        <span class="value">{{ totals.watcher_count }} / {{ totals.cap }}</span>
+                    </div>
+                    @if (totals.planned_margin !== null) {
+                        <div class="kpi" data-field="margin" [class.negative]="totals.planned_margin < 0">
+                            <span class="title" i18n>Marge contre l'attaque estimée</span>
+                            <span class="value">{{ totals.planned_margin }}</span>
+                        </div>
+                    }
+                </div>
+            }
+            <mat-form-field class="attack" appearance="outline" subscriptSizing="dynamic">
+                <mat-label i18n>Attaque (vide = estimée)</mat-label>
+                <input matInput type="number" min="0" step="1" data-field="attack-override" [value]="draft.attackOverride ?? ''" [disabled]="!store.can_edit()"
+                       #attack
+                       [placeholder]="store.estimated_attack() === null ? '' : '' + store.estimated_attack()" (change)="setAttack(attack.value)">
+            </mat-form-field>
+        </section>
+
+        @if (store.over_cap()) {
+            <p class="alert" role="alert" data-alert="over-cap">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                <ng-container i18n>Plafond de veilleurs dépassé</ng-container>
+            </p>
+        }
+
+        @for (shortage of shortages(); track shortage.item_id) {
+            <p class="alert" role="alert" data-alert="insufficient-stock">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                <span><ng-container i18n>Quantité attribuée supérieure au disponible :</ng-container>
+                    {{ shortage.label }} ({{ shortage.remaining }})</span>
+            </p>
+        }
+
+        <div class="watchers">
+            @for (row of store.watcher_rows(); track row.user_id) {
+                <mho-nightwatch-watcher [row]="row" [items]="items()"/>
+            }
+        </div>
+
+        <mat-form-field class="add-watcher" appearance="outline" subscriptSizing="dynamic">
+            <mat-select data-field="add-watcher" [disabled]="!store.can_edit()" i18n-aria-label aria-label="Ajouter un veilleur" #picked
+                        i18n-placeholder placeholder="Ajouter un veilleur…" (selectionChange)="addWatcher(picked, $event.value)">
+                @for (citizen of addable_citizens(); track citizen.userId) {
+                    <mat-option [value]="citizen.userId">{{ citizen.name }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field class="instructions" appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Consignes</mat-label>
+            <textarea matInput rows="3" maxlength="2000" data-field="instructions" [value]="draft.instructions ?? ''" [disabled]="!store.can_edit()"
+                      #instructions
+                      (change)="setInstructions(instructions.value)"></textarea>
+        </mat-form-field>
+    </div>
+} @else if (store.can_create()) {
+    <p class="no-plan" i18n>Aucune proposition pour ce jour.</p>
+    <button mat-stroked-button type="button" data-action="create-plan" (click)="create()">
+        <mat-icon>add</mat-icon>
+        <ng-container i18n>Créer une proposition</ng-container>
+    </button>
+} @else {
+    <p class="no-plan" i18n>Aucune proposition pour ce jour.</p>
+}

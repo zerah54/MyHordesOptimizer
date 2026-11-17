@@ -8,6 +8,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.MapRoutes.Request;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Models.Expeditions;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Expeditions;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -76,11 +77,23 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
         public IClientProxy Users(IReadOnlyList<string> userIds) => _proxy;
     }
 
-    /// <summary>Fake de IGroupManager : aucune opération de groupe réelle n'est requise pour ces tests.</summary>
+    /// <summary>Fake de IGroupManager : retient les groupes courants de chaque connexion.</summary>
     public class FakeGroupManager : IGroupManager
     {
-        public Task AddToGroupAsync(string connectionId, string groupName, CancellationToken cancellationToken = default) => Task.CompletedTask;
-        public Task RemoveFromGroupAsync(string connectionId, string groupName, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        /// <summary>Appartenances courantes, au format "connexion:groupe".</summary>
+        public HashSet<string> Memberships { get; } = new();
+
+        public Task AddToGroupAsync(string connectionId, string groupName, CancellationToken cancellationToken = default)
+        {
+            Memberships.Add($"{connectionId}:{groupName}");
+            return Task.CompletedTask;
+        }
+
+        public Task RemoveFromGroupAsync(string connectionId, string groupName, CancellationToken cancellationToken = default)
+        {
+            Memberships.Remove($"{connectionId}:{groupName}");
+            return Task.CompletedTask;
+        }
     }
 
     public class FakeUserInfoProvider : IUserInfoProvider
@@ -112,13 +125,31 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
             DuplicateChoices = (keepRoute, keepGeneralOrders, keepRouteOrders);
             return Task.FromResult(new ExpeditionDto { Id = expeditionId + 1, Label = label });
         }
-        public Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen) => throw new NotSupportedException();
+        /// <summary>Valeur de canReplaceOccupant du dernier appel à SaveExpeditionCitizenAsync.</summary>
+        public bool? LastCanReplaceOccupant { get; private set; }
+        /// <summary>Exception levée par SaveExpeditionCitizenAsync quand renseignée.</summary>
+        public Exception? SaveCitizenThrows { get; set; }
+        public Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen, bool canReplaceOccupant = false)
+        {
+            LastCanReplaceOccupant = canReplaceOccupant;
+            if (SaveCitizenThrows is not null)
+            {
+                throw SaveCitizenThrows;
+            }
+            return Task.FromResult(new ExpeditionCitizenDto { Id = expeditionCitizen.Id, ExpeditionPartId = expeditionPartId });
+        }
         public void DeleteExpeditionCitizen(int expeditionCitizenId) => throw new NotSupportedException();
         public Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart) => Task.FromResult(new ExpeditionPartDto { Id = expeditionPart.Id, ExpeditionId = expeditionId, MapRouteId = expeditionPart.MapRouteId });
         public void DeleteExpeditionPart(int expeditionPartId) => throw new NotSupportedException();
         public Task<List<ExpeditionPartDto>> GetExpeditionPartsAsync(IReadOnlyCollection<int> expeditionPartIds) => Task.FromResult(expeditionPartIds.Select(id => new ExpeditionPartDto { Id = id }).ToList());
         public Task<List<ExpeditionOrderDto>> SaveCitizenOrdersAsync(int expeditionCitizenId, List<ExpeditionOrderDto> expeditionOrder) => throw new NotSupportedException();
-        public Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder) => throw new NotSupportedException();
+        /// <summary>Nombre d'appels à SavePartOrdersAsync.</summary>
+        public int SavePartOrdersCalls { get; private set; }
+        public Task<List<ExpeditionOrderDto>> SavePartOrdersAsync(int expeditionPartId, List<ExpeditionOrderDto> expeditionOrder)
+        {
+            SavePartOrdersCalls++;
+            return Task.FromResult(expeditionOrder);
+        }
         public void DeleteExpeditionOrder(int expeditionOrderId) => throw new NotSupportedException();
         public ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto) => throw new NotSupportedException();
         public Task<ExpeditionBagDto> UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto) => throw new NotSupportedException();
@@ -129,6 +160,27 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
             PendingMapRouteChanges.Clear();
             return changes;
         }
+    }
+
+    /// <summary>Fake de IExpeditionLockScopeService : renvoie les blocs configurés (aucun par défaut).</summary>
+    public class FakeExpeditionLockScopeService : IExpeditionLockScopeService
+    {
+        public List<ExpeditionLockRef> Refs { get; } = new();
+
+        private Task<IReadOnlyList<ExpeditionLockRef>> Result() => Task.FromResult<IReadOnlyList<ExpeditionLockRef>>(Refs.ToList());
+
+        public Task<IReadOnlyList<ExpeditionLockRef>> OwnersOfOrderAsync(int orderId) => Result();
+        /// <summary>Sac demandé lors du dernier appel à OwnersOfBagAsync.</summary>
+        public int? LastOwnersOfBagId { get; private set; }
+        public Task<IReadOnlyList<ExpeditionLockRef>> OwnersOfBagAsync(int bagId)
+        {
+            LastOwnersOfBagId = bagId;
+            return Result();
+        }
+        public Task<IReadOnlyList<ExpeditionLockRef>> WithDescendantsOfCitizenAsync(int citizenId) => Result();
+        public Task<IReadOnlyList<ExpeditionLockRef>> WithDescendantsOfPartAsync(int partId) => Result();
+        public Task<IReadOnlyList<ExpeditionLockRef>> WithDescendantsOfExpeditionAsync(int expeditionId) => Result();
+        public Task<IReadOnlyList<ExpeditionLockRef>> OfDayAsync(int mapId, int day) => Result();
     }
 
     /// <summary>Fake de ITownAccessService : accorde ou refuse tout selon <see cref="Allow"/>.</summary>
@@ -153,6 +205,11 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
         public Task<bool> CanWriteTownAsync(int resolvedIdTown, int? mapId) => Task.FromResult(Allow);
 
         public Task EnsureCanWriteMapAsync(int mapId) => EnsureCanWriteTownAsync(mapId, mapId);
+
+        /// <summary>Pseudo-mapIds de pré-villes dont l'utilisateur est membre en lecture.</summary>
+        public HashSet<int> ReadablePreTownMapIds { get; } = new();
+
+        public Task<bool> CanReadPreTownAsync(int mapId) => Task.FromResult(ReadablePreTownMapIds.Contains(mapId));
     }
 
     /// <summary>Fake de IMapRouteService : enregistre en renvoyant la requête, ou lève <see cref="SaveException"/>.</summary>

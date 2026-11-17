@@ -59,6 +59,14 @@ describe('computeReconstructedHomeDefense', (): void => {
         expect(computeReconstructedHomeDefense(citizen)).toBe(10);
     });
 
+    it('ajoute +4 avec les Habitations fortifiées, à tout citoyen quel que soit son métier', (): void => {
+        const citizen: Citizen = citizenWith({ house_defense: 10, job: JobEnum.CITIZEN });
+
+        expect(computeReconstructedHomeDefense(citizen, true)).toBe(14);
+        expect(computeReconstructedHomeDefense(citizen, false)).toBe(10);
+        expect(computeReconstructedHomeDefense(citizen)).toBe(10);
+    });
+
     it('ignores renfort/fence for a non-heroic (basic) job even when present', (): void => {
         const citizen: Citizen = citizenWith({ house_defense: 5, job: JobEnum.CITIZEN, renfort_level: 8, has_fence: true });
 

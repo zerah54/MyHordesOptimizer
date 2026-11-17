@@ -9,6 +9,8 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.MapRoutes.Request;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Providers.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Expeditions;
+using MyHordesOptimizerApi.Services.Impl.Locks;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -26,6 +28,8 @@ namespace MyHordesOptimizerApi.Hubs
         protected IMapRouteService MapRouteService { get; init; }
         protected ITownAccessService TownAccessService { get; init; }
         protected IUserInfoProvider UserInfoProvider { get; init; }
+        protected ExpeditionLockRegistry LockRegistry { get; init; }
+        protected IExpeditionLockScopeService LockScope { get; init; }
         protected ILogger<AbstractMyHordesOptimizerControllerBase> Logger { get; init; }
 
         // Ville (mapId) suivie par chaque connexion : celle du jeton à la connexion, puis celle choisie par JoinTown.
@@ -37,12 +41,16 @@ namespace MyHordesOptimizerApi.Hubs
             IMapRouteService mapRouteService,
             ITownAccessService townAccessService,
             IUserInfoProvider userInfoProvider,
+            ExpeditionLockRegistry lockRegistry,
+            IExpeditionLockScopeService lockScope,
             ILogger<AbstractMyHordesOptimizerControllerBase> logger)
         {
             ExpeditionService = expeditionService;
             MapRouteService = mapRouteService;
             TownAccessService = townAccessService;
             UserInfoProvider = userInfoProvider;
+            LockRegistry = lockRegistry;
+            LockScope = lockScope;
             Logger = logger;
         }
 
@@ -63,6 +71,10 @@ namespace MyHordesOptimizerApi.Hubs
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
             var connectionId = Context.ConnectionId;
+            foreach (var key in LockRegistry.ReleaseAll(connectionId))
+            {
+                await SendLockChangedAsync(key.MapId, FreeLockDto(key.Kind, key.EntityId));
+            }
             if (_townIdBySocketToken.TryGetValue(connectionId, out var townId))
             {
                 Logger.LogDebug("[{@connectionId}] {@userId} Disconnected", connectionId, UserInfoProvider.UserId);
@@ -185,11 +197,127 @@ namespace MyHordesOptimizerApi.Hubs
                 : UserInfoProvider.TownDetail?.TownId ?? 0;
         }
 
+        /// <summary>
+        /// Prend le verrou du bloc pour la connexion et le diffuse. Refusé : renvoie le détenteur sans diffuser.
+        /// </summary>
+        public async Task<ExpeditionLockDto> AcquireLock(string kind, int entityId)
+        {
+            var (townId, key) = await PrepareLockAsync(kind, entityId);
+            var self = new LockHolder(Context.ConnectionId, UserInfoProvider.UserId);
+            var holder = LockRegistry.TryAcquire(key, self);
+            if (holder is not null)
+            {
+                Logger.LogInformation("ExpeditionLock Refused map {MapId} {Kind} {EntityId} user {UserId} holder {HolderUserId}",
+                    townId, kind, entityId, self.UserId, holder.UserId);
+                return ToDto(key, holder);
+            }
+            var dto = ToDto(key, self);
+            await SendLockChangedAsync(townId, dto);
+            return dto;
+        }
+
+        /// <summary>Signale que la connexion est toujours active sur le bloc (repousse l'expiration).</summary>
+        public async Task TouchLock(string kind, int entityId)
+        {
+            var (_, key) = await PrepareLockAsync(kind, entityId);
+            LockRegistry.Touch(key, Context.ConnectionId);
+        }
+
+        /// <summary>Libère le verrou du bloc s'il est tenu par la connexion et diffuse le verrou libre.</summary>
+        public async Task ReleaseLock(string kind, int entityId)
+        {
+            var (townId, key) = await PrepareLockAsync(kind, entityId);
+            if (LockRegistry.Release(key, Context.ConnectionId))
+            {
+                await SendLockChangedAsync(townId, FreeLockDto(key.Kind, key.EntityId));
+            }
+        }
+
+        /// <summary>Verrous actifs de la ville courante.</summary>
+        public async Task<List<ExpeditionLockDto>> GetExpeditionLocks()
+        {
+            var townId = CurrentTownId();
+            if (townId <= 0)
+            {
+                throw new HubException("No town");
+            }
+            await TownAccessService.EnsureCanWriteMapAsync(townId);
+            return LockRegistry.ActiveHolders(key => key.MapId == townId)
+                .Select(active => ToDto(active.Key, active.Holder))
+                .ToList();
+        }
+
+        private async Task<(int TownId, ExpeditionLockKey Key)> PrepareLockAsync(string kind, int entityId)
+        {
+            if (!ExpeditionLockDto.TryParseKind(kind, out var lockKind))
+            {
+                throw new HubException($"Unknown lock kind: {kind}");
+            }
+            var townId = CurrentTownId();
+            if (townId <= 0)
+            {
+                throw new HubException("No town");
+            }
+            await TownAccessService.EnsureCanWriteMapAsync(townId);
+            return (townId, new ExpeditionLockKey(townId, lockKind, entityId));
+        }
+
+        /// <summary>
+        /// Refuse l'écriture si l'un des blocs est tenu par une autre connexion ; sinon repousse l'expiration
+        /// des blocs tenus par l'appelant. Sans ville, rien n'est verrouillable.
+        /// </summary>
+        private void EnsureNotLockedByOthers(int townId, IEnumerable<ExpeditionLockRef> refs)
+        {
+            if (townId <= 0)
+            {
+                return;
+            }
+            var connectionId = Context.ConnectionId;
+            var ownKeys = new List<ExpeditionLockKey>();
+            foreach (var lockRef in refs)
+            {
+                var key = new ExpeditionLockKey(townId, lockRef.Kind, lockRef.EntityId);
+                var holder = LockRegistry.HolderOf(key);
+                if (holder is null)
+                {
+                    continue;
+                }
+                if (holder.ConnectionId != connectionId)
+                {
+                    throw new HubException(MhoLockedException.HubMessagePrefix + holder.UserId);
+                }
+                ownKeys.Add(key);
+            }
+            ownKeys.ForEach(key => LockRegistry.Touch(key, connectionId));
+        }
+
+        private static ExpeditionLockDto FreeLockDto(ExpeditionLockKind kind, int entityId)
+        {
+            return new ExpeditionLockDto { Kind = ExpeditionLockDto.KindName(kind), EntityId = entityId };
+        }
+
+        private static ExpeditionLockDto ToDto(ExpeditionLockKey key, LockHolder holder)
+        {
+            var dto = FreeLockDto(key.Kind, key.EntityId);
+            dto.HolderUserId = holder.UserId;
+            dto.HolderConnectionId = holder.ConnectionId;
+            return dto;
+        }
+
+        private Task SendLockChangedAsync(int townId, ExpeditionLockDto dto)
+        {
+            return Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionLockChanged.GetDescription(), dto);
+        }
+
         public async Task PostExpedition(int townId, int day, string expeditionAsJson)
         {
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} in {@townId} for day {@day} PostExpedition : {@expeditionAsJson}", userId, townId, day, expeditionAsJson);
             var expedition = expeditionAsJson.FromJson<ExpeditionRequestDto>();
+            if (expedition.Id.HasValue)
+            {
+                EnsureNotLockedByOthers(CurrentTownId(), new[] { new ExpeditionLockRef(ExpeditionLockKind.Expedition, expedition.Id.Value) });
+            }
             var savedExpedition = await ExpeditionService.SaveExpeditionAsync(expedition, townId, day);
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionUpdated.GetDescription(), savedExpedition);
             Logger.LogDebug("Sent to Group({@townId}) ExpeditionUpdated: {@savedExpedition}", townId, savedExpedition.ToJson());
@@ -199,6 +327,7 @@ namespace MyHordesOptimizerApi.Hubs
         {
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} DeleteExpedition : {@expeditionId}", userId, expeditionId);
+            EnsureNotLockedByOthers(CurrentTownId(), await LockScope.WithDescendantsOfExpeditionAsync(expeditionId));
             ExpeditionService.DeleteExpedition(expeditionId);
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionDeleted.GetDescription(), expeditionId);
@@ -222,6 +351,7 @@ namespace MyHordesOptimizerApi.Hubs
             {
                 throw new MhoTechnicalException($"{nameof(fromDay)} should be different from {nameof(targetDay)}");
             }
+            EnsureNotLockedByOthers(CurrentTownId(), await LockScope.OfDayAsync(townId, targetDay));
             var newExpeditions = await ExpeditionService.CopyExpeditionsAsync(townId, fromDay, targetDay);
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionsUpdated.GetDescription(), newExpeditions);
             Logger.LogDebug("Sent to Group({@townId}) ExpeditionsUpdated: {@newExpeditions}", townId, newExpeditions.ToJson());
@@ -244,6 +374,10 @@ namespace MyHordesOptimizerApi.Hubs
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} PostExpeditionPart {@expeditionId} : {@expeditionPartAsJson}", userId, expeditionId, expeditionPartAsJson);
             var expeditionPart = expeditionPartAsJson.FromJson<ExpeditionPartRequestDto>();
+            if (expeditionPart.Id.HasValue)
+            {
+                EnsureNotLockedByOthers(CurrentTownId(), new[] { new ExpeditionLockRef(ExpeditionLockKind.Part, expeditionPart.Id.Value) });
+            }
             var expeditionPartResult = await ExpeditionService.SaveExpeditionPartAsync(expeditionId, expeditionPart);
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionPartUpdated.GetDescription(), expeditionPartResult);
@@ -255,6 +389,7 @@ namespace MyHordesOptimizerApi.Hubs
         {
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} DeleteExpeditionPart : {@expeditionPartId}", userId, expeditionPartId);
+            EnsureNotLockedByOthers(CurrentTownId(), await LockScope.WithDescendantsOfPartAsync(expeditionPartId));
             ExpeditionService.DeleteExpeditionPart(expeditionPartId);
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionPartDeleted.GetDescription(), expeditionPartId);
@@ -267,7 +402,21 @@ namespace MyHordesOptimizerApi.Hubs
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} PostExpeditionCitizen {@expeditionPartId} : {@expeditionCitizenAsJson}", userId, expeditionPartId, expeditionCitizenAsJson);
             var expeditionCitizen = expeditionCitizenAsJson.FromJson<ExpeditionCitizenRequestDto>();
-            var returnedExpeditionCitizen = await ExpeditionService.SaveExpeditionCitizenAsync(expeditionPartId, expeditionCitizen);
+            if (expeditionCitizen.Id.HasValue)
+            {
+                EnsureNotLockedByOthers(CurrentTownId(), new[] { new ExpeditionLockRef(ExpeditionLockKind.Citizen, expeditionCitizen.Id.Value) });
+            }
+            var canReplaceOccupant = expeditionCitizen.Id.HasValue
+                && LockRegistry.IsHeldBy(new ExpeditionLockKey(CurrentTownId(), ExpeditionLockKind.Citizen, expeditionCitizen.Id.Value), Context.ConnectionId);
+            ExpeditionCitizenDto returnedExpeditionCitizen;
+            try
+            {
+                returnedExpeditionCitizen = await ExpeditionService.SaveExpeditionCitizenAsync(expeditionPartId, expeditionCitizen, canReplaceOccupant);
+            }
+            catch (MhoLockedException e) when (e.HolderUserId.HasValue)
+            {
+                throw new HubException(MhoLockedException.HubMessagePrefix + e.HolderUserId.Value);
+            }
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionCitizenUpdated.GetDescription(), returnedExpeditionCitizen);
             Logger.LogDebug("Sent to Group({@townId}) ExpeditionCitizenUpdated: {@returnedExpeditionCitizen}", townId, returnedExpeditionCitizen);
@@ -277,6 +426,7 @@ namespace MyHordesOptimizerApi.Hubs
         {
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} DeleteExpeditionCitizen : {@expeditionCitizenId}", userId, expeditionCitizenId);
+            EnsureNotLockedByOthers(CurrentTownId(), await LockScope.WithDescendantsOfCitizenAsync(expeditionCitizenId));
             ExpeditionService.DeleteExpeditionCitizen(expeditionCitizenId);
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionCitizenDeleted.GetDescription(), expeditionCitizenId);
@@ -288,6 +438,7 @@ namespace MyHordesOptimizerApi.Hubs
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} PostPartOrders {@expeditionPartId} : {@expeditionOrderAsJson}", userId, expeditionPartId, expeditionOrderAsJson);
             var expeditionOrders = expeditionOrderAsJson.FromJson<List<ExpeditionOrderDto>>();
+            EnsureNotLockedByOthers(CurrentTownId(), new[] { new ExpeditionLockRef(ExpeditionLockKind.PartOrders, expeditionPartId) });
             var returnedOrder = await ExpeditionService.SavePartOrdersAsync(expeditionPartId, expeditionOrders);
             var townId = CurrentTownId();
             // Toutes les consignes de la partie, puis la partie : une liste vide dit qu'elles ont toutes été retirées.
@@ -300,6 +451,7 @@ namespace MyHordesOptimizerApi.Hubs
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} PostCitizenOrders {@expeditionCitizenId} : {@expeditionOrderAsJson}", userId, expeditionCitizenId, expeditionOrderAsJson);
             var expeditionOrders = expeditionOrderAsJson.FromJson<List<ExpeditionOrderDto>>();
+            EnsureNotLockedByOthers(CurrentTownId(), new[] { new ExpeditionLockRef(ExpeditionLockKind.CitizenOrders, expeditionCitizenId) });
             var returnedOrder = await ExpeditionService.SaveCitizenOrdersAsync(expeditionCitizenId, expeditionOrders);
             var townId = CurrentTownId();
             // Toutes les consignes du citoyen, puis le citoyen : une liste vide dit qu'elles ont toutes été retirées.
@@ -311,6 +463,7 @@ namespace MyHordesOptimizerApi.Hubs
         {
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} DeleteExpeditionOrder : {@expeditionOrderId}", userId, expeditionOrderId);
+            EnsureNotLockedByOthers(CurrentTownId(), await LockScope.OwnersOfOrderAsync(expeditionOrderId));
             ExpeditionService.DeleteExpeditionOrder(expeditionOrderId);
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionOrderDeleted.GetDescription(), expeditionOrderId);
@@ -326,6 +479,7 @@ namespace MyHordesOptimizerApi.Hubs
             {
                 throw new MhoTechnicalException($"{nameof(expeditionOrder.Id)} cannot be empty");
             }
+            EnsureNotLockedByOthers(CurrentTownId(), await LockScope.OwnersOfOrderAsync(expeditionOrder.Id.Value));
             var updatedDto = ExpeditionService.UpdateExpeditionOrder(expeditionOrder);
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionOrderUpdated.GetDescription(), updatedDto);
@@ -337,6 +491,13 @@ namespace MyHordesOptimizerApi.Hubs
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} SaveExpeditionBag {@citizenId} : {@expeditionBagDtoAsJson}", userId, citizenId, expeditionBagDtoAsJson);
             var expeditionBagDto = expeditionBagDtoAsJson.FromJson<ExpeditionBagRequestDto>();
+            // Un sac peut être partagé par plusieurs lignes : les verrous de toutes ses lignes le protègent.
+            var refs = new List<ExpeditionLockRef> { new(ExpeditionLockKind.Bag, citizenId) };
+            if (expeditionBagDto.Id.HasValue)
+            {
+                refs.AddRange(await LockScope.OwnersOfBagAsync(expeditionBagDto.Id.Value));
+            }
+            EnsureNotLockedByOthers(CurrentTownId(), refs);
             var updatedDto = await ExpeditionService.UpdateExpeditionBag(citizenId, expeditionBagDto);
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionBagUpdated.GetDescription(), updatedDto);
@@ -347,6 +508,7 @@ namespace MyHordesOptimizerApi.Hubs
         {
             var userId = UserInfoProvider.UserId;
             Logger.LogDebug("{@userId} DeleteExpeditionBag {@bagId}", userId, bagId);
+            EnsureNotLockedByOthers(CurrentTownId(), await LockScope.OwnersOfBagAsync(bagId));
             var replacementBags = ExpeditionService.DeleteExpeditionBag(bagId);
             var townId = CurrentTownId();
             await Clients.Group(townId.ToString()).SendAsync(ExpeditionsHubEvent.ExpeditionBagDeleted.GetDescription(), bagId);
@@ -466,6 +628,8 @@ namespace MyHordesOptimizerApi.Hubs
         [Description("MapRouteChanged")]
         MapRouteChanged,
         [Description("MapRouteDeleted")]
-        MapRouteDeleted
+        MapRouteDeleted,
+        [Description("ExpeditionLockChanged")]
+        ExpeditionLockChanged
     }
 }

@@ -5,6 +5,7 @@ import {
     Component,
     computed,
     DestroyRef,
+    effect,
     inject,
     OnInit,
     output,
@@ -15,6 +16,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,6 +33,7 @@ import { environment } from '../../../environments/environment';
 import { BREAKPOINTS } from '../../_abstract_model/const';
 import { AdminService } from '../../_abstract_model/services/admin.service';
 import { AuthenticationService } from '../../_abstract_model/services/authentication.service';
+import { PreTownService } from '../../_abstract_model/services/pre-town.service';
 import { Imports } from '../../_abstract_model/types/_types';
 import { Me } from '../../_abstract_model/types/me.class';
 import { TownContextService } from '../../_core/services/town-context.service';
@@ -45,7 +48,7 @@ import { TownChipComponent } from './town-chip/town-chip.component';
 const angular_common: Imports = [CommonModule, NgOptimizedImage, NgTemplateOutlet, FormsModule];
 const components: Imports = [AvatarComponent, CitizenMenuComponent, ExternalToolsUpdateButtonComponent, GlobalSearchComponent, TownChipComponent];
 const pipes: Imports = [];
-const material_modules: Imports = [MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatToolbarModule, MatTooltipModule, RouterLink];
+const material_modules: Imports = [MatBadgeModule, MatButtonModule, MatDividerModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatToolbarModule, MatTooltipModule, RouterLink];
 
 @Component({
     selector: 'mho-header',
@@ -100,6 +103,10 @@ export class HeaderComponent implements OnInit {
     private readonly authentication_api: AuthenticationService = inject(AuthenticationService);
     private readonly header_service: HeaderService = inject(HeaderService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly pre_town_service: PreTownService = inject(PreTownService);
+
+    /** Pré-villes non vues : pastille du bouton de profil et de l'entrée « Mes pré-villes ». */
+    protected readonly unseen_pre_towns: Signal<number> = this.pre_town_service.unseenPreTownCount;
 
     /** Migré depuis `@HostListener('window:resize')` vers `host: {}` (voir décorateur ci-dessus). */
     protected onResize(): void {
@@ -109,6 +116,11 @@ export class HeaderComponent implements OnInit {
 
     public constructor() {
         this.title = this.title_service.getTitle();
+        effect((): void => {
+            if (this.me()?.id) {
+                this.pre_town_service.refreshUnseenCount();
+            }
+        });
     }
 
     public ngOnInit(): void {

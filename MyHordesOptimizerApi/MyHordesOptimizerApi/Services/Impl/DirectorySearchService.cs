@@ -62,7 +62,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             };
 
             // Les noms de ville se répètent d'une saison à l'autre : à qualité égale, les plus récentes d'abord.
-            var towns = _dbContext.Towns.AsNoTracking()
+            var towns = _dbContext.Towns.AsNoTracking().ExcludingPreTowns()
                 .Where(town => town.MapId != null && town.Name != null && EF.Functions.Like(town.Name, contains, LikeEscape));
             var townItems = towns
                 .OrderBy(town => EF.Functions.Like(town.Name!, prefix, LikeEscape) ? 0 : EF.Functions.Like(town.Name!, wordStart, LikeEscape) ? 1 : 2)

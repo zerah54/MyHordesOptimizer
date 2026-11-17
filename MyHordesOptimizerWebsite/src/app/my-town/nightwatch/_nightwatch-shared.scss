@@ -1,0 +1,65 @@
+@use '@angular/material' as mat;
+
+// Grille de KPI : même rendu que le planning des chantiers.
+@mixin kpis {
+    .kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+        gap: 0.5em;
+    }
+
+    .kpi {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15em;
+        min-width: 0;
+        padding: 0.4em 0.6em;
+        border: 1px solid var(--mho-line-strong);
+        border-radius: var(--mho-radius-m);
+        background: var(--mho-surface);
+
+        .title {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            opacity: 0.75;
+        }
+
+        .value {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.25em;
+            font-size: 1.15em;
+        }
+
+        &.negative .value {
+            color: var(--mho-danger);
+            font-weight: 600;
+        }
+    }
+}
+
+// Alerte : icône d'avertissement + texte.
+@mixin alert {
+    .alert {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        margin: 0;
+
+        mat-icon {
+            flex: 0 0 auto;
+            color: var(--mho-danger);
+        }
+    }
+}
+
+// Champ de saisie compact (tableaux, cartes).
+@mixin compact-field {
+    mat-form-field {
+        @include mat.form-field-overrides((
+            container-height: 40px,
+            container-vertical-padding: 8px,
+        ));
+    }
+}

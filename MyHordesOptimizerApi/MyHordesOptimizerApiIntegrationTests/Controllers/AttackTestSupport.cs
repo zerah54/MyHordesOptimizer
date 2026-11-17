@@ -16,7 +16,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         public static (int townId, int aliveUserId, int deadUserId, int outsiderUserId) SeedTown(MhoContext context, int day)
         {
             var random = new Random();
-            var townId = random.Next(1, int.MaxValue);
+            var townId = random.Next(1, PreTownIds.Offset);
             var aliveUserId = random.Next(1, int.MaxValue);
             var deadUserId = random.Next(1, int.MaxValue);
             var outsiderUserId = random.Next(1, int.MaxValue);

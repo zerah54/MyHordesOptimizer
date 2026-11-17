@@ -79,7 +79,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         /// </summary>
         private static int SeedTownAndCitizen(MhoContext context, string suffix, bool withMapId = true)
         {
-            var townId = new Random().Next(1, int.MaxValue);
+            var townId = new Random().Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
             var userId = new Random().Next(1, int.MaxValue);
             context.Towns.Add(new Town
             {

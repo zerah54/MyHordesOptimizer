@@ -1,4 +1,4 @@
-import { BudgetLine, CitizenCapacity, citizenCapacity, PoolBudget, poolBudgets } from './budget.util';
+import { BudgetLine, CitizenCapacity, citizenCapacity, detailedBasePa, PoolBudget, poolBudgets, resolveGhoul, simpleCitizenCapacity } from './budget.util';
 import { BuildingProgress, evaluateProgram, remainingAp, StepResult } from './building-progress.util';
 import { BuildingUpgradesDTO, upgradeDefenseBonus } from './building-upgrades.types';
 import { defenseGap, projectedDefense, rankByDefPerPa, RankCandidate, RankedCandidate } from './defense.util';
@@ -15,7 +15,7 @@ import {
 import { CIRCULAR_QUARTERS_UID, DEFENSE_FIXINGS_STEP, DEFENSE_FIXINGS_UID } from './defense-rules.const';
 import { cascadeLevels } from './home-upgrades.util';
 import { nightLifeLoss, ownNightLoss } from './night-survival.util';
-import { BuildingPlanContentDTO, PlanCitizenDTO, PlanLossDTO, PlanLossKind, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
+import { budgetModeOf, BuildingPlanContentDTO, PlanCitizenDTO, PlanLossDTO, PlanLossKind, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
 import { missingResources, ResourceCount, sumResources } from './resources.util';
 import { freeThreshold } from './workshop.util';
 
@@ -53,6 +53,7 @@ export interface CitizenRef {
     userId: number;
     name: string;
     banned: boolean;
+    ghoul?: boolean;
     technician: boolean;
     homeLevel: number | null;
     /** Niveau de chaque amélioration de maison par clé `HomeEnum` (absente = 0) ; nul sans données de maison. */
@@ -170,20 +171,31 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         { workshopLevel: input.workshopLevel, hasSlavery: input.hasSlavery, nightLoss: night_loss, parents }
     );
 
+    const simple: boolean = budgetModeOf(content) === 'simple';
     const capacities: CitizenCapacity[] = input.citizens.map((citizen: CitizenRef): CitizenCapacity => {
         const entry: PlanCitizenDTO | undefined = content.citizens.find((candidate: PlanCitizenDTO): boolean => candidate.userId === citizen.userId);
+        const banned: boolean = entry?.banned ?? citizen.banned;
+        if (simple) {
+            return simpleCitizenCapacity(
+                { userId: citizen.userId, banned, worker: entry?.worker === true, ghoul: resolveGhoul(entry, citizen.ghoul) },
+                content.basePa
+            );
+        }
         const tasks: PlanTaskDTO[] = entry?.tasks ?? [];
         return citizenCapacity({
             userId: citizen.userId,
-            banned: citizen.banned,
+            banned,
             technician: citizen.technician,
-            basePa: entry?.basePaOverride ?? content.basePa,
+            basePa: detailedBasePa(content, entry, resolveGhoul(entry, citizen.ghoul)),
             expeditionPa: input.expeditionPa.get(citizen.userId) ?? 0,
             taskPa: tasksPa(tasks.filter((task: PlanTaskDTO): boolean => task.kind !== 'home')),
             apOnlyTaskPa: tasksPa(tasks.filter((task: PlanTaskDTO): boolean => task.kind === 'home'))
         });
     });
     const lines: BudgetLine[] = content.townLines.map((line: PlanTownLineDTO): BudgetLine => ({ pool: line.pool, pa: line.pa }));
+    if (simple) {
+        lines.push({ pool: 'regular', pa: content.expeditionRab ?? 0 });
+    }
     const budgets: Record<PlanPool, PoolBudget> = poolBudgets(capacities, lines, {
         banned: costOf(results, 'banned'),
         regular: costOf(results, 'regular')

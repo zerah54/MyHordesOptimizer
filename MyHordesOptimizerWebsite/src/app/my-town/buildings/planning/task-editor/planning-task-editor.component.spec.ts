@@ -197,7 +197,7 @@ describe('PlanningTaskEditorComponent', (): void => {
         expect(root().querySelector('[data-field="task-count"]')).not.toBeNull();
     });
 
-    it('sans action proposée : le type « Action de chantier » n\'est pas applicable', async (): Promise<void> => {
+    it('sans action proposée : le type « Action » n\'est pas applicable', async (): Promise<void> => {
         await render();
         fake.displayable_actions.set([]);
 
@@ -216,7 +216,7 @@ describe('PlanningTaskEditorComponent', (): void => {
         expect(task()).toEqual({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 9 });
     });
 
-    it('habitation sous le niveau 1 : le type « Amélioration de maison » n\'est pas applicable', async (): Promise<void> => {
+    it('habitation sous le niveau 1 : le type « Travaux personnels » n\'est pas applicable', async (): Promise<void> => {
         await render();
 
         internals().setTaskKind('homeUpgrade');

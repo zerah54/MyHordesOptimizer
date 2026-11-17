@@ -87,3 +87,18 @@ export function taskLabel(task: PlanTaskDTO, homes: ReadonlyMap<number, HomeLeve
     }
     return task.label === undefined || task.label === null || task.label === '' ? '—' : task.label;
 }
+
+/**
+ * Icône d'une consigne, relative au dépôt d'images : habitation visée, amélioration ou action ; vide pour un texte libre.
+ * @param {PlanTaskDTO} task Consigne du citoyen.
+ * @returns {string} Chemin de l'image, vide sans icône.
+ */
+export function taskIcon(task: PlanTaskDTO): string {
+    if (task.kind === 'home') {
+        return `home/home_lv${typeof task.level === 'number' && task.level >= 0 ? task.level : 0}.gif`;
+    }
+    if (task.kind === 'action') {
+        return DailyActionEnum.getByKey<DailyActionEnum>(task.ref ?? '')?.value.img ?? '';
+    }
+    return task.kind === 'homeUpgrade' && typeof task.ref === 'string' ? (HomeEnum.getByKey<HomeEnum>(task.ref)?.value.img ?? '') : '';
+}

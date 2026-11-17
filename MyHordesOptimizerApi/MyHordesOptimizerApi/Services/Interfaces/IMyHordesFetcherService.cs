@@ -2,6 +2,7 @@
 using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -48,6 +49,9 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 
         /// <summary>Niveaux de maison et améliorations, statiques (fichiers de l'extracteur).</summary>
         HomeReferentialDto GetHomeReferential();
+
+        /// <summary>Paramètres du modèle de veille (fichier statique) ; objets clés par IdItem.</summary>
+        NightwatchReferentialDto GetNightwatchReferential();
 
         /// <summary>Évolutions des chantiers par uid, statiques (Data/Buildings/upgrades.json de l'extracteur).</summary>
         Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades();

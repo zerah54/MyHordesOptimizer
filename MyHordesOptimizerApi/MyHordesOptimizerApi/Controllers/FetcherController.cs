@@ -8,6 +8,7 @@ using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Caching;
@@ -170,6 +171,15 @@ namespace MyHordesOptimizerApi.Controllers
         {
             return _cache.GetOrCreate(ReferentialCacheKeys.HomeReferential,
                 _ => _myHordesFetcherService.GetHomeReferential())!;
+        }
+
+        /// <summary>Paramètres du modèle de veille (défense, risque, coûts), statiques ; objets clés par IdItem.</summary>
+        [HttpGet]
+        [Route("NightwatchReferential")]
+        public ActionResult<NightwatchReferentialDto> GetNightwatchReferential()
+        {
+            return _cache.GetOrCreate(ReferentialCacheKeys.NightwatchReferential,
+                _ => _myHordesFetcherService.GetNightwatchReferential())!;
         }
 
         /// <summary>Évolutions des chantiers (niveaux, textes, valeurs par niveau), statiques (fichier de l'extracteur).</summary>

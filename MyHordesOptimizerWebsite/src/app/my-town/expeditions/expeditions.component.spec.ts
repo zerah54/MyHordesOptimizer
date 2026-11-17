@@ -5,12 +5,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { provideRouter } from '@angular/router';
 import moment from 'moment';
-import { NEVER, Observable, of, Subject } from 'rxjs';
+import { NEVER, Observable, of, Subject, throwError } from 'rxjs';
 import type { Mock, MockInstance } from 'vitest';
 
 import { EXPEDITIONS_EDITION_MODE_KEY, EXPEDITIONS_ITEMS_SORT_KEY } from '../../_abstract_model/const';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
-import { RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
+import { ExpeditionLockDTO, RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
@@ -30,9 +30,12 @@ import { Me } from '../../_abstract_model/types/me.class';
 import { Town } from '../../_abstract_model/types/town.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { TownContextService } from '../../_core/services/town-context.service';
-import { setTown } from '../../_core/utilities/localstorage.util';
+import { setTown, setUser } from '../../_core/utilities/localstorage.util';
 import { ItemsSortMode } from '../../_shared/list-elements-add-remove/items-sort-mode';
+import { EditOrdersData } from './edit-orders/edit-orders.component';
 import { ExpeditionDuplicateDialogComponent, ExpeditionDuplicateDialogData } from './expedition-duplicate-dialog/expedition-duplicate-dialog.component';
+import { ExpeditionLocksStore } from './expedition-locks/expedition-locks.store';
+import { BlockLockState } from './expedition-locks/expedition-locks.util';
 import { ApCheck } from './expedition-resources.util';
 import { bankCountsById, ExpeditionsComponent } from './expeditions.component';
 
@@ -83,6 +86,10 @@ interface ComponentInternals {
     saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void>;
     expeditions: WritableSignal<Expedition[]>;
     subscribeToRealtimeExpeditions(): void;
+    snackbar: { warningSnackbar: Mock<(message: string) => void>; errorSnackbar: Mock<(message: string) => void> };
+    locks: Partial<Record<keyof ExpeditionLocksStore, Mock>>;
+    register(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index: number, expedition: Expedition, citizen_index: number): Promise<void>;
+    openExpeditionOrders(prop: CitizenExpedition | ExpeditionPart): Promise<void>;
 }
 
 describe('ExpeditionsComponent', () => {
@@ -462,6 +469,106 @@ describe('ExpeditionsComponent', () => {
         });
     });
 
+    describe('verrous d\'édition', () => {
+        const LOCKED: Error = new Error('An unexpected error occurred invoking \'PostExpeditionCitizen\' on the server. HubException: Locked:9');
+
+        beforeEach(() => {
+            internals.snackbar = { warningSnackbar: vi.fn(), errorSnackbar: vi.fn() };
+            internals.locks = { heldKeys: vi.fn().mockReturnValue(new Set<string>()), enter: vi.fn(), leave: vi.fn(), activity: vi.fn() };
+            internals.all_citizens = signal([Object.assign(new Citizen(), { id: 9, name: 'Bob' })]);
+            internals.selected_day = signal(5);
+            internals.expeditions = signal([]);
+            internals.expedition_service = { getExpeditions: vi.fn().mockReturnValue(of([])) };
+        });
+
+        it('warns who edits the place when the hub refuses the write, then reloads the day', async () => {
+            realtime_expeditions_service.updateExpeditionCitizen.mockRejectedValueOnce(LOCKED);
+            const place: CitizenExpedition = Object.assign(new CitizenExpedition(), { id: 3 });
+
+            await internals.saveCitizen(new ExpeditionPart(), place);
+
+            expect(internals.snackbar.warningSnackbar).toHaveBeenCalledWith('Modification refusée : en cours de modification par Bob');
+            expect(internals.expedition_service.getExpeditions).toHaveBeenCalledWith(5);
+        });
+
+        it('tells who took the place when a registration is refused', async () => {
+            realtime_expeditions_service.updateExpeditionCitizen.mockRejectedValueOnce(LOCKED);
+            internals.me = signal(Object.assign(new Me(), { id: 7 }));
+            const place: CitizenExpedition = Object.assign(new CitizenExpedition(), { id: 3 });
+            const part: ExpeditionPart = Object.assign(new ExpeditionPart(), { citizens: [place] });
+
+            await internals.register(part, place, 0, Object.assign(new Expedition(), { parts: [part] }), 0);
+
+            expect(sentCitizen().citizen_id).toBe(7);
+            expect(internals.snackbar.warningSnackbar).toHaveBeenCalledWith('Place déjà prise par Bob');
+        });
+
+        it('tells the user he edits the block in another tab when he holds it himself', async () => {
+            setUser(Object.assign(new Me(), { id: 9 }));
+            realtime_expeditions_service.updateExpeditionCitizen.mockRejectedValueOnce(LOCKED);
+
+            await internals.saveCitizen(new ExpeditionPart(), Object.assign(new CitizenExpedition(), { id: 3 }));
+            setUser(null);
+
+            expect(internals.snackbar.warningSnackbar).toHaveBeenCalledWith('Modification refusée : Toi, dans un autre onglet');
+        });
+
+        it('reports a failed reload instead of letting it escape', async () => {
+            realtime_expeditions_service.updateExpeditionCitizen.mockRejectedValueOnce(LOCKED);
+            internals.expedition_service = { getExpeditions: vi.fn().mockReturnValue(throwError((): Error => new Error('offline'))) };
+
+            await expect(internals.saveCitizen(new ExpeditionPart(), Object.assign(new CitizenExpedition(), { id: 3 }))).resolves.toBeUndefined();
+
+            expect(internals.snackbar.errorSnackbar).toHaveBeenCalledTimes(1);
+        });
+
+        it('rethrows a write error which is not a lock refusal', async () => {
+            realtime_expeditions_service.updateExpeditionCitizen.mockRejectedValueOnce(new Error('boom'));
+
+            await expect(internals.saveCitizen(new ExpeditionPart(), new CitizenExpedition())).rejects.toThrow('boom');
+            expect(internals.snackbar.warningSnackbar).not.toHaveBeenCalled();
+        });
+
+        describe('openExpeditionOrders', () => {
+            let open_dialog: Mock;
+
+            beforeEach(() => {
+                open_dialog = vi.fn().mockReturnValue({ afterClosed: (): Observable<unknown> => of(undefined), componentRef: null });
+                internals.dialog = { open: open_dialog };
+            });
+
+            it('opens the orders read only, with the holder name, when someone else edits them', async () => {
+                internals.locks.enter = vi.fn().mockResolvedValue({ kind: 'other', user_id: 9, same_user: false });
+                internals.locks.stateOf = vi.fn().mockReturnValue(signal<BlockLockState>({ kind: 'other', user_id: 9, same_user: false }));
+                const place: CitizenExpedition = Object.assign(new CitizenExpedition(), { id: 3, orders: [] });
+
+                await internals.openExpeditionOrders(place);
+
+                expect(internals.locks.enter).toHaveBeenCalledWith('citizen-orders', 3);
+                expect(internals.locks.stateOf).toHaveBeenCalledWith('citizen-orders:3');
+                const data: EditOrdersData = open_dialog.mock.calls[0][1].data;
+                expect(data.holder_label?.()).toBe('En cours de modification par Bob');
+                expect(internals.locks.leave).toHaveBeenCalledWith('citizen-orders', 3);
+            });
+
+            it('opens the orders of a part editable when the lock is granted, and follows the lock while open', async () => {
+                const state: WritableSignal<BlockLockState> = signal<BlockLockState>({ kind: 'mine' });
+                internals.locks.enter = vi.fn().mockResolvedValue({ kind: 'mine' });
+                internals.locks.stateOf = vi.fn().mockReturnValue(state);
+                const part: ExpeditionPart = Object.assign(new ExpeditionPart(), { id: 2, orders: [] });
+
+                await internals.openExpeditionOrders(part);
+
+                expect(internals.locks.enter).toHaveBeenCalledWith('part-orders', 2);
+                const data: EditOrdersData = open_dialog.mock.calls[0][1].data;
+                expect(data.holder_label?.()).toBeNull();
+                state.set({ kind: 'other', user_id: 9, same_user: false });
+                expect(data.holder_label?.()).toBe('En cours de modification par Bob');
+                expect(internals.locks.leave).toHaveBeenCalledWith('part-orders', 2);
+            });
+        });
+    });
+
     describe('suppression d\'une expédition', () => {
         function waitingFor(expedition_id: number): ExpeditionOrder {
             return Object.assign(new ExpeditionOrder(), { kind: 'wait', target_expedition_id: expedition_id });
@@ -740,6 +847,8 @@ describe('ExpeditionsComponent — rendu de l\'avertissement de PA', () => {
     let fixture: ComponentFixture<ExpeditionsComponent>;
     let duplicate_expedition: Mock<(expedition: Expedition, label: string | null, choices: ExpeditionDuplicateChoices) => Promise<void>>;
     let update_expedition_citizen: Mock<() => Promise<void>>;
+    let locks: ExpeditionLockDTO[];
+    let extra_citizens: Citizen[];
 
     /** Ville en (10, 10) ; tracé de 5 km vers le sud : 3 pas en PA, 2 en PE. */
     function map(): Town {
@@ -749,21 +858,21 @@ describe('ExpeditionsComponent — rendu de l\'avertissement de PA', () => {
         return Object.assign(new Town(), { town_x: 10, town_y: 10, map_width: 25, map_height: 25, cells });
     }
 
-    function expedition(base_ap: number): Expedition {
+    function expedition(base_ap: number, occupied: boolean = true): Expedition {
         const route: ExpeditionPartRoute = { id: 1, label: 'Sud', color: DEFAULT_MAP_ROUTE_COLOR, cells: map().cells.map((cell: Cell): MapRoutePoint => ({ x: cell.x, y: cell.y })), length: 5, version: 1 };
-        const place: CitizenExpedition = Object.assign(new CitizenExpedition(), { id: 3, citizen_id: CITIZEN_ID, base_ap, orders: [] });
+        const place: CitizenExpedition = Object.assign(new CitizenExpedition(), { id: 3, citizen_id: occupied ? CITIZEN_ID : undefined, base_ap, orders: [] });
         const part: ExpeditionPart = Object.assign(new ExpeditionPart(), { id: 2, position: 0, map_route_id: route.id, map_route: route, orders: [], citizens: [place] });
         return Object.assign(new Expedition(), { id: 1, state: 'ready', label: 'Sud', position: 0, parts: [part] });
     }
 
     /** Rend la page en simple observateur (pas de hub) au jour 5, avec une expédition. */
-    async function render(base_ap: number, items: Item[] = [Object.assign(new Item(), { id: 1, uid: 'water_#00' })]): Promise<HTMLElement> {
+    async function render(base_ap: number, items: Item[] = [Object.assign(new Item(), { id: 1, uid: 'water_#00' })], occupied: boolean = true): Promise<HTMLElement> {
         const citizens: CitizenInfo = new CitizenInfo();
-        citizens.citizens = [Object.assign(new Citizen(), { id: CITIZEN_ID, name: 'Alice', is_dead: false })];
+        citizens.citizens = [Object.assign(new Citizen(), { id: CITIZEN_ID, name: 'Alice', is_dead: false }), ...extra_citizens];
         vi.spyOn(TestBed.inject(TownService), 'getCitizens').mockReturnValue(of(citizens));
         vi.spyOn(TestBed.inject(TownService), 'getMap').mockReturnValue(of(map()));
         vi.spyOn(TestBed.inject(ApiService), 'getItems').mockReturnValue(of(items));
-        vi.spyOn(TestBed.inject(ExpeditionService), 'getExpeditions').mockReturnValue(of([expedition(base_ap)]));
+        vi.spyOn(TestBed.inject(ExpeditionService), 'getExpeditions').mockReturnValue(of([expedition(base_ap, occupied)]));
 
         fixture = TestBed.createComponent(ExpeditionsComponent);
         fixture.detectChanges();
@@ -773,6 +882,8 @@ describe('ExpeditionsComponent — rendu de l\'avertissement de PA', () => {
     }
 
     beforeEach(() => {
+        locks = [];
+        extra_citizens = [];
         // Le vrai service ouvre la connexion au hub dès sa construction (MapRoutesStore l'injecte) : ici, flux muets.
         duplicate_expedition = vi.fn().mockReturnValue(Promise.resolve());
         update_expedition_citizen = vi.fn().mockReturnValue(Promise.resolve());
@@ -780,7 +891,9 @@ describe('ExpeditionsComponent — rendu de l\'avertissement de PA', () => {
             duplicateExpedition: duplicate_expedition,
             updateExpeditionCitizen: update_expedition_citizen,
             joinPresence: vi.fn().mockReturnValue(Promise.resolve()),
-            leavePresence: vi.fn().mockReturnValue(Promise.resolve())
+            leavePresence: vi.fn().mockReturnValue(Promise.resolve()),
+            getLocks: vi.fn((): Promise<ExpeditionLockDTO[]> => Promise.resolve(locks)),
+            connectionId: vi.fn().mockReturnValue('my-connection')
         };
         const realtime: Record<string, unknown> = new Proxy<Record<string, unknown>>(calls, {
             get: (target: Record<string, unknown>, key: string | symbol): unknown => typeof key === 'string' && key in target ? target[key] : NEVER
@@ -802,6 +915,7 @@ describe('ExpeditionsComponent — rendu de l\'avertissement de PA', () => {
     afterEach(() => {
         TestBed.inject(TownContextService).clear();
         localStorage.removeItem(EXPEDITIONS_EDITION_MODE_KEY);
+        setUser(null);
     });
 
     it('cycles the SP operator from its button in edition mode', async () => {
@@ -884,6 +998,37 @@ describe('ExpeditionsComponent — rendu de l\'avertissement de PA', () => {
 
         expect(element.querySelector('tr.citizen td.pseudo')).toBeTruthy();
         expect(element.querySelector('.ap-warning')).toBeNull();
+    });
+
+    describe('ligne tenue par un autre', () => {
+        beforeEach(() => {
+            locks.push({ kind: 'citizen', entityId: 3, holderUserId: 9, holderConnectionId: 'other-connection' });
+            extra_citizens.push(Object.assign(new Citizen(), { id: 9, name: 'Bob', is_dead: false }));
+            TestBed.inject(TownContextService).setObservedAccess({ is_citizen: true, is_current_town: true, can_create: true });
+        });
+
+        it('greys the row out and names its holder in edition mode', async () => {
+            localStorage.setItem(EXPEDITIONS_EDITION_MODE_KEY, 'true');
+
+            const element: HTMLElement = await render(5);
+
+            expect(element.querySelector('tr.citizen td.job')?.hasAttribute('inert')).toBe(true);
+            expect(element.querySelector('tr.citizen td.bag')?.hasAttribute('inert')).toBe(false);
+            const label: Element | null = element.querySelector('tr.citizen td.pseudo .lock-label');
+            expect(label?.textContent).toContain('En cours de modification par');
+            expect(label?.textContent).toContain('Bob');
+            expect(label?.closest('[inert]')).toBeNull();
+        });
+
+        it('disables the registration on that place', async () => {
+            setUser(Object.assign(new Me(), { id: CITIZEN_ID }));
+
+            const element: HTMLElement = await render(5, undefined, false);
+
+            const button: HTMLButtonElement | null = element.querySelector<HTMLButtonElement>('tr.citizen td.pseudo button');
+            expect(button?.textContent).toContain('M\'inscrire ici');
+            expect(button?.disabled).toBe(true);
+        });
     });
 
     it('names the shoes icon after the item', async () => {

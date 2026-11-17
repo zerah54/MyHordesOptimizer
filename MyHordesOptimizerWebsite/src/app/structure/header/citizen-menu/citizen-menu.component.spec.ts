@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import type { MockedObject } from 'vitest';
 
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
+import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
@@ -15,7 +16,7 @@ import { Bag } from '../../../_abstract_model/types/bag.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { HeroicActionsWithValue } from '../../../_abstract_model/types/heroic-actions.class';
-import { HomeWithValue } from '../../../_abstract_model/types/home.class';
+import { Home, HomeWithValue } from '../../../_abstract_model/types/home.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { Status } from '../../../_abstract_model/types/status.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
@@ -152,7 +153,17 @@ describe('CitizenMenuComponent', (): void => {
 
             testable.openDailyActions();
 
-            expect(testable.daily_action_keys().map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest', 'home_scavenge']);
+            expect(testable.daily_action_keys().map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_scavenge', 'item_dice', 'item_cards', 'item_soccer']);
+        });
+
+        it('la sieste n\'apparaît que si le citoyen a un Coin sieste', (): void => {
+            vi.spyOn(TestBed.inject(BuiltBuildingsService), 'builtUids').mockReturnValue(of(new Set<string>()));
+            fixture.detectChanges();
+            testable.citizen()!.home = Object.assign(new Home(), { content: [{ element: HomeEnum.REST_LEVEL, value: 1 }] });
+
+            testable.openDailyActions();
+
+            expect(testable.daily_action_keys().map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest', 'item_dice', 'item_cards', 'item_soccer']);
         });
     });
 

@@ -4,6 +4,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Models.Import;
@@ -69,6 +70,7 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
         }
 
         public HomeReferentialDto GetHomeReferential() => throw new NotSupportedException();
+        public NightwatchReferentialDto GetNightwatchReferential() => throw new NotSupportedException();
         public Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades() => throw new NotSupportedException();
         public Dictionary<string, string> GetItemEmotes() => throw new NotSupportedException();
 

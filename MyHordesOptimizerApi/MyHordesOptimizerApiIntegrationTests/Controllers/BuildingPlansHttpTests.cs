@@ -9,6 +9,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans.Request;
 using MyHordesOptimizerApi.Services.Impl;
 using MyHordesOptimizerApi.Services.Impl.BuildingPlans;
+using MyHordesOptimizerApi.Services.Impl.Locks;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApiIntegrationTests.ApplicationFactory;
 using System;
@@ -165,7 +166,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var (townId, aliveUserId, _, _) = AttackTestSupport.SeedTown(context, Day);
             var citizen = CreateClient(factory, aliveUserId);
             var plan = await CreatePlanAsync(citizen, townId);
-            factory.Services.GetRequiredService<BuildingPlanLockRegistry>().TryAcquire(new PlanLockKey(townId, plan.Id), new PlanLockHolder("other", 99));
+            factory.Services.GetRequiredService<BuildingPlanLockRegistry>().TryAcquire(new PlanLockKey(townId, plan.Id), new LockHolder("other", 99));
 
             var response = await PutPlanAsync(citizen, townId, Edit(plan, "B"), "mine");
 
@@ -180,7 +181,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var (townId, aliveUserId, _, _) = AttackTestSupport.SeedTown(context, Day);
             var citizen = CreateClient(factory, aliveUserId);
             var plan = await CreatePlanAsync(citizen, townId);
-            factory.Services.GetRequiredService<BuildingPlanLockRegistry>().TryAcquire(new PlanLockKey(townId, plan.Id), new PlanLockHolder("mine", aliveUserId));
+            factory.Services.GetRequiredService<BuildingPlanLockRegistry>().TryAcquire(new PlanLockKey(townId, plan.Id), new LockHolder("mine", aliveUserId));
 
             var response = await PutPlanAsync(citizen, townId, Edit(plan, "B"), "mine");
 
@@ -198,7 +199,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var plan = await CreatePlanAsync(citizen, townId);
             var registry = factory.Services.GetRequiredService<BuildingPlanLockRegistry>();
             var key = new PlanLockKey(townId, plan.Id);
-            registry.TryAcquire(key, new PlanLockHolder("mine", aliveUserId));
+            registry.TryAcquire(key, new LockHolder("mine", aliveUserId));
             time.Advance(BuildingPlanLockRegistry.IdleTimeout);
 
             var response = await PutPlanAsync(citizen, townId, Edit(plan, "B"), "mine");
@@ -247,7 +248,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var plan = await CreatePlanAsync(citizen, townId);
             var registry = factory.Services.GetRequiredService<BuildingPlanLockRegistry>();
             var key = new PlanLockKey(townId, plan.Id);
-            registry.TryAcquire(key, new PlanLockHolder("mine", aliveUserId));
+            registry.TryAcquire(key, new LockHolder("mine", aliveUserId));
             var twoThirds = BuildingPlanLockRegistry.IdleTimeout * 2 / 3;
             time.Advance(twoThirds);
 
@@ -281,7 +282,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var (townId, aliveUserId, _, _) = AttackTestSupport.SeedTown(context, Day);
             var citizen = CreateClient(factory, aliveUserId);
             var plan = await CreatePlanAsync(citizen, townId);
-            factory.Services.GetRequiredService<BuildingPlanLockRegistry>().TryAcquire(new PlanLockKey(townId, plan.Id), new PlanLockHolder("other", 99));
+            factory.Services.GetRequiredService<BuildingPlanLockRegistry>().TryAcquire(new PlanLockKey(townId, plan.Id), new LockHolder("other", 99));
             var message = new HttpRequestMessage(HttpMethod.Delete, $"/BuildingPlans/{townId}/plans/{plan.Id}");
             message.Headers.Add(Header, "mine");
 
@@ -298,7 +299,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var (townId, aliveUserId, _, _) = AttackTestSupport.SeedTown(context, Day);
             var citizen = CreateClient(factory, aliveUserId);
             var plan = await CreatePlanAsync(citizen, townId);
-            factory.Services.GetRequiredService<BuildingPlanLockRegistry>().TryAcquire(new PlanLockKey(townId, plan.Id), new PlanLockHolder("other", 99));
+            factory.Services.GetRequiredService<BuildingPlanLockRegistry>().TryAcquire(new PlanLockKey(townId, plan.Id), new LockHolder("other", 99));
 
             var response = await citizen.PutAsync($"/BuildingPlans/{townId}/plans/{plan.Id}/effective", null);
 

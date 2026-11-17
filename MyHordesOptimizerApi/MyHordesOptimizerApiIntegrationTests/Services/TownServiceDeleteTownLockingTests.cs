@@ -48,6 +48,30 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         [Fact]
+        public void DeleteTown_VilleLieeAUnePreVille_DelieLaPreVille()
+        {
+            var (context, service, _, townId, mapId) = NewFixture(_factory);
+            var user = new User { IdUser = new Random().Next(1, int.MaxValue), Name = "test-user-" + Guid.NewGuid().ToString("N")[..8] };
+            context.Users.Add(user);
+            context.SaveChanges();
+            var preTown = new PreTown { Alias = "test", IdCreator = user.IdUser, CreatedAt = DateTime.UtcNow, LinkedIdTown = townId, LinkedMapId = mapId, LinkedAt = DateTime.UtcNow, IdLinker = user.IdUser };
+            context.PreTowns.Add(preTown);
+            context.SaveChanges();
+
+            try
+            {
+                service.DeleteTown(townId);
+
+                var after = context.PreTowns.AsNoTracking().Single(p => p.IdPreTown == preTown.IdPreTown);
+                (after.LinkedIdTown, after.LinkedMapId).Should().Be((null, null));
+            }
+            finally
+            {
+                context.PreTowns.Where(p => p.IdPreTown == preTown.IdPreTown).ExecuteDelete();
+            }
+        }
+
+        [Fact]
         public async Task DeleteTown_PendantVerrouExterneSurIdTownInterne_AttendLaLiberation()
         {
             var (context, service, townSyncLock, townId, _) = NewFixture(_factory);

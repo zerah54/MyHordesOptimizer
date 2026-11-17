@@ -11,6 +11,7 @@ export const ROUTES: Route[] = [
     { path: 'tools', loadChildren: () => import('./tools/tools.routes') },
     { path: 'tutorials', loadChildren: () => import('./tutorials/tutorials.routes') },
     { path: 'wiki', loadChildren: () => import('./wiki/wiki.routes') },
+    { path: 'pre-town', loadChildren: () => import('./pre-town/pre-town.routes') },
     { path: 'directory', loadChildren: () => import('./directory/directory.routes') },
     { path: 'miscellaneous', loadChildren: () => import('./miscellaneous/miscellaneous.routes') },
     { path: 'games', loadChildren: () => import('./games/games.routes') },

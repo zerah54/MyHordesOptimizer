@@ -24,7 +24,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         {
             using var scope = Factory.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-            var townId = new Random().Next(1, int.MaxValue);
+            var townId = new Random().Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
             dbContext.Towns.Add(new Town { IdTown = townId, MapId = townId, Name = "test-town-" + townId, Width = 40, Height = 40, Day = 5 });
             await dbContext.SaveChangesAsync();
 

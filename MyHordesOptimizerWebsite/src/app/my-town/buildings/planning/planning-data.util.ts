@@ -211,6 +211,7 @@ export function citizenRefs(citizens: Citizen[]): CitizenRef[] {
                 userId: citizen.id,
                 name: citizen.name,
                 banned: citizen.is_shunned === true,
+                ghoul: citizen.status?.is_ghoul === true,
                 technician: citizen.job?.key === JobEnum.TECHNICIAN.key,
                 homeLevel: typeof house?.value === 'number' ? Math.max(house.value, 0) : null,
                 upgradeLevels: upgradeLevelsOf(citizen)

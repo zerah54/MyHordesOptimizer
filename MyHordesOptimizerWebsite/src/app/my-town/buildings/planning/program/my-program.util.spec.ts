@@ -105,4 +105,11 @@ describe('myProgram', (): void => {
         expect((program_of(1, plan, evaluation) as MyProgram).expeditionPa).toBe(8);
         expect((program_of(2, plan, evaluation) as MyProgram).expeditionPa).toBe(0);
     });
+
+    it('mode simple : PA d\'expédition ignorés (la capacité ne les compte pas)', (): void => {
+        const plan: BuildingPlanContentDTO = content({ budgetMode: 'simple' });
+        const evaluation: DayEvaluation = fakeEvaluation(plan, { expeditionPa: new Map<number, number>([[1, 8]]) });
+
+        expect((program_of(1, plan, evaluation) as MyProgram).expeditionPa).toBe(0);
+    });
 });

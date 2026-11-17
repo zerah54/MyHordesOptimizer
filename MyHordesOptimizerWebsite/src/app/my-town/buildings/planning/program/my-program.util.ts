@@ -1,6 +1,6 @@
 import { CitizenCapacity } from '../budget.util';
 import { StepResult } from '../building-progress.util';
-import { BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from '../plan.types';
+import { budgetModeOf, BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from '../plan.types';
 import { CitizenRef, DayEvaluation } from '../plan-evaluation.util';
 
 /** Avertissement affiché sur « Mon programme ». */
@@ -54,7 +54,7 @@ export function myProgram(user_id: number | null, content: BuildingPlanContentDT
     return {
         citizen,
         capacity,
-        expeditionPa: evaluation.expeditionPa.get(user_id) ?? 0,
+        expeditionPa: budgetModeOf(content) === 'simple' ? 0 : evaluation.expeditionPa.get(user_id) ?? 0,
         tasks: content.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === user_id)?.tasks ?? [],
         steps: items.flatMap((item: MyProgramItem): StepResult[] => (item.kind === 'step' ? [item.result] : [])),
         items,

@@ -21,13 +21,13 @@ import moment from 'moment';
 import { map } from 'rxjs';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
+import { DailyActionEnum, displayableDailyActions, isDailyActionAvailable } from '../../../_abstract_model/enum/daily-action.enum';
 import { StandardColumn } from '../../../_abstract_model/interfaces';
 import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { Imports } from '../../../_abstract_model/types/_types';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
 import { TypedCellDefDirective } from '../../../_core/directives/typed-cell-def.directive';
 import { ColumnIdPipe } from '../../../_core/pipes/column-id.pipe';
@@ -93,6 +93,11 @@ export class CitizensDailyActionsComponent implements OnInit {
     public ngOnInit(): void {
         this.datasource = new MatTableDataSource();
         this.getCitizens();
+    }
+
+    /** La maison de ce citoyen permet-elle l'action ? */
+    protected isDailyActionAvailable(citizen: Citizen, action: DailyActionEnum): boolean {
+        return isDailyActionAvailable(action, citizen);
     }
 
     /** L'action donnée a-t-elle été faite par ce citoyen le jour donné ? */

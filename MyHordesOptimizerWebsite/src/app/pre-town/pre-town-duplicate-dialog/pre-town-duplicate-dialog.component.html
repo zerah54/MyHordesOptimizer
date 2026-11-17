@@ -1,0 +1,12 @@
+<h2 mat-dialog-title i18n>Dupliquer la pré-ville</h2>
+<mat-dialog-content>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Nom de la pré-ville</mat-label>
+        <input matInput type="text" [attr.maxlength]="max_length" cdkFocusInitial [ngModel]="alias()" (ngModelChange)="alias.set($event)"
+               (keydown.enter)="confirm()">
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close i18n>Annuler</button>
+    <button mat-flat-button type="button" [disabled]="!valid()" (click)="confirm()" i18n>Valider</button>
+</mat-dialog-actions>

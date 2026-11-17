@@ -56,6 +56,80 @@
         </table>
     }
 
+    <div class="validation">
+        <button mat-stroked-button type="button" data-action="validate-budget" [disabled]="!store.can_validate_budget()" (click)="validateBudget()">
+            @if (draft.validatedBudget) {
+                <ng-container i18n>Revalider le budget</ng-container>
+            } @else {
+                <ng-container i18n>Valider le budget</ng-container>
+            }
+        </button>
+        @if (validated_at(); as validated_at_label) {
+            <span class="validated-at" data-field="validated-at">
+                <ng-container i18n>Validé le</ng-container>
+                {{ validated_at_label }}
+            </span>
+        }
+    </div>
+    @if (store.budget_diff(); as diff) {
+        <section data-section="budget-diff">
+            <h3 i18n>Écart avec le budget validé</h3>
+            <table class="summary diff">
+                <thead>
+                <tr>
+                    <th><span class="mho-visually-hidden" i18n>Poche</span></th>
+                    <th i18n>Budget</th>
+                    <th i18n>Coût</th>
+                    <th i18n>Reste</th>
+                </tr>
+                </thead>
+                <tbody>
+                    @for (pool of store.visible_pools(); track pool) {
+                        <tr [attr.data-pool]="pool">
+                            <th scope="row">
+                                @if (pool === 'regular') {
+                                    <ng-container i18n>Non-bannis</ng-container>
+                                } @else {
+                                    <ng-container i18n>Bannis</ng-container>
+                                }
+                            </th>
+                            <td data-diff-field="budget">
+                                <mho-icon-ap [value]="signed(diff.pools[pool].budget)"/>
+                            </td>
+                            <td data-diff-field="cost">
+                                <mho-icon-ap [value]="signed(diff.pools[pool].cost)"/>
+                            </td>
+                            <td data-diff-field="remaining" [class.negative]="diff.pools[pool].remaining < 0">
+                                <mho-icon-ap [value]="signed(diff.pools[pool].remaining)"/>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (diff.steps.length > 0) {
+                <ul class="diff-steps">
+                    @for (step of diff.steps; track step.buildingId + ':' + step.kind) {
+                        <li [attr.data-diff]="step.change">
+                            @switch (step.change) {
+                                @case ('added') {
+                                    <ng-container i18n>Ajouté</ng-container>
+                                }
+                                @case ('removed') {
+                                    <ng-container i18n>Retiré</ng-container>
+                                }
+                                @default {
+                                    <ng-container i18n>Modifié</ng-container>
+                                }
+                            }
+                            {{ buildingLabel(step.buildingId) }}
+                            <mho-icon-ap [value]="signed(step.delta)"/>
+                        </li>
+                    }
+                </ul>
+            }
+        </section>
+    }
+
     <h3 i18n>Lignes de la ville</h3>
     <table class="summary lines">
         <thead>
@@ -107,4 +181,15 @@
         </tbody>
     </table>
     <button mat-stroked-button type="button" data-action="add-line" [disabled]="!store.can_edit()" (click)="addLine()" i18n>Ajouter une ligne</button>
+    @if (simple()) {
+        <button mat-stroked-button type="button" data-action="add-preset" [disabled]="!store.can_edit()" [matMenuTriggerFor]="preset_menu">
+            <ng-container i18n>Ajouter un modèle</ng-container>
+            <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #preset_menu="matMenu">
+            <button mat-menu-item type="button" data-preset="guitar" (click)="addPreset('guitar')" i18n>Guitare artisanale</button>
+            <button mat-menu-item type="button" data-preset="dice" (click)="addPreset('dice')" i18n>Dés / Cartes</button>
+            <button mat-menu-item type="button" data-preset="cs" (click)="addPreset('cs')">{{ restLabel() }}</button>
+        </mat-menu>
+    }
 }

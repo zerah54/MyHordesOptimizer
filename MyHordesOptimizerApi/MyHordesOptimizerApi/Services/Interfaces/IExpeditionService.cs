@@ -24,7 +24,7 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         /// </summary>
         Task<ExpeditionDto> DuplicateExpeditionAsync(int expeditionId, string? label, bool keepRoute, bool keepGeneralOrders, bool keepRouteOrders);
 
-        Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen);
+        Task<ExpeditionCitizenDto> SaveExpeditionCitizenAsync(int expeditionPartId, ExpeditionCitizenRequestDto expeditionCitizen, bool canReplaceOccupant = false);
         void DeleteExpeditionCitizen(int expeditionCitizenId);
 
         Task<ExpeditionPartDto> SaveExpeditionPartAsync(int expeditionId, ExpeditionPartRequestDto expeditionPart);

@@ -24,6 +24,7 @@ const WOUND5_KEY: string = 'wound5';
 const WOUND6_KEY: string = 'wound6';
 const SOBER_KEY: string = 'sober';
 const HYDRATED_KEY: string = 'hydrated';
+const GHOUL_KEY: string = 'ghoul';
 
 /** Type de champs de propriétés existants */
 export class StatusEnum extends CommonEnum {
@@ -52,6 +53,8 @@ export class StatusEnum extends CommonEnum {
     public static WOUND6: StatusEnum = new StatusEnum(WOUND6_KEY, {}, $localize`Blessure - Pied`, 'status/status_' + WOUND6_KEY + '.gif', WOUND6_KEY);
     public static SOBER: StatusEnum = new StatusEnum(SOBER_KEY, {}, $localize`Sobre`, 'status/status_' + SOBER_KEY + '.gif', SOBER_KEY);
     public static HYDRATED: StatusEnum = new StatusEnum(HYDRATED_KEY, {}, $localize`Hydraté(e)`, 'status/status_' + HYDRATED_KEY + '.gif', HYDRATED_KEY);
+    /** Renseigné à la main (jamais relevé par l'addon) : écrit par la saisie manuelle de la goule, pas par la liste des états. */
+    public static GHOUL: StatusEnum = new StatusEnum(GHOUL_KEY, {}, $localize`Goule`, 'roles/ghoul.gif', GHOUL_KEY);
 
 
     /**

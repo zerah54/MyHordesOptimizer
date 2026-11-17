@@ -1,0 +1,58 @@
+:host {
+    display: contents;
+
+    .mho-pre-town-detail-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1em;
+        margin-bottom: 0.5em;
+
+        button {
+            display: flex;
+            align-items: center;
+            gap: 0.25em;
+        }
+    }
+
+    .mho-pre-town-detail {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+
+        .preparation-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+
+            button {
+                display: flex;
+                align-items: center;
+                gap: 0.25em;
+            }
+        }
+
+        .organizer-controls, .simulated-controls, .member-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .member-name {
+            flex: 1;
+        }
+
+        .members, .member-search {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4em;
+        }
+
+        .leave-button {
+            display: flex;
+            align-items: center;
+            gap: 0.25em;
+        }
+    }
+}

@@ -77,16 +77,19 @@
                         <mat-expansion-panel-header class="header">
                             <div class="label">
                                 @if (edition_mode() && editable()) {
-                                    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
-                                                    (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
-                                        <mat-label i18n>Nom de l'expédition</mat-label>
-                                        <input matInput [(ngModel)]="expedition.label" (change)="saveExpedition(expedition)">
-                                    </mat-form-field>
-                                    <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
-                                                    (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
-                                        <mat-label i18n>Points de contrôles requis</mat-label>
-                                        <input matInput type="number" [(ngModel)]="expedition.min_pdc" (change)="saveExpedition(expedition)">
-                                    </mat-form-field>
+                                    <div class="lock-host" [mhoExpeditionLock]="lockTarget('expedition', expedition.id)">
+                                        <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
+                                                        (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
+                                            <mat-label i18n>Nom de l'expédition</mat-label>
+                                            <input matInput [(ngModel)]="expedition.label" (change)="saveExpedition(expedition)">
+                                        </mat-form-field>
+                                        <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
+                                                        (click)="$event.stopPropagation()" (keydown.space)="$event.stopPropagation()">
+                                            <mat-label i18n>Points de contrôles requis</mat-label>
+                                            <input matInput type="number" [(ngModel)]="expedition.min_pdc" (change)="saveExpedition(expedition)">
+                                        </mat-form-field>
+                                    </div>
+                                    <ng-container *ngTemplateOutlet="lockLabel; context: {kind: 'expedition', id: expedition.id}"></ng-container>
                                 } @else {
                                     <!-- Une expédition sans nom reste une expédition : repliée, la barre
                                          n'affichait rien du tout et rien ne la distinguait de la suivante. -->
@@ -125,7 +128,7 @@
                         <div class="content">
                             @for (expedition_part of expedition.parts; track expedition_part.id; let expedition_part_index = $index) {
                                 <div class="expedition-part">
-                                    <div class="expedition-part-header">
+                                    <div class="expedition-part-header" [mhoExpeditionLock]="lockTarget('part', expedition_part.id)">
                                         @if (expedition.parts.length > 1) {
                                             <span i18n>Partie {{ expedition_part_index + 1 }}&nbsp;:&nbsp;</span>
                                         }
@@ -140,6 +143,7 @@
                                                               [readonly]="!edition_mode() || !editable() || isDirectionLocked(expedition_part)"></mho-compass-rose>
                                         </div>
                                     </div>
+                                    <ng-container *ngTemplateOutlet="lockLabel; context: {kind: 'part', id: expedition_part.id}"></ng-container>
                                     <table class="expedition-table">
                                         <thead>
                                         <tr class="table-header">
@@ -201,7 +205,7 @@
                                                             </button>
                                                         </td>
                                                     }
-                                                    <td class="job">
+                                                    <td class="job" [mhoExpeditionLock]="lockTarget('citizen', expedition_citizen.id)">
                                                         @if (edition_mode() && editable() && !expedition_citizen.citizen_id) {
                                                             <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
                                                                             class="compact-field">
@@ -222,7 +226,7 @@
                                                         }
                                                     </td>
                                                     <td class="pseudo">
-                                                        <div class="flex">
+                                                        <div class="flex" [mhoExpeditionLock]="lockTarget('citizen', expedition_citizen.id)">
                                                             @if (edition_mode() && editable()) {
                                                                 <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
                                                                                 class="compact-field">
@@ -237,8 +241,8 @@
                                                                         searchable></mho-select>
                                                                 </mat-form-field>
                                                             } @else if (expedition.state === 'ready' && !expedition_citizen.citizen_id && canJoin(expedition_citizen, selected_day())) {
-                                                                <button mat-button
-                                                                        (click)="expedition_citizen.citizen_id = me()?.id; saveCitizen(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)">
+                                                                <button mat-button [disabled]="isLockedByOther('citizen', expedition_citizen.id)"
+                                                                        (click)="register(expedition_part, expedition_citizen, expedition_part_index, expedition, citizen_index)">
                                                                     <ng-container i18n>M'inscrire ici</ng-container>
                                                                 </button>
                                                             } @else {
@@ -250,8 +254,10 @@
                                                                 }
                                                             }
                                                         </div>
+                                                        <ng-container
+                                                            *ngTemplateOutlet="lockLabel; context: {kind: 'citizen', id: expedition_citizen.id}"></ng-container>
                                                     </td>
-                                                    <td class="is-thirsty">
+                                                    <td class="is-thirsty" [mhoExpeditionLock]="lockTarget('citizen', expedition_citizen.id)">
                                                         <img class="cell-label" [src]="HORDES_IMG_REPO() + 'status/status_thirst1.gif'" alt="Soif" i18n-alt>
                                                         @if (edition_mode() && editable()) {
                                                             <mho-tri-state-checkbox
@@ -269,7 +275,7 @@
                                                             }
                                                         }
                                                     </td>
-                                                    <td class="base-ap">
+                                                    <td class="base-ap" [mhoExpeditionLock]="lockTarget('citizen', expedition_citizen.id)">
                                                         <span class="cell-label"><mho-icon-ap></mho-icon-ap></span>
                                                         @if (edition_mode() && editable()) {
                                                             <mho-compact-stepper label="PA de base" i18n-label [min]="0"
@@ -279,7 +285,7 @@
                                                             {{ expedition_citizen.base_ap ?? 6 }}
                                                         }
                                                     </td>
-                                                    <td class="sp">
+                                                    <td class="sp" [mhoExpeditionLock]="lockTarget('citizen', expedition_citizen.id)">
                                                         <span class="cell-label"><mho-icon-ep/></span>
                                                         @if (edition_mode() && editable()) {
                                                             @let sp_operator = spOperator(expedition_citizen);
@@ -296,7 +302,7 @@
                                                             {{ spDisplay(expedition_citizen, selected_day()) }}
                                                         }
                                                     </td>
-                                                    <td class="shoes">
+                                                    <td class="shoes" [mhoExpeditionLock]="lockTarget('citizen', expedition_citizen.id)">
                                                         @if (shoe_icon()) {
                                                             <img class="cell-label" [src]="HORDES_IMG_REPO() + shoe_icon()" [alt]="shoe_label()">
                                                         }
@@ -312,7 +318,7 @@
                                                                  matTooltip="Chaussures interdites" i18n-matTooltip>
                                                         }
                                                     </td>
-                                                    <td class="pdc">
+                                                    <td class="pdc" [mhoExpeditionLock]="lockTarget('citizen', expedition_citizen.id)">
                                                         <img class="cell-label" [src]="HORDES_IMG_REPO() + 'professions/shield.gif'" alt="Points de contrôle"
                                                              i18n-alt>
                                                         @if ((edition_mode() || expedition.state === 'ready') && editable()) {
@@ -326,7 +332,7 @@
                                                         }
                                                     </td>
                                                     @if ((edition_mode() || (expedition_part.citizens | someHeroicActionNeeded)) && editable()) {
-                                                        <td class="heroic">
+                                                        <td class="heroic" [mhoExpeditionLock]="lockTarget('citizen', expedition_citizen.id)">
                                                             <span class="cell-label"><ng-container i18n>Action héroïque</ng-container></span>
                                                             @if (edition_mode() && editable()) {
                                                                 <mat-form-field subscriptSizing="dynamic" [appearance]="'outline'"
@@ -352,13 +358,16 @@
                                                                     (click)="openExpeditionOrders(expedition_citizen)">
                                                                 <mat-icon>edit</mat-icon>
                                                             </button>
+                                                            <ng-container
+                                                                *ngTemplateOutlet="lockLabel; context: {kind: 'citizen-orders', id: expedition_citizen.id}"></ng-container>
                                                         } @else {
                                                             <ng-container
                                                                 *ngTemplateOutlet="displayOrder; context: {$implicit: citizenOrdersOf(expedition_part, expedition_citizen)}"></ng-container>
                                                         }
                                                     </td>
                                                     <td class="bag">
-                                                        <mho-list-element-add-remove [currentList]="expedition_citizen.bag.items" withQuantity
+                                                        <mho-list-element-add-remove [mhoExpeditionLock]="lockTarget('bag', expedition_citizen.id)"
+                                                                                     [currentList]="expedition_citizen.bag.items" withQuantity
                                                                                      label="Sac" i18n-label
                                                                                      [lists]="objects_list()"
                                                                                      [sortMode]="items_sort()" (sortModeChange)="changeItemsSort($event)"
@@ -371,6 +380,8 @@
                                                                                      [readonly]="!edition_mode() || !editable()"
                                                                                      [class]="'mho-expedition-bag-selector'">
                                                         </mho-list-element-add-remove>
+                                                        <ng-container
+                                                            *ngTemplateOutlet="lockLabel; context: {kind: 'bag', id: expedition_citizen.id}"></ng-container>
                                                     </td>
                                                 </tr>
                                             }
@@ -399,6 +410,7 @@
                                             }
                                         </h3>
                                         @if (edition_mode() && editable()) {
+                                            <ng-container *ngTemplateOutlet="lockLabel; context: {kind: 'part-orders', id: expedition_part.id}"></ng-container>
                                             <p class="orders-hint" i18n>Valables sur tout le trajet. Une consigne pour une case précise se pose
                                                 dans la feuille de route.</p>
                                         }
@@ -445,3 +457,15 @@
         </div>
     }
 </mat-card-content>
+<ng-template #lockLabel let-kind="kind" let-id="id">
+    @let lock_state = lockState(kind, id);
+    @if (lock_state.kind === 'other') {
+        <div class="lock-label" role="status">
+            @if (lock_state.same_user) {
+                <ng-container i18n>Toi, dans un autre onglet</ng-container>
+            } @else {
+                <ng-container i18n>En cours de modification par</ng-container> {{ lockHolderName(lock_state) }}
+            }
+        </div>
+    }
+</ng-template>

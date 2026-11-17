@@ -78,6 +78,49 @@ describe('TownContextService', (): void => {
         expect(service.canContribute()).toBe(true);
     });
 
+    it('unlinked pre-town: writable and citizen, still on the pre-town mapId', (): void => {
+        service.setObservedTown(town(1_000_000_005), 'PV');
+        service.setPreTownEditable(true);
+
+        expect(getTown()?.town_id).toBe(1_000_000_005);
+        expect(service.isPreTown()).toBe(true);
+        expect(service.isReadonly()).toBe(false);
+        expect(service.isCitizen()).toBe(true);
+        expect(service.canContribute()).toBe(true);
+        expect(service.isFormerCitizen()).toBe(false);
+    });
+
+    it('linked pre-town: frozen archive, read only', (): void => {
+        service.setObservedTown(town(1_000_000_005), 'PV');
+        service.setPreTownEditable(false);
+
+        expect(service.isPreTown()).toBe(true);
+        expect(service.isReadonly()).toBe(true);
+        expect(service.isCitizen()).toBe(false);
+        expect(service.canContribute()).toBe(false);
+    });
+
+    it('simulated citizens: null by default, set by the pre-town, reset by clear()', (): void => {
+        expect(service.simulatedCitizens()).toBeNull();
+
+        service.setSimulatedCitizens(12);
+        expect(service.simulatedCitizens()).toBe(12);
+
+        service.clear();
+        expect(service.simulatedCitizens()).toBeNull();
+    });
+
+    it('a real observed town is not a pre-town, and clear() resets the pre-town flag', (): void => {
+        service.setObservedTown(town(42));
+        expect(service.isPreTown()).toBe(false);
+
+        service.setPreTownEditable(true);
+        service.clear();
+
+        expect(service.isPreTown()).toBe(false);
+        expect(service.isReadonly()).toBe(false);
+    });
+
     it('clear() forgets the rights with the town', (): void => {
         service.setObservedTown(town(42));
         service.setObservedAccess(FORMER_CITIZEN);

@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,7 +20,13 @@ import { environment } from '../../../environments/environment';
 import { EXPEDITIONS_EDITION_MODE_KEY, EXPEDITIONS_ITEMS_SORT_KEY, FAVORITE_EXPEDITION_ITEMS_UID, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { HeroicActionEnum } from '../../_abstract_model/enum/heroic-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
-import { ExpeditionOrdersUpdate, RealtimeExpeditionsService } from '../../_abstract_model/realtime-services/realtime-expeditions.service';
+import {
+    expeditionLockKey,
+    ExpeditionLockKind,
+    ExpeditionOrdersUpdate,
+    hubLockHolder,
+    RealtimeExpeditionsService
+} from '../../_abstract_model/realtime-services/realtime-expeditions.service';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { ExpeditionService } from '../../_abstract_model/services/expedition.service';
@@ -66,6 +72,16 @@ import { CitizensForExpePipe, FormatPreRegisteredPipe, SomeHeroicActionNeededPip
 import { EditOrdersComponent, EditOrdersData } from './edit-orders/edit-orders.component';
 import { EditPositionsComponent, EditPositionsData } from './edit-positions/edit-positions.component';
 import { ExpeditionDuplicateDialogComponent, ExpeditionDuplicateDialogData } from './expedition-duplicate-dialog/expedition-duplicate-dialog.component';
+import { ExpeditionLockBlockDirective, ExpeditionLockTarget } from './expedition-locks/expedition-lock-block.directive';
+import { ExpeditionLocksStore } from './expedition-locks/expedition-locks.store';
+import {
+    BlockLockState,
+    holderName,
+    lockHolderLabel,
+    lockRefusedMessage,
+    preserveHeldBlocks,
+    refusedLockState
+} from './expedition-locks/expedition-locks.util';
 import { ExpeditionOrderComponent } from './expedition-order/expedition-order.component';
 import { cloneOrder, generalOrders, ruinVisitsOf, sortOrdersByRoute, withCellOrders } from './expedition-orders/expedition-orders.util';
 import { ExpeditionPartRouteComponent } from './expedition-part-route/expedition-part-route.component';
@@ -101,7 +117,8 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     templateUrl: './expeditions.component.html',
     styleUrls: ['./expeditions.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...components, ...material_modules, ...pipes, IconEpComponent]
+    imports: [...angular_common, ...components, ...material_modules, ...pipes, IconEpComponent, ExpeditionLockBlockDirective],
+    providers: [ExpeditionLocksStore]
 })
 export class ExpeditionsComponent implements OnInit {
 
@@ -165,6 +182,7 @@ export class ExpeditionsComponent implements OnInit {
     private readonly clipboard: ClipboardService = inject(ClipboardService);
     private readonly dialog: MatDialog = inject(MatDialog);
     private readonly snackbar: SnackbarService = inject(SnackbarService);
+    private readonly locks: ExpeditionLocksStore = inject(ExpeditionLocksStore);
     /** Tracés de la ville, pour le choix du tracé d'une partie (tenus à jour en temps réel). */
     protected readonly routes_store: MapRoutesStore = inject(MapRoutesStore);
 
@@ -275,6 +293,26 @@ export class ExpeditionsComponent implements OnInit {
         return citizen !== undefined && meetsRequirements(citizen, place, expedition_day, this.currentDay(), this.scouts_lair_built());
     }
 
+    /** Bloc à verrouiller, seulement en mode édition d'un jour modifiable. */
+    protected lockTarget(kind: ExpeditionLockKind, id: number | undefined): ExpeditionLockTarget | null {
+        return this.edition_mode() && this.editable() && id !== undefined ? { kind, id } : null;
+    }
+
+    /** État du verrou d'un bloc. */
+    protected lockState(kind: ExpeditionLockKind, id: number | undefined): BlockLockState {
+        return id === undefined ? { kind: 'free' } : this.locks.stateOf(expeditionLockKey(kind, id))();
+    }
+
+    /** Le bloc est tenu par une autre connexion (autre joueur ou autre onglet). */
+    protected isLockedByOther(kind: ExpeditionLockKind, id: number | undefined): boolean {
+        return this.lockState(kind, id).kind === 'other';
+    }
+
+    /** Nom du citoyen qui tient le bloc, « ? » s'il est inconnu. */
+    protected lockHolderName(state: BlockLockState): string {
+        return holderName(state, this.all_citizens()) ?? '?';
+    }
+
     /** Coût en PA de la place affichée (partie `part_index`, rang `citizen_index`) : sa personne sur ses parties, avec les ressources de sa première place ; place vide : les places vides de ce rang. `null` sans tracé, ou sans personne ni exigence de PE. */
     protected apWarning(expedition: Expedition, part_index: number, citizen_index: number, expedition_day: number): ApCheck | null {
         const town: MapRoutePoint | null = this.town_position();
@@ -331,12 +369,14 @@ export class ExpeditionsComponent implements OnInit {
 
     /** Exigence posée au rang `citizen_index` : recopiée sur la place de même rang de chaque partie, enregistrée avec son propre objet. */
     protected async saveRequirement(expedition: Expedition, citizen_index: number, requirement: PlaceRequirement): Promise<void> {
-        for (const part of expedition.parts) {
-            const place: CitizenExpedition | undefined = part.citizens[citizen_index];
-            if (!place) continue;
-            Object.assign(place, requirement);
-            await this.realtime_expeditions_service.updateExpeditionCitizen(part, place);
-        }
+        await this.write(async (): Promise<void> => {
+            for (const part of expedition.parts) {
+                const place: CitizenExpedition | undefined = part.citizens[citizen_index];
+                if (!place) continue;
+                Object.assign(place, requirement);
+                await this.realtime_expeditions_service.updateExpeditionCitizen(part, place);
+            }
+        });
     }
 
     /** Un jour n'est éditable que s'il n'est pas déjà passé pour la ville. */
@@ -356,7 +396,7 @@ export class ExpeditionsComponent implements OnInit {
                         // de la redemander ici, elle arrive déjà dans expedition.parts.
                         current_expeditions.push(expedition);
                     } else {
-                        current_expeditions[expedition_to_update] = expedition;
+                        current_expeditions[expedition_to_update] = preserveHeldBlocks(expedition, current_expeditions[expedition_to_update], this.locks.heldKeys());
                     }
                     current_expeditions.sort((expedition_a: Expedition, expedition_b: Expedition) => {
                         if (expedition_a.position < expedition_b.position) return -1;
@@ -370,7 +410,7 @@ export class ExpeditionsComponent implements OnInit {
         this.realtime_expeditions_service.expeditions_updated$
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe((expeditions: Expedition[]) => {
-                this.expeditions.set([...expeditions]);
+                this.expeditions.set(this.preservingHeldBlocks(expeditions));
             });
 
         this.realtime_expeditions_service.expedition_deleted$
@@ -422,6 +462,7 @@ export class ExpeditionsComponent implements OnInit {
                             });
                         }
                     } else {
+                        this.preserveHeldParts([expedition_part], current_expedition);
                         current_expedition.parts[part_to_update] = expedition_part;
                     }
 
@@ -469,6 +510,7 @@ export class ExpeditionsComponent implements OnInit {
                     if (citizen_to_update < 0) {
                         current_expedition_part.citizens.push(expedition_citizen);
                     } else {
+                        this.preserveHeldParts([Object.assign(new ExpeditionPart(), { id: current_expedition_part.id, citizens: [expedition_citizen] })], current_expedition);
                         current_expedition_part.citizens[citizen_to_update] = expedition_citizen;
                     }
                     this.renewPart(current_expedition, current_expedition_part);
@@ -653,7 +695,7 @@ export class ExpeditionsComponent implements OnInit {
 
     /** Importe les expéditions depuis celles du jour sélectionné */
     protected async importExpeditions(day: number): Promise<void> {
-        await this.realtime_expeditions_service.copyExpeditions(day, this.selected_day());
+        await this.write(() => this.realtime_expeditions_service.copyExpeditions(day, this.selected_day()));
     }
 
     protected addNewMemberToExpedition(expedition: Expedition, citizen_to_copy?: CitizenExpedition): void {
@@ -683,7 +725,7 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     protected async removeCitizenFromPart(citizen: CitizenExpedition): Promise<void> {
-        await this.realtime_expeditions_service.deleteExpeditionCitizen(citizen);
+        await this.write(() => this.realtime_expeditions_service.deleteExpeditionCitizen(citizen));
     }
 
     /** Demande ce que reprend la copie, puis la crée en dernière position : elle arrive par le hub. */
@@ -715,7 +757,7 @@ export class ExpeditionsComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(async (confirm: boolean): Promise<void> => {
                 if (confirm) {
-                    await this.realtime_expeditions_service.deleteExpedition(expedition);
+                    await this.write(() => this.realtime_expeditions_service.deleteExpedition(expedition));
                 }
             });
     }
@@ -732,36 +774,66 @@ export class ExpeditionsComponent implements OnInit {
             .pipe(takeUntilDestroyed(this.destroy_ref))
             .subscribe(async (confirm: boolean): Promise<void> => {
                 if (confirm) {
-                    await this.realtime_expeditions_service.deleteExpeditionPart(expedition_part);
+                    await this.write(() => this.realtime_expeditions_service.deleteExpeditionPart(expedition_part));
                 }
             });
     }
 
     /**
      * Consignes générales (sans case) d'une partie ou d'un citoyen. L'enregistrement remplace toute la liste : les
-     * consignes par case, que la feuille de route gère, sont reprises telles quelles.
+     * consignes par case, que la feuille de route gère, sont reprises telles quelles. Tenues par un autre : lecture seule.
      */
-    protected openExpeditionOrders(prop: CitizenExpedition | ExpeditionPart): void {
-        this.dialog
-            .open<EditOrdersComponent, EditOrdersData>(EditOrdersComponent, {
+    protected async openExpeditionOrders(prop: CitizenExpedition | ExpeditionPart): Promise<void> {
+        const kind: ExpeditionLockKind = prop instanceof CitizenExpedition ? 'citizen-orders' : 'part-orders';
+        const id: number | undefined = prop.id;
+        if (id !== undefined) {
+            await this.locks.enter(kind, id);
+        }
+        const lock_state: Signal<BlockLockState> = id === undefined ? signal<BlockLockState>({ kind: 'free' }) : this.locks.stateOf(expeditionLockKey(kind, id));
+        const holder_label: Signal<string | null> = computed((): string | null => {
+            const state: BlockLockState = lock_state();
+            return state.kind === 'other' ? lockHolderLabel(state, this.all_citizens()) : null;
+        });
+        const dialog_ref: MatDialogRef<EditOrdersComponent, ExpeditionOrder[]> = this.dialog
+            .open<EditOrdersComponent, EditOrdersData, ExpeditionOrder[]>(EditOrdersComponent, {
                 data: {
                     orders: generalOrders(prop.orders),
-                    citizen_id: prop instanceof CitizenExpedition ? prop.citizen_id : undefined
+                    citizen_id: prop instanceof CitizenExpedition ? prop.citizen_id : undefined,
+                    holder_label
                 },
                 width: '80%'
-            })
+            });
+        // Écoutée même en lecture seule : un verrou libéré entre-temps est repris à la première interaction.
+        const stop_activity: () => void = id === undefined ? (): void => undefined : this.listenOrdersActivity(dialog_ref, kind, id);
+        dialog_ref
             .afterClosed()
-            .subscribe(async (new_orders: ExpeditionOrder[]) => {
-                if (new_orders) {
-                    const orders: ExpeditionOrder[] = withCellOrders(new_orders, prop.orders);
-                    if (prop instanceof CitizenExpedition) {
-                        await this.realtime_expeditions_service.updateExpeditionCitizenOrders(prop, orders);
-                    } else {
-                        await this.realtime_expeditions_service.updateExpeditionPartOrders(prop, orders);
+            .subscribe(async (new_orders: ExpeditionOrder[] | undefined): Promise<void> => {
+                stop_activity();
+                try {
+                    if (new_orders) {
+                        const orders: ExpeditionOrder[] = withCellOrders(new_orders, prop.orders);
+                        await this.write(() => prop instanceof CitizenExpedition
+                            ? this.realtime_expeditions_service.updateExpeditionCitizenOrders(prop, orders)
+                            : this.realtime_expeditions_service.updateExpeditionPartOrders(prop, orders));
+                    }
+                } finally {
+                    if (id !== undefined) {
+                        this.locks.leave(kind, id);
                     }
                 }
             });
+    }
 
+    /** Prolonge le verrou des consignes à chaque interaction dans la modale ; renvoie l'arrêt de l'écoute. */
+    private listenOrdersActivity(dialog_ref: MatDialogRef<EditOrdersComponent, ExpeditionOrder[]>, kind: ExpeditionLockKind, id: number): () => void {
+        const host: HTMLElement | undefined = dialog_ref.componentRef?.location.nativeElement;
+        if (host === undefined) {
+            return (): void => undefined;
+        }
+        const events: string[] = ['keydown', 'pointermove', 'wheel', 'input'];
+        const onActivity: () => void = (): void => this.locks.activity(kind, id);
+        events.forEach((event: string): void => host.addEventListener(event, onActivity));
+        return (): void => events.forEach((event: string): void => host.removeEventListener(event, onActivity));
     }
 
     /** Consignes générales d'une partie : celles par case sont dans la feuille de route. */
@@ -791,7 +863,11 @@ export class ExpeditionsComponent implements OnInit {
         const updated: ExpeditionPart = Object.assign(new ExpeditionPart(), expedition_part, { map_route_id });
         try {
             await this.realtime_expeditions_service.updateExpeditionPart(expedition, updated);
-        } catch {
+        } catch (error: unknown) {
+            if (hubLockHolder(error) !== null) {
+                await this.handleWriteError(error, false);
+                return;
+            }
             this.snackbar.errorSnackbar($localize`Le tracé n'a pas pu être lié à la partie.`);
         }
     }
@@ -836,7 +912,7 @@ export class ExpeditionsComponent implements OnInit {
     protected async emptyBag(citizen: CitizenExpedition): Promise<void> {
         if (citizen && citizen.bag) {
             citizen.bag.items = [];
-            await this.realtime_expeditions_service.updateExpeditionBag(citizen);
+            await this.write(() => this.realtime_expeditions_service.updateExpeditionBag(citizen));
         }
     }
 
@@ -889,18 +965,18 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     protected async saveExpedition(expedition: Expedition): Promise<void> {
-        await this.realtime_expeditions_service.updateExpedition(this.selected_day(), expedition);
+        await this.write(() => this.realtime_expeditions_service.updateExpedition(this.selected_day(), expedition));
     }
 
     protected async saveExpeditionPart(expedition: Expedition, expedition_part: ExpeditionPart): Promise<void> {
-        await this.realtime_expeditions_service.updateExpeditionPart(expedition, expedition_part);
+        await this.write(() => this.realtime_expeditions_service.updateExpeditionPart(expedition, expedition_part));
     }
 
     /** Consigne cochée ou décochée : la liste se met à jour au retour du hub. */
     protected async saveOrder(order: ExpeditionOrder, done: boolean): Promise<void> {
         const updated: ExpeditionOrder = cloneOrder(order);
         updated.is_done = done;
-        await this.realtime_expeditions_service.updateExpeditionOrder(updated);
+        await this.write(() => this.realtime_expeditions_service.updateExpeditionOrder(updated));
     }
 
     protected toggleThirsty(citizen: CitizenExpedition): void {
@@ -909,6 +985,17 @@ export class ExpeditionsComponent implements OnInit {
 
     /** Enregistre la place ; choisie dans la première partie, la personne est recopiée sur la place vide de même rang des autres parties. */
     protected async saveCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void> {
+        await this.write(() => this.persistCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index));
+    }
+
+    /** Inscrit la personne connectée sur la place ; refusée, indique qui l'a prise. */
+    protected async register(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index: number, expedition: Expedition, citizen_index: number): Promise<void> {
+        citizen.citizen_id = this.me()?.id;
+        await this.write(() => this.persistCitizen(expedition_part, citizen, expedition_part_index, expedition, citizen_index), true);
+    }
+
+    /** Envoie la place au hub, recopiée au besoin sur les autres parties (cf. `saveCitizen`). */
+    private async persistCitizen(expedition_part: ExpeditionPart, citizen: CitizenExpedition, expedition_part_index?: number, expedition?: Expedition, citizen_index?: number): Promise<void> {
         console.log('expedition_part', expedition_part);
         if (expedition && expedition_part_index !== undefined && expedition_part_index !== null && citizen_index !== undefined && citizen_index !== null) {
             if (expedition_part_index === 0 && expedition?.parts.length > 1) {
@@ -935,7 +1022,60 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     private async saveBag(citizen: CitizenExpedition): Promise<void> {
-        await this.realtime_expeditions_service.updateExpeditionBag(citizen);
+        await this.write(() => this.realtime_expeditions_service.updateExpeditionBag(citizen));
+    }
+
+    /** Lance une écriture du hub ; un refus de verrou est signalé (cf. `handleWriteError`), toute autre erreur relancée. */
+    private async write(call: () => Promise<unknown>, is_registration: boolean = false): Promise<void> {
+        try {
+            await call();
+        } catch (error: unknown) {
+            await this.handleWriteError(error, is_registration);
+        }
+    }
+
+    /** Refus de verrou : avertit avec le nom du détenteur puis relit le jour ; toute autre erreur est relancée. */
+    private async handleWriteError(error: unknown, is_registration: boolean): Promise<void> {
+        const holder: number | null = hubLockHolder(error);
+        if (holder === null) {
+            throw error;
+        }
+        const state: BlockLockState = refusedLockState(holder);
+        if (is_registration && state.kind === 'other' && !state.same_user) {
+            this.snackbar.warningSnackbar($localize`Place déjà prise par ${this.lockHolderName(state)}:pseudo:`);
+        } else {
+            this.snackbar.warningSnackbar(lockRefusedMessage(holder, this.all_citizens()));
+        }
+        try {
+            await this.reloadDay();
+        } catch {
+            this.snackbar.errorSnackbar($localize`Les expéditions du jour n'ont pas pu être rechargées.`);
+        }
+    }
+
+    /** Relit les expéditions du jour affiché, en gardant la saisie des blocs tenus. */
+    private async reloadDay(): Promise<void> {
+        const day: number = this.selected_day();
+        const expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(day));
+        if (day === this.selected_day()) {
+            this.expeditions.set(this.preservingHeldBlocks(expeditions));
+        }
+    }
+
+    /** Expéditions reçues, où les blocs tenus gardent la saisie locale. */
+    private preservingHeldBlocks(expeditions: Expedition[]): Expedition[] {
+        const held: ReadonlySet<string> = this.locks.heldKeys();
+        const current: Expedition[] = this.expeditions();
+        return expeditions.map((expedition: Expedition): Expedition => preserveHeldBlocks(
+            expedition,
+            current.find((candidate: Expedition): boolean => candidate.id === expedition.id),
+            held
+        ));
+    }
+
+    /** Parties reçues de `expedition`, où les blocs tenus gardent la saisie locale. */
+    private preserveHeldParts(parts: ExpeditionPart[], expedition: Expedition): void {
+        preserveHeldBlocks(Object.assign(new Expedition(), { id: expedition.id, parts }), expedition, this.locks.heldKeys());
     }
 
     protected shareExpeditionForum(): void {

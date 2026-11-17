@@ -5,9 +5,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
+import { Observable, of } from 'rxjs';
 import type { Mock, MockInstance } from 'vitest';
 
 import { RefinementViewDTO } from '../../_abstract_model/dto/refinement.dto';
+import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
 import { SnackbarService } from '../../_core/services/snackbar.service';
@@ -19,12 +21,18 @@ import { OverflowComponent, ScenarioResult } from './overflow.component';
 describe('OverflowComponent', (): void => {
     let fixture: ComponentFixture<OverflowComponent>;
     let component: OverflowComponent;
+    /** Chantiers construits renvoyés par la doublure du service ; nul = état indisponible. */
+    let built_uids: ReadonlySet<string> | null;
 
     beforeEach((): void => {
         setTown(null);
+        built_uids = null;
         TestBed.configureTestingModule({
             imports: [OverflowComponent],
-            providers: [provideHttpClient(withXhr()), provideHttpClientTesting()]
+            providers: [
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
+                { provide: BuiltBuildingsService, useValue: { builtUids: (): Observable<ReadonlySet<string> | null> => of(built_uids) } }
+            ]
         });
         fixture = TestBed.createComponent(OverflowComponent);
         component = fixture.componentInstance;
@@ -553,6 +561,19 @@ describe('OverflowComponent', (): void => {
             town_component['changeInTownMode']();
 
             expect(town_component['citizen_defenses']()).toEqual([{ label: 'Citoyen 1', named: false, defense: 60 }]);
+        });
+
+        it('Habitations fortifiées construites : +4 sur la défense reconstituée des citoyens nommés', (): void => {
+            built_uids = new Set<string>(['small_city_up_#00']);
+            setTown(Object.assign(new TownDetails(), {
+                town_id: 1, town_x: 0, town_y: 0, town_max_x: 40, town_max_y: 40,
+                is_chaos: false, is_devaste: false, day: 5, town_type: 'primary', has_external_api: null
+            }));
+            const town_fixture: ComponentFixture<OverflowComponent> = TestBed.createComponent(OverflowComponent);
+            town_fixture.detectChanges();
+            flushTown(town_fixture);
+
+            expect(town_fixture.componentInstance['citizen_defenses']()[0]).toEqual(expect.objectContaining({ label: 'Alice', defense: 10 + 2 + 4 }));
         });
 
         it('recocher restitue les noms et les défenses reconstituées, pas celles saisies entre-temps', (): void => {

@@ -1,4 +1,4 @@
-import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
@@ -148,6 +148,58 @@ describe('PlanningHeaderComponent', (): void => {
         expect(menuItem('effective')?.disabled).toBe(true);
         menuItem('delete')?.click();
         expect(fake.actions['deletePlan']).toHaveBeenCalledTimes(1);
+    });
+
+    it('le menu copie depuis / vers un jour avec les bons jours', async (): Promise<void> => {
+        await render();
+        open.mockReturnValue({ afterClosed: (): unknown => of({ day: 12, name: 'Copie' }) });
+
+        button('plan-menu')?.click();
+        fixture.detectChanges();
+        menuItem('copy-from-day')?.click();
+        expect(fake.actions['copyPlanBetweenDays']).toHaveBeenCalledWith(12, 10, 'Copie');
+
+        button('plan-menu')?.click();
+        fixture.detectChanges();
+        menuItem('copy-to-day')?.click();
+        expect(fake.actions['copyPlanBetweenDays']).toHaveBeenLastCalledWith(10, 12, 'Copie');
+    });
+
+    it('« vers » ne propose que les jours à partir d\'aujourd\'hui, « depuis » tous les jours', async (): Promise<void> => {
+        await render();
+        Object.assign(fake.store, { days: signal([8, 10, 11]) });
+
+        button('plan-menu')?.click();
+        fixture.detectChanges();
+        menuItem('copy-to-day')?.click();
+        button('plan-menu')?.click();
+        fixture.detectChanges();
+        menuItem('copy-from-day')?.click();
+
+        expect(open.mock.calls[0][1].data.days).toEqual([10, 11]);
+        expect(open.mock.calls[1][1].data.days).toEqual([8, 10, 11]);
+    });
+
+    it("« depuis » est désactivé sur un jour passé, « vers » reste disponible", async (): Promise<void> => {
+        await render();
+        fake.selected_day.set(9);
+        button('plan-menu')?.click();
+        fixture.detectChanges();
+
+        expect(menuItem('copy-from-day')?.disabled).toBe(true);
+        expect(menuItem('copy-to-day')?.disabled).toBe(false);
+    });
+
+    it('copie annulée : rien n\'est copié ; sans droit d\'écriture : pas de menu', async (): Promise<void> => {
+        await render();
+        button('plan-menu')?.click();
+        fixture.detectChanges();
+        menuItem('copy-to-day')?.click();
+        expect(fake.actions['copyPlanBetweenDays']).not.toHaveBeenCalled();
+
+        fake.can_edit.set(false);
+        fixture.detectChanges();
+        expect(button('plan-menu')).toBeNull();
     });
 
     describe('modifications non enregistrées', (): void => {

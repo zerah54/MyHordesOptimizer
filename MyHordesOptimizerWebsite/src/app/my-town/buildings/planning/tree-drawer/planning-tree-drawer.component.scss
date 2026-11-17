@@ -91,6 +91,16 @@
     @include building-tree.label-cell;
     @include building-tree.resources-list;
 
+    .label-cell .temporary {
+        flex: none;
+        color: var(--mho-danger);
+    }
+
+    .label-cell .blueprint {
+        flex: none;
+        margin-left: 0.3em;
+    }
+
     .resources li.missing {
         color: var(--mho-danger);
         font-weight: 600;

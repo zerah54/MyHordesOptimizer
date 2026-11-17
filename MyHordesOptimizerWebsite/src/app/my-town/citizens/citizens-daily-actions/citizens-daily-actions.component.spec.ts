@@ -5,16 +5,19 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Observable, of } from 'rxjs';
 
 import { DailyActionEnum } from '../../../_abstract_model/enum/daily-action.enum';
+import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { BuiltBuildingsService } from '../../../_abstract_model/services/built-buildings.service';
 import { TownService } from '../../../_abstract_model/services/town.service';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../_abstract_model/types/daily-action.class';
+import { Home } from '../../../_abstract_model/types/home.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { CitizensDailyActionsComponent } from './citizens-daily-actions.component';
 
 interface TestableComponent {
     isDailyActionDone(citizen: Citizen, actionKey: string, day: number): boolean;
+    isDailyActionAvailable(citizen: Citizen, action: DailyActionEnum): boolean;
     saveDailyAction(citizen: Citizen, actionKey: string, checked: boolean, day: number): void;
     change_detector_ref: ChangeDetectorRef;
 }
@@ -44,6 +47,16 @@ describe('CitizensDailyActionsComponent', (): void => {
         citizen.daily_actions = [];
         return citizen;
     }
+
+    it('isDailyActionAvailable masque la sieste pour un citoyen sans Coin sieste', (): void => {
+        const citizen: Citizen = makeCitizen(1, 'Alice');
+
+        expect(testable.isDailyActionAvailable(citizen, DailyActionEnum.HOME_REST)).toBe(false);
+        expect(testable.isDailyActionAvailable(citizen, DailyActionEnum.HOME_CLEAN)).toBe(true);
+
+        citizen.home = Object.assign(new Home(), { content: [{ element: HomeEnum.REST_LEVEL, value: 1 }] });
+        expect(testable.isDailyActionAvailable(citizen, DailyActionEnum.HOME_REST)).toBe(true);
+    });
 
     describe('rendering after getCitizens() resolves', (): void => {
         it('renders nothing before citizen_info has loaded', (): void => {
@@ -125,6 +138,6 @@ describe('CitizensDailyActionsComponent — actions selon les chantiers construi
         const instance: CitizensDailyActionsComponent = TestBed.createComponent(CitizensDailyActionsComponent).componentInstance;
 
         expect((instance as unknown as { daily_action_keys: () => DailyActionEnum[] }).daily_action_keys().map((action: DailyActionEnum): string => action.key))
-            .toEqual(['home_clean', 'home_rest', 'home_crows']);
+            .toEqual(['home_clean', 'home_rest', 'home_crows', 'item_dice', 'item_cards', 'item_soccer']);
     });
 });

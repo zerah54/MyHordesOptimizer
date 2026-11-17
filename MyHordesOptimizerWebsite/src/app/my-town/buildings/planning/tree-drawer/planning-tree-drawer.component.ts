@@ -63,6 +63,9 @@ interface ResourceView {
 }
 
 /** Ligne du tiroir. */
+/** Sous-chantiers de la Décharge supprimés du jeu (absorbés par ses évolutions) mais que l'API renvoie encore. */
+const OBSOLETE_BUILDING_UIDS: ReadonlySet<string> = new Set<string>(['small_trash_#01', 'small_trash_#02', 'small_trash_#03', 'small_trash_#04', 'small_trash_#05']);
+
 interface TreeRow {
     building: Building;
     id: number;
@@ -200,7 +203,7 @@ export class PlanningTreeDrawerComponent {
      * @returns {boolean} Vrai si affichée.
      */
     private isShown(row: TreeRow | undefined): boolean {
-        if (row === undefined || !this.plannable().has(row.id)) {
+        if (row === undefined || OBSOLETE_BUILDING_UIDS.has(row.building.uid) || !this.plannable().has(row.id)) {
             return false;
         }
         if (this.unlocked_only() && row.state === 'locked') {

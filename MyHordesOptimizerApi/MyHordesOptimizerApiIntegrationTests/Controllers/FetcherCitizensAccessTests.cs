@@ -53,7 +53,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         /// <summary>Ville avec un citoyen vivant (sac garni, rôle chaman) et un citoyen mort (cadavre garni).</summary>
         private static (int townId, int aliveUserId, int deadUserId) SeedTownWithAliveAndDeadCitizen(MhoContext context, string suffix)
         {
-            var townId = new Random().Next(1, int.MaxValue);
+            var townId = new Random().Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
             var aliveUserId = new Random().Next(1, int.MaxValue);
             var deadUserId = new Random().Next(1, int.MaxValue);
 

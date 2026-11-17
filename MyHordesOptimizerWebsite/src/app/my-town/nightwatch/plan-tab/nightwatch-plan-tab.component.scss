@@ -1,0 +1,48 @@
+@use '../nightwatch-shared' as shared;
+
+:host {
+    display: block;
+    padding-top: 1em;
+
+    @include shared.kpis;
+    @include shared.alert;
+    @include shared.compact-field;
+
+    .plan-tab {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75em;
+    }
+
+    .totals {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 0.75em 1.5em;
+
+        .kpis {
+            flex: 1 1 24rem;
+        }
+
+        .attack {
+            align-self: center;
+            width: 14rem;
+        }
+    }
+
+    .watchers {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+        align-items: start;
+        gap: 0.75em;
+    }
+
+    .add-watcher {
+        align-self: flex-start;
+        width: min(100%, 20rem);
+    }
+
+    .no-plan {
+        opacity: 0.85;
+    }
+}

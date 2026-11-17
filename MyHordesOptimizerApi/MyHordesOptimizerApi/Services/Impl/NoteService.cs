@@ -153,10 +153,28 @@ public class NoteService : INoteService
     /// <summary>Note de ville ou de citoyen : n'a de sens que sur une ville où l'auteur a lui-même été citoyen.</summary>
     private void EnsureParticipated(int authorUserId, int townId)
     {
+        if (PreTownIds.IsPreTownIdTown(townId))
+        {
+            EnsurePreTownWritableMember(authorUserId, -townId - PreTownIds.Offset);
+            return;
+        }
         var participated = _dbContext.TownCitizens.Any(c => c.IdTown == townId && c.IdUser == authorUserId);
         if (!participated)
         {
             throw new MhoTechnicalException($"L'utilisateur {authorUserId} n'a pas participé à la ville {townId}.");
+        }
+    }
+
+    /// <summary>Ville fantôme : réservée aux membres de la pré-ville, et gelée une fois celle-ci liée.</summary>
+    private void EnsurePreTownWritableMember(int authorUserId, int preTownId)
+    {
+        if (!_dbContext.PreTownMembers.Any(m => m.IdPreTown == preTownId && m.IdUser == authorUserId))
+        {
+            throw new MhoForbiddenException("Vous n'êtes pas membre de cette pré-ville.");
+        }
+        if (_dbContext.PreTowns.Any(p => p.IdPreTown == preTownId && p.LinkedIdTown != null))
+        {
+            throw new MhoBadRequestException("Cette pré-ville est liée : elle est en lecture seule.");
         }
     }
 }

@@ -17,6 +17,7 @@ export class TownListMapper {
             isChaos: dto.isChaos,
             isDevasted: dto.isDevasted,
             isFinished: dto.isFinished,
+            preTownAlias: dto.preTownAlias ?? null,
             citizens: (dto.citizens ?? []).map((citizen_dto: TownPublicCitizenDTO): TownPublicCitizen => ({
                 id: citizen_dto.id,
                 name: citizen_dto.name,

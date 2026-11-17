@@ -6,6 +6,7 @@ import { JobEnum } from '../../../../_abstract_model/enum/job.enum';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { DailyAction } from '../../../../_abstract_model/types/daily-action.class';
 import { Home } from '../../../../_abstract_model/types/home.class';
+import { Status } from '../../../../_abstract_model/types/status.class';
 import { CitizenFilterSortStore } from '../../../../_shared/citizen-filters/citizen-filter-sort.store';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { BuildingPlanContentDTO, BuildingPlanDTO, emptyPlanContent, PlanCitizenDTO, PlanTaskDTO } from '../plan.types';
@@ -313,12 +314,28 @@ describe('PlanningTrackingComponent', (): void => {
             expect(addHome(3, HomeEnum.HOUSE_LEVEL)).toBeNull();
         });
 
-        it('signale les bannis et les techniciens', async (): Promise<void> => {
+        it('signale les techniciens et coche « Banni » selon l\'état réel', async (): Promise<void> => {
             await render();
 
-            expect(row(2).querySelector('.badge-banned')).not.toBeNull();
             expect(row(3).querySelector('.badge-tech')).not.toBeNull();
-            expect(row(1).querySelector('.badge-banned')).toBeNull();
+            expect((row(2).querySelector('[data-field="banned"] input') as HTMLInputElement).checked).toBe(true);
+            expect((row(1).querySelector('[data-field="banned"] input') as HTMLInputElement).checked).toBe(false);
+        });
+
+        it('setBanned simule un bannissement, ou une libération, et l\'efface au retour à l\'état réel', async (): Promise<void> => {
+            await render();
+            const banned: () => boolean | null | undefined = (): boolean | null | undefined =>
+                fake.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === 1)?.banned;
+            const set: (user_id: number, value: boolean) => void = (user_id: number, value: boolean): void =>
+                (fixture.componentInstance as unknown as { setBanned(id: number, banned: boolean): void }).setBanned(user_id, value);
+
+            set(1, true);
+            expect(banned()).toBe(true);
+            set(1, false);
+            expect(banned()).toBeNull();
+
+            set(2, false);
+            expect(fake.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === 2)?.banned).toBe(false);
         });
 
         it('rab d\'expé : PA de base moins PA d\'expédition ; surengagement signalé', async (): Promise<void> => {
@@ -388,14 +405,48 @@ describe('PlanningTrackingComponent', (): void => {
             expect(document.querySelector('.mat-mdc-menu-panel mho-planning-task-editor')).toBeNull();
         });
 
-        it('« Ajouter une consigne » > Action de chantier : première action proposée, entrée du citoyen créée', async (): Promise<void> => {
+        /**
+         * Ouvre « Ajouter une consigne » puis le sous-menu d'un type, et en renvoie les choix.
+         * @param {number} user_id Citoyen.
+         * @param {string} kind Type de consigne (`data-kind`).
+         * @returns {HTMLButtonElement[]} Choix du sous-menu.
+         */
+        function openChoices(user_id: number, kind: string): HTMLButtonElement[] {
+            row(user_id).querySelector<HTMLButtonElement>('button[data-action="add-task"]')?.click();
+            fixture.detectChanges();
+            document.querySelector<HTMLButtonElement>(`.mat-mdc-menu-panel [data-kind="${kind}"]`)?.click();
+            fixture.detectChanges();
+            return Array.from(document.querySelectorAll<HTMLButtonElement>('.mat-mdc-menu-panel [data-choice]'));
+        }
+
+        it('« Ajouter une consigne » > Action : sous-menu des actions, « Fouiller les déchets » comprise', async (): Promise<void> => {
             await render();
 
-            row(3).querySelector<HTMLButtonElement>('button[data-action="add-task"]')?.click();
-            fixture.detectChanges();
-            document.querySelector<HTMLButtonElement>('.mat-mdc-menu-panel [data-kind="action"]')?.click();
+            const choices: HTMLButtonElement[] = openChoices(3, 'action');
+            expect(choices.map((choice: HTMLButtonElement): string | undefined => choice.dataset['choice'])).toEqual(['home_crows', 'home_scavenge', 'trash']);
+            choices.find((choice: HTMLButtonElement): boolean => choice.dataset['choice'] === 'trash')?.click();
 
-            expect(tasksOf(3)).toEqual([{ id: expect.stringMatching(/^[a-z0-9]{10}$/), kind: 'action', ref: 'home_crows', pa: 1 }]);
+            expect(tasksOf(3)).toEqual([expect.objectContaining({ id: expect.stringMatching(/^[a-z0-9]{10}$/), kind: 'action', ref: 'trash' })]);
+        });
+
+        it('« Ajouter une consigne » > Travaux personnels : sous-menu des améliorations, niveau suivant du citoyen', async (): Promise<void> => {
+            await render();
+            fake.draft.set({ ...content(), citizens: [{ userId: 3, tasks: [{ id: 'h', kind: 'home', level: 1, pa: 2 }] }] });
+            fixture.detectChanges();
+
+            const choices: HTMLButtonElement[] = openChoices(3, 'homeUpgrade');
+            expect(choices.map((choice: HTMLButtonElement): string | undefined => choice.dataset['choice'])).toEqual(['kitchenLevel', 'hasLock']);
+            choices[1].click();
+
+            expect(tasksOf(3)[1]).toEqual({ id: expect.stringMatching(/^[a-z0-9]{10}$/), kind: 'homeUpgrade', ref: 'hasLock', level: 1, pa: 6 });
+        });
+
+        it('« Ajouter une consigne » > Améliorer sa maison : un seul niveau atteignable, ajouté sans sous-menu, PA des niveaux manquants', async (): Promise<void> => {
+            await render();
+
+            expect(openChoices(3, 'home')).toEqual([]);
+
+            expect(tasksOf(3)).toEqual([{ id: expect.stringMatching(/^[a-z0-9]{10}$/), kind: 'home', level: 2, pa: 4 }]);
         });
 
         it('« Ajouter une consigne » > Libre : consigne vide', async (): Promise<void> => {
@@ -416,6 +467,166 @@ describe('PlanningTrackingComponent', (): void => {
             expect(root().querySelector('button[data-action="add-home"]')).toBeNull();
             expect(root().querySelector('button[data-action="add-task"]')).toBeNull();
             expect(editButtons(2).every((button: HTMLButtonElement): boolean => button.disabled)).toBe(true);
+        });
+    });
+
+    describe('budget simple', (): void => {
+        /** Méthodes `protected` du composant exercées par le gabarit. */
+        interface SimpleInternals {
+            setBudgetMode(mode: 'simple' | 'detailed'): void;
+            setTier(tier: 'b6' | 'b7'): void;
+            setSelectedWorkers(worker: boolean): void;
+            setWorker(user_id: number, worker: boolean): void;
+            setGhoul(user_id: number, ghoul: boolean): void;
+            onExpeditionRab(value: unknown): void;
+        }
+
+        /**
+         * Méthodes protégées du composant.
+         * @returns {SimpleInternals} Accès aux méthodes.
+         */
+        function internals(): SimpleInternals {
+            return fixture.componentInstance as unknown as SimpleInternals;
+        }
+
+        /** Rafraîchit la vue après une modification du plan. */
+        async function refresh(): Promise<void> {
+            fixture.detectChanges();
+            await fixture.whenStable();
+            fixture.detectChanges();
+        }
+
+        it('plan sans mode : table détaillée, sans ouvrier ni goule', async (): Promise<void> => {
+            await render();
+
+            expect(root().querySelector('[data-field="base-pa"]')).not.toBeNull();
+            expect(root().querySelector('[data-field="default-pa"]')).not.toBeNull();
+            expect(root().querySelector('[data-field="worker"], [data-field="tier"], [data-field="expedition-rab"]')).toBeNull();
+            expect(root().querySelectorAll('tr.citizen [data-field="ghoul"]').length).toBe(3);
+            expect(root().querySelector('[data-field="budget-mode"]')).not.toBeNull();
+        });
+
+        it('bascule en simple : masque les PA de base, affiche ouvrier et goule', async (): Promise<void> => {
+            await render();
+
+            internals().setBudgetMode('simple');
+            await refresh();
+
+            expect(fake.draft()?.budgetMode).toBe('simple');
+            expect(root().querySelector('[data-field="base-pa"]')).toBeNull();
+            expect(root().querySelector('[data-field="default-pa"]')).toBeNull();
+            expect(root().querySelectorAll('tr.citizen [data-field="worker"]').length).toBe(3);
+            expect(root().querySelectorAll('tr.citizen [data-field="ghoul"]').length).toBe(3);
+            expect(root().querySelector('tr.citizen td.rab, tr.citizen td.capacity-cell')).toBeNull();
+            expect(root().querySelector('tr.citizen button[data-action="edit-task"]')).not.toBeNull();
+        });
+
+        it('setTier écrit le palier et les PA de base', async (): Promise<void> => {
+            await render();
+
+            internals().setTier('b6');
+            expect(fake.draft()?.basePaTier).toBe('b6');
+            expect(fake.draft()?.basePa).toBe(18);
+            internals().setTier('b7');
+            expect(fake.draft()?.basePa).toBe(19);
+        });
+
+        it('aucun palier coché quand les PA de base ne correspondent à aucun', async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple', basePa: 17 });
+
+            expect(root().querySelector('[data-field="tier"] .mat-button-toggle-checked')).toBeNull();
+        });
+
+        it('le palier correspondant aux PA de base est coché', async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple', basePa: 18 });
+
+            expect(root().querySelector('[data-field="tier"] .mat-button-toggle-checked')?.textContent).toContain('B6');
+        });
+
+        it('les boutons ouvriers n\'apparaissent que si des citoyens sont sélectionnés', async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple' });
+            expect(root().querySelector('[data-action="selected-workers-on"]')).toBeNull();
+
+            root().querySelector<HTMLElement>('tr.citizen [data-field="select"] input')?.click();
+            await refresh();
+
+            expect(root().querySelector('[data-action="selected-workers-on"]')).not.toBeNull();
+            expect(root().querySelector('[data-action="selected-workers-off"]')).not.toBeNull();
+        });
+
+        it('setSelectedWorkers coche puis décoche les citoyens sélectionnés seulement', async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple' });
+            root().querySelectorAll<HTMLElement>('tr.citizen [data-field="select"] input').forEach((input: HTMLElement, index: number): void => {
+                if (index < 2) {
+                    input.click();
+                }
+            });
+            await refresh();
+
+            internals().setSelectedWorkers(true);
+            const workers: () => number[] = (): number[] => (fake.draft()?.citizens ?? [])
+                .filter((entry: PlanCitizenDTO): boolean => entry.worker === true).map((entry: PlanCitizenDTO): number => entry.userId);
+            expect(workers().length).toBe(2);
+
+            internals().setSelectedWorkers(false);
+            expect(workers().length).toBe(0);
+        });
+
+        it('setWorker et setGhoul écrivent sur le citoyen', async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple' });
+
+            internals().setWorker(3, true);
+            internals().setGhoul(3, true);
+
+            const chloe: PlanCitizenDTO | undefined = fake.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === 3);
+            expect(chloe?.worker).toBe(true);
+            expect(chloe?.ghoul).toBe(true);
+        });
+
+        it('goule : case initialisée d\'après la page citoyens, modifiable ; une saisie égale à l\'état réel n\'est pas stockée', async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple' });
+            fake.citizens_full()[2].status = Object.assign(new Status(), { is_ghoul: true });
+            fake.citizens_full.set([...fake.citizens_full()]);
+            fixture.detectChanges();
+            const entry = (): PlanCitizenDTO | undefined => fake.draft()?.citizens.find((candidate: PlanCitizenDTO): boolean => candidate.userId === 3);
+
+            expect((row(3).querySelector('[data-field="ghoul"] input') as HTMLInputElement).checked).toBe(true);
+            internals().setGhoul(3, false);
+            expect(entry()?.ghoul).toBe(false);
+            internals().setGhoul(3, true);
+            expect(entry()?.ghoul).toBeNull();
+        });
+
+        it('le rab d\'expé global est ramené à un entier positif', async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple' });
+            vi.useFakeTimers();
+
+            internals().onExpeditionRab('-4');
+            vi.advanceTimersByTime(500);
+
+            expect(fake.draft()?.expeditionRab).toBe(0);
+        });
+
+        it("le rab d'expé global est plafonné à 100000", async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple' });
+            vi.useFakeTimers();
+
+            internals().onExpeditionRab('250000');
+            vi.advanceTimersByTime(500);
+
+            expect(fake.draft()?.expeditionRab).toBe(100000);
+            expect(root().querySelector('[data-field="expedition-rab"]')?.getAttribute('max')).toBe('100000');
+        });
+
+        it('lecture seule : interrupteur et commandes du mode simple désactivés', async (): Promise<void> => {
+            await render({ ...content(), budgetMode: 'simple' });
+            fake.can_edit.set(false);
+            await refresh();
+
+            const controls: HTMLElement[] = Array.from(root().querySelectorAll<HTMLElement>(
+                '[data-field="budget-mode"] button, [data-field="tier"] button, [data-field="expedition-rab"], [data-field="worker"] input, [data-field="ghoul"] input'));
+            expect(controls.length).toBeGreaterThan(6);
+            expect(controls.every((control: HTMLElement): boolean => (control as HTMLButtonElement).disabled)).toBe(true);
         });
     });
 });

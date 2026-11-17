@@ -1208,7 +1208,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 // passée ne bouge plus — et les rejouer ne ferait que rebrûler le quota. Le filtre porte
                 // sur les identifiants renvoyés par /json/townlist pour la saison demandée, jamais sur
                 // Town.season : l'appartenance à la saison est déjà prouvée par la liste elle-même.
-                var alreadyImportedIds = DbContext.Towns
+                var alreadyImportedIds = DbContext.Towns.ExcludingPreTowns()
                     .Where(town => town.RankingImportedAt != null)
                     .Select(town => town.IdTown)
                     .ToHashSet();
@@ -1221,7 +1221,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             var importedTowns = 0;
 
             // Snapshot BDD pour détection de migration
-            var bddQuery = DbContext.Towns.AsQueryable();
+            var bddQuery = DbContext.Towns.ExcludingPreTowns();
             if (season.HasValue) bddQuery = bddQuery.Where(t => t.Season == season.Value);
             var bddTownMeta = bddQuery.Select(t => new { t.IdTown, t.MapId }).ToList();
             var bddTownIdSet = bddTownMeta.Select(t => t.IdTown).ToHashSet();
@@ -1232,7 +1232,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
             // même quand on filtre par saison, mais exclut celles d'une AUTRE saison déjà connue :
             // un mapId peut être recyclé d'une saison à l'autre, et une ligne provisoire d'une saison
             // passée ne doit jamais être migrée par erreur vers une ville différente qui réutilise le même mapId.
-            var unmigratedTowns = DbContext.Towns
+            var unmigratedTowns = DbContext.Towns.ExcludingPreTowns()
                 .Where(t => t.IdTown < 0)
                 .Select(t => new { t.IdTown, t.Season })
                 .ToList();
@@ -1434,6 +1434,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                 var sql = $"UPDATE `{table}` SET `{column}` = {{0}} WHERE `{column}` = {{1}}";
                 DbContext.Database.ExecuteSqlRaw(sql, dto.Id, oldIdTown);
             }
+            // Le lien d'une pré-ville suit la ville (colonne non nommée idTown, ignorée par la boucle ci-dessus).
+            DbContext.Database.ExecuteSqlRaw("UPDATE PreTown SET linkedIdTown = {0} WHERE linkedIdTown = {1}", dto.Id, oldIdTown);
             // La Town elle-même en dernier
             DbContext.Database.ExecuteSqlRaw(
                 "UPDATE Town SET idTown = {0}, mapId = {1} WHERE idTown = {2}",

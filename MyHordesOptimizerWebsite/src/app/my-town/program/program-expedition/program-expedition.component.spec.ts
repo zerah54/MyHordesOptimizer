@@ -120,7 +120,7 @@ describe('ProgramExpeditionComponent', (): void => {
 
         expect(text()).toContain('Tous ensemble');
         fixture.debugElement.query(By.directive(ExpeditionOrderComponent)).componentInstance.doneChange.emit(true);
-        expect(editor.toggleDone).toHaveBeenCalledWith(order, true);
+        expect(editor.toggleDone).toHaveBeenCalledWith(order, true, expect.anything());
     });
 
     it('passe en vue équipe : une ligne par place, place vide = Place libre', async (): Promise<void> => {
@@ -215,7 +215,7 @@ describe('ProgramExpeditionComponent', (): void => {
 
         fixture.debugElement.query(By.directive(ExpeditionOrderComponent)).componentInstance.doneChange.emit(true);
 
-        expect(editor.toggleDone).toHaveBeenCalledWith(order, true);
+        expect(editor.toggleDone).toHaveBeenCalledWith(order, true, expect.anything());
     });
 
     it('n\'affiche ni soif ni chaussures si indifférent', (): void => {

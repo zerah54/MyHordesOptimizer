@@ -1,11 +1,14 @@
 import {
     bannedPoolForced,
     bannedPoolShown,
+    BASE_PA_BY_TIER,
     BudgetCitizen,
     CitizenCapacity,
     citizenCapacity,
     expeditionPaByCitizen,
+    GHOUL_PA_MALUS,
     poolBudgets,
+    simpleCitizenCapacity,
     TECHNICIAN_CP
 } from './budget.util';
 import { BuildingPlanContentDTO, emptyPlanContent } from './plan.types';
@@ -148,6 +151,35 @@ describe('budget.util', (): void => {
             const result: { pa: Map<number, number>; partsWithoutRoute: number } = expeditionPaByCitizen([{ routeLength: null, seats: [{ citizenId: 1, startPe: 0 }] }]);
             expect(result.pa.get(1)).toBeUndefined();
             expect(result.partsWithoutRoute).toBe(1);
+        });
+    });
+
+    describe('capacité du budget simple', (): void => {
+        const worker: { userId: number; banned: boolean; worker: boolean; ghoul: boolean } = { userId: 1, banned: false, worker: true, ghoul: false };
+
+        it('un ouvrier non goule a la base entière, sans PC', (): void => {
+            const capacity: CitizenCapacity = simpleCitizenCapacity(worker, 19);
+            expect(capacity.paCapacity).toBe(19);
+            expect(capacity.cpCapacity).toBe(0);
+            expect(capacity.capacity).toBe(19);
+            expect(capacity.overCommitted).toBe(false);
+        });
+
+        it('un ouvrier goule perd le malus de goule', (): void => {
+            expect(simpleCitizenCapacity({ ...worker, ghoul: true }, 19).capacity).toBe(19 - GHOUL_PA_MALUS);
+        });
+
+        it('un non-ouvrier a une capacité nulle, goule ou non', (): void => {
+            expect(simpleCitizenCapacity({ ...worker, worker: false }, 19).capacity).toBe(0);
+            expect(simpleCitizenCapacity({ ...worker, worker: false, ghoul: true }, 19).capacity).toBe(0);
+        });
+
+        it('la capacité ne passe jamais sous zéro', (): void => {
+            expect(simpleCitizenCapacity({ ...worker, ghoul: true }, 4).capacity).toBe(0);
+        });
+
+        it('les paliers de PA de base valent 18 (b6) et 19 (b7)', (): void => {
+            expect(BASE_PA_BY_TIER).toEqual({ b6: 18, b7: 19 });
         });
     });
 });

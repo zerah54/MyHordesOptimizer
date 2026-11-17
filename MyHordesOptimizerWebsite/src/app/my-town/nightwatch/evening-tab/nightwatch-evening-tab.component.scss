@@ -1,0 +1,56 @@
+@use '../nightwatch-shared' as shared;
+
+:host {
+    display: block;
+    padding-top: 1em;
+
+    @include shared.kpis;
+    @include shared.alert;
+
+    .evening-tab {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75em;
+    }
+
+    .table-scroll {
+        overflow: auto;
+    }
+
+    table.summary {
+        width: 100%;
+
+        td {
+            vertical-align: top;
+            padding-block: 0.5em;
+        }
+
+        tr.to-contact td[data-field='name'] {
+            font-weight: 600;
+        }
+    }
+
+    mat-chip mat-icon {
+        color: var(--mho-danger);
+    }
+
+    .phrase {
+        display: block;
+
+        &.real {
+            font-style: italic;
+        }
+    }
+
+    .item {
+        display: block;
+    }
+
+    .badges {
+        display: inline-block;
+    }
+
+    .empty {
+        opacity: 0.85;
+    }
+}

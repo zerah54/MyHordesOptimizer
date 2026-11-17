@@ -153,6 +153,14 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownBuildingPlanSettings> TownBuildingPlanSettings { get; set; }
 
+    public virtual DbSet<TownNightwatchPlan> TownNightwatchPlans { get; set; }
+
+    public virtual DbSet<PreTown> PreTowns { get; set; }
+
+    public virtual DbSet<PreTownMember> PreTownMembers { get; set; }
+
+    public virtual DbSet<PreTownLinkEntry> PreTownLinkEntries { get; set; }
+
     public virtual DbSet<TownRankingSnapshot> TownRankingSnapshots { get; set; }
 
     public virtual DbSet<TownRankingSnapshotCitizen> TownRankingSnapshotCitizens { get; set; }

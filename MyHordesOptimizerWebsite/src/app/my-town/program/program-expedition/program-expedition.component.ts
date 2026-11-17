@@ -7,11 +7,11 @@ import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { Imports } from '../../../_abstract_model/types/_types';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
-import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
 import { ExpeditionPart } from '../../../_abstract_model/types/expedition-part.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
@@ -164,7 +164,7 @@ export class ProgramExpeditionComponent {
 
     /** Coche ou décoche une consigne ; la liste affichée change au retour du hub. */
     protected async toggleDone(order: ExpeditionOrder, done: boolean): Promise<void> {
-        await this.editor.toggleDone(order, done);
+        await this.editor.toggleDone(order, done, this.citizens());
     }
 
     /** Fiche de la personne placée, et son nom ou son nom de repli (« Place n »). */

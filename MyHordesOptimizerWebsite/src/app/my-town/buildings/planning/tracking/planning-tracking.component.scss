@@ -66,8 +66,14 @@
     .fields {
         display: flex;
         flex-wrap: wrap;
+        align-items: center;
         gap: 1em;
         margin: 0.5em 0;
+    }
+
+    .flag {
+        width: 1%;
+        white-space: nowrap;
     }
 
     .base-pa mat-form-field {
@@ -79,7 +85,6 @@
         font-weight: 600;
     }
 
-    .badge-banned,
     .badge-tech {
         margin-left: 0.5em;
         padding: 0 0.4em;
@@ -94,6 +99,11 @@
         vertical-align: middle;
     }
 
+    .task-icon {
+        margin-right: 0.4em;
+        vertical-align: middle;
+    }
+
     .task-label {
         padding: 0;
         border: 0;
@@ -102,6 +112,12 @@
         font: inherit;
         text-align: left;
         cursor: pointer;
+
+        &:not(:disabled)::after {
+            content: '✎';
+            margin-left: 4px;
+            opacity: 0.55;
+        }
 
         &:disabled {
             cursor: default;
@@ -152,4 +168,11 @@
     .empty {
         opacity: 0.7;
     }
+}
+
+// Hors de :host : les menus s'affichent dans l'overlay, hors de l'élément du composant.
+.choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
 }

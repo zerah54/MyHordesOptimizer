@@ -11,10 +11,11 @@ import { Building } from '../../../_abstract_model/types/building.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../../_abstract_model/types/citizen-info.class';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { Me } from '../../../_abstract_model/types/me.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { TownContextService } from '../../../_core/services/town-context.service';
-import { setTown } from '../../../_core/utilities/localstorage.util';
+import { setTown, setUser } from '../../../_core/utilities/localstorage.util';
 import { GLOBAL_SEARCH_DIRECTORY_DEBOUNCE_MS, GlobalSearchService } from './global-search.service';
 import { GlobalSearchEntry, GlobalSearchGroup, GlobalSearchGroupId } from './global-search.util';
 
@@ -86,6 +87,7 @@ describe('GlobalSearchService', (): void => {
     afterEach((): void => {
         TestBed.inject(TownContextService).clear();
         setTown(null);
+        setUser(null);
     });
 
     it('does not request anything until the index is needed', (): void => {
@@ -171,6 +173,29 @@ describe('GlobalSearchService', (): void => {
         TestBed.inject(TownContextService).setObservedTown(makeTown(99), 'Ville observée');
 
         expect(entriesOf(service.search('banque'), 'pages').map((entry: GlobalSearchEntry): string => entry.link.path)).toEqual(['town/99/bank']);
+    });
+
+    describe('pre-towns page (user menu entry)', (): void => {
+        const pre_town_paths = (query: string): string[] =>
+            entriesOf(service.search(query), 'pages').map((entry: GlobalSearchEntry): string => entry.link.path);
+
+        it('is found for a logged-in user, accent and case insensitive', (): void => {
+            setUser(Object.assign(new Me(), { id: 5 }));
+
+            expect(pre_town_paths('pré')).toContain('pre-town');
+            expect(pre_town_paths('PRE-VILLE')).toContain('pre-town');
+        });
+
+        it('is absent when logged out', (): void => {
+            expect(pre_town_paths('pré')).not.toContain('pre-town');
+        });
+
+        it('leaves the sidenav entries unchanged', (): void => {
+            setTown(makeTown(12));
+            setUser(Object.assign(new Me(), { id: 5 }));
+
+            expect(pre_town_paths('banque')).toEqual(['my-town/bank']);
+        });
     });
 
     it('expands a whole acronym of the glossary into what it stands for', (): void => {

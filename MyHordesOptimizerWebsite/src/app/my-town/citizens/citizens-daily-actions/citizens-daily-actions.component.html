@@ -16,13 +16,15 @@
                             @default {
                                 <div class="band">
                                     @for (action of daily_action_keys(); track action.key) {
-                                        <mho-compact-toggle
-                                            (valueChange)="saveDailyAction(row, action.key, $event, +column.id)"
-                                            [disabled]="is_readonly()"
-                                            [icon]="action.value.img"
-                                            [label]="action.getLabel()"
-                                            [value]="isDailyActionDone(row, action.key, +column.id)">
-                                        </mho-compact-toggle>
+                                        @if (isDailyActionAvailable(row, action)) {
+                                            <mho-compact-toggle
+                                                (valueChange)="saveDailyAction(row, action.key, $event, +column.id)"
+                                                [disabled]="is_readonly()"
+                                                [icon]="action.value.img"
+                                                [label]="action.getLabel()"
+                                                [value]="isDailyActionDone(row, action.key, +column.id)">
+                                            </mho-compact-toggle>
+                                        }
                                     }
                                 </div>
                             }

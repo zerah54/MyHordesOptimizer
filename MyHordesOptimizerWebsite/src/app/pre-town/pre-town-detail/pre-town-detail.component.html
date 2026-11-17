@@ -1,0 +1,127 @@
+@if (pre_town(); as pt) {
+    <mat-card-header class="mho-pre-town-detail-header">
+        <mat-card-title>{{ pt.alias }}</mat-card-title>
+        <button mat-stroked-button (click)="copyLink()">
+            <mat-icon>link</mat-icon>
+            <ng-container i18n>Copier le lien</ng-container>
+        </button>
+    </mat-card-header>
+
+    <mat-card-content class="mho-pre-town-detail">
+        @if (pt.isOrganizer) {
+            <div class="preparation-actions">
+                @if (!pt.isLinked) {
+                    <button class="link-button" mat-flat-button color="primary" [disabled]="busy()" (click)="link()">
+                        @if (busy()) {
+                            <mat-spinner diameter="20"/>
+                        } @else {
+                            <mat-icon>add_link</mat-icon>
+                            <ng-container i18n>Lier à ma ville actuelle</ng-container>
+                        }
+                    </button>
+                }
+                @if (pt.canUnlink) {
+                    <button class="unlink-button" mat-stroked-button [disabled]="busy()" (click)="unlink()">
+                        @if (busy()) {
+                            <mat-spinner diameter="20"/>
+                        } @else {
+                            <mat-icon>link_off</mat-icon>
+                            <ng-container i18n>Délier</ng-container>
+                        }
+                    </button>
+                }
+                <button class="duplicate-button" mat-stroked-button [disabled]="busy()" (click)="duplicate()">
+                    @if (busy()) {
+                        <mat-spinner diameter="20"/>
+                    } @else {
+                        <mat-icon>content_copy</mat-icon>
+                        <ng-container i18n>Dupliquer</ng-container>
+                    }
+                </button>
+            </div>
+        }
+        @if (pt.isOrganizer) {
+            <div class="organizer-controls">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Nom de la pré-ville</mat-label>
+                    <input [ngModel]="alias_draft()" (ngModelChange)="alias_draft.set($event)" (keydown.enter)="rename()" matInput>
+                </mat-form-field>
+                <button class="rename-button" mat-flat-button color="primary" [disabled]="!can_rename()" (click)="rename()">
+                    @if (busy()) {
+                        <mat-spinner diameter="20"/>
+                    } @else {
+                        <mat-icon>save</mat-icon>
+                        <ng-container i18n>Renommer</ng-container>
+                    }
+                </button>
+            </div>
+        }
+        @if (pt.isOrganizer && !pt.isLinked) {
+            <div class="simulated-controls">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Citoyens simulés</mat-label>
+                    <input class="simulated-input" type="number" [min]="min_simulated" [max]="max_simulated" step="1"
+                           [ngModel]="simulated_draft()" (ngModelChange)="simulated_draft.set($event)" (keydown.enter)="setSimulatedCitizens()" matInput>
+                </mat-form-field>
+                <button class="simulated-button" mat-flat-button color="primary" [disabled]="!can_set_simulated()" (click)="setSimulatedCitizens()">
+                    @if (busy()) {
+                        <mat-spinner diameter="20"/>
+                    } @else {
+                        <mat-icon>save</mat-icon>
+                        <ng-container i18n>Enregistrer</ng-container>
+                    }
+                </button>
+            </div>
+        } @else {
+            <div class="simulated-value">
+                <ng-container i18n>Citoyens simulés :</ng-container>
+                {{ pt.simulatedCitizens }}
+            </div>
+        }
+
+        <section class="members">
+            <h3 i18n>Membres</h3>
+            @for (member of pt.members; track member.idUser) {
+                <div class="member-row">
+                    <span class="member-name">{{ member.name }}</span>
+                    @if (member.isOrganizer) {
+                        <mat-icon class="organizer-flag" i18n-aria-label aria-label="Organisateur" i18n-title title="Organisateur">star</mat-icon>
+                    }
+                    @if (member.idUser === my_user_id) {
+                        <button class="leave-button" mat-stroked-button [disabled]="busy()" (click)="leave()">
+                            <mat-icon>logout</mat-icon>
+                            <ng-container i18n>Quitter</ng-container>
+                        </button>
+                    } @else if (pt.isOrganizer) {
+                        <button class="promote-member" mat-icon-button [disabled]="busy()" [title]="roleTitle(member)" [attr.aria-label]="roleTitle(member)"
+                                (click)="setOrganizer(member, !member.isOrganizer)">
+                            <mat-icon>{{ member.isOrganizer ? 'star_border' : 'star' }}</mat-icon>
+                        </button>
+                        <button class="remove-member" mat-icon-button [disabled]="busy()" i18n-title title="Retirer" i18n-aria-label aria-label="Retirer"
+                                (click)="removeMember(member.idUser)">
+                            <mat-icon>person_remove</mat-icon>
+                        </button>
+                    }
+                </div>
+            }
+        </section>
+
+        @if (pt.isOrganizer) {
+            <section class="member-search">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Ajouter un joueur</mat-label>
+                    <input [formControl]="search_control" [matAutocomplete]="player_auto" matInput>
+                    <mat-autocomplete #player_auto="matAutocomplete" [displayWith]="clearDisplay" (optionSelected)="onPlayerSelected($event)">
+                        @for (candidate of candidates(); track candidate.id) {
+                            <mat-option [value]="candidate" [disabled]="busy()">{{ candidate.name }}</mat-option>
+                        }
+                    </mat-autocomplete>
+                </mat-form-field>
+            </section>
+        }
+    </mat-card-content>
+} @else if (loading()) {
+    <mat-card-content>
+        <mat-spinner diameter="30"/>
+    </mat-card-content>
+}

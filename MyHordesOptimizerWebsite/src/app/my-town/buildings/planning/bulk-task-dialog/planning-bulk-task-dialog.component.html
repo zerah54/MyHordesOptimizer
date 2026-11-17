@@ -7,10 +7,10 @@
         <mat-form-field appearance="outline" subscriptSizing="dynamic">
             <mat-label i18n>Type</mat-label>
             <mat-select data-field="bulk-kind" [value]="kind()" (selectionChange)="setKind($event.value)">
-                <mat-option value="home" i18n>Maison</mat-option>
-                <mat-option value="homeUpgrade" i18n>Amélioration de maison</mat-option>
+                <mat-option value="home" i18n>Améliorer sa maison</mat-option>
+                <mat-option value="homeUpgrade" i18n>Travaux personnels</mat-option>
                 <mat-option value="action" [disabled]="action_options().length === 0">
-                    <ng-container i18n>Action de chantier</ng-container>
+                    <ng-container i18n>Action</ng-container>
                 </mat-option>
                 <mat-option value="free" i18n>Libre</mat-option>
             </mat-select>
@@ -19,7 +19,7 @@
         @switch (kind()) {
             @case ('action') {
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>Action de chantier</mat-label>
+                    <mat-label i18n>Action</mat-label>
                     <mat-select data-field="bulk-action" [value]="action_key()" (selectionChange)="action_key.set($event.value)">
                         @for (action of action_options(); track action.key) {
                             <mat-option [value]="action.key">{{ action.getLabel() }}</mat-option>
@@ -29,7 +29,7 @@
             }
             @case ('homeUpgrade') {
                 <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>Amélioration de maison</mat-label>
+                    <mat-label i18n>Travaux personnels</mat-label>
                     <mat-select data-field="bulk-upgrade" [value]="upgrade_key()" (selectionChange)="upgrade_key.set($event.value); level.set(null)">
                         @for (option of store.home_upgrades(); track option.key) {
                             <mat-option [value]="option.key">{{ option.label }}</mat-option>

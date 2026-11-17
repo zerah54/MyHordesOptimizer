@@ -62,6 +62,14 @@
         <mat-icon>content_copy</mat-icon>
         <span i18n>Dupliquer</span>
     </button>
+    <button mat-menu-item type="button" data-action="copy-from-day" [disabled]="store.selected_day() < store.current_day" (click)="copyFromDay()">
+        <mat-icon>event_repeat</mat-icon>
+        <span i18n>Copier depuis le jour…</span>
+    </button>
+    <button mat-menu-item type="button" data-action="copy-to-day" (click)="copyToDay()">
+        <mat-icon>event_repeat</mat-icon>
+        <span i18n>Copier vers le jour…</span>
+    </button>
     <button mat-menu-item type="button" data-action="effective" [disabled]="store.selected_plan()?.isEffective === true" (click)="store.setEffective()">
         <mat-icon>star</mat-icon>
         <span i18n>Rendre effective pour ce jour</span>

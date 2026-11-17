@@ -142,7 +142,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         {
             var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
             var userId = new Random().Next(1, int.MaxValue);
-            var mapId = new Random().Next(1, int.MaxValue);
+            var mapId = new Random().Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
             var response = BuildInTownResponse(userId, suffix, mapId);
             var tracker = new PictosCallTracker();
 
@@ -235,7 +235,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         {
             var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
             var userId = new Random().Next(1, int.MaxValue);
-            var mapId = new Random().Next(1, int.MaxValue);
+            var mapId = new Random().Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
             var response = BuildInTownResponse(userId, suffix, mapId);
             var tracker = new PictosCallTracker();
 

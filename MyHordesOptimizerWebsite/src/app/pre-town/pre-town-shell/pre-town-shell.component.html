@@ -1,0 +1,27 @@
+<div class="pre-town-banner">
+    <a class="pre-town-banner__back" routerLink="/pre-town">
+        <mat-icon>arrow_back</mat-icon>
+        <ng-container i18n>Mes pré-villes</ng-container>
+    </a>
+    <mat-icon>event_note</mat-icon>
+    @if (pre_town(); as pt) {
+        <span class="pre-town-banner__name">{{ pt.alias }}</span>
+        @if (frozen()) {
+            <span class="pre-town-banner__frozen" i18n>Liée : lecture seule</span>
+        }
+        <nav class="pre-town-banner__nav">
+            <a routerLink="." routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" i18n>Préparation</a>
+            <a routerLink="buildings" routerLinkActive="active" i18n>Chantiers</a>
+            <a routerLink="nightwatch" routerLinkActive="active" i18n>Veilles</a>
+            <a routerLink="wishlist" routerLinkActive="active" i18n>Liste de courses</a>
+        </nav>
+    }
+</div>
+
+@if (context_ready()) {
+    <router-outlet></router-outlet>
+} @else if (loading()) {
+    <div class="pre-town-loading">
+        <mat-spinner diameter="48"/>
+    </div>
+}

@@ -164,6 +164,7 @@ namespace MyHordesOptimizerApi.Controllers
             finally
             {
                 _cache.Remove(ReferentialCacheKeys.Items);
+                _cache.Remove(ReferentialCacheKeys.NightwatchReferential);
                 // Les recettes sont importées avec les items (même méthode de service).
                 _cache.Remove(ReferentialCacheKeys.Recipes);
             }
@@ -265,6 +266,7 @@ namespace MyHordesOptimizerApi.Controllers
         private void InvalidateAllReferentialCaches()
         {
             _cache.Remove(ReferentialCacheKeys.Items);
+            _cache.Remove(ReferentialCacheKeys.NightwatchReferential);
             _cache.Remove(ReferentialCacheKeys.Recipes);
             _cache.Remove(ReferentialCacheKeys.Ruins);
             _cache.Remove(ReferentialCacheKeys.Buildings);

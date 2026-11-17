@@ -18,7 +18,8 @@
     }
 
     @if (is_key_login) {
-        <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+        <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu" [matBadge]="unseen_pre_towns()"
+                [matBadgeHidden]="unseen_pre_towns() === 0" matBadgeSize="small" i18n-matBadgeDescription matBadgeDescription="Nouvelles pré-villes">
             @if (saved_external_app_id() === null || saved_external_app_id() === undefined || saved_external_app_id() === '') {
                 <ng-container i18n>Se connecter</ng-container>
             } @else if (me()) {
@@ -38,16 +39,19 @@
             </a>
         } @else if (me()) {
             @if (me()!.username && me()!.username !== '') {
-                <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+                <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu" [matBadge]="unseen_pre_towns()"
+                        [matBadgeHidden]="unseen_pre_towns() === 0" matBadgeSize="small" i18n-matBadgeDescription matBadgeDescription="Nouvelles pré-villes">
                     <ng-container *ngTemplateOutlet="userIdentity"></ng-container>
                 </button>
             } @else {
-                <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+                <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu" [matBadge]="unseen_pre_towns()"
+                        [matBadgeHidden]="unseen_pre_towns() === 0" matBadgeSize="small" i18n-matBadgeDescription matBadgeDescription="Nouvelles pré-villes">
                     <ng-container i18n>Utilisateur inconnu</ng-container>
                 </button>
             }
         } @else {
-            <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu">
+            <button mat-button type="button" class="profil-button" [matMenuTriggerFor]="userMenu" [matBadge]="unseen_pre_towns()"
+                    [matBadgeHidden]="unseen_pre_towns() === 0" matBadgeSize="small" i18n-matBadgeDescription matBadgeDescription="Nouvelles pré-villes">
                 <ng-container i18n>Utilisateur inconnu</ng-container>
             </button>
         }
@@ -77,6 +81,10 @@
                 }
                 @if (me.id) {
                     <a mat-menu-item [routerLink]="['/profile', me.id]" i18n>Mon compte</a>
+                    <a mat-menu-item routerLink="/pre-town">
+                        <span [matBadge]="unseen_pre_towns()" [matBadgeHidden]="unseen_pre_towns() === 0" matBadgeSize="small" matBadgeOverlap="false"
+                              i18n-matBadgeDescription matBadgeDescription="Nouvelles pré-villes"><ng-container i18n>Mes pré-villes</ng-container></span>
+                    </a>
                 }
             }
             @if (admin_service.isAdmin()) {

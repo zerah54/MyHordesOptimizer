@@ -1,0 +1,104 @@
+@use '../../nightwatch-shared' as shared;
+
+:host {
+    display: block;
+
+    @include shared.alert;
+    @include shared.compact-field;
+
+    .watcher-head {
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 0;
+    }
+
+    .head-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+
+    .body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75em;
+        padding-top: 0.5em;
+    }
+
+    .assigned,
+    .add-item,
+    .options,
+    .computed,
+    .stats {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5em 1em;
+    }
+
+    .items {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+    }
+
+    .assigned .item-label {
+        display: inline-flex;
+        align-items: center;
+        flex: 1 1 8rem;
+        gap: 0.4em;
+    }
+
+    .picker {
+        flex: 1 1 12rem;
+    }
+
+    .quantity {
+        width: 6rem;
+    }
+
+    .options {
+        .past {
+            width: 9rem;
+        }
+
+        .note {
+            flex: 1 1 10rem;
+        }
+    }
+
+    .stat {
+        display: flex;
+        flex-direction: column;
+        min-width: 5rem;
+        padding: 0.3em 0.6em;
+        border: 1px solid var(--mho-line-strong);
+        border-radius: var(--mho-radius-m);
+        background: var(--mho-surface);
+
+        .title {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            opacity: 0.75;
+        }
+
+        .value {
+            font-size: 1.15em;
+        }
+    }
+
+    .tier {
+        flex: 1 1 14rem;
+        margin: 0;
+        font-style: italic;
+    }
+
+    .alerts {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+}

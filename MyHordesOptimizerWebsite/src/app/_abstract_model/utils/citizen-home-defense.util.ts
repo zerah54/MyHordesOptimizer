@@ -1,3 +1,4 @@
+import { FORTIFIED_HOMES_BONUS } from '../../my-town/buildings/planning/defense-rules.const';
 import { HomeEnum } from '../enum/home.enum';
 import { JobEnum } from '../enum/job.enum';
 import { Property } from '../enum/property.enum';
@@ -13,13 +14,16 @@ const DOUBLE_WEIGHT_ITEM_UIDS: readonly string[] = ['soul_blue_#00', 'soul_blue_
  * baseDef + renfort/clôture (citoyens héroïques uniquement) + objets de défense en coffre.
  * Best-effort : additionalDefense/temporaryDefense (bonus d'objets consommés) ne sont pas reconstructibles
  * (pas de source scrapable) — le résultat est un plancher, jamais un plafond.
+ * @param {Citizen} citizen Citoyen.
+ * @param {boolean} [fortified_homes] Chantier « Habitations fortifiées » construit : +4 pour tout citoyen.
+ * @returns {number} Défense de maison reconstituée.
  */
-export function computeReconstructedHomeDefense(citizen: Citizen): number {
+export function computeReconstructedHomeDefense(citizen: Citizen, fortified_homes: boolean = false): number {
     const isHeroic: boolean = citizen.job?.key !== JobEnum.CITIZEN.key;
     const jobDefense: number = isHeroic ? 2 + (citizen.job?.key === JobEnum.GUARDIAN.key ? 1 : 0) : 0;
     const upgradesDefense: number = isHeroic ? computeUpgradesDefense(citizen) : 0;
     const itemDefense: number = computeItemDefense(citizen);
-    return (citizen.house_defense ?? 0) + jobDefense + upgradesDefense + itemDefense;
+    return (citizen.house_defense ?? 0) + (fortified_homes ? FORTIFIED_HOMES_BONUS : 0) + jobDefense + upgradesDefense + itemDefense;
 }
 
 function computeUpgradesDefense(citizen: Citizen): number {

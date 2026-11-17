@@ -8,10 +8,10 @@ import moment from 'moment';
 import { BURIED_RUIN_ID } from '../../../_abstract_model/const';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Cell } from '../../../_abstract_model/types/cell.class';
-import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
-import { Expedition } from '../../../_abstract_model/types/expedition.class';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { ExpeditionPart, ExpeditionPartRoute } from '../../../_abstract_model/types/expedition-part.class';
+import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { mapRouteColorVar, MapRoutePoint } from '../../../_abstract_model/types/map-route.class';
 import { Ruin } from '../../../_abstract_model/types/ruin.class';
@@ -279,7 +279,7 @@ export class ExpeditionRoadbookComponent {
     }
 
     protected toggleDone(line: OrderLine, done: boolean): Promise<void> {
-        return this.order_editor.toggleDone(line.owned.order, done);
+        return this.order_editor.toggleDone(line.owned.order, done, this.form_context().citizens);
     }
 
     /** PA de visite de ruine : ceux de la place du joueur filtré (visites de la partie comprises), sinon ceux de la partie. */

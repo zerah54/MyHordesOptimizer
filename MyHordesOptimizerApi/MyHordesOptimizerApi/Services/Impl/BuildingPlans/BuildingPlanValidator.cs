@@ -24,6 +24,8 @@ namespace MyHordesOptimizerApi.Services.Impl.BuildingPlans
         private const int MaxActionUses = 3;
         private static readonly string[] Pools = { "banned", "regular" };
         private static readonly string[] BuildingStepKinds = { "build", "repair" };
+        private static readonly string[] BudgetModes = { "simple", "detailed" };
+        private static readonly string[] PaTiers = { "b6", "b7" };
         private static readonly string[] Modes = { "finish", "leave", "survive" };
         private static readonly string[] LossKinds = { "destroyed", "bonus" };
         private static readonly string[] TaskKinds = { "home", "homeUpgrade", "action", "free" };
@@ -59,6 +61,17 @@ namespace MyHordesOptimizerApi.Services.Impl.BuildingPlans
             Check(content.Losses.Count <= MaxRows, "Trop de pertes prévues.");
             Check(content.Losses.All(loss => LossKinds.Contains(loss.Kind)), "Type de perte inconnu.");
             Check(content.Losses.Select(loss => (loss.BuildingId, loss.Kind)).Distinct().Count() == content.Losses.Count, "Perte prévue en double.");
+            Check(content.BudgetMode is null || BudgetModes.Contains(content.BudgetMode), "Mode de budget inconnu.");
+            Check(content.BasePaTier is null || PaTiers.Contains(content.BasePaTier), "Palier de PA de base inconnu.");
+            Check(content.ExpeditionRab >= 0 && content.ExpeditionRab <= 100000, "PA de rab d'expédition invalides.");
+            if (content.ValidatedBudget is { } validated)
+            {
+                Check(validated.ValidatedAt.Length <= MaxLabel, "Date de validation trop longue.");
+                Check(validated.Pools.Count <= Pools.Length && validated.Pools.Keys.All(pool => Pools.Contains(pool)), "Poche de budget validé inconnue.");
+                Check(validated.Pools.Values.All(pool => pool.Budget >= 0 && pool.Budget <= 100000 && pool.Cost >= 0 && pool.Cost <= 100000), "Budget validé invalide.");
+                Check(validated.Steps.Count <= MaxRows, "Trop d'étapes validées.");
+                Check(validated.Steps.All(step => BuildingStepKinds.Contains(step.Kind) && Pools.Contains(step.Pool) && step.PaCost >= 0 && step.PaCost <= 100000 && step.Invested >= 0 && step.Invested <= 100000 && step.Life >= 0 && step.Life <= 100000), "Étape validée invalide.");
+            }
 
             foreach (var citizen in content.Citizens)
             {

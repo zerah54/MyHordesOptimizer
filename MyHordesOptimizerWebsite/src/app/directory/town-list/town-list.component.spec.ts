@@ -1,6 +1,6 @@
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, DeferBlockBehavior, DeferBlockFixture, DeferBlockState, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import type { MockedObject } from 'vitest';
 
@@ -35,7 +35,7 @@ function town(citizens: TownPublicCitizen[]): TownListItem {
     return {
         id: 1, mapId: 12, name: 'Test', width: null, height: null, townType: null,
         season: null, phase: null, language: null, score: null,
-        isChaos: false, isDevasted: false, isFinished: false, citizens
+        isChaos: false, isDevasted: false, isFinished: false, preTownAlias: null, citizens
     };
 }
 
@@ -212,5 +212,51 @@ describe('TownListComponent ouverture d\'une ville', (): void => {
     it('ouvre sa propre ville courante en mode normal', (): void => {
         setTown(Object.assign(new TownDetails(), { town_id: 12 }));
         expect(testable.getRowCommands(town([]))).toEqual(['/my-town']);
+    });
+});
+
+describe('TownListComponent alias de pré-ville', (): void => {
+    let fixture: ComponentFixture<TownListComponent>;
+
+    /** Rend la liste avec les lignes données et retourne le texte de la cellule « nom » de chaque ligne. */
+    async function renderNameCells(items: TownListItem[]): Promise<string[]> {
+        const townService: MockedObject<TownService> = {
+            getSeasonPhases: vi.fn().mockName('TownService.getSeasonPhases').mockReturnValue(of([])),
+            getTownsPaged: vi.fn().mockName('TownService.getTownsPaged')
+                .mockReturnValue(of({ items, totalCount: items.length, availableTypes: [], availableLanguages: [] }))
+        } as unknown as MockedObject<TownService>;
+        const noteService: MockedObject<NoteService> = {
+            getMyTownNotes: vi.fn().mockName('NoteService.getMyTownNotes').mockReturnValue(of({}))
+        } as unknown as MockedObject<NoteService>;
+        await TestBed.configureTestingModule({
+            imports: [TownListComponent],
+            providers: [
+                provideHttpClient(withXhr()), provideHttpClientTesting(),
+                { provide: TownService, useValue: townService },
+                { provide: NoteService, useValue: noteService }
+            ],
+            deferBlockBehavior: DeferBlockBehavior.Manual
+        }).compileComponents();
+        fixture = TestBed.createComponent(TownListComponent);
+        fixture.detectChanges();
+        const blocks: DeferBlockFixture[] = await fixture.getDeferBlocks();
+        for (const block of blocks) {
+            await block.render(DeferBlockState.Complete);
+        }
+        fixture.detectChanges();
+        const cells: NodeListOf<HTMLElement> = (fixture.nativeElement as HTMLElement).querySelectorAll('td.mat-column-name');
+        return Array.from(cells).map((cell: HTMLElement): string => (cell.textContent ?? '').replace(/\s+/g, ' ').trim());
+    }
+
+    it('affiche l\'alias en plus du nom quand une pré-ville est liée', async (): Promise<void> => {
+        const cells: string[] = await renderNameCells([{ ...town([]), preTownAlias: 'Les Rôdeurs' }]);
+
+        expect(cells).toEqual(['Test Les Rôdeurs']);
+    });
+
+    it('laisse l\'affichage du nom inchangé sans alias', async (): Promise<void> => {
+        const cells: string[] = await renderNameCells([town([])]);
+
+        expect(cells).toEqual(['Test']);
     });
 });

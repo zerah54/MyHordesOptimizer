@@ -73,4 +73,44 @@ describe('budgetBreakdown', (): void => {
         expect(rowOf(rows, 'overCommitted')?.pa).toEqual({ banned: 0, regular: 17 });
         expect(rows.reduce((sum: number, row: BudgetRow): number => sum + row.pa.regular, 0)).toBe(evaluation.budgets.regular.remaining);
     });
+
+    describe('mode simple', (): void => {
+        /**
+         * Alice et Chloé ouvrières (Chloé goule), Bob banni non ouvrier ; rab d'expé 100 et une ligne ville de 40 PA (non-bannis).
+         * @returns {BuildingPlanContentDTO} Contenu.
+         */
+        function simpleContent(): BuildingPlanContentDTO {
+            return {
+                ...emptyPlanContent(),
+                budgetMode: 'simple',
+                basePa: 19,
+                expeditionRab: 100,
+                townLines: [{ label: 'Ville', pool: 'regular', pa: 40 }],
+                citizens: [
+                    { userId: 1, tasks: [{ kind: 'action', ref: 'trash', count: 2, pa: 2 }], worker: true },
+                    { userId: 2, tasks: [] },
+                    { userId: 3, tasks: [], worker: true, ghoul: true }
+                ]
+            };
+        }
+
+        it('ventile PA de base des ouvriers, goules, rab d\'expé et lignes ville ; somme égale au reste', (): void => {
+            const plan: BuildingPlanContentDTO = simpleContent();
+            const evaluation: DayEvaluation = fakeEvaluation(plan, { expeditionPa: new Map<number, number>([[1, 3]]) });
+            const rows: BudgetRow[] = budgetBreakdown(plan, FAKE_CITIZENS, evaluation);
+            const pools: PlanPool[] = ['banned', 'regular'];
+
+            expect(rowOf(rows, 'basePa')?.pa).toEqual({ banned: 0, regular: 38 });
+            expect(rowOf(rows, 'ghouls')?.pa).toEqual({ banned: 0, regular: -6 });
+            expect(rowOf(rows, 'expeditionRab')?.pa).toEqual({ banned: 0, regular: 100 });
+            expect(rowOf(rows, 'townLines')?.pa).toEqual({ banned: 0, regular: 40 });
+            expect(rowOf(rows, 'expeditions')).toBeUndefined();
+            expect(rowOf(rows, 'technicianCp')).toBeUndefined();
+            expect(rowOf(rows, 'action:trash')).toBeUndefined();
+            expect(rowOf(rows, 'overCommitted')).toBeUndefined();
+            for (const pool of pools) {
+                expect(rows.reduce((sum: number, row: BudgetRow): number => sum + row.pa[pool], 0)).toBe(evaluation.budgets[pool].remaining);
+            }
+        });
+    });
 });

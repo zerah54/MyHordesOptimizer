@@ -9,6 +9,7 @@ using MyHordesOptimizerApi.Data.Camping;
 using MyHordesOptimizerApi.Data.Building;
 using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Data.Jobs;
+using MyHordesOptimizerApi.Data.Nightwatch;
 
 namespace MyHordesOptimizerApi.Repository.Interfaces
 {
@@ -41,5 +42,6 @@ namespace MyHordesOptimizerApi.Repository.Interfaces
         Dictionary<string, JArray> GetResultGroups();
         Dictionary<string, MyHordesMetaResultCodeModel> GetMetaRequirements();
         Dictionary<string, string> GetItemsNightwatch();
+        NightwatchReferentialCodeModel GetNightwatchReferential();
     }
 }

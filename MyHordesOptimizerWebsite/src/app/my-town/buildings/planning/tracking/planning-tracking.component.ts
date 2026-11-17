@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,26 +20,36 @@ import { getHomeIcon } from '../../../../_core/utilities/citizen.util';
 import { getTown } from '../../../../_core/utilities/localstorage.util';
 import { CitizenChipComponent } from '../../../../_shared/citizen-chip/citizen-chip.component';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
-import { CitizenCapacity } from '../budget.util';
+import { BASE_PA_BY_TIER, CitizenCapacity, detailedBasePa, resolveGhoul } from '../budget.util';
 import { CitizenFiltersStore } from '../citizen-filters.store';
 import { PlanningCitizenFiltersComponent } from '../citizen-filters/planning-citizen-filters.component';
 import { HOME_COLUMNS, homeDone, homeHeaderIcon, homeOf, homeSummary } from '../home-columns.util';
-import { cascadeAp, homeTaskIndex, HomeUpgradeRef, nextHomeTarget, upgradesAllowed } from '../home-upgrades.util';
-import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } from '../plan.types';
+import { cascadeAp, homeTaskIndex, HomeUpgradeRef, nextHomeTarget, reachableHomeLevels, upgradesAllowed } from '../home-upgrades.util';
+import { BasePaTier, budgetModeOf, BuildingPlanContentDTO, PlanBudgetMode, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } from '../plan.types';
 import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
+import { taskIcon } from '../planning-labels.util';
 import { actionDefaults, entryFor, plannableActions, upgradeAp, upgradeDefaults } from '../task-edit.util';
 import { PlanningTaskEditorComponent } from '../task-editor/planning-task-editor.component';
 import { newTaskId } from '../task-id.util';
 import { taskLocked, TaskStatus } from '../task-status.util';
 import { rowState, taskFilterKey, TrackingRow, TrackingState, TrackingTask } from '../tracking.util';
 
-const angular_common: Imports = [FormsModule];
-const material_modules: Imports = [MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatTooltipModule];
+/** Plafond de PA accepté par l'API pour le rab d'expé. */
+const MAX_EXPEDITION_RAB: number = 100000;
 
-/** Colonnes fixes du tableau : citoyen, PA de base, rab d'expé, consignes, capacité, état. */
-const FIXED_COLUMNS: number = 6;
+const angular_common: Imports = [FormsModule];
+const material_modules: Imports = [MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatTooltipModule];
+
+/** Colonnes fixes du tableau détaillé : citoyen, PA de base, rab d'expé, consignes, capacité, état. */
+const DETAILED_COLUMNS: number = 8;
+
+/** Colonnes fixes du tableau simple : citoyen, ouvrier, goule, consignes, état. */
+const SIMPLE_COLUMNS: number = 6;
+
+/** Paliers de PA de base du mode simple, dans l'ordre d'affichage. */
+const TIERS: readonly BasePaTier[] = ['b6', 'b7'];
 
 /**
  * Clé d'un élément de maison pour les consignes : nulle pour l'habitation, clé de l'amélioration sinon.
@@ -66,7 +77,23 @@ export class PlanningTrackingComponent {
     protected readonly expeditionTooltip: string = $localize`PA d'expédition :`;
 
     /** Nombre de colonnes du tableau, case de sélection comprise. */
-    protected readonly column_count: Signal<number> = computed((): number => (this.store.can_edit() ? 1 : 0) + FIXED_COLUMNS + HOME_COLUMNS.length);
+    protected readonly column_count: Signal<number> = computed((): number =>
+        (this.store.can_edit() ? 1 : 0) + (this.simple() ? SIMPLE_COLUMNS : DETAILED_COLUMNS) + HOME_COLUMNS.length);
+
+    /** Mode de budget de la copie de travail. */
+    protected readonly simple: Signal<boolean> = computed((): boolean => {
+        const draft: BuildingPlanContentDTO | null = this.store.draft();
+        return draft !== null && budgetModeOf(draft) === 'simple';
+    });
+
+    /** Palier correspondant aux PA de base du plan, nul si aucun. */
+    protected readonly tier: Signal<BasePaTier | null> = computed((): BasePaTier | null => {
+        const base_pa: number | undefined = this.store.draft()?.basePa;
+        return TIERS.find((candidate: BasePaTier): boolean => BASE_PA_BY_TIER[candidate] === base_pa) ?? null;
+    });
+
+    protected readonly tiers: readonly BasePaTier[] = TIERS;
+    protected readonly BASE_PA_BY_TIER: Record<BasePaTier, number> = BASE_PA_BY_TIER;
 
     /** Jour à venir : consignes sans statut (rien ne peut encore être fait). */
     protected readonly future: Signal<boolean> = computed((): boolean => this.store.selected_day() > this.store.current_day);
@@ -175,13 +202,25 @@ export class PlanningTrackingComponent {
     }
 
     /**
+     * Simule le bannissement (ou la libération) d'un citoyen dans ce plan ; l'écart avec l'état réel n'est conservé que s'il existe.
+     * @param {number} user_id Identifiant du citoyen.
+     * @param {boolean} banned Banni ou non dans le plan.
+     */
+    protected setBanned(user_id: number, banned: boolean): void {
+        const real: boolean = this.store.citizens_full().find((candidate: Citizen): boolean => candidate.id === user_id)?.is_shunned === true;
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            entryFor(content, user_id).banned = banned === real ? null : banned;
+        });
+    }
+
+    /**
      * PA de base effectifs d'un citoyen (valeur propre ou par défaut du plan).
      * @param {number} user_id Identifiant du citoyen.
      * @returns {number} PA de base.
      */
     protected basePa(user_id: number): number {
         const draft: BuildingPlanContentDTO | null = this.store.draft();
-        return draft?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === user_id)?.basePaOverride ?? draft?.basePa ?? 0;
+        return draft === null ? 0 : detailedBasePa(draft, draft.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === user_id), this.isGhoul(user_id));
     }
 
     /**
@@ -212,6 +251,96 @@ export class PlanningTrackingComponent {
     }
 
     /**
+     * Change le mode de budget du plan.
+     * @param {PlanBudgetMode} mode Mode choisi.
+     */
+    protected setBudgetMode(mode: PlanBudgetMode): void {
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            content.budgetMode = mode;
+        });
+    }
+
+    /**
+     * Choisit le palier de PA de base du mode simple ; l'évaluation lit `basePa`.
+     * @param {BasePaTier} tier Palier.
+     */
+    protected setTier(tier: BasePaTier): void {
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            content.basePaTier = tier;
+            content.basePa = BASE_PA_BY_TIER[tier];
+        });
+    }
+
+    /**
+     * Applique le rab d'expé global du mode simple après un court délai.
+     * @param {unknown} value Valeur saisie.
+     */
+    protected onExpeditionRab(value: unknown): void {
+        const rab: number = Math.min(MAX_EXPEDITION_RAB, toNonNegativeInt(value));
+        this.store.deferEdit('expedition-rab', (content: BuildingPlanContentDTO): void => {
+            content.expeditionRab = rab;
+        });
+    }
+
+    /**
+     * Le citoyen travaille-t-il sur les chantiers (mode simple) ?
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {boolean} Vrai si ouvrier.
+     */
+    protected isWorker(user_id: number): boolean {
+        return this.draftEntry(user_id)?.worker === true;
+    }
+
+    /**
+     * Le citoyen est-il goule (mode simple) ?
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {boolean} Vrai si goule.
+     */
+    protected isGhoul(user_id: number): boolean {
+        return resolveGhoul(this.draftEntry(user_id), this.trackedGhoul(user_id));
+    }
+
+    private trackedGhoul(user_id: number): boolean {
+        return this.store.citizens_full().find((candidate: Citizen): boolean => candidate.id === user_id)?.status?.is_ghoul === true;
+    }
+
+    /**
+     * Marque un citoyen comme ouvrier ou non.
+     * @param {number} user_id Identifiant du citoyen.
+     * @param {boolean} worker Ouvrier ou non.
+     */
+    protected setWorker(user_id: number, worker: boolean): void {
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            entryFor(content, user_id).worker = worker;
+        });
+    }
+
+    /**
+     * Marque un citoyen comme goule ou non.
+     * @param {number} user_id Identifiant du citoyen.
+     * @param {boolean} ghoul Goule ou non.
+     */
+    protected setGhoul(user_id: number, ghoul: boolean): void {
+        const real: boolean = this.trackedGhoul(user_id);
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            entryFor(content, user_id).ghoul = ghoul === real ? null : ghoul;
+        });
+    }
+
+    /**
+     * Marque les citoyens sélectionnés dans la liste comme ouvriers ou non.
+     * @param {boolean} worker Ouvrier ou non.
+     */
+    protected setSelectedWorkers(worker: boolean): void {
+        const user_ids: number[] = [...this.filters.selected()];
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            user_ids.forEach((user_id: number): void => {
+                entryFor(content, user_id).worker = worker;
+            });
+        });
+    }
+
+    /**
      * Applique les PA de base par défaut après un court délai.
      * @param {unknown} value Valeur saisie.
      */
@@ -235,7 +364,7 @@ export class PlanningTrackingComponent {
     }
 
     /**
-     * Le type « Action de chantier » est applicable : au moins une action proposée ce jour.
+     * Le type « Action » est applicable : au moins une action proposée ce jour.
      * @returns {boolean} Vrai si une action peut être choisie.
      */
     protected hasActions(): boolean {
@@ -243,12 +372,13 @@ export class PlanningTrackingComponent {
     }
 
     /**
-     * Ajoute une consigne d'un type, avec ses valeurs par défaut (première action proposée, première amélioration au niveau suivant).
+     * Ajoute une consigne d'un type, avec ses valeurs par défaut (amélioration au niveau suivant du citoyen).
      * @param {number} user_id Identifiant du citoyen.
      * @param {PlanTaskKind} kind Type de consigne.
+     * @param {string | number | null} [choice] Choix fait dans le sous-menu : niveau de maison, clé d'amélioration ou clé d'action ; à défaut, le premier proposé.
      */
-    protected addTask(user_id: number, kind: PlanTaskKind): void {
-        const task: PlanTaskDTO | null = this.newTask(user_id, kind);
+    protected addTask(user_id: number, kind: PlanTaskKind, choice: string | number | null = null): void {
+        const task: PlanTaskDTO | null = this.newTask(user_id, kind, choice);
         if (task === null) {
             return;
         }
@@ -339,18 +469,74 @@ export class PlanningTrackingComponent {
      * @param {PlanTaskKind} kind Type.
      * @returns {PlanTaskDTO | null} Consigne, nulle si le type n'est pas applicable (aucune action, aucune amélioration).
      */
-    private newTask(user_id: number, kind: PlanTaskKind): PlanTaskDTO | null {
+    private newTask(user_id: number, kind: PlanTaskKind, choice: string | number | null = null): PlanTaskDTO | null {
         const id: string = newTaskId();
         if (kind === 'action') {
-            const action: DailyActionEnum | undefined = plannableActions(this.store.displayable_actions())[0];
+            const actions: DailyActionEnum[] = plannableActions(this.store.displayable_actions());
+            const action: DailyActionEnum | undefined = actions.find((candidate: DailyActionEnum): boolean => candidate.key === choice) ?? actions[0];
             const citizen: Citizen | undefined = this.store.citizens_full().find((candidate: Citizen): boolean => candidate.id === user_id);
             return action === undefined ? null : { id, kind, ...actionDefaults(action, citizen?.job?.key ?? null, citizen?.hero_skills ?? null) };
         }
         if (kind === 'homeUpgrade') {
-            const upgrade: HomeUpgradeRef | undefined = this.store.home_upgrades()[0];
+            const upgrades: HomeUpgradeRef[] = this.store.home_upgrades();
+            const upgrade: HomeUpgradeRef | undefined = upgrades.find((candidate: HomeUpgradeRef): boolean => candidate.key === choice) ?? upgrades[0];
             return upgrade === undefined || !this.canAddUpgrade(user_id) ? null : { id, kind, ...upgradeDefaults(upgrade, currentHomeLevel(this.citizenRef(user_id), upgrade.key)) };
         }
+        if (kind === 'home' && typeof choice === 'number') {
+            const homes: ReadonlyMap<number, HomeLevelRef> = this.store.homes();
+            return { id, kind, level: choice, pa: cascadeAp((value: number): number => homes.get(value)?.ap ?? 0, currentHomeLevel(this.citizenRef(user_id), null), choice) };
+        }
         return kind === 'home' ? { id, kind, pa: 0 } : { id, kind, label: '', pa: 0 };
+    }
+
+    /**
+     * Icône d'une consigne, devant son libellé.
+     * @param {PlanTaskDTO} task Consigne.
+     * @returns {string} Chemin de l'image, vide sans icône.
+     */
+    protected taskIconOf(task: PlanTaskDTO): string {
+        return taskIcon(task);
+    }
+
+    /**
+     * Icône d'une amélioration de maison.
+     * @param {string} key Clé `HomeEnum`.
+     * @returns {string} Chemin de l'image, vide sans icône.
+     */
+    protected upgradeIcon(key: string): string {
+        return taskIcon({ kind: 'homeUpgrade', ref: key, pa: 0 });
+    }
+
+    /**
+     * Niveaux de maison proposables dans « Ajouter une consigne » : ceux que le citoyen peut atteindre.
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {HomeLevelRef[]} Niveaux, par ordre croissant.
+     */
+    protected addMenuHomes(user_id: number): HomeLevelRef[] {
+        const homes: HomeLevelRef[] = Array.from(this.store.homes().values())
+            .filter((home: HomeLevelRef): boolean => home.level >= 1)
+            .sort((a: HomeLevelRef, b: HomeLevelRef): number => a.level - b.level);
+        const reachable: Set<number> = new Set<number>(reachableHomeLevels(
+            homes.map((home: HomeLevelRef): number => home.level), currentHomeLevel(this.citizenRef(user_id), null), this.store.unlimited_home_levels()
+        ));
+        return homes.filter((home: HomeLevelRef): boolean => reachable.has(home.level));
+    }
+
+    /**
+     * Actions proposables dans « Ajouter une consigne ».
+     * @returns {DailyActionEnum[]} Actions du jour, dans l'ordre du référentiel.
+     */
+    protected addMenuActions(): DailyActionEnum[] {
+        return plannableActions(this.store.displayable_actions());
+    }
+
+    /**
+     * Saisies d'un citoyen dans la copie de travail.
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {PlanCitizenDTO | undefined} Entrée, absente sans saisie.
+     */
+    private draftEntry(user_id: number): PlanCitizenDTO | undefined {
+        return this.store.draft()?.citizens.find((entry: PlanCitizenDTO): boolean => entry.userId === user_id);
     }
 
     /**

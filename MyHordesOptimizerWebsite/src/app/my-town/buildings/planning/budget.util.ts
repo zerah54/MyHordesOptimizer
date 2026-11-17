@@ -1,7 +1,37 @@
-import { BuildingPlanContentDTO, PlanPool, PlanTownLineDTO } from './plan.types';
+import { BasePaTier, BuildingPlanContentDTO, PlanPool, PlanTownLineDTO } from './plan.types';
 
 /** Points de construction par jour d'un technicien. */
 export const TECHNICIAN_CP: number = 6;
+
+/** Malus de PA d'un citoyen goule en mode simple. */
+export const GHOUL_PA_MALUS: number = 6;
+
+/**
+ * PA de base d'un citoyen en mode détaillé : valeur saisie pour lui, sinon celle du plan moins le malus d'une goule.
+ * @param {BuildingPlanContentDTO} content Contenu du plan.
+ * @param {{ basePaOverride?: number | null } | undefined} entry Entrée du citoyen dans le plan.
+ * @param {boolean} ghoul Citoyen goule (saisie du plan ou page citoyens).
+ * @returns {number} PA de base.
+ */
+export function detailedBasePa(content: BuildingPlanContentDTO, entry: { basePaOverride?: number | null } | undefined, ghoul: boolean): number {
+    return entry?.basePaOverride ?? Math.max(0, content.basePa - (ghoul ? GHOUL_PA_MALUS : 0));
+}
+
+/**
+ * Goule retenue pour un citoyen : la saisie du plan l'emporte sur l'état renseigné dans la page citoyens.
+ * @param {{ ghoul?: boolean | null } | undefined} entry Entrée du citoyen dans le plan.
+ * @param {boolean | undefined} tracked Goule d'après la page citoyens.
+ * @returns {boolean} Vrai si goule.
+ */
+export function resolveGhoul(entry: { ghoul?: boolean | null } | undefined, tracked: boolean | undefined): boolean {
+    return entry?.ghoul ?? tracked === true;
+}
+
+/**
+ * PA de base d'un ouvrier selon le repas du jour : 6 PA de départ + 6 PA après avoir bu (retour au maximum de 6) + 6 (b6) ou 7 (b7) après le repas.
+ * Source : jeu MyHordes, `CitizenHandler::getMaxAP` (max 6) et effets `drink_ap_1`, `eat_ap6` (retour au maximum) et `eat_ap7` (maximum + 1) de `ActionEffectProvider.php` ; 19 = valeur par défaut des plans.
+ */
+export const BASE_PA_BY_TIER: Record<BasePaTier, number> = { b6: 18, b7: 19 };
 
 /**
  * Vrai si la poche des bannis doit rester affichée quel que soit le réglage : banni dans la ville, BDE ou contenu côté bannis.
@@ -99,6 +129,17 @@ export function citizenCapacity(citizen: BudgetCitizen): CitizenCapacity {
         capacity: pa_capacity + cp_capacity,
         overCommitted: pa_left < 0
     };
+}
+
+/**
+ * Capacité d'un citoyen en mode simple : seuls les ouvriers comptent, avec la base moins le malus de goule ; jamais négative.
+ * @param {{ userId: number; banned: boolean; worker: boolean; ghoul: boolean }} citizen Citoyen et ses réglages.
+ * @param {number} base_pa PA de base d'un ouvrier.
+ * @returns {CitizenCapacity} Capacité, sans PC.
+ */
+export function simpleCitizenCapacity(citizen: { userId: number; banned: boolean; worker: boolean; ghoul: boolean }, base_pa: number): CitizenCapacity {
+    const pa_capacity: number = citizen.worker ? Math.max(0, base_pa - (citizen.ghoul ? GHOUL_PA_MALUS : 0)) : 0;
+    return { userId: citizen.userId, banned: citizen.banned, paCapacity: pa_capacity, cpCapacity: 0, capacity: pa_capacity, overCommitted: false };
 }
 
 /**

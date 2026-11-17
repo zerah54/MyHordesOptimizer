@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
 {
@@ -7,6 +7,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer
         public int Id { get; set; }
         public int? MapId { get; set; }
         public string? Name { get; set; }
+        /// <summary>Alias de la pré-ville liée à cette ville, null si aucune.</summary>
+        public string? PreTownAlias { get; set; }
         public int? Width { get; set; }
         public int? Height { get; set; }
         public TownType? TownType { get; set; }

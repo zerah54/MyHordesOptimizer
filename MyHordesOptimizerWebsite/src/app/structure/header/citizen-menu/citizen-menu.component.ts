@@ -6,7 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { take } from 'rxjs';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
+import { DailyActionEnum, displayableDailyActions, isDailyActionAvailable } from '../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
@@ -286,7 +286,9 @@ export class CitizenMenuComponent implements OnInit {
         this.closeOtherMenus('dailyActions');
         this.built_buildings.builtUids()
             .pipe(take(1), takeUntilDestroyed(this.destroy_ref))
-            .subscribe((uids: ReadonlySet<string> | null): void => this.daily_action_keys.set(displayableDailyActions(uids)));
+            .subscribe((uids: ReadonlySet<string> | null): void => this.daily_action_keys.set(
+                displayableDailyActions(uids).filter((action: DailyActionEnum): boolean => isDailyActionAvailable(action, this.citizen() ?? {}))
+            ));
     }
 
     /** L'action donnée a-t-elle déjà été faite aujourd'hui ? */

@@ -5,7 +5,9 @@ using MyHordesOptimizerApi.Controllers.Abstract;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Hubs;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Services.Impl.BuildingPlans;
+using MyHordesOptimizerApi.Services.Impl.Locks;
 using MyHordesOptimizerApiUnitTests.Expeditions.Fakes;
 using System;
 using System.Collections.Generic;
@@ -58,7 +60,7 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
         }
 
         private static BuildingPlansHub NewHub(BuildingPlanLockRegistry registry, int userId, int townId, string connectionId,
-            FakeTownAccessService? townAccessService = null, FakeHubCallerClients? clients = null)
+            FakeTownAccessService? townAccessService = null, FakeHubCallerClients? clients = null, FakeGroupManager? groups = null)
         {
             return new BuildingPlansHub(
                 registry,
@@ -68,7 +70,7 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
             {
                 Context = new FakeHubCallerContext(connectionId),
                 Clients = clients ?? new FakeHubCallerClients(),
-                Groups = new FakeGroupManager()
+                Groups = groups ?? new FakeGroupManager()
             };
         }
 
@@ -154,8 +156,8 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
         public async Task GetPlanLocks_RenvoieLesVerrousDeLaVilleSansDiffuser()
         {
             var registry = NewRegistry();
-            registry.TryAcquire(new PlanLockKey(42, 9), new PlanLockHolder("c2", 7));
-            registry.TryAcquire(new PlanLockKey(43, 3), new PlanLockHolder("c3", 8));
+            registry.TryAcquire(new PlanLockKey(42, 9), new LockHolder("c2", 7));
+            registry.TryAcquire(new PlanLockKey(43, 3), new LockHolder("c3", 8));
             var clients = new FakeHubCallerClients();
             var hub = NewHub(registry, userId: 5, townId: 42, connectionId: "c1", clients: clients);
 
@@ -203,8 +205,8 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
         {
             var time = new ManualTimeProvider();
             var registry = new BuildingPlanLockRegistry(time);
-            registry.TryAcquire(new PlanLockKey(1, 1), new PlanLockHolder("c1", 5));
-            registry.TryAcquire(new PlanLockKey(2, 2), new PlanLockHolder("c2", 6));
+            registry.TryAcquire(new PlanLockKey(1, 1), new LockHolder("c1", 5));
+            registry.TryAcquire(new PlanLockKey(2, 2), new LockHolder("c2", 6));
             time.Advance(BuildingPlanLockRegistry.IdleTimeout + TimeSpan.FromSeconds(1));
             var hubContext = new FakeHubContext { FailingGroup = "1" };
             var sweeper = new BuildingPlanLockSweeper(hubContext, registry, NullLogger<BuildingPlanLockSweeper>.Instance);
@@ -227,6 +229,177 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
             clients.Proxy.Sent[0].Args[0].Should().Be(5);
         }
 
+        private static FakeTownAccessService Member(params int[] preTownMapIds)
+        {
+            var service = new FakeTownAccessService();
+            foreach (var id in preTownMapIds)
+            {
+                service.ReadablePreTownMapIds.Add(id);
+            }
+            return service;
+        }
+
+        [Fact]
+        public async Task UseTown_MembreDePreVille_VerrouSurLePseudoMapIdEtGroupeRejoint()
+        {
+            var pseudo = PreTownIds.ToMapId(9101);
+            var registry = NewRegistry();
+            var groups = new FakeGroupManager();
+            var hub = NewHub(registry, userId: 5, townId: 42, connectionId: "c1", townAccessService: Member(pseudo), groups: groups);
+
+            await hub.UseTown(pseudo);
+            await hub.AcquirePlanLock(9);
+
+            registry.HolderOf(new PlanLockKey(pseudo, 9)).Should().NotBeNull();
+            registry.HolderOf(new PlanLockKey(42, 9)).Should().BeNull();
+            groups.Memberships.Should().Contain($"c1:{pseudo}");
+        }
+
+        [Fact]
+        public async Task UseTown_NonMembre_LeveEtNeRejointRien()
+        {
+            var pseudo = PreTownIds.ToMapId(9102);
+            var groups = new FakeGroupManager();
+            var hub = NewHub(NewRegistry(), userId: 5, townId: 4301, connectionId: "c1", townAccessService: Member(), groups: groups);
+
+            var act = () => hub.UseTown(pseudo);
+
+            await act.Should().ThrowAsync<MhoForbiddenException>();
+            groups.Memberships.Should().BeEmpty();
+            (await hub.JoinPresence()).Should().Equal(5);
+        }
+
+        [Fact]
+        public async Task UseTown_VilleReelleDifferenteDuJeton_Leve()
+        {
+            var groups = new FakeGroupManager();
+            var hub = NewHub(NewRegistry(), userId: 5, townId: 42, connectionId: "c1", groups: groups);
+
+            var act = () => hub.UseTown(43);
+
+            await act.Should().ThrowAsync<MhoForbiddenException>();
+            groups.Memberships.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task UseTown_VilleDuJeton_RestaureLeDefaut()
+        {
+            var pseudo = PreTownIds.ToMapId(9103);
+            var registry = NewRegistry();
+            var groups = new FakeGroupManager();
+            var hub = NewHub(registry, userId: 5, townId: 42, connectionId: "c1", townAccessService: Member(pseudo), groups: groups);
+            await hub.UseTown(pseudo);
+
+            await hub.UseTown(42);
+            await hub.AcquirePlanLock(9);
+
+            registry.HolderOf(new PlanLockKey(42, 9)).Should().NotBeNull();
+            registry.HolderOf(new PlanLockKey(pseudo, 9)).Should().BeNull();
+            groups.Memberships.Should().NotContain($"c1:{pseudo}");
+        }
+
+        [Fact]
+        public async Task UseTown_PresenceSurLePseudoMapId_EtNettoyeeALaDeconnexion()
+        {
+            var pseudo = PreTownIds.ToMapId(9104);
+            var access = Member(pseudo);
+            var hubA = NewHub(NewRegistry(), userId: 5, townId: 42, connectionId: "cA", townAccessService: access);
+            var hubB = NewHub(NewRegistry(), userId: 6, townId: 42, connectionId: "cB", townAccessService: access);
+            await hubA.UseTown(pseudo);
+            await hubB.UseTown(pseudo);
+
+            (await hubA.JoinPresence()).Should().Equal(5);
+            (await hubB.JoinPresence()).Should().BeEquivalentTo(new[] { 5, 6 });
+            (await NewHub(NewRegistry(), userId: 7, townId: 4302, connectionId: "cC").JoinPresence()).Should().Equal(7);
+
+            await hubA.OnDisconnectedAsync(null);
+            var hubD = NewHub(NewRegistry(), userId: 8, townId: 42, connectionId: "cD", townAccessService: access);
+            await hubD.UseTown(pseudo);
+
+            (await hubD.JoinPresence()).Should().BeEquivalentTo(new[] { 6, 8 });
+        }
+
+        [Fact]
+        public async Task UseTown_Deconnexion_LibereLesVerrousEtQuitteLesGroupes()
+        {
+            var pseudo = PreTownIds.ToMapId(9105);
+            var registry = NewRegistry();
+            var groups = new FakeGroupManager();
+            var clients = new FakeHubCallerClients();
+            var hub = NewHub(registry, userId: 5, townId: 42, connectionId: "c1", townAccessService: Member(pseudo), clients: clients, groups: groups);
+            await hub.OnConnectedAsync();
+            await hub.UseTown(pseudo);
+            await hub.AcquirePlanLock(9);
+            await hub.JoinPresence();
+
+            await hub.OnDisconnectedAsync(null);
+
+            registry.HolderOf(new PlanLockKey(pseudo, 9)).Should().BeNull();
+            groups.Memberships.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task UseTown_PreVille_QuitteLeGroupeEtLaPresenceDeLaVilleDuJeton()
+        {
+            var pseudo = PreTownIds.ToMapId(9201);
+            var groups = new FakeGroupManager();
+            var hub = NewHub(NewRegistry(), userId: 5, townId: 42, connectionId: "c1", townAccessService: Member(pseudo), groups: groups);
+            await hub.OnConnectedAsync();
+            await hub.JoinPresence();
+
+            await hub.UseTown(pseudo);
+
+            groups.Memberships.Should().Contain($"c1:{pseudo}").And.NotContain("c1:42");
+            (await NewHub(NewRegistry(), userId: 6, townId: 42, connectionId: "c2").JoinPresence()).Should().Equal(6);
+        }
+
+        [Fact]
+        public async Task UseTown_RetourALaVilleDuJeton_RemetLaConnexionDansSonGroupe()
+        {
+            var pseudo = PreTownIds.ToMapId(9202);
+            var groups = new FakeGroupManager();
+            var hub = NewHub(NewRegistry(), userId: 5, townId: 42, connectionId: "c1", townAccessService: Member(pseudo), groups: groups);
+            await hub.OnConnectedAsync();
+            await hub.UseTown(pseudo);
+
+            await hub.UseTown(42);
+
+            groups.Memberships.Should().Contain("c1:42").And.NotContain($"c1:{pseudo}");
+        }
+
+        [Fact]
+        public async Task UseTown_ChangementDeVille_LibereLesVerrousDeLAncienneVilleEtLeDiffuse()
+        {
+            var pseudo = PreTownIds.ToMapId(9203);
+            var registry = NewRegistry();
+            var clients = new FakeHubCallerClients();
+            var hub = NewHub(registry, userId: 5, townId: 42, connectionId: "c1", townAccessService: Member(pseudo), clients: clients);
+            await hub.AcquirePlanLock(9);
+            clients.Proxy.Sent.Clear();
+
+            await hub.UseTown(pseudo);
+
+            registry.HolderOf(new PlanLockKey(42, 9)).Should().BeNull();
+            clients.Proxy.Sent.Select(s => s.Method).Should().Equal("PlanLockChanged");
+        }
+
+        [Fact]
+        public async Task UseTown_ChangementDePreVille_QuitteLAncienneAvantDeRejoindreLaNouvelle()
+        {
+            var first = PreTownIds.ToMapId(9106);
+            var second = PreTownIds.ToMapId(9107);
+            var groups = new FakeGroupManager();
+            var hub = NewHub(NewRegistry(), userId: 5, townId: 42, connectionId: "c1", townAccessService: Member(first, second), groups: groups);
+            await hub.UseTown(first);
+            await hub.JoinPresence();
+
+            await hub.UseTown(second);
+
+            groups.Memberships.Should().Contain($"c1:{second}").And.NotContain($"c1:{first}");
+            await hub.UseTown(first);
+            (await hub.JoinPresence()).Should().Equal(5);
+        }
+
         [Fact]
         public void Sweeper_PasseToutesLesCinqSecondes()
         {
@@ -238,7 +411,7 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
         {
             var time = new ManualTimeProvider();
             var registry = new BuildingPlanLockRegistry(time);
-            registry.TryAcquire(new PlanLockKey(42, 9), new PlanLockHolder("c1", 5));
+            registry.TryAcquire(new PlanLockKey(42, 9), new LockHolder("c1", 5));
             time.Advance(BuildingPlanLockRegistry.IdleTimeout + TimeSpan.FromSeconds(1));
             var hubContext = new FakeHubContext();
             var sweeper = new BuildingPlanLockSweeper(hubContext, registry, NullLogger<BuildingPlanLockSweeper>.Instance);

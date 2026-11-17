@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.MapRoutes.Request;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Hubs;
+using MyHordesOptimizerApi.Services.Impl.Expeditions;
 using MyHordesOptimizerApiUnitTests.Expeditions.Fakes;
 using System;
 using System.Collections.Concurrent;
@@ -27,13 +28,17 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions
             FakeTownAccessService? townAccessService = null,
             FakeMapRouteService? mapRouteService = null,
             FakeExpeditionService? expeditionService = null,
-            FakeHubCallerClients? clients = null)
+            FakeHubCallerClients? clients = null,
+            ExpeditionLockRegistry? lockRegistry = null,
+            FakeExpeditionLockScopeService? lockScope = null)
         {
             var hub = new ExpeditionsHub(
                 expeditionService ?? new FakeExpeditionService(),
                 mapRouteService ?? new FakeMapRouteService(),
                 townAccessService ?? new FakeTownAccessService(),
                 new FakeUserInfoProvider { UserId = userId, TownDetail = townId > 0 ? new SimpleMeTownDetailDto { TownId = townId } : null! },
+                lockRegistry ?? new ExpeditionLockRegistry(TimeProvider.System),
+                lockScope ?? new FakeExpeditionLockScopeService(),
                 NullLogger<AbstractMyHordesOptimizerControllerBase>.Instance)
             {
                 Context = new FakeHubCallerContext(connectionId),

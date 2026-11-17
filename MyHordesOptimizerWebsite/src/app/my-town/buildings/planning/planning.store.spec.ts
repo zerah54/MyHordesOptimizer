@@ -20,7 +20,8 @@ import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { errorInterceptor } from '../../../_core/services/errors-interceptor.service';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
-import { setTown, setUser } from '../../../_core/utilities/localstorage.util';
+import { setObservedTown, setTown, setUser } from '../../../_core/utilities/localstorage.util';
+import { simulatedCitizens } from '../../../pre-town/simulated-citizens.util';
 import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
 import {
     BuildingPlanContentDTO,
@@ -148,11 +149,11 @@ function static_data(plans: BuildingPlansDTO): PlanningStatic {
 describe('PlanningStore', (): void => {
     const load_static: Mock<() => Observable<PlanningStatic>> = vi.fn();
     const load_day: Mock<(day: number) => Observable<PlanningDay>> = vi.fn();
-    const get_plans: Mock<() => Observable<BuildingPlansDTO>> = vi.fn();
-    const save_plan: Mock<(request: BuildingPlanRequestDTO, connection_id: string | null) => Observable<BuildingPlanDTO>> = vi.fn();
-    const delete_plan: Mock<(id: number, connection_id: string | null) => Observable<void>> = vi.fn();
-    const set_effective: Mock<(id: number, connection_id: string | null) => Observable<BuildingPlanDTO>> = vi.fn();
-    const save_settings: Mock<(request: { itemValues: Record<string, number>; version?: number | null }, connection_id: string | null) => Observable<BuildingPlansDTO>> = vi.fn();
+    const get_plans: Mock<(map_id?: number) => Observable<BuildingPlansDTO>> = vi.fn();
+    const save_plan: Mock<(request: BuildingPlanRequestDTO, connection_id: string | null, map_id?: number) => Observable<BuildingPlanDTO>> = vi.fn();
+    const delete_plan: Mock<(id: number, connection_id: string | null, map_id?: number) => Observable<void>> = vi.fn();
+    const set_effective: Mock<(id: number, connection_id: string | null, map_id?: number) => Observable<BuildingPlanDTO>> = vi.fn();
+    const save_settings: Mock<(request: { itemValues: Record<string, number>; version?: number | null }, connection_id: string | null, map_id?: number) => Observable<BuildingPlansDTO>> = vi.fn();
     const get_citizen: Mock<(id: number) => Observable<Citizen>> = vi.fn();
     let realtime: FakeRealtime;
     let snackbar: { warningSnackbar: Mock<(message: string) => void> };
@@ -240,6 +241,49 @@ describe('PlanningStore', (): void => {
         TestBed.resetTestingModule();
         store = create({ ...plans_dto([plan()]), access: { isCitizen: false, canEdit: false } });
         expect(store.is_citizen()).toBe(false);
+    });
+
+    describe('citoyens simulés de pré-ville', (): void => {
+        function createInPreTown(count: number, overrides: Partial<PlanningStatic> = {}, dto: BuildingPlansDTO = plans_dto([plan()])): PlanningStore {
+            load_static.mockReturnValue(of({ ...static_data(dto), citizens: [], ...overrides }));
+            TestBed.configureTestingModule({
+                providers: [
+                    PlanningStore,
+                    ...fakes(),
+                    { provide: PlanningDataService, useValue: { loadStatic: load_static, loadDay: load_day } },
+                    { provide: BuildingPlanService, useValue: { getPlans: get_plans, savePlan: save_plan, deletePlan: delete_plan, setEffective: set_effective, saveSettings: save_settings } }
+                ]
+            });
+            const context: TownContextService = TestBed.inject(TownContextService);
+            context.setPreTownEditable(true);
+            context.setSimulatedCitizens(count);
+            const created: PlanningStore = TestBed.inject(PlanningStore);
+            created.load();
+            return created;
+        }
+
+        afterEach((): void => TestBed.inject(TownContextService).clear());
+
+        it('en pré-ville, rien n\'est cochable : le suivi écrirait dans la vraie ville', (): void => {
+            store = createInPreTown(5, { citizens: simulatedCitizens(5) });
+
+            expect(store.citizens().length).toBe(5);
+            expect(store.can_track()).toBe(false);
+        });
+
+        it('hors pré-ville, une liste vide reste vide', (): void => {
+            store = create(plans_dto([plan()]), { citizens: [] });
+
+            expect(store.citizens()).toEqual([]);
+        });
+
+        it('un plan qui vise un citoyen simulé disparu ne casse rien', (): void => {
+            const orphan: BuildingPlanDTO = plan({ content: { ...emptyPlanContent(), citizens: [{ userId: -35, tasks: [] }] } });
+            store = createInPreTown(30, { citizens: simulatedCitizens(30) }, plans_dto([orphan]));
+
+            expect(store.citizens().length).toBe(30);
+            expect(store.evaluation()).not.toBeNull();
+        });
     });
 
     describe('poche des bannis', (): void => {
@@ -718,7 +762,120 @@ describe('PlanningStore', (): void => {
         http_mock.verify();
     });
 
-    it('sans droit d\'écriture, aucune action n\'appelle l\'API ni ne modifie l\'état', (): void => {
+    describe('sortie vers une autre ville', (): void => {
+        const PSEUDO_MAP_ID: number = 1_000_000_007;
+
+        /** Page d'une pré-ville : le contexte observé porte l'identifiant fictif. */
+        function observePreTown(): void {
+            setObservedTown(Object.assign(new TownDetails(), { town_id: PSEUDO_MAP_ID, day: TODAY, town_type: 'RNE' }));
+        }
+
+        /** Détruit la page, puis efface le contexte de pré-ville, comme le fait le shell en la quittant. */
+        function leavePage(): void {
+            TestBed.resetTestingModule();
+            setObservedTown(null);
+        }
+
+        beforeEach((): void => {
+            vi.useFakeTimers();
+        });
+
+        afterEach((): void => {
+            vi.useRealTimers();
+            setObservedTown(null);
+        });
+
+        it('sortie : l\'enregistrement part sur la ville de la page, pas sur celle que le contexte désigne alors', async (): Promise<void> => {
+            observePreTown();
+            store = create();
+            const first: Subject<BuildingPlanDTO> = new Subject<BuildingPlanDTO>();
+            save_plan.mockReturnValueOnce(first);
+            store.updateDraft((content: BuildingPlanContentDTO): void => {
+                content.basePa = 25;
+            });
+            await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS);
+            store.updateDraft((content: BuildingPlanContentDTO): void => {
+                content.basePa = 26;
+            });
+
+            leavePage();
+            save_plan.mockReturnValue(NEVER);
+            first.next(plan({ version: 4, content: { ...emptyPlanContent(), basePa: 25 } }));
+            first.complete();
+            await settle();
+
+            expect(save_plan).toHaveBeenCalledTimes(2);
+            expect(save_plan.mock.calls[1][2]).toBe(PSEUDO_MAP_ID);
+        });
+
+        it('sortie avec un 409 : la relecture des propositions vise la ville de la page', async (): Promise<void> => {
+            observePreTown();
+            store = create();
+            const first: Subject<BuildingPlanDTO> = new Subject<BuildingPlanDTO>();
+            save_plan.mockReturnValueOnce(first);
+            store.updateDraft((content: BuildingPlanContentDTO): void => {
+                content.basePa = 25;
+            });
+            await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS);
+
+            leavePage();
+            first.error(new HttpErrorResponse({ status: 409 }));
+            await settle();
+
+            expect(get_plans).toHaveBeenCalledTimes(1);
+            expect(get_plans).toHaveBeenCalledWith(PSEUDO_MAP_ID);
+        });
+
+        it('suppression attendant une écriture : la requête part sur la ville de la page', async (): Promise<void> => {
+            observePreTown();
+            store = create();
+            const first: Subject<BuildingPlanDTO> = new Subject<BuildingPlanDTO>();
+            save_plan.mockReturnValueOnce(first);
+            delete_plan.mockReturnValue(NEVER);
+            store.updateDraft((content: BuildingPlanContentDTO): void => {
+                content.basePa = 25;
+            });
+            await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS);
+            store.deletePlan();
+            await settle();
+
+            leavePage();
+            first.next(plan({ version: 4, content: { ...emptyPlanContent(), basePa: 25 } }));
+            first.complete();
+            await settle();
+
+            expect(delete_plan).toHaveBeenCalledTimes(1);
+            expect(delete_plan).toHaveBeenCalledWith(7, 'conn-me', PSEUDO_MAP_ID);
+        });
+
+        it('effectif, réglages et création portent aussi la ville de la page', async (): Promise<void> => {
+            observePreTown();
+            store = create();
+            set_effective.mockReturnValue(NEVER);
+            save_settings.mockReturnValue(NEVER);
+
+            store.setEffective();
+            store.saveItemValues({ '5': 3 });
+            store.createPlan('Nouveau');
+            await settle();
+
+            expect(set_effective).toHaveBeenCalledWith(7, 'conn-me', PSEUDO_MAP_ID);
+            expect(save_settings.mock.calls[0][2]).toBe(PSEUDO_MAP_ID);
+            expect(save_plan.mock.calls[0][2]).toBe(PSEUDO_MAP_ID);
+        });
+
+        it('sans ville connue à l\'ouverture, le paramètre reste absent : l\'URL suit le contexte à l\'appel',(): void => {
+            setTown(null);
+            store = create();
+            save_settings.mockReturnValue(NEVER);
+
+            store.saveItemValues({ '5': 3 });
+
+            expect(save_settings.mock.calls[0][2]).toBeUndefined();
+        });
+    });
+
+    it('sans droit d\'écriture, aucune action n\'appelle l\'API ni ne modifie l\'état',(): void => {
         store = create(plans_dto([plan()], false));
 
         store.updateDraft((content: BuildingPlanContentDTO): void => {
@@ -788,7 +945,7 @@ describe('PlanningStore', (): void => {
         store.deletePlan();
         await settle();
 
-        expect(delete_plan).toHaveBeenCalledWith(7, 'conn-me');
+        expect(delete_plan).toHaveBeenCalledWith(7, 'conn-me', 42);
         expect(store.plans_of_day().map((p: BuildingPlanDTO): number => p.id)).toEqual([9]);
         expect(store.selected_plan()?.id).toBe(9);
     });
@@ -800,7 +957,7 @@ describe('PlanningStore', (): void => {
 
         store.setEffective();
 
-        expect(set_effective).toHaveBeenCalledWith(7, 'conn-me');
+        expect(set_effective).toHaveBeenCalledWith(7, 'conn-me', 42);
         expect(store.plans_of_day().find((p: BuildingPlanDTO): boolean => p.id === 7)?.isEffective).toBe(true);
         expect(store.plans_of_day().find((p: BuildingPlanDTO): boolean => p.id === 9)?.isEffective).toBe(false);
     });
@@ -811,7 +968,7 @@ describe('PlanningStore', (): void => {
 
         store.saveItemValues({ '5': 3 });
 
-        expect(save_settings).toHaveBeenCalledWith({ itemValues: { '5': 3 }, version: 4 }, 'conn-me');
+        expect(save_settings).toHaveBeenCalledWith({ itemValues: { '5': 3 }, version: 4 }, 'conn-me', 42);
         expect(store.item_values().get(5)).toBe(3);
     });
 
@@ -913,7 +1070,7 @@ describe('PlanningStore', (): void => {
             store = TestBed.inject(PlanningStore);
             store.load();
 
-            expect(store.displayable_actions().map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest', 'trash']);
+            expect(store.displayable_actions().map((action: DailyActionEnum): string => action.key)).toEqual(['home_clean', 'home_rest', 'trash', 'item_dice', 'item_cards', 'item_soccer']);
         });
 
         it('displayable_actions : chantier terminé par le programme du jour', (): void => {
@@ -1389,7 +1546,7 @@ describe('PlanningStore', (): void => {
             store.createPlan('Plan B');
             await settle();
 
-            const saved: BuildingPlanRequestDTO | undefined = save_plan.mock.calls.map((call: [BuildingPlanRequestDTO, string | null]): BuildingPlanRequestDTO => call[0])
+            const saved: BuildingPlanRequestDTO | undefined = save_plan.mock.calls.map((call: [BuildingPlanRequestDTO, string | null, number?]): BuildingPlanRequestDTO => call[0])
                 .find((request: BuildingPlanRequestDTO): boolean => request.id === 7);
             expect(saved?.content.basePa).toBe(25);
             expect(store.selected_plan()?.id).toBe(9);
@@ -1766,7 +1923,7 @@ describe('PlanningStore', (): void => {
             set_effective.mockReturnValue(of(plan()));
 
             store.setEffective();
-            expect(set_effective).toHaveBeenCalledWith(7, 'conn-me');
+            expect(set_effective).toHaveBeenCalledWith(7, 'conn-me', 42);
 
             realtime.plan_effective_changed$.next(plan({ id: 9, name: 'Plan B', isEffective: true }));
             expect(store.plans_of_day().find((candidate: BuildingPlanDTO): boolean => candidate.id === 9)?.isEffective).toBe(true);
@@ -1783,7 +1940,7 @@ describe('PlanningStore', (): void => {
             expect(store.can_edit()).toBe(true);
             expect(store.plans_of_day().length).toBe(1);
             store.saveItemValues({ '5': 8 });
-            expect(save_settings).toHaveBeenCalledWith({ itemValues: { '5': 8 }, version: 9 }, 'conn-me');
+            expect(save_settings).toHaveBeenCalledWith({ itemValues: { '5': 8 }, version: 9 }, 'conn-me', 42);
         });
 
         it('saveItemValues envoie la version de base donnée (modifications faites avant un réglage reçu) plutôt que la version courante', (): void => {
@@ -1795,7 +1952,7 @@ describe('PlanningStore', (): void => {
             expect(store.settings_version()).toBe(9);
             store.saveItemValues({ '5': 8 }, 4);
 
-            expect(save_settings).toHaveBeenCalledWith({ itemValues: { '5': 8 }, version: 4 }, 'conn-me');
+            expect(save_settings).toHaveBeenCalledWith({ itemValues: { '5': 8 }, version: 4 }, 'conn-me', 42);
         });
 
         it('ignore les événements du hub pour une ville observée (le hub suit la ville du jeton)', (): void => {
@@ -1807,6 +1964,128 @@ describe('PlanningStore', (): void => {
             context.clear();
 
             expect(store.selected_plan()?.id).toBe(7);
+        });
+    });
+
+    describe('budget validé', (): void => {
+        it('validateBudget fige le budget dans la copie de travail et la marque modifiée', (): void => {
+            store = create();
+            expect(store.can_validate_budget()).toBe(true);
+            expect(store.budget_diff()).toBeNull();
+
+            store.validateBudget();
+
+            expect(store.draft()?.validatedBudget?.steps).toEqual([{ buildingId: 1, kind: 'build', pool: 'regular', paCost: store.evaluation()?.budgets.regular.cost, invested: store.evaluation()?.progressBefore.get(1)?.invested }]);
+            expect(store.dirty()).toBe(true);
+            expect(store.budget_diff()?.steps).toEqual([]);
+        });
+
+        it('budget_diff reflète une modification faite après la validation', (): void => {
+            store = create();
+            store.validateBudget();
+
+            store.updateDraft((content: BuildingPlanContentDTO): void => {
+                content.townLines.push({ label: 'Guitare', pool: 'regular', pa: 5 });
+            });
+
+            expect(store.budget_diff()?.pools.regular.budget).toBe(5);
+        });
+
+        it('can_validate_budget est faux sans droit d\'écriture, budget_diff nul sans évaluation', (): void => {
+            store = create(plans_dto([plan()], false));
+            expect(store.can_validate_budget()).toBe(false);
+
+            TestBed.resetTestingModule();
+            store = create(plans_dto([]));
+            expect(store.evaluation()).toBeNull();
+            expect(store.can_validate_budget()).toBe(false);
+            expect(store.budget_diff()).toBeNull();
+        });
+    });
+
+    describe('copie entre jours', (): void => {
+        const built_wall: TownBuildingStateDTO = { buildingId: 1, isBuilt: true, paCurrent: 40, apRemaining: 0, life: null, maxLife: null, def: null, level: null, difficulty: null, resources: [] };
+
+        function createCopy(plans: BuildingPlanDTO[] = [plan(), plan({ id: 8, day: TODAY + 1, name: 'Plan demain' })]): PlanningStore {
+            return create(plans_dto(plans), { state: { buildings: [built_wall], defense: null } });
+        }
+
+        it('vers un jour qui a déjà un plan : nouveau plan sans id, rien de remplacé, chantier construit retiré', (): void => {
+            store = createCopy();
+            save_plan.mockReturnValue(of(plan({ id: 9, day: TODAY + 1, name: 'Copie' })));
+
+            store.copyPlanBetweenDays(TODAY, TODAY + 1, 'Copie');
+
+            const request: BuildingPlanRequestDTO = save_plan.mock.calls[0][0];
+            expect(request.day).toBe(TODAY + 1);
+            expect(request.id).toBeUndefined();
+            expect(request.content.programs.regular).toEqual([]);
+            expect(store.selected_day()).toBe(TODAY + 1);
+            expect(store.plans_of_day().map((p: BuildingPlanDTO): number => p.id)).toEqual([8, 9]);
+            expect(store.selected_plan()?.id).toBe(9);
+        });
+
+        it('depuis un jour : copie la proposition effective de ce jour vers le jour sélectionné', (): void => {
+            store = createCopy([plan(), plan({ id: 8, day: TODAY + 1, name: 'Autre', isEffective: false }), plan({ id: 10, day: TODAY + 1, name: 'Effective' })]);
+            save_plan.mockReturnValue(of(plan({ id: 11, name: 'Copie' })));
+
+            store.copyPlanBetweenDays(TODAY + 1, TODAY, 'Copie');
+
+            const request: BuildingPlanRequestDTO = save_plan.mock.calls[0][0];
+            expect(request.day).toBe(TODAY);
+            expect(request.id).toBeUndefined();
+            expect(store.selected_day()).toBe(TODAY);
+            expect(store.plans_of_day().length).toBe(2);
+        });
+
+        it('sans effective sur le jour source : copie la première proposition', (): void => {
+            const first: BuildingPlanDTO = plan({
+                id: 8, day: TODAY + 1, name: 'Première', isEffective: false,
+                content: { ...emptyPlanContent(), programs: { banned: [], regular: [{ buildingId: 9, kind: 'build', targetRemaining: 0 }] } }
+            });
+            store = createCopy([plan(), first]);
+            save_plan.mockReturnValue(of(plan({ id: 12 })));
+
+            store.copyPlanBetweenDays(TODAY + 1, TODAY, 'Copie');
+
+            expect(save_plan.mock.calls[0][0].content.programs.regular).toEqual([{ buildingId: 9, kind: 'build', targetRemaining: 0 }]);
+        });
+
+        it('jour source sans proposition : aucune sauvegarde', (): void => {
+            store = createCopy();
+
+            store.copyPlanBetweenDays(TODAY + 3, TODAY, 'Copie');
+
+            expect(save_plan).not.toHaveBeenCalled();
+        });
+
+        it('vers un jour passé : aucune sauvegarde', (): void => {
+            store = createCopy([plan(), plan({ id: 8, day: TODAY - 1, name: 'Hier' })]);
+
+            store.copyPlanBetweenDays(TODAY, TODAY - 1, 'Copie');
+
+            expect(save_plan).not.toHaveBeenCalled();
+        });
+
+        it('depuis le jour affiché : la source est la copie de travail, modifications en attente comprises', (): void => {
+            store = createCopy();
+            save_plan.mockReturnValue(of(plan({ id: 9, day: TODAY + 1 })));
+            store.updateDraft((content: BuildingPlanContentDTO): void => {
+                content.instructions = 'En attente';
+            });
+
+            store.copyPlanBetweenDays(TODAY, TODAY + 1, 'Copie');
+
+            expect(save_plan.mock.calls[0][0].content.instructions).toBe('En attente');
+        });
+
+        it('tronque le nom à 64 caractères', (): void => {
+            store = createCopy();
+            save_plan.mockReturnValue(of(plan({ id: 9, day: TODAY + 1 })));
+
+            store.copyPlanBetweenDays(TODAY, TODAY + 1, 'x'.repeat(80));
+
+            expect(save_plan.mock.calls[0][0].name).toBe('x'.repeat(64));
         });
     });
 });

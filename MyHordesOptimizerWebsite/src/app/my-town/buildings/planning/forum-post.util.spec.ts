@@ -148,6 +148,22 @@ describe('forum-post.util', (): void => {
             expect(text).toContain('Budget : 82:ap: · Coût : 40:ap: · Reste : 42:ap:');
         });
 
+        it('mode simple : le rab d\'expé est listé et les lignes du bloc Budget somment au total affiché', (): void => {
+            const content: BuildingPlanContentDTO = { ...plan(), budgetMode: 'simple', expeditionRab: 12 };
+            const text: string = joined(budgetPost(context(content)));
+            const start: number = text.indexOf('[collapse=Budget]');
+            const block: string = text.slice(start, text.indexOf('[/collapse]', start));
+            const lines: number[] = Array.from(block.matchAll(/:middot: [^\n]* :([-+]?\d+):ap:/g)).map((match: RegExpMatchArray): number => Number(match[1]));
+            const total: number = Number(/Budget : (-?\d+):ap:/.exec(block)?.[1]);
+
+            expect(block).toContain('Rab d\'expé : +12:ap:');
+            expect(lines.reduce((sum: number, value: number): number => sum + value, 0)).toBe(total);
+        });
+
+        it('mode détaillé : aucune ligne de rab d\'expé', (): void => {
+            expect(joined(budgetPost(context({ ...plan(), expeditionRab: 12 })))).not.toContain('Rab d\'expé');
+        });
+
         it('budget et plan : bannis avant non-bannis', (): void => {
             const content: BuildingPlanContentDTO = { ...plan(), programs: { ...plan().programs, banned: [{ buildingId: 1, kind: 'build', targetRemaining: 10 }] } };
             const text: string = joined(budgetPost(context(content)));

@@ -1,22 +1,24 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of, take } from 'rxjs';
 
+import { TownContextService } from '../../_core/services/town-context.service';
 import { BuildingUpgradesDTO } from '../../my-town/buildings/planning/building-upgrades.types';
 import { HomeReferentialDTO } from '../../my-town/buildings/planning/home-referential.types';
 import { BuildingPlansDTO, BuildingPlanStateDTO } from '../../my-town/buildings/planning/plan.types';
+import { simulatedCitizens } from '../../pre-town/simulated-citizens.util';
 import { ItemEmotesDTO } from '../dto/item.dto';
 import { RefinementViewDTO } from '../dto/refinement.dto';
 import { BankInfo } from '../types/bank-info.class';
 import { Building } from '../types/building.class';
-import { CitizenInfo } from '../types/citizen-info.class';
 import { Citizen } from '../types/citizen.class';
+import { CitizenInfo } from '../types/citizen-info.class';
 import { Expedition } from '../types/expedition.class';
 import { Item } from '../types/item.class';
 import { ApiService } from './api.service';
 import { BuildingPlanService } from './building-plan.service';
 import { ExpeditionService } from './expedition.service';
-import { TownStatisticsService } from './town-statistics.service';
 import { TownService } from './town.service';
+import { TownStatisticsService } from './town-statistics.service';
 
 /** Données de la ville qui ne dépendent pas du jour affiché. */
 export interface PlanningStatic {
@@ -48,6 +50,7 @@ export class PlanningDataService {
     private readonly town_service: TownService = inject(TownService);
     private readonly expedition_service: ExpeditionService = inject(ExpeditionService);
     private readonly statistics_service: TownStatisticsService = inject(TownStatisticsService);
+    private readonly town_context: TownContextService = inject(TownContextService);
 
     /**
      * Charge les données indépendantes du jour : plans, état synchronisé, référentiels, citoyens et banque.
@@ -61,11 +64,21 @@ export class PlanningDataService {
             buildings: this.api.getBuildings().pipe(take(1)),
             items: this.api.getItems().pipe(take(1)),
             homes: this.plan_service.getHomeReferential().pipe(take(1)),
-            citizens: this.town_service.getCitizens().pipe(take(1), map((info: CitizenInfo): Citizen[] => info.citizens)),
+            citizens: this.town_service.getCitizens().pipe(take(1), map((info: CitizenInfo): Citizen[] => this.withSimulatedCitizens(info.citizens))),
             bank: this.town_service.getBank().pipe(take(1), map((info: BankInfo): Item[] => info.items)),
             upgrades: this.plan_service.getBuildingUpgrades().pipe(take(1)),
             item_emotes: this.api.getItemEmotes().pipe(take(1))
         });
+    }
+
+    /**
+     * En pré-ville, remplace les citoyens reçus par les citoyens simulés.
+     * @param {Citizen[]} citizens Citoyens reçus.
+     * @returns {Citizen[]} Citoyens à utiliser.
+     */
+    private withSimulatedCitizens(citizens: Citizen[]): Citizen[] {
+        const simulated: number | null = this.town_context.isPreTown() ? this.town_context.simulatedCitizens() : null;
+        return simulated === null ? citizens : simulatedCitizens(simulated);
     }
 
     /**

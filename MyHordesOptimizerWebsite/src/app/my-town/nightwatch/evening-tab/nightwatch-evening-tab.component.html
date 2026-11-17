@@ -1,0 +1,149 @@
+<div class="evening-tab">
+    @if (!is_effective()) {
+        <p class="empty" data-field="no-effective">
+            @if (effective_elsewhere()) {
+                <ng-container i18n>La comparaison porte sur la proposition effective du jour : affichez-la pour voir l'écart entre le prévu et le réel.
+                </ng-container>
+            } @else {
+                <ng-container i18n>Aucune proposition effective pour ce jour : rendez-en une effective pour comparer le prévu et le réel.</ng-container>
+            }
+        </p>
+    } @else {
+        @if (store.totals(); as totals) {
+            <section class="kpis" data-block="totals">
+                <div class="kpi" data-field="planned-total">
+                    <span class="title" i18n>Défense prévue</span>
+                    <span class="value">{{ totals.defense }}</span>
+                </div>
+                <div class="kpi" data-field="real-total">
+                    <span class="title" i18n>Défense réelle</span>
+                    <span class="value">{{ totals.real_defense }}</span>
+                </div>
+                @if (totals.real_margin !== null) {
+                    <div class="kpi" data-field="margin" [class.negative]="totals.real_margin < 0">
+                        <span class="title" i18n>Marge contre l'attaque estimée</span>
+                        <span class="value">
+                            {{ totals.real_margin }}
+                            @if (totals.real_margin < 0) {
+                                <mat-chip-set>
+                                    <mat-chip data-field="margin-warning" disableRipple>
+                                        <mat-icon matChipAvatar aria-hidden="true">warning</mat-icon>
+                                        <ng-container i18n>défense insuffisante</ng-container>
+                                    </mat-chip>
+                                </mat-chip-set>
+                            }
+                        </span>
+                    </div>
+                } @else {
+                    <div class="kpi">
+                        <span class="value" data-field="margin-unknown" i18n>Attaque estimée inconnue</span>
+                    </div>
+                }
+            </section>
+        } @else {
+            <p class="empty" data-field="no-totals" i18n>Totaux indisponibles : le référentiel ou l'état de la ville n'est pas chargé.</p>
+        }
+
+        @if (stale_bags().length > 0) {
+            <div class="alert" data-field="stale-bags" role="status">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                <span>
+                    <ng-container i18n>Données de sac périmées ou inconnues, le réel est peut-être faux pour :</ng-container>
+                    @for (age of stale_bags(); track $index) {
+                        {{ age.name }}@if (age.updated_at !== null) {
+                            ({{ ageOf(age.updated_at) }})
+                        }
+                        @if (!$last) {
+                            ,
+                        }
+                    }
+                </span>
+            </div>
+        }
+
+        @if (rows().length === 0) {
+            <p class="empty" data-field="no-watcher" i18n>Aucun veilleur dans cette proposition.</p>
+        } @else {
+            <div class="mat-elevation-z8 table-scroll">
+                <table mat-table [dataSource]="rows()" [trackBy]="trackRow" class="summary">
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>Veilleur</th>
+                        <td mat-cell *matCellDef="let row" data-field="name">{{ row.name }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="defense">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>Défense prévue / réelle</th>
+                        <td mat-cell *matCellDef="let row" data-field="defense">{{ row.gap.planned_defense }} / {{ row.gap.real_defense }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="risk">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>Risque prévu / réel</th>
+                        <td mat-cell *matCellDef="let row" data-field="risk">{{ row.planned_risk }} % / {{ row.real_risk }} %</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="phrase">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>Phrase prévue / réelle</th>
+                        <td mat-cell *matCellDef="let row" data-field="phrase">
+                            <span class="phrase planned">{{ row.planned_phrase }}</span>
+                            @if (row.gap.tier_real !== row.gap.tier_planned) {
+                                <span class="phrase real">{{ row.real_phrase }}</span>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="missing_items">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>Objets manquants</th>
+                        <td mat-cell *matCellDef="let row" data-field="missing-items">
+                            @for (item of row.missing_items; track $index) {
+                                <span class="item">{{ item.quantity }} × {{ item.label }}</span>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="extra_items">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>Objets en trop</th>
+                        <td mat-cell *matCellDef="let row" data-field="extra-items">
+                            @for (item of row.extra_items; track $index) {
+                                <span class="item">{{ item.quantity }} × {{ item.label }}</span>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="missing_statuses">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>Statuts manquants</th>
+                        <td mat-cell *matCellDef="let row" data-field="missing-statuses">
+                            @for (status of row.unverified_statuses; track $index) {
+                                <span class="item" data-field="unverified-statuses">
+                                    {{ status }}
+                                    <mat-chip-set class="badges">
+                                        <mat-chip disableRipple i18n>prévu, non vérifié</mat-chip>
+                                    </mat-chip-set>
+                                </span>
+                            }
+                            @for (status of row.missing_statuses; track $index) {
+                                <span class="item">{{ status }}</span>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="to_contact">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>À contacter</th>
+                        <td mat-cell *matCellDef="let row">
+                            @if (row.gap.to_contact) {
+                                <mat-chip-set>
+                                    <mat-chip data-field="to-contact" disableRipple>
+                                        <mat-icon matChipAvatar aria-hidden="true">campaign</mat-icon>
+                                        <ng-container i18n>à contacter</ng-container>
+                                    </mat-chip>
+                                </mat-chip-set>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="columns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: columns" [attr.data-user]="row.gap.user_id" [class.to-contact]="row.gap.to_contact"></tr>
+                </table>
+            </div>
+        }
+    }
+</div>

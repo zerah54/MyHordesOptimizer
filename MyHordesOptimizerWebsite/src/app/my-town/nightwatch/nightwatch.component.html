@@ -4,9 +4,80 @@
     </mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-nightwatch">
-    <!--    <mat-tab-group [mat-stretch-tabs]="false" mat-align-tabs="start">
-            <mat-tab label="Scrutateur" i18n-label>
-                <mho-scrutateur></mho-scrutateur>
+    @if (store.loading()) {
+        <div class="loading">
+            <mat-spinner diameter="40"/>
+        </div>
+    } @else if (store.load_failed()) {
+        <p class="load-failed" i18n>Impossible de charger les plans de veille.</p>
+        <button mat-stroked-button type="button" data-action="retry" (click)="store.load()" i18n>Réessayer</button>
+    } @else {
+        <mho-nightwatch-header/>
+
+        @if (store.selected_day() < store.current_day) {
+            <p class="past-day" data-field="past-day" i18n>Jour passé : lecture seule.</p>
+        }
+
+        @if (is_readonly) {
+            <p class="past-day" data-field="readonly-town" i18n>Ville observée : lecture seule.</p>
+        }
+
+        @if (store.conflict(); as conflict) {
+            <div class="banner" role="alert">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                <span>
+                    @if (conflict.kept) {
+                        <ng-container i18n>Cette proposition a été modifiée par</ng-container>
+                        {{ conflict.author ?? '?' }}.
+                        <ng-container i18n>Vos modifications sont conservées ; enregistrer écrasera la version de cette personne.</ng-container>
+                    } @else if (conflict.author !== null) {
+                        {{ conflict.author }}
+                        <ng-container i18n>a pris la main sur cette proposition : vos dernières modifications n'ont pas pu être enregistrées.</ng-container>
+                    } @else {
+                        <ng-container
+                            i18n>Quelqu'un a pris la main sur cette proposition : vos dernières modifications n'ont pas pu être enregistrées.</ng-container>
+                    }
+                </span>
+                <button mat-button type="button" data-action="dismiss-conflict" (click)="store.dismissConflict()" i18n>Compris</button>
+            </div>
+        }
+
+        @if (store.lock(); as lock) {
+            @if (lock.kind === 'other') {
+                <div class="banner" role="status" data-field="lock-banner">
+                    <mat-icon aria-hidden="true">lock</mat-icon>
+                    <span>
+                        @if (lock.sameUser) {
+                            <ng-container i18n>Tu modifies cette proposition dans un autre onglet</ng-container>
+                        } @else {
+                            {{ (store.citizenState(lock.userId)?.name ?? '?') }}
+                            <ng-container i18n>modifie cette proposition</ng-container>
+                        }
+                    </span>
+                    @if (store.can_write()) {
+                        <button mat-button type="button" data-action="take-lock" (click)="store.takeLock()" i18n>Prendre la main</button>
+                    }
+                </div>
+            }
+        }
+
+        <div class="actions">
+            <button mat-stroked-button type="button" data-action="copy-forum" [disabled]="!can_copy()" (click)="copyForumPost()">
+                <mat-icon aria-hidden="true">content_copy</mat-icon>
+                <ng-container i18n>Copier le message forum</ng-container>
+            </button>
+        </div>
+
+        <mat-tab-group [mat-stretch-tabs]="false" mat-align-tabs="start">
+            <mat-tab label="Plan" i18n-label>
+                <mho-nightwatch-plan-tab/>
             </mat-tab>
-        </mat-tab-group>-->
+            <mat-tab label="Bilan" i18n-label>
+                <mho-nightwatch-stock-tab/>
+            </mat-tab>
+            <mat-tab label="Soir de veille" i18n-label>
+                <mho-nightwatch-evening-tab/>
+            </mat-tab>
+        </mat-tab-group>
+    }
 </mat-card-content>

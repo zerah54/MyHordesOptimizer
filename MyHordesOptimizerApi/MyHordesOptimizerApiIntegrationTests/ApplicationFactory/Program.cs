@@ -60,6 +60,7 @@ builder.Services.AddControllers(config =>
 {
     config.Filters.Add<ApiExceptionFilter>();
     config.Filters.Add<JwtActionFilter>();
+    config.Filters.Add<PreTownReadAccessFilter>();
 })
     // Sous WebApplicationFactory (dotnet test), Assembly.GetEntryAssembly() renvoie le testhost
     // VSTest — la découverte de contrôleurs par défaut ne scanne alors que CE projet de test, jamais
@@ -96,6 +97,14 @@ builder.Services.AddScoped<IUserAccountService, UserAccountService>();
 
 // Requis par NoteServiceTests (Services.Impl.NoteService).
 builder.Services.AddScoped<INoteService, NoteService>();
+builder.Services.AddScoped<IPreTownService, MyHordesOptimizerApi.Services.Impl.PreTowns.PreTownService>();
+builder.Services.AddScoped<IPreTownLinkService, MyHordesOptimizerApi.Services.Impl.PreTowns.PreTownLinkService>();
+builder.Services.AddScoped<IPreTownMerger, MyHordesOptimizerApi.Services.Impl.PreTowns.Mergers.WishListGroupMerger>();
+builder.Services.AddScoped<IPreTownMerger, MyHordesOptimizerApi.Services.Impl.PreTowns.Mergers.WishListItemMerger>();
+builder.Services.AddScoped<IPreTownMerger, MyHordesOptimizerApi.Services.Impl.PreTowns.Mergers.BuildingPlanMerger>();
+builder.Services.AddScoped<IPreTownMerger, MyHordesOptimizerApi.Services.Impl.PreTowns.Mergers.BuildingPlanSettingsMerger>();
+builder.Services.AddScoped<IPreTownMerger, MyHordesOptimizerApi.Services.Impl.PreTowns.Mergers.NightwatchPlanMerger>();
+builder.Services.AddScoped<IPreTownMerger, MyHordesOptimizerApi.Services.Impl.PreTowns.Mergers.NoteMerger>();
 
 // Requis par MapThemeServiceTests.
 builder.Services.AddScoped<IMapThemeService, MapThemeService>();
@@ -128,13 +137,18 @@ builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 // le vrai TownAccessService.
 builder.Services.AddScoped<ITownAccessService, MyHordesOptimizerApiIntegrationTests.Fakes.AllowAllTownAccessService>();
 builder.Services.AddScoped<IExpeditionService, ExpeditionService>();
+builder.Services.AddScoped<IExpeditionLockScopeService, MyHordesOptimizerApi.Services.Impl.Expeditions.ExpeditionLockScopeService>();
 builder.Services.AddScoped<IMapRouteService, MyHordesOptimizerApi.Services.Impl.MapRoutes.MapRouteService>();
 builder.Services.AddScoped<IBuildingPlanService, MyHordesOptimizerApi.Services.Impl.BuildingPlans.BuildingPlanService>();
+builder.Services.AddScoped<INightwatchPlanService, MyHordesOptimizerApi.Services.Impl.Nightwatch.NightwatchPlanService>();
 // Verrous des propositions de plan ; AddSignalR rend IHubContext<BuildingPlansHub> résoluble pour le diffuseur
 // du contrôleur (sans MapHub ni balayeur : aucun test HTTP n'ouvre de connexion).
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Impl.BuildingPlans.BuildingPlanLockRegistry>();
+builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Impl.Expeditions.ExpeditionLockRegistry>();
 builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Interfaces.IBuildingPlanBroadcaster, MyHordesOptimizerApi.Services.Impl.BuildingPlans.BuildingPlanBroadcaster>();
+builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Impl.Nightwatch.NightwatchPlanLockRegistry>();
+builder.Services.AddSingleton<MyHordesOptimizerApi.Services.Interfaces.INightwatchPlanBroadcaster, MyHordesOptimizerApi.Services.Impl.Nightwatch.NightwatchPlanBroadcaster>();
 builder.Services.AddSignalR();
 
 // Requis par TownWriteAccessHttpTests (Controllers.MyHordesOptimizerMapController).

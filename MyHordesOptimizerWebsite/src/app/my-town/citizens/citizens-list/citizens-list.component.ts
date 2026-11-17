@@ -37,7 +37,7 @@ import { map } from 'rxjs';
 
 import { CITIZENS_LIST_DISPLAY_MODE_KEY, HORDES_IMG_REPO } from '../../../_abstract_model/const';
 import { NoteDTO } from '../../../_abstract_model/dto/note.dto';
-import { DailyActionEnum, displayableDailyActions } from '../../../_abstract_model/enum/daily-action.enum';
+import { DailyActionEnum, displayableDailyActions, isDailyActionAvailable } from '../../../_abstract_model/enum/daily-action.enum';
 import { HeroicActionEnum } from '../../../_abstract_model/enum/heroic-action.enum';
 import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { JobEnum } from '../../../_abstract_model/enum/job.enum';
@@ -835,12 +835,11 @@ export class CitizensListComponent implements OnInit {
         }
     }
 
-    /** Résout la valeur courante d'une action pour un citoyen — même forme que getHeroicAction/getHomeUpgrade. */
-    protected getDailyAction(citizen: Citizen, action: DailyActionEnum): { element: DailyActionEnum; value: boolean } {
-        return {
-            element: action,
-            value: !!this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, action.key)
-        };
+    /** Résout la valeur courante d'une action pour un citoyen — même forme que getHeroicAction/getHomeUpgrade ; nul si sa maison ou son sac ne permet pas l'action. */
+    protected getDailyAction(citizen: Citizen, action: DailyActionEnum): { element: DailyActionEnum; value: boolean } | null {
+        const value: boolean = !!this.daily_action_pipe.transform(citizen.daily_actions, this.current_day, action.key);
+        if (!isDailyActionAvailable(action, citizen)) return null;
+        return { element: action, value };
     }
 
     /** Prend ou retire une action quotidienne. citizenId (pas une référence) : cellule différée, cf. updateActions/updateHome. */

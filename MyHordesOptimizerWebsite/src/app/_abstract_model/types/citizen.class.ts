@@ -108,7 +108,8 @@ export class Citizen extends CommonModel<CitizenDTO> {
     public toCitizenStatusDto(): { userId: number, status: string[] } {
         return {
             userId: this.id,
-            status: this.status?.icons.map((icon: StatusEnum) => icon?.key) || [],
+            // La goule n'est jamais envoyée avec les états : elle s'écrit à part (cf. TownService.updateStatus).
+            status: this.status?.icons.filter((icon: StatusEnum) => icon?.key !== StatusEnum.GHOUL.key).map((icon: StatusEnum) => icon?.key) || [],
         };
     }
 

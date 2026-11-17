@@ -50,7 +50,7 @@ interface TestableComponent {
     getDailyAction(citizen: Citizen, action: DailyActionEnum): {
         element: DailyActionEnum;
         value: boolean;
-    };
+    } | null;
     saveDailyAction(actionKey: string, checked: boolean, citizenId: number): void;
     goToProfile(userId: number): void;
     addChestItem(citizen_id: number, item_id: number): void;
@@ -165,10 +165,19 @@ describe('CitizensListComponent', (): void => {
         const result: {
             element: DailyActionEnum;
             value: boolean;
-        } = testable.getDailyAction(citizenWithBathToday(), DailyActionEnum.HOME_POOL);
+        } = testable.getDailyAction(citizenWithBathToday(), DailyActionEnum.HOME_POOL)!;
 
         expect(result.element).toBe(DailyActionEnum.HOME_POOL);
         expect(result.value).toBe(true);
+    });
+
+    it('getDailyAction renvoie null pour la sieste d\'un citoyen sans Coin sieste, l\'action sinon', (): void => {
+        const citizen: Citizen = citizenWithBathToday();
+
+        expect(testable.getDailyAction(citizen, DailyActionEnum.HOME_REST)).toBeNull();
+
+        citizen.home = Object.assign(new Home(), { content: [{ element: HomeEnum.REST_LEVEL, value: 2 }] });
+        expect(testable.getDailyAction(citizen, DailyActionEnum.HOME_REST)?.element).toBe(DailyActionEnum.HOME_REST);
     });
 
     it('saveDailyAction looks up the citizen by id (deferred-cell context passes an id, not a reference)', (): void => {
@@ -682,10 +691,10 @@ describe('CitizensListComponent — actions selon les chantiers construits', ():
     }
 
     it('masque les actions dont le chantier n\'est pas construit', async (): Promise<void> => {
-        expect(await displayedActions(new Set<string>(['small_gallery_#00']))).toEqual(['home_clean', 'home_rest', 'home_scavenge']);
+        expect(await displayedActions(new Set<string>(['small_gallery_#00']))).toEqual(['home_clean', 'home_rest', 'home_scavenge', 'item_dice', 'item_cards', 'item_soccer']);
     });
 
     it('n\'affiche que les actions sans chantier si les chantiers sont inconnus', async (): Promise<void> => {
-        expect(await displayedActions(null)).toEqual(['home_clean', 'home_rest']);
+        expect(await displayedActions(null)).toEqual(['home_clean', 'home_rest', 'item_dice', 'item_cards', 'item_soccer']);
     });
 });

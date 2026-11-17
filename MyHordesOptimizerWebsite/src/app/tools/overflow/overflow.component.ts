@@ -18,11 +18,12 @@ import { catchError, debounceTime, forkJoin, of, Subject, take } from 'rxjs';
 
 import { RefinementViewDTO } from '../../_abstract_model/dto/refinement.dto';
 import { HomeEnum } from '../../_abstract_model/enum/home.enum';
-import { TownService } from '../../_abstract_model/services/town.service';
+import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
 import { TownStatisticsService } from '../../_abstract_model/services/town-statistics.service';
+import { TownService } from '../../_abstract_model/services/town.service';
 import { I18nLabels, Imports } from '../../_abstract_model/types/_types';
-import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { Citizen } from '../../_abstract_model/types/citizen.class';
 import { EstimationsResult } from '../../_abstract_model/types/estimations-result.class';
 import { HomeWithValue } from '../../_abstract_model/types/home.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -32,6 +33,7 @@ import { getTown } from '../../_core/utilities/localstorage.util';
 import { decodeSnapshot, toBoundedNumber, TOOL_SNAPSHOT_PARAM } from '../../_core/utilities/tool-snapshot.util';
 import { PageTitleComponent } from '../../_shared/page-title/page-title.component';
 import { ToolPresetsComponent } from '../../_shared/tool-presets/tool-presets.component';
+import { FORTIFIED_HOMES_UID } from '../../my-town/buildings/planning/defense-rules.const';
 
 /** Nombre de paliers d'habitation dans le jeu (niveaux 0 à 8 : Lit de camp → Château). */
 const HOUSE_LEVEL_COUNT: number = 9;
@@ -225,6 +227,7 @@ export class OverflowComponent implements OnInit {
     protected readonly snapshot_provider: () => Record<string, unknown> = (): Record<string, unknown> => this.toSnapshot();
     private readonly town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
     private readonly town_service: TownService = inject(TownService);
+    private readonly built_buildings_service: BuiltBuildingsService = inject(BuiltBuildingsService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
     private readonly router: Router = inject(Router);
     private readonly snackbar_service: SnackbarService = inject(SnackbarService);
@@ -232,6 +235,8 @@ export class OverflowComponent implements OnInit {
     private habitation_level: number = 0;
     /** Citoyens vivants connus (mode « Ma ville »), pour étiqueter et pré-remplir {@link citizen_defenses}. */
     private known_citizens: Citizen[] = [];
+    /** Chantier « Habitations fortifiées » construit ; faux s'il est inconnu (état non synchronisé). */
+    private fortified_homes: boolean = false;
     // --- Résultats déterministes ---
     private overflow_after_defense: number = 0;
     /** Demandes de recalcul émises par les champs de saisie, regroupées par {@link COMPUTE_DEBOUNCE_MS}. */
@@ -470,10 +475,13 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
             citizens: this.town_service.getCitizens()
                 .pipe(take(1), catchError(() => of(null))),
             refinement: this.town_statistics_service.getRefinement(town.day)
+                .pipe(take(1), catchError(() => of(null))),
+            built: this.built_buildings_service.builtUids()
                 .pipe(take(1), catchError(() => of(null)))
         })
             .pipe(takeUntilDestroyed(this.destroy_ref))
-            .subscribe(({ attack, citizens: citizensInfo, refinement }: { attack: EstimationsResult | null; citizens: CitizenInfo | null; refinement: RefinementViewDTO | null }) => {
+            .subscribe(({ attack, citizens: citizensInfo, refinement, built }: { attack: EstimationsResult | null; citizens: CitizenInfo | null; refinement: RefinementViewDTO | null; built: ReadonlySet<string> | null }) => {
+                this.fortified_homes = built?.has(FORTIFIED_HOMES_UID) ?? false;
                 // Le max affiné est la plus basse valeur sûre : il prime sur le max estimé.
                 if (refinement?.status === 'Valid' && refinement.attackMax !== null) {
                     this.attack.set(refinement.attackMax);
@@ -569,7 +577,7 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
                 additions.push({
                     label: this.known_citizens[i]?.name ?? this.genericCitizenLabel(i),
                     named: !!this.known_citizens[i],
-                    defense: this.known_citizens[i] ? computeReconstructedHomeDefense(this.known_citizens[i]) : this.home_defense
+                    defense: this.known_citizens[i] ? computeReconstructedHomeDefense(this.known_citizens[i], this.fortified_homes) : this.home_defense
                 });
             }
             citizen_defenses = citizen_defenses.concat(additions);

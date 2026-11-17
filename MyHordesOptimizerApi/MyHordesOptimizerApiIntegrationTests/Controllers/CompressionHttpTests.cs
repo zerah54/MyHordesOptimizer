@@ -62,7 +62,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
                 var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
                 var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
                 var random = new Random();
-                var mapId = random.Next(1, int.MaxValue);
+                var mapId = random.Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
                 context.Towns.Add(new Town { IdTown = mapId, Name = "test-town-" + suffix, MapId = mapId });
                 var lastUpdate = new LastUpdateInfo { DateUpdate = DateTime.UtcNow };
                 context.LastUpdateInfos.Add(lastUpdate);

@@ -591,13 +591,15 @@
 </ng-template>
 
 <ng-template #dailyActionCell let-action let-citizenId="citizenId">
-    <mho-compact-toggle
-        (valueChange)="saveDailyAction(action.element.key, $event, citizenId)"
-        [disabled]="is_readonly()"
-        [icon]="action.element.value.img"
-        [label]="action.element.getLabel()"
-        [value]="action.value">
-    </mho-compact-toggle>
+    @if (action) {
+        <mho-compact-toggle
+            (valueChange)="saveDailyAction(action.element.key, $event, citizenId)"
+            [disabled]="is_readonly()"
+            [icon]="action.element.value.img"
+            [label]="action.element.getLabel()"
+            [value]="action.value">
+        </mho-compact-toggle>
+    }
 </ng-template>
 
 <ng-template #heroicCell let-action let-citizenId="citizenId">

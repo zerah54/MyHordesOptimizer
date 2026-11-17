@@ -13,6 +13,7 @@ using System.Linq;
 using MyHordesOptimizerApi.Data.Building;
 using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Data.Jobs;
+using MyHordesOptimizerApi.Data.Nightwatch;
 
 namespace MyHordesOptimizerApi.Repository.Impl
 {
@@ -95,6 +96,9 @@ namespace MyHordesOptimizerApi.Repository.Impl
 
         public Dictionary<string, string> GetItemsNightwatch() =>
             File.ReadAllText("Data/Items/items-nightwatch.json").FromJson<Dictionary<string, string>>();
+
+        public NightwatchReferentialCodeModel GetNightwatchReferential() =>
+            File.ReadAllText("Data/Nightwatch/nightwatch-referential.json").FromJson<NightwatchReferentialCodeModel>();
 
         public Dictionary<string, Dictionary<string, dynamic[]>> GetItemsDropRates()
         {

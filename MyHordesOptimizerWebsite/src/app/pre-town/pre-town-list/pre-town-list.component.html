@@ -1,0 +1,48 @@
+<mat-card-header class="mho-pre-town-list-header">
+    <mat-card-title>
+        <mho-page-title page="preTowns"/>
+    </mat-card-title>
+</mat-card-header>
+
+<mat-card-content class="mho-pre-town-list">
+    <div class="create">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Nom de la pré-ville</mat-label>
+            <input [ngModel]="alias()" (ngModelChange)="alias.set($event)" (keydown.enter)="create()" matInput>
+        </mat-form-field>
+        <button class="create-button" mat-flat-button color="primary" [disabled]="!can_create()" (click)="create()">
+            @if (creating()) {
+                <mat-spinner diameter="20"/>
+            } @else {
+                <mat-icon>add</mat-icon>
+                <ng-container i18n>Créer</ng-container>
+            }
+        </button>
+    </div>
+
+    @if (list_loading()) {
+        <div class="list-loading">
+            <mat-spinner diameter="32"/>
+        </div>
+    } @else if (list_failed()) {
+        <p class="list-error" i18n>Impossible de charger vos pré-villes.</p>
+    } @else if (pre_towns().length === 0) {
+        <p class="list-empty" i18n>Aucune pré-ville.</p>
+    }
+
+    @for (item of pre_towns(); track item.preTownId) {
+        <button class="pre-town-row" type="button" (click)="open(item)">
+            <span class="alias">{{ item.alias }}</span>
+            @if (!item.seen) {
+                <span class="new-badge" i18n>nouveau</span>
+            }
+            @if (item.isLinked) {
+                <span class="linked-badge" i18n>liée</span>
+            }
+            <span class="members">
+                <mat-icon>group</mat-icon>
+                {{ item.memberCount }}
+            </span>
+        </button>
+    }
+</mat-card-content>

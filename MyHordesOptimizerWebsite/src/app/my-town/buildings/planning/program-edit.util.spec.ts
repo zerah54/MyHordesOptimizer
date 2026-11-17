@@ -184,6 +184,15 @@ describe('program-edit.util', (): void => {
             expect(content.instructions).toBeNull();
         });
 
+        it('sanitizeContent conserve le budget validé', (): void => {
+            const content: BuildingPlanContentDTO = {
+                ...emptyPlanContent(),
+                validatedBudget: { validatedAt: 'x', pools: { banned: { budget: 0, cost: 0 }, regular: { budget: 5, cost: 3 } }, steps: [{ buildingId: 1, kind: 'build', pool: 'regular', paCost: 3, invested: 0 }] }
+            };
+
+            expect(sanitizeContent(content).validatedBudget).toEqual(content.validatedBudget);
+        });
+
         it('sanitizeContent retire les consignes vides et rogne textes et notes, sans modifier l\'original', (): void => {
             const content: BuildingPlanContentDTO = {
                 ...emptyPlanContent(),

@@ -19,6 +19,7 @@ import { TownContextService } from '../../../_core/services/town-context.service
 import { availabilityIn } from '../../../_core/utilities/building-tree.util';
 import { getTown, getUserId } from '../../../_core/utilities/localstorage.util';
 import { bannedPoolForced, bannedPoolShown } from './budget.util';
+import { BudgetDiff, budgetDiff, snapshotBudget } from './budget-diff.util';
 import { BuildingProgress } from './building-progress.util';
 import { BuildingUpgradesDTO } from './building-upgrades.types';
 import { HomeUpgradeRef, homeUpgradeRefs } from './home-upgrades.util';
@@ -29,11 +30,14 @@ import {
     BuildingPlanRequestDTO,
     BuildingPlansDTO,
     emptyPlanContent,
+    PlanCitizenDTO,
     PlanPool,
     PlanTaskDTO,
-    TownBuildingStateDTO
+    TownBuildingStateDTO,
+    ValidatedBudgetDTO
 } from './plan.types';
 import { PlanAlert, planAlerts } from './plan-alerts.util';
+import { contentForCopy } from './plan-copy.util';
 import { BuildingRef, CitizenRef, DayEvaluation, evaluateDays, homeCosts, HomeLevelRef, URBANISM_UID } from './plan-evaluation.util';
 import { buildDayInputs } from './plan-inputs.util';
 import { bankMap, buildingRefs, builtUidsOf, citizenRefs, hasSlaveryOf, homeLevelRefs, itemValueMap } from './planning-data.util';
@@ -148,6 +152,9 @@ export class PlanningStore {
     private creating: boolean = false;
 
     public readonly current_day: number = getTown()?.day ?? 1;
+
+    /** Ville de la page, relevée à l'ouverture : l'enregistrement de sortie part après que le contexte a changé. */
+    private readonly map_id: number | undefined = getTown()?.town_id;
     public readonly loading: Signal<boolean> = this._loading.asReadonly();
     public readonly saving: Signal<boolean> = this._saving.asReadonly();
     public readonly load_failed: Signal<boolean> = this._load_failed.asReadonly();
@@ -263,7 +270,14 @@ export class PlanningStore {
         );
     });
 
-    public readonly citizens: Signal<CitizenRef[]> = computed((): CitizenRef[] => citizenRefs(this.static_data()?.citizens ?? []));
+    /** Citoyens vivants ; le bannissement du plan en cours d'édition l'emporte sur l'état réel. */
+    public readonly citizens: Signal<CitizenRef[]> = computed((): CitizenRef[] => {
+        const entries: PlanCitizenDTO[] = this._draft()?.citizens ?? [];
+        return citizenRefs(this.static_data()?.citizens ?? []).map((ref: CitizenRef): CitizenRef => {
+            const banned: boolean | null | undefined = entries.find((entry: PlanCitizenDTO): boolean => entry.userId === ref.userId)?.banned;
+            return banned === undefined || banned === null ? ref : { ...ref, banned };
+        });
+    });
 
     /** Citoyens vivants complets (métier, maison, actions…) ; nouveau tableau après chaque coche enregistrée. */
     public readonly citizens_full: Signal<Citizen[]> = computed((): Citizen[] => {
@@ -271,9 +285,9 @@ export class PlanningStore {
         return (this.static_data()?.citizens ?? []).filter((citizen: Citizen): boolean => citizen.is_dead !== true);
     });
 
-    /** Coche possible : citoyen de la ville, hors observateur, sur le jour en cours. */
+    /** Coche possible : citoyen de la ville, hors observateur et hors pré-ville (citoyens simulés), sur le jour en cours. */
     public readonly can_track: Signal<boolean> = computed((): boolean =>
-        this.is_citizen() && !this.town_context.isReadonly() && this._selected_day() === this.current_day);
+        this.is_citizen() && !this.town_context.isReadonly() && !this.town_context.isPreTown() && this._selected_day() === this.current_day);
 
     /** Actions quotidiennes possibles ce jour : chantier construit, ou terminé par le programme du jour. */
     public readonly displayable_actions: Signal<DailyActionEnum[]> = computed((): DailyActionEnum[] => {
@@ -352,6 +366,16 @@ export class PlanningStore {
         const evaluation: DayEvaluation | null = this.evaluation();
         return evaluation === null ? [] : planAlerts(evaluation, this.buildings(), this.citizens(), this.banned_pool_shown());
     });
+
+    /** Écart avec le budget validé ; nul sans validation ou sans évaluation. */
+    public readonly budget_diff: Signal<BudgetDiff | null> = computed((): BudgetDiff | null => {
+        const baseline: ValidatedBudgetDTO | null | undefined = this._draft()?.validatedBudget;
+        const evaluation: DayEvaluation | null = this.evaluation();
+        return baseline === null || baseline === undefined || evaluation === null ? null : budgetDiff(baseline, evaluation);
+    });
+
+    /** Le budget peut être validé : droit d'édition et évaluation disponible. */
+    public readonly can_validate_budget: Signal<boolean> = computed((): boolean => this.can_edit() && this.evaluation() !== null);
 
     /** Charge toutes les données de la page et sélectionne la proposition du jour. */
     public load(): void {
@@ -438,6 +462,34 @@ export class PlanningStore {
         this.addPlan(name, current === null ? emptyPlanContent() : sanitizeContent(current));
     }
 
+    /**
+     * Copie une proposition d'un jour vers un autre, hors chantiers déjà construits ; crée toujours une nouvelle proposition
+     * au jour cible (jamais d'écrasement), puis l'affiche.
+     * @param {number} from_day Jour source : sa proposition effective, sinon la première ; sans proposition, rien n'est copié.
+     * @param {number} to_day Jour cible ; un jour passé est refusé.
+     * @param {string} name Nom de la copie (rogné à 64 caractères).
+     */
+    public copyPlanBetweenDays(from_day: number, to_day: number, name: string): void {
+        if (to_day < this.current_day) {
+            return;
+        }
+        let source: BuildingPlanContentDTO | null;
+        if (from_day === this._selected_day()) {
+            this.flushEdits();
+            source = this._draft() ?? this.selected_plan()?.content ?? null;
+        } else {
+            const of_day: BuildingPlanDTO[] = (this.plans_dto()?.plans ?? []).filter((plan: BuildingPlanDTO): boolean => plan.day === from_day);
+            source = (of_day.find((plan: BuildingPlanDTO): boolean => plan.isEffective) ?? of_day[0])?.content ?? null;
+        }
+        if (source === null) {
+            return;
+        }
+        const built_ids: Set<number> = new Set<number>((this.static_data()?.state.buildings ?? [])
+            .filter((state: TownBuildingStateDTO): boolean => state.isBuilt)
+            .map((state: TownBuildingStateDTO): number => state.buildingId));
+        this.addPlan(name.slice(0, 64), contentForCopy(source, built_ids), to_day);
+    }
+
     /** Supprime la proposition sélectionnée, après avoir pris la main (un refus n'envoie rien). */
     public deletePlan(): void {
         const plan: BuildingPlanDTO | null = this.selected_plan();
@@ -453,8 +505,20 @@ export class PlanningStore {
         if (!this.can_write() || plan === null) {
             return;
         }
-        this.plan_service.setEffective(plan.id, this.realtime.connectionId()).subscribe({
+        this.plan_service.setEffective(plan.id, this.realtime.connectionId(), this.map_id).subscribe({
             next: (updated: BuildingPlanDTO): void => this.markEffective(updated)
+        });
+    }
+
+    /** Fige le budget et les étapes actuels comme budget validé, en remplaçant une validation précédente. */
+    public validateBudget(): void {
+        const evaluation: DayEvaluation | null = this.evaluation();
+        if (evaluation === null) {
+            return;
+        }
+        const snapshot: ValidatedBudgetDTO = snapshotBudget(evaluation, new Date().toISOString());
+        this.updateDraft((content: BuildingPlanContentDTO): void => {
+            content.validatedBudget = snapshot;
         });
     }
 
@@ -541,7 +605,7 @@ export class PlanningStore {
         if (!this.can_edit_settings() || plans === null) {
             return;
         }
-        this.plan_service.saveSettings({ itemValues: values, version: version ?? plans.settingsVersion }, this.realtime.connectionId()).subscribe({
+        this.plan_service.saveSettings({ itemValues: values, version: version ?? plans.settingsVersion }, this.realtime.connectionId(), this.map_id).subscribe({
             next: (dto: BuildingPlansDTO): void => this.plans_dto.set(withPlanTaskIds(dto))
         });
     }
@@ -657,16 +721,20 @@ export class PlanningStore {
      * le serveur donne la main sur la nouvelle à cette connexion. Indépendant des écritures en cours sur une autre proposition.
      * @param {string} name Nom.
      * @param {BuildingPlanContentDTO} content Contenu.
+     * @param {number} day Jour de la proposition (le jour sélectionné par défaut) ; affiché s'il diffère.
      */
-    private addPlan(name: string, content: BuildingPlanContentDTO): void {
+    private addPlan(name: string, content: BuildingPlanContentDTO, day: number = this._selected_day()): void {
         if (!this.can_write() || this.creating) {
             return;
         }
         this.creating = true;
-        this.plan_service.savePlan({ day: this._selected_day(), name, content }, this.realtime.connectionId()).subscribe({
+        this.plan_service.savePlan({ day, name, content }, this.realtime.connectionId(), this.map_id).subscribe({
             next: (saved: BuildingPlanDTO): void => {
                 this.creating = false;
                 this.updatePlans((dto: BuildingPlansDTO): BuildingPlansDTO => ({ ...dto, plans: [...dto.plans, saved] }));
+                if (saved.day !== this._selected_day()) {
+                    this.selectDay(saved.day);
+                }
                 this.selectPlan(saved.id);
             },
             error: (): void => {
@@ -709,7 +777,7 @@ export class PlanningStore {
                     this.snackbar.warningSnackbar($localize`Cette proposition a été supprimée`);
                 }
             };
-            this.plan_service.getPlans().subscribe({
+            this.plan_service.getPlans(this.map_id).subscribe({
                 next: (dto: BuildingPlansDTO): void => {
                     this.plans_dto.set(withPlanTaskIds(dto));
                     if (abandon_draft) {
@@ -855,7 +923,7 @@ export class PlanningStore {
         const epoch: number = this.draft_epoch;
         this.in_flight = done;
         this._saving.set(true);
-        this.plan_service.savePlan(request, this.realtime.connectionId()).subscribe({
+        this.plan_service.savePlan(request, this.realtime.connectionId(), this.map_id).subscribe({
             next: (saved: BuildingPlanDTO): void => {
                 this.replacePlan(saved);
                 on_saved();
@@ -927,7 +995,7 @@ export class PlanningStore {
         if (this.lockOf(plan_id).kind !== 'mine') {
             return;
         }
-        this.plan_service.deletePlan(plan_id, this.realtime.connectionId()).subscribe({
+        this.plan_service.deletePlan(plan_id, this.realtime.connectionId(), this.map_id).subscribe({
             next: (): void => this.dropPlan(plan_id),
             error: (): void => undefined
         });
@@ -1187,7 +1255,7 @@ export class PlanningStore {
 
     /** Relit les propositions (refus de main, coupure) ; la copie de travail suit si rien n'attend. */
     private reloadPlans(): void {
-        this.plan_service.getPlans().subscribe({
+        this.plan_service.getPlans(this.map_id).subscribe({
             next: (dto: BuildingPlansDTO): void => {
                 this.plans_dto.set(withPlanTaskIds(dto));
                 if (!this._dirty()) {

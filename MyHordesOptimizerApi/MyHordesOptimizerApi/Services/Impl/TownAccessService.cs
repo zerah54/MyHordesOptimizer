@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MyHordesOptimizerApi.Exceptions;
+using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces;
 using System.Linq;
@@ -45,7 +46,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 throw Forbidden(userId, resolvedIdTown);
             }
             using var scope = ServiceScopeFactory.CreateScope();
-            if (!CitizenshipQuery(scope.ServiceProvider.GetRequiredService<MhoContext>(), resolvedIdTown, userId).Any())
+            if (!AccessQuery(scope.ServiceProvider.GetRequiredService<MhoContext>(), resolvedIdTown, userId).Any())
             {
                 throw Forbidden(userId, resolvedIdTown);
             }
@@ -71,26 +72,52 @@ namespace MyHordesOptimizerApi.Services.Impl
                 return false;
             }
             using var scope = ServiceScopeFactory.CreateScope();
-            return await CitizenshipQuery(scope.ServiceProvider.GetRequiredService<MhoContext>(), resolvedIdTown, userId).AnyAsync();
+            return await AccessQuery(scope.ServiceProvider.GetRequiredService<MhoContext>(), resolvedIdTown, userId).AnyAsync();
         }
 
         public async Task EnsureCanWriteMapAsync(int mapId)
         {
-            // Ville du jeton : aucune requête, pas même la résolution.
-            if (mapId > 0 && UserInfoProvider.TownDetail?.TownId == mapId)
+            // Ville du jeton : aucune requête, pas même la résolution. Jamais pour une pré-ville.
+            if (mapId > 0 && !PreTownIds.IsPreTownMapId(mapId) && UserInfoProvider.TownDetail?.TownId == mapId)
             {
                 return;
             }
             int resolvedIdTown;
-            using (var scope = ServiceScopeFactory.CreateScope())
+            if (PreTownIds.IsPreTownMapId(mapId))
             {
+                resolvedIdTown = -mapId;
+            }
+            else
+            {
+                using var scope = ServiceScopeFactory.CreateScope();
                 resolvedIdTown = scope.ServiceProvider.GetRequiredService<MhoContext>().ResolveTownId(mapId);
             }
             await EnsureCanWriteTownAsync(resolvedIdTown, mapId);
         }
 
+        public async Task<bool> CanReadPreTownAsync(int mapId)
+        {
+            var userId = UserInfoProvider.UserId;
+            if (userId <= 0 || !PreTownIds.IsPreTownMapId(mapId))
+            {
+                return false;
+            }
+            using var scope = ServiceScopeFactory.CreateScope();
+            return await IsPreTownMemberAsync(scope.ServiceProvider.GetRequiredService<MhoContext>(), mapId - PreTownIds.Offset, userId);
+        }
+
+        /// <summary>Appartenance à une pré-ville, liée ou non : prédicat de lecture, partagé avec le filtre HTTP.</summary>
+        public static Task<bool> IsPreTownMemberAsync(MhoContext dbContext, int preTownId, int userId)
+        {
+            return dbContext.PreTownMembers.AnyAsync(member => member.IdPreTown == preTownId && member.IdUser == userId);
+        }
+
         private bool IsTokenTown(int resolvedIdTown, int? mapId)
         {
+            if (PreTownIds.IsPreTownIdTown(resolvedIdTown) || (mapId is int id && PreTownIds.IsPreTownMapId(id)))
+            {
+                return false;
+            }
             var tokenMapId = UserInfoProvider.TownDetail?.TownId;
             if (tokenMapId is null || tokenMapId <= 0)
             {
@@ -99,6 +126,23 @@ namespace MyHordesOptimizerApi.Services.Impl
             // Ville provisoire : IdTown = -mapId (cf. MhoContext.ResolveTownId).
             var townMapId = mapId ?? (resolvedIdTown < 0 ? -resolvedIdTown : (int?)null);
             return townMapId == tokenMapId;
+        }
+
+        /// <summary>
+        /// Pré-ville : membre d'une pré-ville non liée (liée = gelée). Ville réelle : citoyenneté. Une requête
+        /// dans chaque cas ; la pré-ville a sa propre requête pour ne rien ajouter au chemin des villes réelles.
+        /// </summary>
+        private static IQueryable<int> AccessQuery(MhoContext dbContext, int resolvedIdTown, int userId)
+        {
+            if (!PreTownIds.IsPreTownIdTown(resolvedIdTown))
+            {
+                return CitizenshipQuery(dbContext, resolvedIdTown, userId);
+            }
+            var preTownId = -resolvedIdTown - PreTownIds.Offset;
+            return dbContext.PreTownMembers
+                .Where(member => member.IdPreTown == preTownId && member.IdUser == userId
+                    && dbContext.PreTowns.Any(preTown => preTown.IdPreTown == preTownId && preTown.LinkedIdTown == null))
+                .Select(member => member.IdUser);
         }
 
         /// <summary>Une seule requête (UNION ALL), sur les clés (idTown, idUser) des deux tables.</summary>

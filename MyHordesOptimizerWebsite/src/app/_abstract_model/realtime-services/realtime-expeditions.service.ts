@@ -40,6 +40,36 @@ export function isHubConflictError(error: unknown): boolean {
     return message.startsWith(HUB_CONFLICT_PREFIX) || message.includes(`HubException: ${HUB_CONFLICT_PREFIX}`);
 }
 
+/** Nature d'un bloc verrouillable de la page Expéditions (`bag` : id du citoyen d'expédition). */
+export type ExpeditionLockKind = 'expedition' | 'part' | 'citizen' | 'bag' | 'part-orders' | 'citizen-orders';
+
+/** Verrou d'édition d'un bloc ; `holderUserId` vaut `null` quand le verrou est libéré. */
+export interface ExpeditionLockDTO {
+    kind: ExpeditionLockKind;
+    entityId: number;
+    holderUserId: number | null;
+    holderConnectionId: string | null;
+}
+
+/** Préfixe des refus d'écriture sur un bloc verrouillé (`Locked:<id du détenteur>`). */
+const HUB_LOCKED_PREFIX: string = 'Locked:';
+
+/** Clé client d'un bloc verrouillable. */
+export function expeditionLockKey(kind: ExpeditionLockKind, entity_id: number): string {
+    return `${kind}:${entity_id}`;
+}
+
+/** Id du détenteur d'un verrou quand l'erreur du hub est un refus `Locked:<id>`, sinon `null`. */
+export function hubLockHolder(error: unknown): number | null {
+    const message: string = error instanceof Error ? error.message : typeof error === 'string' ? error : '';
+    const index: number = message.startsWith(HUB_LOCKED_PREFIX) ? 0 : message.indexOf(`HubException: ${HUB_LOCKED_PREFIX}`);
+    if (index < 0) {
+        return null;
+    }
+    const match: RegExpMatchArray | null = message.slice(index).match(/Locked:(\d+)/);
+    return match === null ? null : Number(match[1]);
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -93,6 +123,9 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
 
     private map_route_deleted_subject: Subject<number> = new Subject<number>();
     public map_route_deleted$: Observable<number> = this.map_route_deleted_subject.asObservable();
+
+    private expedition_lock_changed_subject: Subject<ExpeditionLockDTO> = new Subject<ExpeditionLockDTO>();
+    public expedition_lock_changed$: Observable<ExpeditionLockDTO> = this.expedition_lock_changed_subject.asObservable();
 
     private user_joined_subject: Subject<number[]> = new Subject<number[]>();
     public user_joined$: Observable<number[]> = this.user_joined_subject.asObservable();
@@ -191,6 +224,11 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
             this.hubConnection.on('MapRouteDeleted', (route_id: number) => {
                 console.log('receive', 'MapRouteDeleted', route_id);
                 this.map_route_deleted_subject.next(route_id);
+            });
+
+            this.hubConnection.on('ExpeditionLockChanged', (lock: ExpeditionLockDTO) => {
+                console.log('receive', 'ExpeditionLockChanged', lock);
+                this.expedition_lock_changed_subject.next(lock);
             });
 
             this.hubConnection.on('UserJoined', (user_ids: string) => {
@@ -346,6 +384,31 @@ export class RealtimeExpeditionsService extends RealtimeGlobalService {
         console.log('send', 'CopyGameRoute', map_id, game_route_id);
         const saved: MapRouteDTO = await this.invokeHub<MapRouteDTO>('CopyGameRoute', map_id, game_route_id);
         return new MapRoute(saved);
+    }
+
+    /** Identifiant de la connexion au hub, `null` hors connexion. */
+    public connectionId(): string | null {
+        return this.hubConnection?.connectionId ?? null;
+    }
+
+    /** Prend le verrou d'un bloc ; renvoie le détenteur effectif (refus : celui d'une autre connexion). */
+    public async acquireLock(kind: ExpeditionLockKind, entity_id: number): Promise<ExpeditionLockDTO> {
+        return this.invokeHub<ExpeditionLockDTO>('AcquireLock', kind, entity_id);
+    }
+
+    /** Signale l'activité sur un bloc verrouillé (prolonge le verrou). */
+    public async touchLock(kind: ExpeditionLockKind, entity_id: number): Promise<void> {
+        await this.invokeHub('TouchLock', kind, entity_id);
+    }
+
+    /** Libère le verrou d'un bloc. */
+    public async releaseLock(kind: ExpeditionLockKind, entity_id: number): Promise<void> {
+        await this.invokeHub('ReleaseLock', kind, entity_id);
+    }
+
+    /** Verrous actifs de la ville suivie ; rejet si la connexion n'a pas de ville. */
+    public async getLocks(): Promise<ExpeditionLockDTO[]> {
+        return this.invokeHub<ExpeditionLockDTO[]>('GetExpeditionLocks');
     }
 
     public async deleteMapRoute(route_id: number): Promise<void> {

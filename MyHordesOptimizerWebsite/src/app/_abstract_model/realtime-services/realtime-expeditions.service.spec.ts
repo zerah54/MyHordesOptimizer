@@ -9,7 +9,7 @@ import { Expedition } from '../types/expedition.class';
 import { ExpeditionOrder } from '../types/expedition-order.class';
 import { ExpeditionPart } from '../types/expedition-part.class';
 import { MapRoute } from '../types/map-route.class';
-import { isHubConflictError, RealtimeExpeditionsService } from './realtime-expeditions.service';
+import { ExpeditionLockDTO, expeditionLockKey, hubLockHolder, isHubConflictError, RealtimeExpeditionsService } from './realtime-expeditions.service';
 
 /** Méthode protégée du service, espionnée dans `beforeEach`. */
 type InvokeHub = Mock<(method: string, ...args: unknown[]) => Promise<unknown>>;
@@ -272,6 +272,52 @@ describe('RealtimeExpeditionsService', () => {
 
             expect(reconnections).toBe(1);
         });
+    });
+});
+
+describe('expedition locks', () => {
+    let service: RealtimeExpeditionsService;
+    let invoke: InvokeHub;
+
+    beforeEach(() => {
+        service = Object.create(RealtimeExpeditionsService.prototype);
+        vi.spyOn(<HubInvoker><unknown>service, 'invokeHub').mockReturnValue(Promise.resolve());
+        invoke = <InvokeHub>(<HubInvoker><unknown>service).invokeHub;
+    });
+
+    it('builds the client key of a block', () => {
+        expect(expeditionLockKey('bag', 5)).toBe('bag:5');
+    });
+
+    it('invokes AcquireLock and returns the lock', async () => {
+        const lock: ExpeditionLockDTO = { kind: 'citizen', entityId: 7, holderUserId: 3, holderConnectionId: 'c1' };
+        invoke.mockResolvedValueOnce(lock);
+
+        expect(await service.acquireLock('citizen', 7)).toEqual(lock);
+        expect(invoke).toHaveBeenCalledWith('AcquireLock', 'citizen', 7);
+    });
+
+    it('invokes TouchLock, ReleaseLock and GetExpeditionLocks', async () => {
+        await service.touchLock('part', 2);
+        await service.releaseLock('part', 2);
+        invoke.mockResolvedValueOnce([]);
+        await service.getLocks();
+
+        expect(invoke).toHaveBeenCalledWith('TouchLock', 'part', 2);
+        expect(invoke).toHaveBeenCalledWith('ReleaseLock', 'part', 2);
+        expect(invoke).toHaveBeenCalledWith('GetExpeditionLocks');
+    });
+});
+
+describe('hubLockHolder', () => {
+    it('extracts the holder id of a refused write', () => {
+        expect(hubLockHolder(new Error('An unexpected error occurred invoking \'X\' on the server. HubException: Locked:42'))).toBe(42);
+        expect(hubLockHolder('Locked:7')).toBe(7);
+    });
+
+    it('ignores any other error', () => {
+        expect(hubLockHolder(new Error('HubException: Conflict: version 3'))).toBeNull();
+        expect(hubLockHolder(undefined)).toBeNull();
     });
 });
 

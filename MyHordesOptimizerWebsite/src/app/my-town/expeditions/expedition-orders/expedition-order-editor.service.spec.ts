@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 
 import { RealtimeExpeditionsService } from '../../../_abstract_model/realtime-services/realtime-expeditions.service';
+import { Citizen } from '../../../_abstract_model/types/citizen.class';
 import { CitizenExpedition } from '../../../_abstract_model/types/citizen-expedition.class';
 import { Expedition } from '../../../_abstract_model/types/expedition.class';
 import { ExpeditionOrder } from '../../../_abstract_model/types/expedition-order.class';
@@ -28,7 +29,9 @@ function order(overrides: Partial<ExpeditionOrder> = {}): ExpeditionOrder {
     });
 }
 
-const CONTEXT: ExpeditionOrderMapContext = { map: undefined, cells: new Map(), ruins: [], citizens: [], items: [], expeditions: [] };
+const BOB: Citizen = <Citizen>{ id: 9, name: 'Bob' };
+
+const CONTEXT: ExpeditionOrderMapContext ={ map: undefined, cells: new Map(), ruins: [], citizens: [], items: [], expeditions: [] };
 
 describe('ExpeditionOrderEditorService', (): void => {
     let service: ExpeditionOrderEditorService;
@@ -36,6 +39,8 @@ describe('ExpeditionOrderEditorService', (): void => {
     let updatePartOrders: ReturnType<typeof vi.fn>;
     let updateCitizenOrders: ReturnType<typeof vi.fn>;
     let errorSnackbar: ReturnType<typeof vi.fn>;
+    let warningSnackbar: ReturnType<typeof vi.fn>;
+    let updateOrder: ReturnType<typeof vi.fn>;
     let dialogResult: ExpeditionOrderFormResult | undefined;
 
     function open(expedition_part: ExpeditionPart, existing: OwnedExpeditionOrder | null = null): Promise<void> {
@@ -45,15 +50,20 @@ describe('ExpeditionOrderEditorService', (): void => {
     beforeEach((): void => {
         updatePartOrders = vi.fn().mockResolvedValue(undefined);
         updateCitizenOrders = vi.fn().mockResolvedValue(undefined);
+        updateOrder = vi.fn().mockResolvedValue(undefined);
         errorSnackbar = vi.fn();
+        warningSnackbar = vi.fn();
         dialogResult = undefined;
         dialogOpen = vi.fn().mockReturnValue({ afterClosed: (): unknown => of(dialogResult) });
         TestBed.configureTestingModule({
             providers: [
                 ExpeditionOrderEditorService,
                 { provide: MatDialog, useValue: { open: dialogOpen } },
-                { provide: RealtimeExpeditionsService, useValue: { updateExpeditionPartOrders: updatePartOrders, updateExpeditionCitizenOrders: updateCitizenOrders } },
-                { provide: SnackbarService, useValue: { errorSnackbar } }
+                {
+                    provide: RealtimeExpeditionsService,
+                    useValue: { updateExpeditionPartOrders: updatePartOrders, updateExpeditionCitizenOrders: updateCitizenOrders, updateExpeditionOrder: updateOrder }
+                },
+                { provide: SnackbarService, useValue: { errorSnackbar, warningSnackbar } }
             ]
         });
         service = TestBed.inject(ExpeditionOrderEditorService);
@@ -168,6 +178,34 @@ describe('ExpeditionOrderEditorService', (): void => {
         await open(expedition_part);
 
         expect(errorSnackbar).toHaveBeenCalledTimes(1);
+    });
+
+    it('warns with the holder name when saving is refused by a lock', async (): Promise<void> => {
+        updatePartOrders.mockRejectedValueOnce(new Error('HubException: Locked:9'));
+        dialogResult = { action: 'save', order: order(), owner_ids: [] };
+
+        await service.edit(part(), { x: 5, y: 6 }, null, { ...CONTEXT, citizens: [BOB] });
+
+        expect(warningSnackbar).toHaveBeenCalledWith('Modification refusée : en cours de modification par Bob');
+        expect(errorSnackbar).not.toHaveBeenCalled();
+    });
+
+    it('warns with the holder name when checking an order is refused by a lock', async (): Promise<void> => {
+        updateOrder.mockRejectedValueOnce(new Error('HubException: Locked:9'));
+
+        await service.toggleDone(order({ id: 3 }), true, [BOB]);
+
+        expect(warningSnackbar).toHaveBeenCalledWith('Modification refusée : en cours de modification par Bob');
+        expect(errorSnackbar).not.toHaveBeenCalled();
+    });
+
+    it('shows an error snackbar when checking an order fails', async (): Promise<void> => {
+        updateOrder.mockRejectedValueOnce(new Error('boom'));
+
+        await service.toggleDone(order({ id: 3 }), true, [BOB]);
+
+        expect(errorSnackbar).toHaveBeenCalledTimes(1);
+        expect(warningSnackbar).not.toHaveBeenCalled();
     });
 
     describe('passages of a route crossing a cell several times', (): void => {

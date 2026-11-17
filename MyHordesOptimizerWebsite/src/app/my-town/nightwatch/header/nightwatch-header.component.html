@@ -1,0 +1,64 @@
+<div class="nightwatch-header">
+    <mho-day-selector [days]="store.days()" [value]="store.selected_day()" [today]="store.current_day"
+                      (valueChange)="selectDay($event)"></mho-day-selector>
+
+    <div class="plans" role="group" i18n-aria-label aria-label="Propositions du jour">
+        @for (plan of store.plans_of_day(); track plan.id) {
+            <span class="plan-chip" [class.selected]="isSelected(plan)">
+                <button mat-button type="button" data-action="select-plan" [attr.aria-pressed]="isSelected(plan)" (click)="selectPlan(plan.id)">
+                    <span class="label">
+                        @if (plan.isEffective) {
+                            <mat-icon class="effective" role="img" i18n-aria-label aria-label="Proposition effective du jour" i18n-matTooltip
+                                      matTooltip="Proposition effective du jour">star</mat-icon>
+                        }
+                        {{ plan.name }}
+                    </span>
+                </button>
+                @if (isSelected(plan) && store.can_write()) {
+                    <button mat-icon-button type="button" data-action="plan-menu" [matMenuTriggerFor]="plan_menu" i18n-matTooltip
+                            matTooltip="Actions sur la proposition">
+                        <mat-icon>more_vert</mat-icon>
+                    </button>
+                }
+            </span>
+        }
+        <button mat-stroked-button type="button" data-action="new-plan" [disabled]="!store.can_write()" (click)="newPlan()">
+            <span class="label">
+                <mat-icon>add</mat-icon>
+                <ng-container i18n>Proposition</ng-container>
+            </span>
+        </button>
+    </div>
+
+    <span class="save-state" data-field="save-state" role="status">
+        @if (store.save_state() === 'pending' || store.save_state() === 'saving') {
+            <mat-icon aria-hidden="true">sync</mat-icon>
+            <ng-container i18n>Enregistrement…</ng-container>
+        } @else if (store.save_state() === 'saved') {
+            <mat-icon aria-hidden="true">check</mat-icon>
+            <ng-container i18n>Enregistré</ng-container>
+        } @else if (store.save_state() === 'error') {
+            <mat-icon aria-hidden="true">error</mat-icon>
+            <ng-container i18n>Échec de l'enregistrement</ng-container>
+        }
+    </span>
+</div>
+
+<mat-menu #plan_menu="matMenu">
+    <button mat-menu-item type="button" data-action="rename" [disabled]="!store.can_edit()" (click)="rename()">
+        <mat-icon>edit</mat-icon>
+        <span i18n>Renommer</span>
+    </button>
+    <button mat-menu-item type="button" data-action="duplicate" (click)="duplicate()">
+        <mat-icon>content_copy</mat-icon>
+        <span i18n>Dupliquer</span>
+    </button>
+    <button mat-menu-item type="button" data-action="effective" [disabled]="store.selected_plan()?.isEffective === true" (click)="store.setEffective()">
+        <mat-icon>star</mat-icon>
+        <span i18n>Rendre effective pour ce jour</span>
+    </button>
+    <button mat-menu-item type="button" data-action="delete" [disabled]="!store.can_edit()" (click)="remove()">
+        <mat-icon>delete</mat-icon>
+        <span i18n>Supprimer</span>
+    </button>
+</mat-menu>

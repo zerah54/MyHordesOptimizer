@@ -1,0 +1,155 @@
+<div class="stock-tab">
+    @if (rows().length === 0) {
+        <p class="empty" data-field="no-stock" i18n>Aucun objet attribué aux veilleurs.</p>
+    } @else {
+        <div class="mat-elevation-z8 table-scroll">
+            <table mat-table [dataSource]="rows()" [trackBy]="trackRow" class="summary">
+                <ng-container matColumnDef="item">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Objet</th>
+                    <td mat-cell *matCellDef="let row">
+                        <span class="item">
+                            @if (row.item.icon !== '') {
+                                <img class="item-icon" [src]="row.item.icon" alt="">
+                            }
+                            {{ row.item.label }}
+                        </span>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="need">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Besoin</th>
+                    <td mat-cell *matCellDef="let row" data-field="need">{{ row.line.need }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="in_bag">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Dans les sacs</th>
+                    <td mat-cell *matCellDef="let row" data-field="in-bag">{{ row.line.in_bag }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="in_chests">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Coffres</th>
+                    <td mat-cell *matCellDef="let row" data-field="in-chests">
+                        {{ row.line.in_chests }}
+                        @if (row.line.oldest_chest_update !== null) {
+                            <span class="chest-date" data-field="chest-date">{{ chestDate(row.line.oldest_chest_update) }}</span>
+                        }
+                        @if (row.line.stale_chest || row.line.unknown_age) {
+                            <mat-chip-set class="badges">
+                                @if (row.line.stale_chest) {
+                                    <mat-chip data-badge="stale" disableRipple i18n>périmé</mat-chip>
+                                }
+                                @if (row.line.unknown_age) {
+                                    <mat-chip data-badge="unknown-age" disableRipple i18n>âge inconnu</mat-chip>
+                                }
+                            </mat-chip-set>
+                        }
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="in_bank">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Banque</th>
+                    <td mat-cell *matCellDef="let row" data-field="in-bank">{{ row.line.in_bank }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="in_desert">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Désert</th>
+                    <td mat-cell *matCellDef="let row" data-field="in-desert">
+                        {{ row.line.in_desert }}
+                        @if (row.line.in_desert > 0) {
+                            <mat-chip-set class="badges">
+                                <mat-chip disableRipple i18n>à rapatrier</mat-chip>
+                            </mat-chip-set>
+                        }
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="manual">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Saisie manuelle</th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-form-field class="manual" appearance="outline" subscriptSizing="dynamic">
+                            <input matInput type="number" min="0" step="1" data-field="manual" [value]="row.line.manual" [disabled]="!store.can_edit()"
+                                   [attr.aria-label]="manualLabel(row.item.label)" #manual (change)="setManual(row.line.item_id, manual)">
+                        </mat-form-field>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="remaining">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Reste à trouver</th>
+                    <td mat-cell *matCellDef="let row" data-field="remaining" class="remaining">
+                        {{ row.line.remaining }}
+                        @if (row.line.remaining > 0) {
+                            <mat-chip-set class="badges">
+                                <mat-chip data-field="missing-mark" disableRipple i18n>à trouver</mat-chip>
+                            </mat-chip-set>
+                        }
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="broken">
+                    <th mat-header-cell *matHeaderCellDef scope="col" i18n>Cassés en ville</th>
+                    <td mat-cell *matCellDef="let row" data-field="broken">{{ row.line.broken_in_town }}</td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="stock_columns"></tr>
+                <tr mat-row *matRowDef="let row; columns: stock_columns" [attr.data-item]="row.line.item_id" [class.missing]="row.line.remaining > 0"></tr>
+            </table>
+        </div>
+    }
+
+    @if (store.totals(); as totals) {
+        <section class="cost" data-block="cost">
+            <h3 i18n>Coût</h3>
+            <div class="kpis">
+                <div class="kpi" data-field="repair-pa">
+                    <span class="title" i18n>Réparations</span>
+                    <span class="value"><mho-icon-ap [value]="totals.cost.repair_pa"/></span>
+                </div>
+                <div class="kpi" data-field="batteries">
+                    <span class="title" i18n>Piles</span>
+                    <span class="value">{{ totals.cost.batteries }}</span>
+                </div>
+                <div class="kpi" data-field="water">
+                    <span class="title" i18n>Eau</span>
+                    <span class="value">{{ totals.cost.water }}</span>
+                </div>
+            </div>
+        </section>
+    }
+
+    <section class="buildings" data-block="buildings">
+        <h3 i18n>Consommation des chantiers</h3>
+        @if (building_needs().status === 'ready') {
+            @if (building_rows().length === 0) {
+                <p class="empty" data-field="buildings-none" i18n>Le plan de chantiers effectif de ce jour ne requiert aucun objet.</p>
+            } @else {
+                <div class="mat-elevation-z8 table-scroll">
+                    <table mat-table [dataSource]="building_rows()" class="summary">
+                        <ng-container matColumnDef="item">
+                            <th mat-header-cell *matHeaderCellDef scope="col" i18n>Objet</th>
+                            <td mat-cell *matCellDef="let row">
+                                <span class="item">
+                                    @if (row.item.icon !== '') {
+                                        <img class="item-icon" [src]="row.item.icon" alt="">
+                                    }
+                                    {{ row.item.label }}
+                                </span>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="need">
+                            <th mat-header-cell *matHeaderCellDef scope="col" i18n>Besoin</th>
+                            <td mat-cell *matCellDef="let row" data-field="building-need">{{ row.count }}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="building_columns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: building_columns" [attr.data-building-item]="row.item_id"></tr>
+                    </table>
+                </div>
+            }
+        } @else if (building_needs().status === 'loading') {
+            <p class="empty" data-field="buildings-loading" i18n>Chargement…</p>
+        } @else if (building_needs().status === 'unavailable') {
+            <p class="empty" data-field="buildings-unavailable" i18n>Aucun plan de chantiers effectif lisible pour ce jour.</p>
+        }
+    </section>
+</div>

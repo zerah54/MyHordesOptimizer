@@ -12,6 +12,7 @@ using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Bag;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Citizens;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Map;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
@@ -1636,6 +1637,13 @@ namespace MyHordesOptimizerApi.Services.Impl
         public HomeReferentialDto GetHomeReferential()
         {
             return Citizens.HomeReferentialMapper.Map(MyHordesCodeRepository.GetHomeLevels(), MyHordesCodeRepository.GetHomeUpgrades());
+        }
+
+        public NightwatchReferentialDto GetNightwatchReferential()
+        {
+            var idItemByUid = DbContext.Items.Where(item => item.Uid != null).Select(item => new { item.Uid, item.IdItem })
+                .ToDictionary(item => item.Uid!, item => item.IdItem);
+            return Nightwatch.NightwatchReferentialMapper.Map(MyHordesCodeRepository.GetNightwatchReferential(), idItemByUid);
         }
 
         public Dictionary<string, BuildingUpgradeCodeModel> GetBuildingUpgrades()

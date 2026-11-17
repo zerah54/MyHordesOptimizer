@@ -1,0 +1,56 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.pre-town-banner {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: var(--mat-sys-secondary-container);
+    color: var(--mat-sys-on-secondary-container);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+
+    &__back {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 8px;
+        color: inherit;
+    }
+
+    &__name {
+        font-weight: 600;
+    }
+
+    &__frozen {
+        opacity: 0.85;
+    }
+
+    &__nav {
+        display: flex;
+        gap: 12px;
+        margin-left: auto;
+
+        a {
+            color: inherit;
+
+            &.active {
+                font-weight: 600;
+                text-decoration: underline;
+            }
+        }
+    }
+}
+
+.pre-town-loading {
+    display: flex;
+    justify-content: center;
+    padding: 32px;
+}

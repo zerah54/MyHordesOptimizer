@@ -105,12 +105,16 @@ export class RealtimeBuildingPlansService extends RealtimeGlobalService {
     /** Rouvre la connexion, avec le jeton courant, si la ville du joueur a changé depuis son ouverture. */
     public async ensureTown(): Promise<void> {
         const town_id: number | null = getOwnTown()?.town_id ?? null;
-        if (town_id === this.connected_town_id) {
-            return;
+        if (town_id !== this.connected_town_id) {
+            this.connected_town_id = town_id;
+            await this.hubConnection.stop();
+            await this.ensureConnected();
         }
-        this.connected_town_id = town_id;
-        await this.hubConnection.stop();
-        await this.ensureConnected();
+        try {
+            await this.syncActiveTown();
+        } catch (error: unknown) {
+            console.warn('UseTown', error);
+        }
     }
 
     /** Déclare la présence (page ouverte), publie et renvoie la liste des présents. */
@@ -132,6 +136,10 @@ export class RealtimeBuildingPlansService extends RealtimeGlobalService {
 
     /** Renvoie les verrous actifs de la ville, sans rien diffuser. */
     public async getPlanLocks(): Promise<PlanLockDTO[]> {
+        if (this.isFrozenPreTown()) {
+            return [];
+        }
+        await this.syncActiveTown();
         return await this.invokeHub<PlanLockDTO[]>('GetPlanLocks');
     }
 
@@ -152,6 +160,7 @@ export class RealtimeBuildingPlansService extends RealtimeGlobalService {
 
     /** Déclare la présence au hub et publie la liste des présents. */
     private async declarePresence(): Promise<number[]> {
+        await this.syncActiveTown();
         const user_ids: number[] = await this.invokeHub<number[]>('JoinPresence');
         this.users_subject.next(user_ids);
         return user_ids;
@@ -159,6 +168,11 @@ export class RealtimeBuildingPlansService extends RealtimeGlobalService {
 
     /** Redéclare la présence si elle était demandée, puis signale la reconnexion (même en cas d'échec). */
     private async onReconnected(): Promise<void> {
+        try {
+            await this.syncActiveTown();
+        } catch (error: unknown) {
+            console.warn('UseTown', error);
+        }
         if (this.presence_requested) {
             try {
                 await this.declarePresence();
