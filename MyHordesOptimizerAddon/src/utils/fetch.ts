@@ -5,10 +5,12 @@ import { freezeAvatarsAnimations } from '../ui/avatars';
 import { automaticallyOpenBag } from '../ui/bag';
 import { displayCampingPredict } from '../ui/camping-predict';
 import { displayCellDetailsOnPage } from '../ui/cell-details';
+import { displayCitizenHomesTab } from '../ui/citizen-homes-tab';
 import { alertIfInactiveAndNoEscort, changeDefaultEscortOptions, preventFromLeaving } from '../ui/desert';
 import { displayExpeditionRouteOnPage } from '../ui/expedition-route';
 import { createExpeditionsBtn } from '../ui/expeditions';
 import { addExternalLinksColumnToWelcomeTowns, addExternalLinksToProfiles, addExternalLinksToTowns } from '../ui/external-links';
+import { createForeignHomeUpdateButton } from '../ui/foreign-home-update';
 import {
     autoExpandForumCollapseSections,
     displayCountCharacters,
@@ -19,6 +21,7 @@ import {
 } from '../ui/forum';
 import { styleForumThreadTitles } from '../ui/forum-styles';
 import { displayGhoulVoracityPercent } from '../ui/ghoul';
+import { createHeroSkillsUpdateButtons } from '../ui/hero-skills-update';
 import { displayCitizenNoteIcons, displayTownNote, displayUserGlobalNote } from '../ui/notes';
 import { addCopyRegistryButton } from '../ui/registry';
 import { displayMinApOnBuildings, displaySearchFields } from '../ui/search-fields';
@@ -53,6 +56,8 @@ export function initOptionsWithLoginNeeded(): void {
         displayWishlistInApp,
         displayPriorityOnItems,
         createUpdateExternalToolsButton,
+        createForeignHomeUpdateButton,
+        createHeroSkillsUpdateButtons,
         createExpeditionsBtn,
         displayEstimationsOnWatchtower,
         /** Se cale elle-même sur le rendu de la carte : plus besoin de la retarder */
@@ -73,6 +78,7 @@ export function initOptionsWithoutLoginNeeded(): void {
         preventFromLeaving,
         alertIfInactiveAndNoEscort,
         displaySearchFields,
+        displayCitizenHomesTab,
         displayMinApOnBuildings,
         displayAdvancedTooltips,
         displayTranslateTool,

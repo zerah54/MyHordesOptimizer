@@ -5,6 +5,53 @@ import type { I18nLabel } from '../types';
 ////////////////
 
 export const texts = {
+    foreign_home_update_btn: {
+        en: 'Update this house in MyHordes Optimizer',
+        fr: 'Mettre à jour cette maison dans MyHordes Optimizer',
+        de: 'Dieses Haus in MyHordes Optimizer aktualisieren',
+        es: 'Actualizar esta casa en MyHordes Optimizer'
+    },
+    foreign_home_upgrades: { en: 'Building upgrades', fr: 'Travaux', de: 'Bauarbeiten', es: 'Obras' },
+    foreign_home_chest: { en: 'Chest', fr: 'Coffre', de: 'Truhe', es: 'Baúl' },
+    hero_skills_update_btn: {
+        en: 'Update my S.U.P.E.R. in MyHordes Optimizer',
+        fr: 'Mettre à jour mes S.U.P.E.R. dans MyHordes Optimizer',
+        de: 'Meine S.U.P.E.R. in MyHordes Optimizer aktualisieren',
+        es: 'Actualizar mis S.U.P.E.R. en MyHordes Optimizer'
+    },
+    hero_skills_update_deferred: {
+        en: 'Will be sent once you are in the town',
+        fr: 'Sera envoyé une fois dans la ville',
+        de: 'Wird gesendet, sobald du in der Stadt bist',
+        es: 'Se enviará una vez en el pueblo'
+    },
+    homes_tab_title: { en: 'Homes', fr: 'Maisons', de: 'Häuser', es: 'Viviendas' },
+    homes_filter_yes: { en: 'Yes', fr: 'Oui', de: 'Ja', es: 'Sí' },
+    homes_filter_no: { en: 'No', fr: 'Non', de: 'Nein', es: 'No' },
+    heroics_tab_title: { en: 'Heroic Actions', fr: 'Actions héroïques', de: 'Heldentaten', es: 'Acciones heroicas' },
+    homes_search_name: { en: 'Search a citizen', fr: 'Rechercher un citoyen', de: 'Bürger suchen', es: 'Buscar un ciudadano' },
+    homes_column_name: { en: 'Citizen', fr: 'Citoyen', de: 'Bürger', es: 'Ciudadano' },
+    homes_column_update: { en: 'Updated', fr: 'MàJ', de: 'Aktualisiert', es: 'Actualizado' },
+    homes_never: { en: 'never', fr: 'jamais', de: 'nie', es: 'nunca' },
+    homes_col_house: { en: 'House', fr: 'Habitation', de: 'Behausung', es: 'Vivienda' },
+    homes_col_kitchen: { en: 'Kitchen', fr: 'Cuisine', de: 'Küche', es: 'Cocina' },
+    homes_col_labo: { en: 'Home Laboratory', fr: 'Cave-laboratoire', de: 'Hobbylabor', es: 'Sótano laboratorio' },
+    homes_col_chest: { en: 'More Storage', fr: 'Rangements', de: 'Stauraum', es: 'Compartimentos' },
+    homes_col_renfort: { en: 'Reinforcements', fr: 'Renforts', de: 'Verstärkungen', es: 'Refuerzos' },
+    homes_col_rest: { en: 'Siesta Time™', fr: 'Coin sieste', de: 'Ruheecke', es: 'Rincón para siesta' },
+    homes_col_alarm: { en: 'Rudimentary Alarm', fr: 'Alarme rudimentaire', de: 'Primitives Alarmsystem', es: 'Alarma rudimentaria' },
+    homes_col_curtain: { en: 'Large Curtain', fr: 'Gros rideau', de: 'Großer Vorhang', es: 'Gran cortina' },
+    homes_col_lock: { en: 'Lock', fr: 'Verrou', de: 'Türschloss', es: 'Cerrojo' },
+    homes_col_fence: { en: 'Fence', fr: 'Clôture', de: 'Zaun', es: 'Valla' },
+    homes_col_rescue: { en: 'Rescue', fr: 'Sauvetage', de: 'Rettung', es: 'Rescate' },
+    homes_col_uppercut: { en: 'Vicious Uppercut', fr: 'Uppercut Sauvage', de: 'Wildstyle Uppercut', es: 'Puñetazo salvaje' },
+    homes_col_second_wind: { en: 'Second wind', fr: 'Second Souffle', de: 'Zweite Lunge', es: 'Segundo aliento' },
+    homes_col_lucky_find: { en: 'Seeker', fr: 'Trouvaille', de: 'Fund', es: 'Hallazgo' },
+    homes_col_cheat_death: { en: 'Cheat Death', fr: 'Vaincre la Mort', de: 'Den Tod besiegen', es: 'Vencer a la muerte' },
+    homes_col_heroic_return: { en: 'Heroic Return', fr: 'Retour du Héro', de: 'Die Rückkehr des Helden', es: 'El retorno del Héroe' },
+    homes_col_break_through: { en: 'Break Through', fr: 'Passage en Force', de: 'Durchgang in Kraft', es: 'Pasaje en vigor' },
+    homes_col_brother_in_arms: { en: 'Brothers in Arms', fr: 'Camaraderie', de: 'Freundschaft', es: 'Camaradería' },
+    homes_col_apag: { en: 'Pre-war camera', fr: 'Appareil Photo d\'Avant-Guerre', de: 'Kamera aus Vorkriegs-Tagen', es: 'Cámara fotográfica de post-guerra' },
     website: {
         en: 'Website',
         fr: 'Site web',
@@ -634,6 +681,24 @@ export const texts = {
         fr: 'En ville',
         de: 'In der Stadt',
         es: 'En la ciudad'
+    },
+    filter_banned_label: {
+        en: 'Banishment',
+        fr: 'Bannissement',
+        de: 'Verbannung',
+        es: 'Destierro'
+    },
+    filter_banned_yes: {
+        en: 'Banned',
+        fr: 'Banni',
+        de: 'Verbannt',
+        es: 'Desterrado'
+    },
+    filter_banned_no: {
+        en: 'Not banned',
+        fr: 'Non banni',
+        de: 'Nicht verbannt',
+        es: 'No desterrado'
     },
     filter_house_level_label: {
         en: 'Habitation',

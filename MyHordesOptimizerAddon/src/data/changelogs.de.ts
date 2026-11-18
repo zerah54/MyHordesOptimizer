@@ -1,4 +1,13 @@
 export const changelogs: Record<string, string> = {
+    '1.1.66': `
+        [Neu] Bürgerliste: zwei neue Tabs, „Häuser“ (Behausungen und Bauarbeiten) und „Heldentaten“
+        [Neu] Haus eines anderen Bürgers: Schaltfläche, um sein Haus in MyHordes Optimizer zu aktualisieren
+        [Neu] S.U.P.E.R.: Schaltfläche, um deine Heldenfähigkeiten in MyHordes Optimizer zu aktualisieren
+
+        [Verbesserung] Forum: Kopieren/Zitieren einer Nachricht übernimmt die Medienblöcke des Scripts nicht mehr
+        [Verbesserung] Bürgerliste: neuer Filter nach Verbannung
+        [Verbesserung] Forum: imgur-Alben/-Galerien/-Bilder werden eingebettet, nativer Videoplayer für direkte Links (.mp4, .webm…)
+        `,
     '1.1.65': `
         [Verbesserung] Einkaufsliste: Gegenstandsgruppen werden in einer einzigen Zeile angezeigt (summierte Zähler), und die Gruppe wird im Tooltip angegeben
         [Verbesserung] Expeditionen: Wenn du nur eine Expedition hast, wird sie automatisch verfolgt

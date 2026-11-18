@@ -70,6 +70,18 @@ export interface MatchedVideo {
     videoId: string;
 }
 
+/** Extensions de fichier vidéo lisibles nativement par `<video>`, testées sur le `pathname` (tolère un `?query`) */
+const direct_video_url_pattern: RegExp = /\.(mp4|webm|ogv|m4v)$/i;
+
+/** true si le lien pointe directement vers un fichier vidéo (catbox, discord cdn…) plutôt que vers un fournisseur */
+export function isDirectVideoLink(href: string): boolean {
+    try {
+        return direct_video_url_pattern.test(new URL(href, document.baseURI).pathname);
+    } catch {
+        return false;
+    }
+}
+
 /** Reconnaît un lien de post pointant vers une vidéo YouTube ou Dailymotion et en extrait l'identifiant. */
 export function matchVideoLink(href: string): MatchedVideo | null {
     let url: URL;

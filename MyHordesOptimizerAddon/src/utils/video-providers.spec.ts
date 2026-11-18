@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { fetchJsonp } from './jsonp';
-import { dailymotionProvider, type MatchedVideo, matchVideoLink, youtubeProvider } from './video-providers';
+import { dailymotionProvider, isDirectVideoLink, type MatchedVideo, matchVideoLink, youtubeProvider } from './video-providers';
 
 vi.mock('./jsonp', () => ({ fetchJsonp: vi.fn() }));
 
@@ -93,5 +93,23 @@ describe('dailymotionProvider', () => {
         vi.mocked(fetchJsonp).mockResolvedValue(undefined);
 
         await expect(dailymotionProvider.resolveThumbnailUrl?.('x7tgcev')).resolves.toBeUndefined();
+    });
+});
+
+describe('isDirectVideoLink', () => {
+    it.each([
+        'https://files.catbox.moe/a7axe7.mp4',
+        'https://cdn.example.com/clip.MP4?x=1',
+        'https://cdn.example.com/clip.webm',
+    ])('matches a direct video file: %s', (href: string) => {
+        expect(isDirectVideoLink(href)).toBe(true);
+    });
+
+    it.each([
+        'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        'https://example.com/mp4',
+        'https://example.com/image.png',
+    ])('rejects a non-file link: %s', (href: string) => {
+        expect(isDirectVideoLink(href)).toBe(false);
     });
 });

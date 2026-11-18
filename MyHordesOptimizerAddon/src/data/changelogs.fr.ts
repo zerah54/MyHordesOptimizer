@@ -1,4 +1,13 @@
 export const changelogs: Record<string, string> = {
+    '1.1.66': `
+        [Nouveauté] Liste des citoyens : deux nouveaux onglets, « Maisons » (habitations et travaux) et « Actions héroïques »
+        [Nouveauté] Maison d'un autre citoyen : bouton pour mettre à jour sa maison dans MyHordes Optimizer
+        [Nouveauté] S.U.P.E.R. : bouton pour mettre à jour vos compétences héroïques dans MyHordes Optimizer
+
+        [Amélioration] Forum : copier/citer un message n'importe plus les blocs médias du script
+        [Amélioration] Liste des citoyens : nouveau filtre par bannissement
+        [Amélioration] Forum : intégration des albums/galeries/images imgur et lecteur vidéo natif pour les liens directs (.mp4, .webm…)
+        `,
     '1.1.65': `
         [Amélioration] Liste de courses : les groupes d'objets sont affichés sur une seule ligne (compteurs cumulés), et le groupe est indiqué dans le tooltip
         [Amélioration] Expéditions : si vous n'avez qu'une seule expédition, elle est suivie automatiquement

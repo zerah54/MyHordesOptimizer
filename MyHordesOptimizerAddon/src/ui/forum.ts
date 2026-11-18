@@ -1,11 +1,19 @@
 import { lang, mh_optimizer_icon, mho_blacklist_key } from '../config/constants';
 import { fill_items_messages_pool } from '../data/fill-items-messages';
 import { state } from '../state';
-import { findLinkInsertionPoint, type LinkInsertionPoint } from '../utils/forum-link-insertion';
+import {
+    findLinkInsertionPoint,
+    findSameHrefLinkRun,
+    forum_media_block_class,
+    getLinkRunText,
+    type LinkInsertionPoint,
+    stripForumMediaBlocks,
+} from '../utils/forum-link-insertion';
+import { getForumImageUrl, getImgurEmbedUrl } from '../utils/image-links';
 import { pageIsDesert, pageIsForum, pageIsMsgReceived } from '../utils/page';
 import { unwatchRendered, watchRendered } from '../utils/render-watch';
 import { getStorageItem, setStorageItem } from '../utils/storage';
-import { type MatchedVideo, matchVideoLink } from '../utils/video-providers';
+import { isDirectVideoLink, type MatchedVideo, matchVideoLink } from '../utils/video-providers';
 
 export function fillItemsMessages() {
     if (state.mho_parameters.fill_items_messages && pageIsMsgReceived()) {
@@ -302,26 +310,13 @@ export function pinForumSpoilersOnClick(): void {
     });
 }
 
-/** Extensions d'image reconnues sur le `pathname` d'un lien (insensible à la casse, tolère un `?query` en suffixe) */
-const image_url_pattern: RegExp = /\.(jpe?g|png|gif|webp|svg|bmp)$/i;
-/** Classe commune aux blocs image et vidéo injectés après un lien */
-const forum_media_block_class: string = 'mho-forum-media-block';
 /** Classe de la légende commune aux blocs image et vidéo */
 const forum_media_caption_class: string = 'mho-forum-media-caption';
 /** Classe du bloc image injecté après un lien, pour le retrouver et le retirer si l'option est décochée */
 const forum_image_block_class: string = 'mho-forum-image-block';
 
-/** true si le `pathname` de l'URL (pas le href brut, pour tolérer un `?v=...`) se termine par une extension d'image connue */
-function isForumImageLink(href: string): boolean {
-    try {
-        return image_url_pattern.test(new URL(href, document.baseURI).pathname);
-    } catch {
-        return false;
-    }
-}
-
-/** Construit le bloc image + légende optionnelle à insérer après le lien d'origine */
-function buildForumImageBlock(href: string, caption: string | null): HTMLElement {
+/** Construit le bloc image (`image_url`) cliquable vers `href` + légende optionnelle à insérer après le lien d'origine */
+function buildForumImageBlock(href: string, image_url: string, caption: string | null): HTMLElement {
     const wrapper: HTMLElement = document.createElement('div');
     wrapper.classList.add(forum_media_block_class, forum_image_block_class);
 
@@ -333,7 +328,7 @@ function buildForumImageBlock(href: string, caption: string | null): HTMLElement
     const img: HTMLImageElement = document.createElement('img');
     img.loading = 'lazy';
     img.addEventListener('error', () => wrapper.remove(), { once: true });
-    img.src = href;
+    img.src = image_url;
 
     link.appendChild(img);
     wrapper.appendChild(link);
@@ -346,6 +341,112 @@ function buildForumImageBlock(href: string, caption: string | null): HTMLElement
     }
 
     return wrapper;
+}
+
+/** Classe du bloc d'intégration imgur (album, galerie ou image seule sans extension) */
+const forum_imgur_block_class: string = 'mho-forum-imgur-block';
+
+/**
+ * Hauteurs fixes (px, indépendantes de la largeur, mesurées le 2026-11-17) des bandes de l'embed
+ * imgur : bouton Share en haut, logo en bas. Rognées par le cadre ; à remesurer si imgur change sa
+ * mise en page.
+ */
+const imgur_embed_top_bar_height: number = 60;
+const imgur_embed_bottom_bar_height: number = 55;
+/** Hauteur de l'iframe avant la première annonce `resize_imgur` */
+const imgur_embed_default_height: number = 500;
+
+/** Donne à l'iframe sa hauteur complète et au cadre qui la rogne la hauteur sans les bandes Share/logo */
+function setImgurEmbedHeight(iframe: HTMLIFrameElement, height: number): void {
+    iframe.style.height = `${height}px`;
+    if (iframe.parentElement) {
+        iframe.parentElement.style.height = `${Math.max(height - imgur_embed_top_bar_height - imgur_embed_bottom_bar_height, 0)}px`;
+    }
+}
+
+let is_imgur_resize_listener_installed: boolean = false;
+
+/**
+ * L'iframe d'intégration imgur annonce sa hauteur (`resize_imgur`) ou son absence (`404_imgur_embed`)
+ * par `postMessage` : on retrouve l'iframe émettrice via `event.source` pour l'ajuster ou la retirer.
+ */
+function installImgurResizeListener(): void {
+    if (is_imgur_resize_listener_installed) return;
+    is_imgur_resize_listener_installed = true;
+
+    window.addEventListener('message', (event: MessageEvent) => {
+        if (event.origin !== 'https://imgur.com' || typeof event.data !== 'string') return;
+
+        let data: { message?: unknown; height?: unknown };
+        try {
+            data = JSON.parse(event.data) as { message?: unknown; height?: unknown };
+        } catch {
+            return;
+        }
+
+        const iframe: HTMLIFrameElement | undefined = Array.from(document.querySelectorAll<HTMLIFrameElement>(`.${forum_imgur_block_class} iframe`))
+            .find((candidate: HTMLIFrameElement) => candidate.contentWindow === event.source);
+        if (!iframe) return;
+
+        if (data.message === '404_imgur_embed') {
+            iframe.closest(`.${forum_media_block_class}`)?.remove();
+        } else if (data.message === 'resize_imgur') {
+            const height: number = Number(data.height);
+            if (height > 0) setImgurEmbedHeight(iframe, height);
+        }
+    });
+}
+
+/**
+ * Construit le bloc iframe d'intégration imgur + légende optionnelle, rangé avec les blocs image (même
+ * option). Le cadre rogne les bandes Share/logo ; c'est un vrai `<a>` vers la page imgur pour que la
+ * bordure prenne la couleur de lien du thème, comme les autres blocs média.
+ */
+function buildForumImgurBlock(href: string, embed_url: string, caption: string | null): HTMLElement {
+    installImgurResizeListener();
+
+    const wrapper: HTMLElement = document.createElement('div');
+    wrapper.classList.add(forum_media_block_class, forum_image_block_class, forum_imgur_block_class);
+
+    const frame: HTMLAnchorElement = document.createElement('a');
+    frame.classList.add('mho-forum-imgur-frame');
+    frame.href = href;
+    frame.target = '_blank';
+    frame.rel = 'noopener noreferrer';
+
+    const iframe: HTMLIFrameElement = document.createElement('iframe');
+    iframe.loading = 'lazy';
+    iframe.scrolling = 'no';
+    iframe.allowFullscreen = true;
+    iframe.src = embed_url;
+    frame.appendChild(iframe);
+    wrapper.appendChild(frame);
+    setImgurEmbedHeight(iframe, imgur_embed_default_height);
+
+    if (caption) {
+        const caption_element: HTMLElement = document.createElement('div');
+        caption_element.classList.add(forum_media_caption_class);
+        caption_element.textContent = caption;
+        wrapper.appendChild(caption_element);
+    }
+
+    return wrapper;
+}
+
+let is_media_blocks_copy_guard_installed: boolean = false;
+
+/**
+ * Copier/Citer du jeu importent le `innerHTML` du post dans l'éditeur via un événement `import`
+ * (non bouillonnant) : on l'intercepte en phase de capture pour en retirer nos blocs média.
+ */
+function installMediaBlocksCopyGuard(): void {
+    if (is_media_blocks_copy_guard_installed) return;
+    is_media_blocks_copy_guard_installed = true;
+
+    document.addEventListener('import', (event: Event) => {
+        const detail: { html?: unknown } | null = (event as CustomEvent<{ html?: unknown } | null>).detail;
+        if (detail && typeof detail.html === 'string') detail.html = stripForumMediaBlocks(detail.html);
+    }, true);
 }
 
 /**
@@ -367,21 +468,28 @@ function processForumMediaLinks(
         return;
     }
 
-    const links: HTMLAnchorElement[] = Array.from(document.querySelectorAll(`.forum-post-content a[href]:not([${checked_data_attr}])`));
+    installMediaBlocksCopyGuard();
+
+    /** Les `<a>` de nos propres blocs (image cliquable, vignette vidéo) ne sont pas des liens du post */
+    const links: HTMLAnchorElement[] = Array.from(document.querySelectorAll<HTMLAnchorElement>(`.forum-post-content a[href]:not([${checked_data_attr}])`))
+        .filter((link: HTMLAnchorElement) => !link.closest(`.${forum_media_block_class}`));
     /** Deux liens média consécutifs partageant le même point d'insertion : on chaîne sur le dernier bloc posé là, pas sur le point d'origine à chaque fois, pour garder l'ordre du texte */
     const last_inserted_at_node: Map<HTMLElement, HTMLElement> = new Map();
 
     links.forEach((link: HTMLAnchorElement) => {
-        link.setAttribute(checked_data_attr, '1');
+        if (link.hasAttribute(checked_data_attr)) return;
+
+        const run: HTMLAnchorElement[] = findSameHrefLinkRun(link);
+        run.forEach((run_link: HTMLAnchorElement) => run_link.setAttribute(checked_data_attr, '1'));
 
         const href: string = link.getAttribute('href') ?? '';
-        const link_text: string = (link.textContent ?? '').trim();
+        const link_text: string = getLinkRunText(run);
         const caption: string | null = link_text !== '' && link_text !== href ? link_text : null;
 
         const block: HTMLElement | null = matchAndBuild(href, caption);
         if (!block) return;
 
-        const insertion_point: LinkInsertionPoint = findLinkInsertionPoint(link);
+        const insertion_point: LinkInsertionPoint = findLinkInsertionPoint(run[run.length - 1]);
         const previous_block: HTMLElement | undefined = last_inserted_at_node.get(insertion_point.node);
 
         if (previous_block) {
@@ -403,8 +511,10 @@ function processForumMediaLinks(
 export function displayForumLinkImages(): void {
     const is_enabled: boolean = !!(state.mho_parameters?.forum_options && state.mho_parameters?.forum_auto_display_images);
     processForumMediaLinks(is_enabled, forum_image_block_class, 'data-mho-image-checked', (href, caption) => {
-        if (!isForumImageLink(href)) return null;
-        return buildForumImageBlock(href, caption);
+        const image_url: string | null = getForumImageUrl(href);
+        if (image_url) return buildForumImageBlock(href, image_url, caption);
+        const imgur_embed_url: string | null = getImgurEmbedUrl(href);
+        return imgur_embed_url ? buildForumImgurBlock(href, imgur_embed_url, caption) : null;
     });
 }
 
@@ -487,15 +597,47 @@ function buildForumVideoBlock(matched: MatchedVideo, href: string, caption: stri
 }
 
 /**
+ * Construit le bloc lecteur `<video>` natif + légende optionnelle pour un lien direct vers un fichier
+ * vidéo. Le bloc disparaît en cas d'erreur (404, codec non supporté…), le lien texte restant en place.
+ * Le `<a>` sans `href` sert uniquement à hériter de la couleur de lien du thème pour la bordure, sans
+ * que les clics sur les contrôles du lecteur n'ouvrent le lien.
+ */
+function buildForumDirectVideoBlock(href: string, caption: string | null): HTMLElement {
+    const wrapper: HTMLElement = document.createElement('div');
+    wrapper.classList.add(forum_media_block_class, forum_video_block_class);
+
+    const video: HTMLVideoElement = document.createElement('video');
+    video.controls = true;
+    video.preload = 'metadata';
+    video.addEventListener('error', () => wrapper.remove(), { once: true });
+    video.src = href;
+
+    const a: HTMLAnchorElement = document.createElement('a');
+    a.appendChild(video);
+    wrapper.appendChild(a);
+
+    if (caption) {
+        const caption_element: HTMLElement = document.createElement('div');
+        caption_element.classList.add(forum_media_caption_class);
+        caption_element.textContent = caption;
+        wrapper.appendChild(caption_element);
+    }
+
+    return wrapper;
+}
+
+/**
  * Affiche une vignette cliquable sous chaque lien de post pointant vers une vidéo YouTube ou
- * Dailymotion, sans jamais supprimer le lien texte d'origine. Même principe de rejeu que
- * `displayForumLinkImages` (pas de `watchRendered`, s'appuie sur le rejeu de navigation SPA).
+ * Dailymotion, ou un lecteur natif pour un lien direct vers un fichier vidéo (.mp4, .webm…), sans
+ * jamais supprimer le lien texte d'origine. Même principe de rejeu que `displayForumLinkImages`
+ * (pas de `watchRendered`, s'appuie sur le rejeu de navigation SPA).
  */
 export function displayForumLinkVideos(): void {
     const is_enabled: boolean = !!(state.mho_parameters?.forum_options && state.mho_parameters?.forum_auto_display_videos);
     processForumMediaLinks(is_enabled, forum_video_block_class, 'data-mho-video-checked', (href, caption) => {
         const matched: MatchedVideo | null = matchVideoLink(href);
-        if (!matched) return null;
-        return buildForumVideoBlock(matched, href, caption);
+        if (matched) return buildForumVideoBlock(matched, href, caption);
+        if (isDirectVideoLink(href)) return buildForumDirectVideoBlock(href, caption);
+        return null;
     });
 }

@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vite
 import { state } from '../state';
 import type { MhoState } from '../types';
 import { fetcher } from '../utils/fetch';
-import { getCitizens, readTownCitizenRefs } from './citizens';
+import { fetchCitizenHomeRows, getCitizens, readTownCitizenRefs } from './citizens';
 
 vi.mock('../utils/fetch', () => ({ fetcher: vi.fn() }));
 vi.mock('../utils/notifications', () => ({ addError: vi.fn() }));
@@ -30,6 +30,40 @@ describe('readTownCitizenRefs', () => {
     it('rend une liste vide pour une réponse inattendue', () => {
         expect(readTownCitizenRefs(null)).toEqual([]);
         expect(readTownCitizenRefs({ citizens: {} })).toEqual([]);
+    });
+});
+
+describe('fetchCitizenHomeRows', () => {
+    let saved: Pick<MhoState, 'api_url' | 'mh_user' | 'citizens'>;
+
+    beforeEach(() => {
+        saved = { api_url: state.api_url, mh_user: state.mh_user, citizens: state.citizens };
+        state.api_url = 'https://api';
+        state.mh_user = { id: 1, townDetails: { townId: 2 } };
+        (fetcher as unknown as Mock).mockReset();
+    });
+
+    afterEach(() => {
+        Object.assign(state, saved);
+    });
+
+    it('renvoie les lignes lues sans toucher à state.citizens', async () => {
+        const body: unknown = { citizens: [{ id: 12, name: 'Parti', home: { content: { houseLevel: 3 } } }] };
+        (fetcher as unknown as Mock).mockResolvedValue({ status: 200, json: (): Promise<unknown> => Promise.resolve(body) });
+
+        const rows = await fetchCitizenHomeRows();
+
+        expect(fetcher).toHaveBeenCalledWith('https://api/Fetcher/citizens?userId=1&townId=2');
+        expect(rows).toHaveLength(1);
+        expect(rows[0].name).toBe('Parti');
+        expect(rows[0].home['houseLevel']).toBe(3);
+        expect(state.citizens).toBe(saved.citizens);
+    });
+
+    it('rejette sur un statut différent de 200', async () => {
+        (fetcher as unknown as Mock).mockResolvedValue({ status: 500, text: (): Promise<string> => Promise.resolve('boom'), json: (): Promise<unknown> => Promise.resolve({}) });
+
+        await expect(fetchCitizenHomeRows()).rejects.toBeDefined();
     });
 });
 

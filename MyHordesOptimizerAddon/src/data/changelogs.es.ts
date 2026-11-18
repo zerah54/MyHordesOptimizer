@@ -1,4 +1,13 @@
 export const changelogs: Record<string, string> = {
+    '1.1.66': `
+        [Novedad] Lista de ciudadanos: dos pestañas nuevas, «Viviendas» (viviendas y obras) y «Acciones heroicas»
+        [Novedad] Casa de otro ciudadano: botón para actualizar su casa en MyHordes Optimizer
+        [Novedad] S.U.P.E.R.: botón para actualizar tus habilidades heroicas en MyHordes Optimizer
+
+        [Mejora] Foro: copiar/citar un mensaje ya no importa los bloques multimedia del script
+        [Mejora] Lista de ciudadanos: nuevo filtro por destierro
+        [Mejora] Foro: integración de álbumes/galerías/imágenes de imgur y reproductor de vídeo nativo para enlaces directos (.mp4, .webm…)
+        `,
     '1.1.65': `
         [Mejora] Lista de compras: los grupos de objetos se muestran en una sola fila (contadores sumados) y el grupo se indica en el tooltip
         [Mejora] Expediciones: si solo tienes una expedición, se sigue automáticamente

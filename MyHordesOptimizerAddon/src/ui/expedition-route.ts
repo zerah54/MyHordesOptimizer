@@ -305,6 +305,9 @@ function ensureBlock(): HTMLElement | null {
     content.classList.add('mho-expedition-route-content');
     inner.appendChild(content);
 
+    /** Bloc neuf (le jeu a pu retirer l'ancien) : son contenu est vide, la signature mémorisée ne doit plus le court-circuiter */
+    last_signature = undefined;
+
     const cell_informations: Element | null = document.getElementById('cell-informations');
     if (cell_informations?.parentElement === container) {
         cell_informations.insertAdjacentElement('afterend', block);

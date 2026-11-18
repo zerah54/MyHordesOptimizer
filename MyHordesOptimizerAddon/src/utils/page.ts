@@ -50,6 +50,11 @@ export function pageIsHouse(): boolean {
     return document.URL.indexOf('town/house/dash') > -1;
 }
 
+/** @return {boolean}    true si la page est la maison d'un autre citoyen */
+export function pageIsForeignHome(): boolean {
+    return document.URL.indexOf('town/visit/') > -1;
+}
+
 /** @return {boolean}    true si la page de l'utilisateur est la page d'envoi de messages */
 
 export function pageIsMsgReceived(): boolean {

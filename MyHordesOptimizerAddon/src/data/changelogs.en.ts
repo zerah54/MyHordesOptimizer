@@ -1,4 +1,13 @@
 export const changelogs: Record<string, string> = {
+    '1.1.66': `
+        [New] Citizen list: two new tabs, “Homes” (houses and upgrades) and “Heroic Actions”
+        [New] Another citizen's home: button to update their house in MyHordes Optimizer
+        [New] S.U.P.E.R.: button to update your heroic skills in MyHordes Optimizer
+
+        [Improvement] Forum: copying/quoting a message no longer imports the script's media blocks
+        [Improvement] Citizen list: new banishment filter
+        [Improvement] Forum: imgur albums/galleries/images embedded and native video player for direct links (.mp4, .webm…)
+        `,
     '1.1.65': `
         [Improvement] Shopping list: item groups are shown on a single row (combined counts), and the group is shown in the tooltip
         [Improvement] Expeditions: if you only have one expedition, it is followed automatically

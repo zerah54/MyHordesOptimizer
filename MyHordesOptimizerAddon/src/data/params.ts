@@ -83,6 +83,21 @@ export const params_categories: ParamCategory[] = [
                                 },
                             },
                             {
+                                id: 'update_mho_hero_skills',
+                                label: {
+                                    en: 'My S.U.P.E.R. hero skills',
+                                    fr: 'Mes capacités S.U.P.E.R.',
+                                    de: 'Meine S.U.P.E.R.-Fähigkeiten',
+                                    es: 'Mis habilidades S.U.P.E.R.'
+                                },
+                                help: {
+                                    en: 'A button will be placed on the summary before joining a town, and in the "Active skills" tab of the hero skills page',
+                                    fr: 'Un bouton sera placé sur le récapitulatif avant de valider l\'entrée en ville, et dans l\'onglet « Capacités actives » de la page des capacités héroïques',
+                                    de: 'Eine Schaltfläche wird in der Zusammenfassung vor dem Stadtbeitritt und im Reiter „Aktive Fähigkeiten" der Heldenfähigkeiten-Seite platziert',
+                                    es: 'Se colocará un botón en el resumen antes de entrar en el pueblo, y en la pestaña «Habilidades activas» de la página de habilidades heroicas'
+                                },
+                            },
+                            {
                                 id: 'update_mho_bags',
                                 label: {
                                     en: 'Details of my rucksack and those of my escort',
@@ -711,6 +726,25 @@ export const params_categories: ParamCategory[] = [
                                 }
                             }
                         ]
+                    },
+                ]
+            },
+            {
+                id: 'citizen_tabs',
+                label: {
+                    en: 'Additional tabs on the citizens page',
+                    fr: 'Onglets supplémentaires sur la page des citoyens',
+                    de: 'Zusätzliche Registerkarten auf der Bürgerseite',
+                    es: 'Pestañas adicionales en la página de ciudadanos'
+                },
+                children: [
+                    {
+                        id: 'citizen_tab_homes',
+                        label: { en: 'Homes', fr: 'Maisons', de: 'Häuser', es: 'Viviendas' },
+                    },
+                    {
+                        id: 'citizen_tab_heroics',
+                        label: { en: 'Heroic Actions', fr: 'Actions héroïques', de: 'Heldentaten', es: 'Acciones heroicas' },
                     },
                 ]
             },

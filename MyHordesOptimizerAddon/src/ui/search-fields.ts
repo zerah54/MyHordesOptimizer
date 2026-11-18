@@ -12,6 +12,7 @@ import { params_categories } from '../data/params';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
 import type { I18nLabel } from '../types';
+import { isCitizenRowBanned } from '../utils/citizen-banned';
 import { isCitizenLocationOutside } from '../utils/citizen-location';
 import { createCheckboxDropdown, createSingleFilterSelect } from '../utils/dom';
 import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
@@ -764,10 +765,24 @@ function displayFiltersOnCitizenList() {
         filter_container.appendChild(locationCtnr);
         locationSelect.addEventListener('change', triggerFilters);
 
+        // Select : bannissement
+        const { container: bannedCtnr, select: bannedSelect } = createSingleFilterSelect(
+            getI18N(texts.filter_banned_label),
+            `${mho_filter_citizen_list_id}-banned`,
+            [
+                { value: 'all', text: getI18N(texts.filter_all) },
+                { value: 'banned', text: getI18N(texts.filter_banned_yes) },
+                { value: 'not-banned', text: getI18N(texts.filter_banned_no) }
+            ]
+        );
+        filter_container.appendChild(bannedCtnr);
+        bannedSelect.addEventListener('change', triggerFilters);
+
         applyFilters = () => {
             const nameVal = normalizeString(nameInput.value);
             const onlineVal = onlineSelect.value;
             const locationVal = locationSelect.value;
+            const bannedVal = bannedSelect.value;
             const selectedProfs = getSelectedProfessions();
             const selectedLvls = getSelectedHouseLevels();
 
@@ -793,6 +808,7 @@ function displayFiltersOnCitizenList() {
                 const pass = (nameVal === '' || rowName.includes(nameVal))
                     && (onlineVal === 'all' || onlineVal === connectionStatus)
                     && (locationVal === 'all' || (locationVal === 'outside') === isOutside)
+                    && (bannedVal === 'all' || (bannedVal === 'banned') === isCitizenRowBanned(row))
                     && (selectedProfs.length === 0 || selectedProfs.includes(prof))
                     && (selectedLvls.length === 0 || selectedLvls.includes(houseLevel));
 

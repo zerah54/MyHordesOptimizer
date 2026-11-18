@@ -1589,6 +1589,25 @@ body.mho-spoiler-pin-enabled .forum-post-content .spoiler {
         }
     }
 
+    /** Largeur de référence de l'embed imgur (540px) ; hauteurs posées en JS (`setImgurEmbedHeight`) */
+    &.mho-forum-imgur-block .mho-forum-imgur-frame {
+        display: block;
+        width: 540px;
+        max-width: 100%;
+        overflow: hidden;
+        border: 6px double currentColor;
+        border-radius: 4px;
+        margin: 0 auto;
+
+        iframe {
+            display: block;
+            width: 100%;
+            border: none;
+            /** = `imgur_embed_top_bar_height` (forum.ts) : masque la bande du bouton Share */
+            margin-top: -60px;
+        }
+    }
+
     &.mho-forum-video-block {
         iframe, .mho-forum-video-thumbnail {
             display: inline-block;
@@ -1609,6 +1628,16 @@ body.mho-spoiler-pin-enabled .forum-post-content .spoiler {
         iframe {
             display: block;
             width: 100%;
+        }
+
+        /** Lien direct vers un fichier : ratio natif conservé (pas de 16/9 forcé, pour les vidéos verticales) */
+        video {
+            display: block;
+            max-width: 100%;
+            max-height: 70vh;
+            border: 6px double currentColor;
+            border-radius: 4px;
+            margin: 0 auto;
         }
 
         /** Toujours rendue à l'intérieur de `.mho-forum-video-thumbnail`, qui porte déjà taille/bordure/arrondi */
@@ -1965,4 +1994,53 @@ $mho-route-arrow-stroke: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org
     border-radius: 0.25em;
     display: inline-flex;
     align-items: center;
+}
+
+.mho-homes-list {
+    .mho-homes-sortable {
+        cursor: pointer;
+    }
+
+    .mho-homes-name {
+        word-break: break-word;
+
+        // Étoile de héros (ou son emplacement vide) reprise de la liste du jeu : inutile ici.
+        img[src*="professions/hero"], img[src*="professions/void"] {
+            display: none;
+        }
+    }
+
+    // Largeurs fixes : sans elles, le contenu élargit les cellules et les colonnes ne s'alignent plus sur l'en-tête.
+    .mho-homes-value, .mho-homes-update {
+        flex: 0 0 auto;
+        min-width: 0;
+        box-sizing: border-box;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    // Les cellules des lignes sont en flex (`content-center-vertical`) : `text-align` n'y centre plus rien.
+    .mho-homes-value {
+        width: 2.4em;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .mho-homes-house {
+        width: 2.8em;
+    }
+
+    .mho-homes-update {
+        width: 6.5em;
+        text-align: right;
+        justify-content: flex-end;
+    }
+
+    .mho-homes-empty {
+        color: grey;
+    }
+
+    .mho-homes-stale {
+        color: red;
+    }
 }

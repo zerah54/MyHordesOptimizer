@@ -45,6 +45,7 @@ export const mho_forum_thread_styles_key = 'MHO_forum_thread_styles';
 export const mho_anti_abuse_key = 'MHO_anti_abuse';
 /** Fouilles réussies déjà envoyées ce jour-là, par case et citoyen : l'envoi suivant en garde le maximum */
 export const mho_sent_digs_key: string = `MHO_${local_storage_prefix}sent_digs`;
+export const mho_pending_hero_skills_key: string = `MHO_${local_storage_prefix}pending_hero_skills`;
 /** Tracé suivi dans le désert, pour une ville et un jour */
 export const mho_expedition_route_choice_key: string = `MHO_${local_storage_prefix}expedition_route_choice`;
 export const mho_version_key = 'MHO_version';
@@ -82,6 +83,8 @@ export const btn_id = 'optimizer-btn';
 export const content_btn_id = 'optimizer-content-btn';
 export const mh_content_id = 'content';
 export const mh_update_external_tools_id = 'mh-update-external-tools';
+export const mho_foreign_home_update_id = 'mho-foreign-home-update';
+export const mho_hero_skills_update_id = 'mho-hero-skills-update';
 export const mho_warn_missing_logs_id = 'mho-warn-missing-logs';
 export const mho_camping_predict_id = 'mho-camping-predict';
 export const zone_info_zombies_id = 'zone-info-zombies';
@@ -98,6 +101,10 @@ export const mho_search_dump_field_id = 'mho-search-dump-field';
 export const mho_search_registry_field_id = 'mho-search-registry-field';
 export const mho_search_trap_field_id = 'mho-search-trap-field';
 export const mho_filter_citizen_list_id = 'mho-filter-citizen-list';
+export const mho_citizen_homes_id = 'mho-citizen-homes';
+export const mho_citizen_homes_tab_id = 'mho-citizen-homes-tab';
+export const mho_citizen_heroics_id = 'mho-citizen-heroics';
+export const mho_citizen_heroics_tab_id = 'mho-citizen-heroics-tab';
 export const mho_filter_omniscience_id = 'mho-filter-omniscience';
 export const mho_display_translate_input_id = 'mho-display-translate-input';
 export const mho_watchtower_estim_id = 'mho-watchtower-estim';

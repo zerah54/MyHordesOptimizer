@@ -175,6 +175,17 @@ describe('expedition-route', (): void => {
         expect(document.querySelector<HTMLElement>('.mho-expedition-route-swatch').style.backgroundColor).toBe('rgb(70, 214, 224)');
     });
 
+    it('bloc retiré puis recréé (actualisation du jeu) : le contenu est rempli de nouveau', (): void => {
+        routeChoiceMock.mockReturnValue('part:12');
+        buildDesert('Position : 0 / 1');
+        renderExpeditionRoute();
+        document.getElementById(expedition_route_block_id).remove();
+
+        renderExpeditionRoute();
+
+        expect(blockText('.mho-expedition-route-status')).toBe('Follow the route: north ⇧');
+    });
+
     it('case traversée deux fois : consignes groupées par passage, sans ligne « prochaine case »', (): void => {
         routeChoiceMock.mockReturnValue('part:12');
         const cells: { x: number; y: number }[] = [absolute(0, 0), absolute(0, 1), absolute(0, 2), absolute(0, 1), absolute(0, 0)];

@@ -1,4 +1,5 @@
 import { state } from '../state';
+import { type CitizenHomeRow, readCitizenHomeRows } from '../utils/citizen-homes';
 import { fetcher } from '../utils/fetch';
 import { addError } from '../utils/notifications';
 import type { TownCitizenRef } from '../utils/successful-digs-page';
@@ -40,6 +41,18 @@ export async function fetchTownCitizenRefs(): Promise<TownCitizenRef[]> {
         return convertResponsePromiseToError(response);
     }
     return readTownCitizenRefs(await response.json());
+}
+
+/**
+ * Citoyens vivants de la ville avec niveaux de maison et pouvoirs héroïques, lus dans la base MHO
+ * (`GET Fetcher/citizens`, aucun appel à MyHordes). Ne touche pas à `state.citizens`.
+ */
+export async function fetchCitizenHomeRows(): Promise<CitizenHomeRow[]> {
+    const response: Response = await fetcher(`${state.api_url}/Fetcher/citizens?userId=${state.mh_user?.id}&townId=${state.mh_user?.townDetails?.townId}`);
+    if (response.status !== 200) {
+        return convertResponsePromiseToError(response);
+    }
+    return readCitizenHomeRows(await response.json());
 }
 
 /** Lecture défensive de la réponse : une entrée sans identifiant numérique ni pseudo est ignorée */

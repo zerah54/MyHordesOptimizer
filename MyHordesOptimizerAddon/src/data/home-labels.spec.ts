@@ -30,4 +30,13 @@ describe('libellés de maison et d\'actions quotidiennes', (): void => {
         expect(HOME_UPGRADES['chestLevel'].max_lvl).toBe(13);
         expect(DAILY_ACTION_LABELS['trash'].fr).toBe('Fouiller les déchets');
     });
+
+    it('reprend les libellés officiels du jeu, lus tels quels sur la maison d\'un autre citoyen', (): void => {
+        expect(HOUSE_LEVEL_LABELS[7].en).toBe('Bunker');
+        expect(HOUSE_LEVEL_LABELS[7].es).toBe('Búnker');
+        expect(HOUSE_LEVEL_LABELS[8].en).toBe('Castle');
+        expect(HOME_UPGRADES['chestLevel'].label.en).toBe('More Storage');
+        expect(HOME_UPGRADES['laboLevel'].label.en).toBe('Home Laboratory');
+        expect(HOME_UPGRADES['renfortLevel'].label.de).toBe('Verstärkungen');
+    });
 });

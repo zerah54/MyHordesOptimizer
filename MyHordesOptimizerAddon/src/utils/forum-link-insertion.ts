@@ -3,6 +3,48 @@ export interface LinkInsertionPoint {
     position: InsertPosition;
 }
 
+/** Classe commune aux blocs image et vidéo injectés après un lien */
+export const forum_media_block_class: string = 'mho-forum-media-block';
+
+/**
+ * Regroupe un lien avec les liens de même `href` qui le suivent sur la même ligne, séparés
+ * uniquement par des éléments (ex. tag utilisateur) ou des blancs : le jeu coupe ainsi un lien
+ * contenant un tag en plusieurs `<a>`. S'arrête au premier `<br>` ou texte non blanc.
+ */
+export function findSameHrefLinkRun(link: HTMLAnchorElement): HTMLAnchorElement[] {
+    const href: string | null = link.getAttribute('href');
+    const run: HTMLAnchorElement[] = [link];
+
+    let sibling: ChildNode | null = link.nextSibling;
+    while (sibling) {
+        if (sibling instanceof HTMLElement) {
+            if (sibling.tagName === 'BR') break;
+            if (sibling instanceof HTMLAnchorElement && sibling.getAttribute('href') === href) run.push(sibling);
+        } else if ((sibling.textContent ?? '').trim() !== '') {
+            break;
+        }
+        sibling = sibling.nextSibling;
+    }
+
+    return run;
+}
+
+/** Texte affiché du premier au dernier lien d'un groupe, éléments intercalés (tags) compris */
+export function getLinkRunText(run: HTMLAnchorElement[]): string {
+    const range: Range = document.createRange();
+    range.setStartBefore(run[0]);
+    range.setEndAfter(run[run.length - 1]);
+    return range.toString().trim();
+}
+
+/** Retire les blocs média injectés d'un HTML de post, pour qu'ils ne soient pas recopiés par Copier/Citer */
+export function stripForumMediaBlocks(html: string): string {
+    const template: HTMLTemplateElement = document.createElement('template');
+    template.innerHTML = html;
+    template.content.querySelectorAll(`.${forum_media_block_class}`).forEach((block: Element) => block.remove());
+    return template.innerHTML;
+}
+
 /**
  * Repère où poser un bloc après un lien sans jamais quitter son conteneur direct (celui-ci peut
  * être `.forum-post-content` lui-même, mais tout aussi bien un `<blockquote>` de citation ou le
