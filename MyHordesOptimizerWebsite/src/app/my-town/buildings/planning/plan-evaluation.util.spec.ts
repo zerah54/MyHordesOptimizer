@@ -1,9 +1,10 @@
 import { CitizenCapacity } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
+import { RankedCandidate } from './defense.util';
 import { neutralDefenseFactors } from './defense-gain.util';
 import { CEMETERY_UID, COFFINS_UID, DEFENSE_FIXINGS_UID } from './defense-rules.const';
-import { RankedCandidate } from './defense.util';
 import { REACTOR_UID } from './night-survival.util';
+import { BuildingPlanContentDTO, emptyPlanContent, PlanCitizenDTO, PlanStepDTO } from './plan.types';
 import {
     advanceDay,
     BuildingRef,
@@ -18,7 +19,6 @@ import {
     URBANISM_UID,
     WORKSHOP_UID
 } from './plan-evaluation.util';
-import { BuildingPlanContentDTO, emptyPlanContent, PlanCitizenDTO, PlanStepDTO } from './plan.types';
 import { ResourceCount } from './resources.util';
 
 function ref(overrides: Partial<BuildingRef>): BuildingRef {
@@ -409,6 +409,14 @@ describe('plan-evaluation.util', (): void => {
                 buildingLevels: new Map<string, number>([['gate', 1]])
             });
         }
+
+        it('défense du lendemain : celle reportée au jour suivant, sans la défense temporaire', (): void => {
+            const day: DayInput = input({}, { temporaryDefense: 50 });
+            const evaluation: DayEvaluation = evaluateDay(day);
+
+            expect(evaluation.nextDayDefense).toBe(evaluation.projectedDefense - 50);
+            expect(evaluation.nextDayDefense).toBe(advanceDay(evaluation, day).baseDefense);
+        });
 
         it('Brasier construit dans la journée : la seconde évolution compte pour la nuit et le lendemain', (): void => {
             const day: DayInput = pyreInput({ programs: { banned: [], regular: [step(8, 0)] } });

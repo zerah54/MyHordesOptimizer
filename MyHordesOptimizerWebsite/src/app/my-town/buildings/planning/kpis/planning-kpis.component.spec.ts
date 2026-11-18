@@ -51,6 +51,25 @@ describe('PlanningKpisComponent', (): void => {
         expect(defense.querySelector('.gap')?.textContent).toContain('100');
     });
 
+    it('affiche l\'attaque du lendemain et l\'écart avec la défense de demain', async (): Promise<void> => {
+        await render();
+        const tomorrow: () => HTMLElement | null = (): HTMLElement | null => root().querySelector<HTMLElement>('.kpi.defense .tomorrow');
+        expect(tomorrow()).toBeNull();
+
+        fake.tomorrow.set({ refined: false, min: 900, max: 1300, gap: 150 });
+        fixture.detectChanges();
+        expect(tomorrow()?.getAttribute('data-state')).toBe('gap');
+        expect(tomorrow()?.textContent).toContain('900');
+        expect(tomorrow()?.textContent).toContain('1300');
+        expect(tomorrow()?.textContent).toContain('150');
+
+        fake.tomorrow.set({ refined: true, min: 1000, max: 1000, gap: -20 });
+        fixture.detectChanges();
+        expect(tomorrow()?.getAttribute('data-state')).toBe('surplus');
+        expect(tomorrow()?.textContent).not.toContain('–');
+        expect(tomorrow()?.textContent).toContain('20');
+    });
+
     it('affiche les PA restants de chaque poche, négatifs en évidence', async (): Promise<void> => {
         await render({ ...emptyPlanContent(), basePa: 0, programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0 }] } });
 

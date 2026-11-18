@@ -20,6 +20,7 @@ import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { errorInterceptor } from '../../../_core/services/errors-interceptor.service';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
+import { getMaxAttack } from '../../../_core/utilities/estimations.util';
 import { setObservedTown, setTown, setUser } from '../../../_core/utilities/localstorage.util';
 import { simulatedCitizens } from '../../../pre-town/simulated-citizens.util';
 import {
@@ -31,7 +32,7 @@ import {
     PlanTaskDTO,
     TownBuildingStateDTO
 } from './plan.types';
-import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
+import { BuildingRef, DayEvaluation, URBANISM_UID } from './plan-evaluation.util';
 import { AUTOSAVE_DELAY_MS, AUTOSAVE_MAX_WAIT_MS, PlanningStore } from './planning.store';
 import { ToggleContext } from './program-edit.util';
 import { TaskCheckService } from './task-check.service';
@@ -896,7 +897,7 @@ describe('PlanningStore', (): void => {
         expect(save_settings).not.toHaveBeenCalled();
     });
 
-    it('selectDay charge les jours manquants une seule fois et chaîne les jours intermédiaires', (): void => {
+    it('selectDay charge les jours manquants une seule fois et chaîne les jours intermédiaires jusqu\'au lendemain',(): void => {
         const next_day_plan: BuildingPlanDTO = plan({
             id: 8, day: TODAY + 1, version: 1,
             content: { ...emptyPlanContent(), programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', targetRemaining: 10 }] } }
@@ -907,7 +908,7 @@ describe('PlanningStore', (): void => {
         store.selectDay(TODAY + 2);
         store.selectDay(TODAY + 2);
 
-        expect(load_day.mock.calls.map((call: [number]): number => call[0]).sort()).toEqual([TODAY + 1, TODAY + 2]);
+        expect(load_day.mock.calls.map((call: [number]): number => call[0]).sort()).toEqual([TODAY + 2, TODAY + 3]);
         expect(store.selected_plan()).toBeNull();
         expect(store.evaluation()).toBeNull();
     });
@@ -2000,6 +2001,24 @@ describe('PlanningStore', (): void => {
             expect(store.evaluation()).toBeNull();
             expect(store.can_validate_budget()).toBe(false);
             expect(store.budget_diff()).toBeNull();
+        });
+    });
+
+    describe('attaque du lendemain', (): void => {
+        it('affinage du lendemain chargé et comparé à la défense de demain', (): void => {
+            store = create();
+
+            expect(load_day).toHaveBeenCalledWith(TODAY + 1);
+            const evaluation: DayEvaluation | null = store.evaluation();
+            expect(store.tomorrow()).toEqual({ refined: true, min: 1000 + TODAY + 1, max: 1000 + TODAY + 1, gap: 1000 + TODAY + 1 - (evaluation?.nextDayDefense ?? 0) });
+        });
+
+        it('sans affinage du lendemain : fourchette théorique du jeu', (): void => {
+            load_day.mockImplementation((day: number): Observable<PlanningDay> => of({ expeditions: [], attack: day === TODAY ? 1000 : null }));
+            store = create();
+
+            expect(store.tomorrow()?.refined).toBe(false);
+            expect(store.tomorrow()?.max).toBe(getMaxAttack(TODAY + 1, 'RNE'));
         });
     });
 

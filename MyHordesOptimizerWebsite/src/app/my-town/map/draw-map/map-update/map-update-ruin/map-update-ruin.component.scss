@@ -3,11 +3,10 @@
 
     .mho-map-update-ruin {
         .drops {
-            display: flex;
-            flex-wrap: wrap;
+            column-count: 2;
 
             > div {
-                width: 50%;
+                break-inside: avoid;
                 white-space: nowrap;
             }
         }

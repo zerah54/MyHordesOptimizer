@@ -132,6 +132,8 @@ export interface DayEvaluation {
     attack: number | null;
     target: number | null;
     projectedDefense: number;
+    /** Défense de départ du lendemain : sans défense temporaire ni chantiers tombés ou détruits cette nuit. */
+    nextDayDefense: number;
     defenseGap: number | null;
     freeThresholds: Map<number, number>;
     ranking: RankedCandidate[];
@@ -237,7 +239,7 @@ export function evaluateDay(input: DayInput): DayEvaluation {
     });
     const attack: number | null = content.attackOverride ?? input.attack;
 
-    return {
+    const evaluation: Omit<DayEvaluation, 'nextDayDefense'> = {
         workshopLevel: input.workshopLevel,
         hasSlavery: input.hasSlavery,
         results,
@@ -265,6 +267,7 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         homeWorkPa: content.citizens.reduce((sum: number, entry: PlanCitizenDTO): number =>
             sum + tasksPa(entry.tasks.filter((task: PlanTaskDTO): boolean => task.kind === 'home' || task.kind === 'homeUpgrade')), 0)
     };
+    return { ...evaluation, nextDayDefense: advanceDay(evaluation, input).baseDefense };
 }
 
 /**
@@ -404,11 +407,11 @@ function pendingBuildings(input: DayInput, completed_ids: readonly number[]): Bu
 
 /**
  * Valeurs à reporter au jour suivant : avancement, niveau d'atelier (vote du soir), BDE et défense de départ.
- * @param {DayEvaluation} evaluation Évaluation du jour qui se termine.
+ * @param {Omit<DayEvaluation, 'nextDayDefense'>} evaluation Évaluation du jour qui se termine.
  * @param {DayInput} input Entrée du jour qui se termine.
  * @returns {CarriedState} État de départ du lendemain.
  */
-export function advanceDay(evaluation: DayEvaluation, input: DayInput): CarriedState {
+export function advanceDay(evaluation: Omit<DayEvaluation, 'nextDayDefense'>, input: DayInput): CarriedState {
     const votes: EveningVote[] = [evaluation.vote, evaluation.secondVote].filter((vote: EveningVote | null): vote is EveningVote => vote !== null);
     const voted_workshop: boolean = votes.some((vote: EveningVote): boolean => vote.uid === WORKSHOP_UID);
     const slavery_built: boolean = builtInEvening(evaluation.progressAfter, input.buildings, SLAVERY_UID);

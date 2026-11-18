@@ -22,6 +22,7 @@ import { bannedPoolForced, bannedPoolShown } from './budget.util';
 import { BudgetDiff, budgetDiff, snapshotBudget } from './budget-diff.util';
 import { BuildingProgress } from './building-progress.util';
 import { BuildingUpgradesDTO } from './building-upgrades.types';
+import { TomorrowCoverage,tomorrowCoverage } from './defense.util';
 import { HomeUpgradeRef, homeUpgradeRefs } from './home-upgrades.util';
 import { KeyedDebounce } from './keyed-debounce.util';
 import {
@@ -342,6 +343,16 @@ export class PlanningStore {
         );
         const evaluations: DayEvaluation[] = evaluateDays(inputs);
         return evaluations[evaluations.length - 1] ?? null;
+    });
+
+    /** Attaque du lendemain (affinage, sinon fourchette théorique) face à la défense de demain ; nul sans évaluation. */
+    public readonly tomorrow: Signal<TomorrowCoverage | null> = computed((): TomorrowCoverage | null => {
+        const evaluation: DayEvaluation | null = this.evaluation();
+        if (evaluation === null) {
+            return null;
+        }
+        const next_day: number = this._selected_day() + 1;
+        return tomorrowCoverage(evaluation.nextDayDefense, this.loaded_days().get(next_day)?.attack ?? null, next_day, getTown()?.town_type ?? 'RE');
     });
 
     /** BDE construit au jour affiché ; un jour passé n'a pas d'évaluation et lit l'état synchronisé. */
@@ -690,8 +701,12 @@ export class PlanningStore {
         }
     }
 
+    /**
+     * Charge les données des jours d'aujourd'hui jusqu'au lendemain du jour donné (attaque du lendemain).
+     * @param {number} day Dernier jour affiché.
+     */
     private ensureDaysLoaded(day: number): void {
-        for (let current: number = this.current_day; current <= day; current++) {
+        for (let current: number = this.current_day; current <= day + 1; current++) {
             if (this.requested_days.has(current)) {
                 continue;
             }

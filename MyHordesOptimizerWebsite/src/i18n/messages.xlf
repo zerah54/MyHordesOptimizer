@@ -2069,6 +2069,9 @@
             <trans-unit id="8990629910323339983" datatype="html">
                 <source>Fermer l&apos;éditeur</source>
             </trans-unit>
+            <trans-unit id="8991101699648603906" datatype="html">
+                <source>Demain : attaque</source>
+            </trans-unit>
             <trans-unit id="8991308190521486230" datatype="html">
                 <source>Alertes</source>
             </trans-unit>
@@ -4201,6 +4204,9 @@
             </trans-unit>
             <trans-unit id="4378147649219625174" datatype="html">
                 <source>Zone</source>
+            </trans-unit>
+            <trans-unit id="4378742234231982508" datatype="html">
+                <source>(théorique)</source>
             </trans-unit>
             <trans-unit id="4209980706371465802" datatype="html">
                 <source>Quantité souhaitée</source>

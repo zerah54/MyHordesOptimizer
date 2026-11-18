@@ -34,13 +34,14 @@
                    d'elles-mêmes : pas de `space-between`, qui écartait les objets d'une même
                    ligne jusqu'à ce qu'on ne sache plus quel taux allait avec quelle icône. */
                 > .drops-list {
-                    display: flex;
-                    flex-wrap: wrap;
-                    align-items: center;
-                    gap: 4px 6px;
+                    column-width: 110px;
+                    column-gap: 6px;
 
                     .drop {
-                        display: inline-flex;
+                        display: flex;
+                        width: fit-content;
+                        break-inside: avoid;
+                        margin-bottom: 4px;
                         align-items: center;
                         gap: 4px;
                         padding: 1px 6px 1px 3px;

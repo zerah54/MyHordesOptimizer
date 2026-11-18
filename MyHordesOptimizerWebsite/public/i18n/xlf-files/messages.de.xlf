@@ -1106,6 +1106,10 @@
                 <source>Zone</source>
                 <target state="final">Zone</target>
             </trans-unit>
+            <trans-unit id="4378742234231982508" datatype="html">
+                <source>(théorique)</source>
+                <target state="translated">(theoretisch)</target>
+            </trans-unit>
             <trans-unit id="4819076195461123852" datatype="html" approved="yes">
                 <source>Moyenne</source>
                 <target state="final">Mittel</target>
@@ -1637,6 +1641,10 @@
             <trans-unit id="8990629910323339983" datatype="html">
                 <source>Fermer l&apos;éditeur</source>
                 <target state="translated">Editor schließen</target>
+            </trans-unit>
+            <trans-unit id="8991101699648603906" datatype="html">
+                <source>Demain : attaque</source>
+                <target state="translated">Morgen: Angriff</target>
             </trans-unit>
             <trans-unit id="8991308190521486230" datatype="html">
                 <source>Alertes</source>

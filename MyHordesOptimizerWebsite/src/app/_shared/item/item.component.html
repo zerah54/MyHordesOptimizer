@@ -57,11 +57,11 @@
                                 <strong>{{ dig.out_of | number:'1.0-0':locale }}</strong>
                             </div>
                             <div class="dig-bar" role="img"
-                                 [attr.aria-label]="(dig.percent | number:'1.0-2':locale) + ' % par fouille réussie'">
+                                 [attr.aria-label]="(dig.percent | number:'1.3-3':locale) + ' % par fouille réussie'">
                                 <span [style.width.%]="dig.bar"></span>
                             </div>
                             <div class="dig-detail">
-                                {{ dig.percent | number:'1.0-2':locale }} %
+                                {{ dig.percent | number:'1.3-3':locale }} %
                                 @if (dig.praf) {
                                     <ng-container i18n>par fouille réussie sur une zone épuisée</ng-container>
                                 } @else {

@@ -1,4 +1,5 @@
-import { defenseGap, projectedDefense, rankByDefPerPa, RankCandidate, RankedCandidate } from './defense.util';
+import { getMaxAttack, getMinAttack } from '../../../_core/utilities/estimations.util';
+import { defenseGap, projectedDefense, rankByDefPerPa, RankCandidate, RankedCandidate, tomorrowCoverage } from './defense.util';
 
 describe('defense.util', (): void => {
     it('projectedDefense additionne la base, les chantiers, les réparations, les maisons et les sources', (): void => {
@@ -54,6 +55,16 @@ describe('defense.util', (): void => {
                 { label: 'A', kind: 'building', def: 10, pa: 10, resources: [] }
             ], values);
             expect(ranked.map((r: RankedCandidate): string => r.label)).toEqual(['A', 'B']);
+        });
+    });
+
+    it('tomorrowCoverage : affinage du lendemain s\'il existe, écart face à lui', (): void => {
+        expect(tomorrowCoverage(800, 850, 5, 'RE')).toEqual({ refined: true, min: 850, max: 850, gap: 50 });
+    });
+
+    it('tomorrowCoverage : sans affinage, fourchette théorique du jeu, écart face au max', (): void => {
+        expect(tomorrowCoverage(800, null, 5, 'RNE')).toEqual({
+            refined: false, min: getMinAttack(5, 'RNE'), max: getMaxAttack(5, 'RNE'), gap: getMaxAttack(5, 'RNE') - 800
         });
     });
 });

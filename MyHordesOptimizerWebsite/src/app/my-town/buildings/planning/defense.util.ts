@@ -1,3 +1,5 @@
+import { TownTypeId } from '../../../_abstract_model/types/_types';
+import { getMaxAttack, getMinAttack } from '../../../_core/utilities/estimations.util';
 import { ResourceCount } from './resources.util';
 
 /** Éléments qui composent la défense projetée d'une journée. */
@@ -90,4 +92,26 @@ export function rankByDefPerPa(candidates: RankCandidate[], itemValues: Readonly
         }
         return rank_a > rank_b ? -1 : 1;
     });
+}
+
+/** Attaque du lendemain (affinée, sinon fourchette théorique) et écart face à son maximum : positif = reste à couvrir. */
+export interface TomorrowCoverage {
+    refined: boolean;
+    min: number;
+    max: number;
+    gap: number;
+}
+
+/**
+ * Couverture de l'attaque du lendemain par la défense de demain.
+ * @param {number} defense Défense de demain.
+ * @param {number | null} refined Attaque affinée du lendemain, nulle si aucun affinage.
+ * @param {number} day Jour du lendemain.
+ * @param {TownTypeId} town_type Type de ville (fourchette théorique).
+ * @returns {TomorrowCoverage} Attaque retenue et écart.
+ */
+export function tomorrowCoverage(defense: number, refined: number | null, day: number, town_type: TownTypeId): TomorrowCoverage {
+    const min: number = refined ?? getMinAttack(day, town_type);
+    const max: number = refined ?? getMaxAttack(day, town_type);
+    return { refined: refined !== null, min, max, gap: max - defense };
 }

@@ -14,6 +14,7 @@ import { bannedPoolForced, bannedPoolShown } from './budget.util';
 import { BudgetDiff } from './budget-diff.util';
 import { BuildingProgress } from './building-progress.util';
 import { BuildingUpgradesDTO } from './building-upgrades.types';
+import { TomorrowCoverage } from './defense.util';
 import { neutralDefenseFactors } from './defense-gain.util';
 import { HomeUpgradeRef } from './home-upgrades.util';
 import { KeyedDebounce } from './keyed-debounce.util';
@@ -125,6 +126,7 @@ export interface FakePlanningStore {
     store: PlanningStore;
     draft: WritableSignal<BuildingPlanContentDTO | null>;
     evaluation: WritableSignal<DayEvaluation | null>;
+    tomorrow: WritableSignal<TomorrowCoverage | null>;
     budget_diff: WritableSignal<BudgetDiff | null>;
     can_validate_budget: WritableSignal<boolean>;
     can_edit: WritableSignal<boolean>;
@@ -171,6 +173,7 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
     const fake: Omit<FakePlanningStore, 'store' | 'actions' | 'updateDraft'> = {
         draft,
         evaluation: signal<DayEvaluation | null>(fakeEvaluation(content)),
+        tomorrow: signal<TomorrowCoverage | null>(null),
         budget_diff: signal<BudgetDiff | null>(null),
         can_validate_budget: signal(true),
         can_edit: signal(true),

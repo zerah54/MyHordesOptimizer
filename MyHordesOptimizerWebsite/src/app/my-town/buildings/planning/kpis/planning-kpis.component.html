@@ -31,6 +31,23 @@
                     </button>
                 }
             </span>
+            @if (store.tomorrow(); as tomorrow) {
+                <span class="sub tomorrow" [attr.data-state]="tomorrow.gap > 0 ? 'gap' : 'surplus'">
+                    <ng-container i18n>Demain : attaque</ng-container>
+                    @if (tomorrow.refined) {
+                        {{ tomorrow.max }}
+                    } @else {
+                        {{ tomorrow.min }}&nbsp;–&nbsp;{{ tomorrow.max }}
+                        <ng-container i18n>(théorique)</ng-container>
+                    }
+                    ·
+                    @if (tomorrow.gap > 0) {
+                        <ng-container i18n>Reste à couvrir</ng-container> {{ tomorrow.gap }}
+                    } @else {
+                        <ng-container i18n>Surplus</ng-container> {{ -tomorrow.gap }}
+                    }
+                </span>
+            }
         </div>
 
         @if (!flat()) {
