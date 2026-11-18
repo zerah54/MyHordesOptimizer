@@ -4976,6 +4976,9 @@
             <trans-unit id="3131499204058979166" datatype="html">
                 <source>Pandémonium</source>
             </trans-unit>
+            <trans-unit id="406246734239119077" datatype="html">
+                <source>Programmes</source>
+            </trans-unit>
             <trans-unit id="4068382494466269539" datatype="html">
                 <source>La liste est impactée par la distance choisie</source>
             </trans-unit>

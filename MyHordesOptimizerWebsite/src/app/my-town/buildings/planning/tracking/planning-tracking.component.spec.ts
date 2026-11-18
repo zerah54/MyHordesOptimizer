@@ -109,6 +109,18 @@ describe('PlanningTrackingComponent', (): void => {
         expect(root().querySelector('.summary')?.textContent).toContain('0');
     });
 
+    it('en-têtes Banni et Goule : icônes du jeu avec libellé en infobulle', async (): Promise<void> => {
+        await render();
+
+        const banned: HTMLImageElement | null = root().querySelector<HTMLImageElement>('thead th[data-col="banned"] img');
+        const ghoul: HTMLImageElement | null = root().querySelector<HTMLImageElement>('thead th[data-col="ghoul"] img');
+        expect(banned?.getAttribute('src')).toContain('emotes/ban.gif');
+        expect(banned?.getAttribute('alt')).toBe('Banni');
+        expect(ghoul?.getAttribute('src')).toContain('emotes/ghoul.gif');
+        expect(ghoul?.getAttribute('alt')).toBe('Goule');
+        expect(banned?.hasAttribute('width')).toBe(false);
+    });
+
     it('colonnes d\'habitation : niveau d\'habitation puis améliorations, masquables sur petit écran', async (): Promise<void> => {
         await render();
 
@@ -607,7 +619,7 @@ describe('PlanningTrackingComponent', (): void => {
             expect(fake.draft()?.expeditionRab).toBe(0);
         });
 
-        it("le rab d'expé global est plafonné à 100000", async (): Promise<void> => {
+        it('le rab d\'expé global est plafonné à 100000', async (): Promise<void> => {
             await render({ ...content(), budgetMode: 'simple' });
             vi.useFakeTimers();
 

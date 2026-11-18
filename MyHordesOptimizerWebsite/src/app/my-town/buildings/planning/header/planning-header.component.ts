@@ -107,16 +107,16 @@ export class PlanningHeaderComponent {
         }
     }
 
-    /** Copie dans le jour affiché la proposition d'un autre jour (choisi dans la boîte), sous un nouveau nom. */
+    /** Remplace les parties cochées de la proposition affichée par celles d'un autre jour (choisi dans la boîte). */
     protected copyFromDay(): void {
         this.askDayAndName($localize`Copier depuis le jour`, (result: PlanningCopyDayDialogResult): void =>
-            this.store.copyPlanBetweenDays(result.day, this.store.selected_day(), result.name));
+            this.store.copyPlanFromDay(result.day, result.parts), false, true);
     }
 
     /** Copie la proposition du jour affiché vers un autre jour (choisi dans la boîte), sous un nouveau nom. */
     protected copyToDay(): void {
         this.askDayAndName($localize`Copier vers le jour`, (result: PlanningCopyDayDialogResult): void =>
-            this.store.copyPlanBetweenDays(this.store.selected_day(), result.day, result.name), true);
+            this.store.copyPlanBetweenDays(this.store.selected_day(), result.day, result.name), true, false);
     }
 
     /** Supprime la proposition affichée après confirmation (elle est partagée par toute la ville). */
@@ -156,17 +156,18 @@ export class PlanningHeaderComponent {
     }
 
     /**
-     * Demande un jour et un nom puis applique l'action ; une boîte annulée ne fait rien.
+     * Demande un jour et un nom (ou les parties à copier) puis applique l'action ; une boîte annulée ne fait rien.
      * @param {string} title Titre de la boîte.
      * @param {(result: PlanningCopyDayDialogResult) => void} apply Action à appliquer.
      * @param {boolean} future_only Ne propose que les jours à partir d'aujourd'hui (cible d'une copie).
+     * @param {boolean} ask_parts Demande les parties à copier au lieu du nom.
      */
-    private askDayAndName(title: string, apply: (result: PlanningCopyDayDialogResult) => void, future_only: boolean = false): void {
+    private askDayAndName(title: string, apply: (result: PlanningCopyDayDialogResult) => void, future_only: boolean, ask_parts: boolean): void {
         const plan: BuildingPlanDTO | null = this.store.selected_plan();
         const today: number = this.store.current_day;
         const days: number[] = future_only ? this.store.days().filter((day: number): boolean => day >= today) : this.store.days();
         const data: PlanningCopyDayDialogData = {
-            title, name: plan === null ? '' : $localize`${plan.name}:name: (copie)`, day: Math.max(this.store.selected_day(), future_only ? today : 0), days, today
+            title, name: plan === null ? '' : $localize`${plan.name}:name: (copie)`, day: Math.max(this.store.selected_day(), future_only ? today : 0), days, today, askParts: ask_parts
         };
         this.dialog.open<PlanningCopyDayDialogComponent, PlanningCopyDayDialogData, PlanningCopyDayDialogResult>(PlanningCopyDayDialogComponent, { data, width: '24rem', maxWidth: '95vw' })
             .afterClosed()

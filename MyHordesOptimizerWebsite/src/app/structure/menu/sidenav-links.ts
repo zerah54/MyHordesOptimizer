@@ -67,7 +67,7 @@ export function buildSidenavLinks(town_context: TownContextService, program_menu
                     townSuffix: 'nightwatch',
                     displayed: true,
                     lvl: 1,
-                    authorized: (): boolean => isInTown() && !environment.production,
+                    authorized: (): boolean => isInTown(),
                     spoil: false
                 },
                 {

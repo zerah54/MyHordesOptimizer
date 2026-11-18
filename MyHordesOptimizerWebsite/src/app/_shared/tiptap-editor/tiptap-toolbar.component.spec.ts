@@ -1,8 +1,6 @@
 import { TestbedHarnessEnvironment } from '@angular/cdk/testing/testbed';
-import { ANIMATION_MODULE_TYPE, ChangeDetectionStrategy, Component } from '@angular/core';
+import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatMenuHarness } from '@angular/material/menu/testing';
 import { MatSelectHarness } from '@angular/material/select/testing';
 import { MatTabGroupHarness } from '@angular/material/tabs/testing';
@@ -22,19 +20,6 @@ import { of } from 'rxjs';
 import { ApiService } from '../../_abstract_model/services/api.service';
 import { Item } from '../../_abstract_model/types/item.class';
 import { TiptapToolbarComponent } from './tiptap-toolbar.component';
-
-/** Reproduit l'usage reel : la toolbar est rendue a l'interieur du mat-form-field hote (cf. tiptap-editor.component). */
-@Component({
-    template: `<mat-form-field style="display: block; width: 500px">
-        <input matInput style="display: none">
-        <mho-tiptap-toolbar [editor]="editor"></mho-tiptap-toolbar>
-    </mat-form-field>`,
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatFormFieldModule, MatInputModule, TiptapToolbarComponent]
-})
-class HostFormFieldComponent {
-    public editor!: Editor;
-}
 
 function fakeItem(uid: string, img: string, label: string): Item {
     const item: Item = new Item();
@@ -135,30 +120,6 @@ describe('TiptapToolbarComponent', (): void => {
         fixture.debugElement.query(By.css('[data-action="align-center"]')).nativeElement.click();
 
         expect(editor.isActive({ textAlign: 'center' })).toBe(true);
-    });
-
-    // jsdom ne calcule aucun layout réel : getBoundingClientRect() renvoie toujours 0 pour tous les
-    // éléments (overlay comme mat-form-field), rendant la comparaison de largeurs sans objet ici.
-    // Ce test vérifie un comportement CSS réel (non-régression sur le redimensionnement de
-    // l'overlay) qui nécessite un vrai moteur de rendu — à réactiver si un mode navigateur réel
-    // est un jour configuré pour Vitest (options `browsers`/`runner: 'vitest', browsers: [...]`).
-    it.skip('does not size the select overlay panel to an ancestor mat-form-field', async (): Promise<void> => {
-        await TestBed.configureTestingModule({
-            imports: [HostFormFieldComponent],
-            providers: [{ provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }, { provide: ApiService, useValue: { getItems: (): unknown => of(FAKE_ITEMS) } }]
-        }).compileComponents();
-        const hostFixture: ComponentFixture<HostFormFieldComponent> = TestBed.createComponent(HostFormFieldComponent);
-        hostFixture.componentInstance.editor = editor;
-        hostFixture.detectChanges();
-
-        const loader = TestbedHarnessEnvironment.loader(hostFixture);
-        const select: MatSelectHarness = await loader.getHarness(MatSelectHarness.with({ selector: '[data-action="heading"]' }));
-        await select.open();
-
-        const overlayWidth: number = document.querySelector('.cdk-overlay-pane')!.getBoundingClientRect().width;
-        const formFieldWidth: number = hostFixture.nativeElement.querySelector('mat-form-field').getBoundingClientRect().width;
-
-        expect(overlayWidth).toBeLessThan(formFieldWidth);
     });
 
     it('sets the heading level from the heading select', async (): Promise<void> => {

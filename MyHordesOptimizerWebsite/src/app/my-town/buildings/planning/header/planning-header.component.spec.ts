@@ -152,16 +152,19 @@ describe('PlanningHeaderComponent', (): void => {
 
     it('le menu copie depuis / vers un jour avec les bons jours', async (): Promise<void> => {
         await render();
-        open.mockReturnValue({ afterClosed: (): unknown => of({ day: 12, name: 'Copie' }) });
+        open.mockReturnValue({ afterClosed: (): unknown => of({ day: 12, name: 'Copie', parts: { budget: true, programs: false } }) });
 
         button('plan-menu')?.click();
         fixture.detectChanges();
         menuItem('copy-from-day')?.click();
-        expect(fake.actions['copyPlanBetweenDays']).toHaveBeenCalledWith(12, 10, 'Copie');
+        expect(open.mock.calls[0][1].data.askParts).toBe(true);
+        expect(fake.actions['copyPlanFromDay']).toHaveBeenCalledWith(12, { budget: true, programs: false });
+        expect(fake.actions['copyPlanBetweenDays']).not.toHaveBeenCalled();
 
         button('plan-menu')?.click();
         fixture.detectChanges();
         menuItem('copy-to-day')?.click();
+        expect(open.mock.calls[1][1].data.askParts).toBe(false);
         expect(fake.actions['copyPlanBetweenDays']).toHaveBeenLastCalledWith(10, 12, 'Copie');
     });
 
@@ -180,7 +183,7 @@ describe('PlanningHeaderComponent', (): void => {
         expect(open.mock.calls[1][1].data.days).toEqual([8, 10, 11]);
     });
 
-    it("« depuis » est désactivé sur un jour passé, « vers » reste disponible", async (): Promise<void> => {
+    it('« depuis » est désactivé sur un jour passé, « vers » reste disponible', async (): Promise<void> => {
         await render();
         fake.selected_day.set(9);
         button('plan-menu')?.click();

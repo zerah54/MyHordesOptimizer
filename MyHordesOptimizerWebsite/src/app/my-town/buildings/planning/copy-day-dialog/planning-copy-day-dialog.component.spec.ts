@@ -9,7 +9,7 @@ describe('PlanningCopyDayDialogComponent', (): void => {
     let fixture: ComponentFixture<PlanningCopyDayDialogComponent>;
     let close: Mock<(result?: unknown) => void>;
 
-    const data: PlanningCopyDayDialogData = { title: 'Copier vers le jour', name: 'Plan A (copie)', day: 10, days: [10, 11, 12], today: 10 };
+    const data: PlanningCopyDayDialogData = { title: 'Copier vers le jour', name: 'Plan A (copie)', day: 10, days: [10, 11, 12], today: 10, askParts: false };
 
     async function render(value: PlanningCopyDayDialogData): Promise<void> {
         close = vi.fn();
@@ -56,7 +56,7 @@ describe('PlanningCopyDayDialogComponent', (): void => {
 
         submit().click();
 
-        expect(close).toHaveBeenCalledWith({ day: 11, name: 'Copie' });
+        expect(close).toHaveBeenCalledWith({ day: 11, name: 'Copie', parts: { budget: true, programs: true } });
     });
 
     it('le sélecteur de jour a un nom accessible', async (): Promise<void> => {
@@ -69,5 +69,35 @@ describe('PlanningCopyDayDialogComponent', (): void => {
         await render({ ...data, name: '' });
 
         expect(submit().disabled).toBe(true);
+    });
+
+    describe('choix des parties', (): void => {
+        function part(name: string): HTMLInputElement {
+            return root().querySelector<HTMLInputElement>(`[data-field="${name}"] input`) as HTMLInputElement;
+        }
+
+        it('sans nom, budget et programmes cochés par défaut ; valide avec les parties choisies', async (): Promise<void> => {
+            await render({ ...data, name: '', askParts: true });
+
+            expect(input()).toBeNull();
+            expect(part('budget').checked).toBe(true);
+            expect(part('programs').checked).toBe(true);
+
+            part('budget').click();
+            fixture.detectChanges();
+            submit().click();
+
+            expect(close).toHaveBeenCalledWith({ day: 10, name: '', parts: { budget: false, programs: true } });
+        });
+
+        it('aucune partie cochée désactive la validation', async (): Promise<void> => {
+            await render({ ...data, name: '', askParts: true });
+
+            part('budget').click();
+            part('programs').click();
+            fixture.detectChanges();
+
+            expect(submit().disabled).toBe(true);
+        });
     });
 });

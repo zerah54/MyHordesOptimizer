@@ -37,7 +37,7 @@ import {
     ValidatedBudgetDTO
 } from './plan.types';
 import { PlanAlert, planAlerts } from './plan-alerts.util';
-import { contentForCopy } from './plan-copy.util';
+import { contentForCopy, CopyParts, mergeCopiedParts } from './plan-copy.util';
 import { BuildingRef, CitizenRef, DayEvaluation, evaluateDays, homeCosts, HomeLevelRef, URBANISM_UID } from './plan-evaluation.util';
 import { buildDayInputs } from './plan-inputs.util';
 import { bankMap, buildingRefs, builtUidsOf, citizenRefs, hasSlaveryOf, homeLevelRefs, itemValueMap } from './planning-data.util';
@@ -473,21 +473,27 @@ export class PlanningStore {
         if (to_day < this.current_day) {
             return;
         }
-        let source: BuildingPlanContentDTO | null;
-        if (from_day === this._selected_day()) {
-            this.flushEdits();
-            source = this._draft() ?? this.selected_plan()?.content ?? null;
-        } else {
-            const of_day: BuildingPlanDTO[] = (this.plans_dto()?.plans ?? []).filter((plan: BuildingPlanDTO): boolean => plan.day === from_day);
-            source = (of_day.find((plan: BuildingPlanDTO): boolean => plan.isEffective) ?? of_day[0])?.content ?? null;
+        const copied: BuildingPlanContentDTO | null = this.copySource(from_day);
+        if (copied !== null) {
+            this.addPlan(name.slice(0, 64), copied, to_day);
         }
-        if (source === null) {
+    }
+
+    /**
+     * Remplace les parties choisies de la proposition affichée par celles d'un autre jour, hors chantiers déjà construits.
+     * @param {number} from_day Jour source : sa proposition effective, sinon la première ; sans proposition, rien n'est copié.
+     * @param {CopyParts} parts Parties à copier ; aucune = rien ne change.
+     */
+    public copyPlanFromDay(from_day: number, parts: CopyParts): void {
+        if (!parts.budget && !parts.programs) {
             return;
         }
-        const built_ids: Set<number> = new Set<number>((this.static_data()?.state.buildings ?? [])
-            .filter((state: TownBuildingStateDTO): boolean => state.isBuilt)
-            .map((state: TownBuildingStateDTO): number => state.buildingId));
-        this.addPlan(name.slice(0, 64), contentForCopy(source, built_ids), to_day);
+        const copied: BuildingPlanContentDTO | null = this.copySource(from_day);
+        if (copied !== null) {
+            this.updateDraft((content: BuildingPlanContentDTO): void => {
+                Object.assign(content, mergeCopiedParts(content, copied, parts));
+            });
+        }
     }
 
     /** Supprime la proposition sélectionnée, après avoir pris la main (un refus n'envoie rien). */
@@ -723,6 +729,29 @@ export class PlanningStore {
      * @param {BuildingPlanContentDTO} content Contenu.
      * @param {number} day Jour de la proposition (le jour sélectionné par défaut) ; affiché s'il diffère.
      */
+    /**
+     * Contenu à copier depuis un jour : copie de travail pour le jour affiché, sinon proposition effective (ou la première) de ce jour.
+     * @param {number} from_day Jour source.
+     * @returns {BuildingPlanContentDTO | null} Contenu prêt à copier, nul sans proposition.
+     */
+    private copySource(from_day: number): BuildingPlanContentDTO | null {
+        let source: BuildingPlanContentDTO | null;
+        if (from_day === this._selected_day()) {
+            this.flushEdits();
+            source = this._draft() ?? this.selected_plan()?.content ?? null;
+        } else {
+            const of_day: BuildingPlanDTO[] = (this.plans_dto()?.plans ?? []).filter((plan: BuildingPlanDTO): boolean => plan.day === from_day);
+            source = (of_day.find((plan: BuildingPlanDTO): boolean => plan.isEffective) ?? of_day[0])?.content ?? null;
+        }
+        if (source === null) {
+            return null;
+        }
+        const built_ids: Set<number> = new Set<number>((this.static_data()?.state.buildings ?? [])
+            .filter((state: TownBuildingStateDTO): boolean => state.isBuilt)
+            .map((state: TownBuildingStateDTO): number => state.buildingId));
+        return contentForCopy(source, built_ids);
+    }
+
     private addPlan(name: string, content: BuildingPlanContentDTO, day: number = this._selected_day()): void {
         if (!this.can_write() || this.creating) {
             return;

@@ -22,7 +22,6 @@ import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { setObservedTown, setTown, setUser } from '../../../_core/utilities/localstorage.util';
 import { simulatedCitizens } from '../../../pre-town/simulated-citizens.util';
-import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
 import {
     BuildingPlanContentDTO,
     BuildingPlanDTO,
@@ -32,6 +31,7 @@ import {
     PlanTaskDTO,
     TownBuildingStateDTO
 } from './plan.types';
+import { BuildingRef, URBANISM_UID } from './plan-evaluation.util';
 import { AUTOSAVE_DELAY_MS, AUTOSAVE_MAX_WAIT_MS, PlanningStore } from './planning.store';
 import { ToggleContext } from './program-edit.util';
 import { TaskCheckService } from './task-check.service';
@@ -2077,6 +2077,36 @@ describe('PlanningStore', (): void => {
             store.copyPlanBetweenDays(TODAY, TODAY + 1, 'Copie');
 
             expect(save_plan.mock.calls[0][0].content.instructions).toBe('En attente');
+        });
+
+        it('depuis un jour : remplace les parties choisies de la proposition affichée, sans en créer', (): void => {
+            const source: BuildingPlanDTO = plan({
+                id: 8, day: TODAY + 1, name: 'Demain',
+                content: {
+                    ...emptyPlanContent(), basePa: 42, instructions: 'Source',
+                    programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', targetRemaining: 0 }, { buildingId: 9, kind: 'build', targetRemaining: 0 }] }
+                }
+            });
+            store = createCopy([plan(), source]);
+
+            store.copyPlanFromDay(TODAY + 1, { budget: false, programs: true });
+
+            expect(save_plan).not.toHaveBeenCalled();
+            expect(store.selected_plan()?.id).toBe(7);
+            expect(store.plans_of_day().length).toBe(1);
+            expect(store.draft()?.programs.regular).toEqual([{ buildingId: 9, kind: 'build', targetRemaining: 0 }]);
+            expect(store.draft()?.instructions).toBe('Source');
+            expect(store.draft()?.basePa).toBe(19);
+            expect(store.dirty()).toBe(true);
+        });
+
+        it('depuis un jour sans proposition ou sans partie choisie : rien ne change', (): void => {
+            store = createCopy();
+
+            store.copyPlanFromDay(TODAY + 3, { budget: true, programs: true });
+            store.copyPlanFromDay(TODAY + 1, { budget: false, programs: false });
+
+            expect(store.dirty()).toBe(false);
         });
 
         it('tronque le nom à 64 caractères', (): void => {

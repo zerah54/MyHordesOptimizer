@@ -80,11 +80,15 @@
                 <img [src]="HORDES_IMG_REPO + headerIcon(home)" [alt]="home.getLabel()" [matTooltip]="home.getLabel()">
             </th>
         }
-        <th i18n>Banni</th>
+        <th data-col="banned">
+            <img [src]="HORDES_IMG_REPO + 'emotes/ban.gif'" alt="Banni" i18n-alt matTooltip="Banni" i18n-matTooltip>
+        </th>
         @if (simple()) {
             <th i18n>Ouvrier</th>
         }
-        <th i18n>Goule</th>
+        <th data-col="ghoul">
+            <img [src]="HORDES_IMG_REPO + 'emotes/ghoul.gif'" alt="Goule" i18n-alt matTooltip="Goule" i18n-matTooltip>
+        </th>
         @if (!simple()) {
             <th i18n>
                 <mho-icon-ap/>

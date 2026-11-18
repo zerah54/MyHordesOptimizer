@@ -82,7 +82,6 @@ export const MY_TOWN_ROUTES: Route[] = [
         path: 'nightwatch',
         component: NightwatchComponent,
         title: 'MyHordes Optimizer' + ' - ' + $localize`Ma ville` + ' - ' + $localize`Veilles`,
-        canActivate: [(): boolean => inject(InDevModeGuard).canActivate()]
     },
     {
         path: 'program',
