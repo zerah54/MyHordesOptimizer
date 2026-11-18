@@ -1,0 +1,14 @@
+name: (All) Deploy Prod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  server:
+    uses: ./.github/workflows/deploy-server-prod.yml
+    secrets: inherit
+
+  client:
+    needs: server
+    uses: ./.github/workflows/deploy-client-prod.yml
+    secrets: inherit

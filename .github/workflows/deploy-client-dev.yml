@@ -2,6 +2,7 @@ name: (Client) Deploy Dev
 
 on:
   workflow_dispatch:
+  workflow_call:
 #  push:
 #    branches: [ main ]
 #    paths:

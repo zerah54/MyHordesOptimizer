@@ -1,7 +1,8 @@
 name: (Client) Deploy Prod
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+  workflow_call:
 
 jobs:
   firebase-deploy-prod:
