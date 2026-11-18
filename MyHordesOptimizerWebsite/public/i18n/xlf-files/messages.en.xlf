@@ -2362,6 +2362,10 @@
                 <source>Vous n&apos;êtes inscrit sur aucune expédition aujourd&apos;hui.</source>
                 <target state="translated">You are not registered on any expedition today.</target>
             </trans-unit>
+            <trans-unit id="3764708127311802515" datatype="html">
+                <source>Pour les <x id="emote" equiv-text="emote"/> <x id="pool" equiv-text="poolLabel(pool)"/></source>
+                <target state="translated">For <x id="emote" equiv-text="emote"/> <x id="pool" equiv-text="poolLabel(pool)"/></target>
+            </trans-unit>
             <trans-unit id="2565276430680693432" datatype="html" approved="yes">
                 <source>&lt;ul&gt; &lt;li&gt;&lt;strong&gt;Afficher les zones du scrutateur&lt;/strong&gt; : choisissez une ou plusieurs directions sur la rose des vents pour tracer la limite des zones de régénération correspondantes (une direction cochée est foncée, une direction décochée grise ; le point central coche ou décoche tout) ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Afficher les zones en distance&lt;/strong&gt; : « Ajouter une zone » trace la limite d&apos;une distance en km ou en PA (en PA, « Aller / Retour » divise la distance par deux). Chaque zone ajoutée se retire avec sa corbeille.&lt;/li&gt; &lt;/ul&gt;</source>
                 <target state="final">&lt;ul&gt; &lt;li&gt;&lt;strong&gt;Show Searchtower zones&lt;/strong&gt;: choose one or more directions on the compass rose to draw the limit of the corresponding regeneration zones (a checked direction is dark, an unchecked one gray; the central dot checks or unchecks everything);&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Show zones by distance&lt;/strong&gt;: &quot;Add a zone&quot; draws the limit of a distance in km or in AP (in AP, &quot;Round trip&quot; divides the distance by two). Each added zone is removed with its trash can.&lt;/li&gt; &lt;/ul&gt;</target>

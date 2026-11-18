@@ -433,7 +433,12 @@ describe('forum-post.util', (): void => {
             const text: string = joined(programPost(context(plan())));
 
             expect(text).toContain('[b]Programme chantiers dans l\'ordre[/b]');
-            expect(text.indexOf(':arrowright: [b]Bannis')).toBeLessThan(text.indexOf(':arrowright: [b]Non-bannis'));
+            expect(text).not.toContain(':arrowright:');
+            const banned: number = text.indexOf('[collapse=Pour les :ban: Bannis]');
+            const regular: number = text.indexOf('[collapse=Pour les :human: Non-bannis]');
+            expect(banned).toBeGreaterThan(text.indexOf('[b]Programme chantiers dans l\'ordre[/b]'));
+            expect(banned).toBeLessThan(regular);
+            expect(text.slice(banned, regular)).toContain('[/collapse]');
             expect(text).toContain('Laisser Mur à 10:ap:');
             expect(text).toContain('Réparer entièrement Porte');
             expect(text).toContain(':middot: #99');

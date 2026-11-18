@@ -2498,6 +2498,9 @@
             <trans-unit id="3763884071190628578" datatype="html">
                 <source>Vous n&apos;êtes inscrit sur aucune expédition aujourd&apos;hui.</source>
             </trans-unit>
+            <trans-unit id="3764708127311802515" datatype="html">
+                <source>Pour les <x id="emote" equiv-text="emote"/> <x id="pool" equiv-text="poolLabel(pool)"/></source>
+            </trans-unit>
             <trans-unit id="2565276430680693432" datatype="html">
                 <source>&lt;ul&gt; &lt;li&gt;&lt;strong&gt;Afficher les zones du scrutateur&lt;/strong&gt; : choisissez une ou plusieurs directions sur la rose des vents pour tracer la limite des zones de régénération correspondantes (une direction cochée est foncée, une direction décochée grise ; le point central coche ou décoche tout) ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Afficher les zones en distance&lt;/strong&gt; : « Ajouter une zone » trace la limite d&apos;une distance en km ou en PA (en PA, « Aller / Retour » divise la distance par deux). Chaque zone ajoutée se retire avec sa corbeille.&lt;/li&gt; &lt;/ul&gt;</source>
             </trans-unit>

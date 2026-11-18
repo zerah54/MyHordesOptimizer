@@ -98,7 +98,7 @@ export function programPost(context: PostContext, ping: boolean = true): string[
         $localize`[big][b]Programme chantiers · J${context.day}:day:[/b][/big]`,
         dayInstructions(context),
         ...instructionGroups(context, ping),
-        `[b]${$localize`Programme chantiers dans l'ordre`}[/b]\n${orderedProgram(context)}`,
+        ...programBlocks(context),
         defenseSummary(context),
         lossBlock(context),
         voteLine(context, true),
@@ -428,33 +428,50 @@ function dayInstructions(context: PostContext): string {
     return text === '' ? '' : `[b]${$localize`Consignes du jour`}[/b]\n${text}`;
 }
 
-/** Programme des chantiers dans l'ordre d'exécution (bannis puis non-bannis), consignes intercalées. */
-function orderedProgram(context: PostContext): string {
-    const lines: string[] = [];
-    for (const pool of postPools(context)) {
-        const items: PlanItemDTO[] = context.content.programs[pool];
-        if (items.length === 0) {
-            continue;
-        }
-        if (showsPools(context)) {
-            lines.push(`:arrowright: [b]${poolLabel(pool)}[/b]`);
-        }
-        if (pool === 'banned' && context.evaluation.hasSlavery) {
-            lines.push($localize`Investissez vos PA par paires de PA pour ne rien perdre.`);
-        }
-        items.forEach((item: PlanItemDTO, index: number): void => {
-            if (!isBuildingStep(item)) {
-                if (item.text.trim() !== '') {
-                    lines.push(`» [i]${item.text.trim()}[/i]`);
-                }
-                return;
-            }
-            const result: StepResult | undefined = context.evaluation.results.find((candidate: StepResult): boolean => candidate.pool === pool && candidate.index === index);
-            if (result !== undefined) {
-                lines.push(`:middot: ${stepAction(context, result)}`);
-            }
-        });
+/**
+ * Programme des chantiers dans l'ordre d'exécution, consignes intercalées : un bloc repliable par poche (bannis puis
+ * non-bannis) quand le post distingue les poches, sinon une liste simple sous le titre.
+ * @param {PostContext} context Données du jour.
+ * @returns {string[]} Blocs du programme.
+ */
+function programBlocks(context: PostContext): string[] {
+    const title: string = `[b]${$localize`Programme chantiers dans l'ordre`}[/b]`;
+    const empty: string = `${title}\n${$localize`Aucune étape.`}`;
+    if (!showsPools(context)) {
+        const lines: string[] = poolProgram(context, 'regular');
+        return [lines.length === 0 ? empty : `${title}\n${lines.join('\n')}`];
     }
-    return lines.length === 0 ? $localize`Aucune étape.` : lines.join('\n');
+    const blocks: string[] = postPools(context).flatMap((pool: PlanPool): string[] => {
+        const lines: string[] = poolProgram(context, pool);
+        const emote: string = pool === 'banned' ? ':ban:' : ':human:';
+        return lines.length === 0 ? [] : [collapse($localize`Pour les ${emote}:emote: ${poolLabel(pool)}:pool:`, lines)];
+    });
+    return blocks.length === 0 ? [empty] : [title, ...blocks];
+}
+
+/**
+ * Lignes du programme d'une poche : étapes et consignes, précédées du rappel des paires de PA côté bannis avec le BDE.
+ * @param {PostContext} context Données du jour.
+ * @param {PlanPool} pool Poche.
+ * @returns {string[]} Lignes, vides si la poche n'a rien.
+ */
+function poolProgram(context: PostContext, pool: PlanPool): string[] {
+    const lines: string[] = [];
+    context.content.programs[pool].forEach((item: PlanItemDTO, index: number): void => {
+        if (!isBuildingStep(item)) {
+            if (item.text.trim() !== '') {
+                lines.push(`» [i]${item.text.trim()}[/i]`);
+            }
+            return;
+        }
+        const result: StepResult | undefined = context.evaluation.results.find((candidate: StepResult): boolean => candidate.pool === pool && candidate.index === index);
+        if (result !== undefined) {
+            lines.push(`:middot: ${stepAction(context, result)}`);
+        }
+    });
+    if (lines.length > 0 && pool === 'banned' && context.evaluation.hasSlavery) {
+        lines.unshift($localize`Investissez vos PA par paires de PA pour ne rien perdre.`);
+    }
+    return lines;
 }
 
