@@ -148,6 +148,13 @@ describe('forum-post.util', (): void => {
             expect(text).toContain('Budget : 82:ap: · Coût : 40:ap: · Reste : 42:ap:');
         });
 
+        it('ligne liée à une source : PA calculés, pas la valeur stockée', (): void => {
+            const content: BuildingPlanContentDTO = { ...plan(), townLines: [{ label: 'Guitare', pool: 'regular', pa: 0, source: 'guitar' }] };
+            const text: string = joined(budgetPost(context(content)));
+
+            expect(text).toContain('Guitare : +2:ap:');
+        });
+
         it('mode simple : le rab d\'expé est listé et les lignes du bloc Budget somment au total affiché', (): void => {
             const content: BuildingPlanContentDTO = { ...plan(), budgetMode: 'simple', expeditionRab: 12 };
             const text: string = joined(budgetPost(context(content)));
@@ -382,7 +389,8 @@ describe('forum-post.util', (): void => {
             const text: string = joined(programPost(context(plan())));
 
             expect(text).toContain(':home: Baracke (4:ap:)');
-            expect(text).toContain(':middot: RDE');
+            expect(text).toMatch(/^RDE$/m);
+            expect(text).not.toContain(':middot: RDE');
             expect(text).toContain(':home: Cuisine 1 (3:ap:)');
         });
 
@@ -464,9 +472,21 @@ describe('forum-post.util', (): void => {
             expect(text).toContain('[b]Consignes du jour[/b]\nPlanches en banque avant 18h.');
             expect(text.indexOf('Consignes du jour')).toBeLessThan(text.indexOf('Consignes individuelles'));
             expect(text).toContain(':middot: Mur — [i]après 20h[/i]');
-            expect(text).toContain('» [i]Attendre le retour de l\'expé[/i]');
+            expect(text).toMatch(/^\[i\]Attendre le retour de l'expé\[\/i\]$/m);
+            expect(text).not.toContain('»');
             expect(text.indexOf(':middot: Mur')).toBeLessThan(text.indexOf('Attendre le retour'));
             expect(text.indexOf('Attendre le retour')).toBeLessThan(text.indexOf('Réparer entièrement Porte'));
+        });
+
+        it('consigne écrite à la main : texte tel quel, sans préfixe ajouté', (): void => {
+            const content: BuildingPlanContentDTO = {
+                ...plan(),
+                programs: { banned: [], regular: [{ kind: 'instruction', text: ' Précision : attendre l\'expé ' }] }
+            };
+
+            const text: string = joined(programPost(context(content)));
+
+            expect(text).toMatch(/^\[i\]Précision : attendre l'expé\[\/i\]$/m);
         });
 
         it('rappelle la défense visée et la défense projetée par le plan', (): void => {

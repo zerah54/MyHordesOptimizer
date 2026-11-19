@@ -20,10 +20,11 @@ export class TownStatisticsService extends GlobalService {
      * Calcule la fenêtre d'attaque du jour `day` (âmes lues en base par l'API).
      * @param day Jour attaqué.
      * @param beta Endpoint bêta.
+     * @param quiet Sans loader ni message d'erreur.
      */
-    public getAttackCalculation(day: number, beta: boolean): Observable<EstimationsResult> {
+    public getAttackCalculation(day: number, beta: boolean, quiet: boolean = false): Observable<EstimationsResult> {
         return new Observable((sub: Subscriber<EstimationsResult>) => {
-            super.get<EstimationsResultDTO>(this.API_URL + `/attaqueEstimation/AttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown()?.town_id}`)
+            super.get<EstimationsResultDTO>(this.API_URL + `/attaqueEstimation/AttackCalculation${beta ? '/beta' : ''}?day=${day}&townId=${getTown()?.town_id}`, quiet, undefined, quiet)
                 .subscribe({
                     next: (response: HttpResponse<EstimationsResultDTO>) => {
                         sub.next(new EstimationsResult(response.body));
@@ -49,9 +50,14 @@ export class TownStatisticsService extends GlobalService {
         });
     }
 
-    public getEstimations(day: number): Observable<Estimations> {
+    /**
+     * Estimations saisies pour le jour `day`.
+     * @param day Jour attaqué.
+     * @param quiet Sans loader ni message d'erreur.
+     */
+    public getEstimations(day: number, quiet: boolean = false): Observable<Estimations> {
         return new Observable((sub: Subscriber<Estimations>) => {
-            super.get<EstimationsDTO>(this.API_URL + `/AttaqueEstimation/Estimations/${day}?townid=${getTown()?.town_id}`)
+            super.get<EstimationsDTO>(this.API_URL + `/AttaqueEstimation/Estimations/${day}?townid=${getTown()?.town_id}`, quiet, undefined, quiet)
                 .subscribe({
                     next: (response: HttpResponse<EstimationsDTO>) => {
                         sub.next(new Estimations(response.body));

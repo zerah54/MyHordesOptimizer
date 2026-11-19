@@ -116,6 +116,29 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
         }
 
         [Fact]
+        public void SerializeContent_AcceptsTownLineSource()
+        {
+            var content = new BuildingPlanContentDto { TownLines = { new PlanTownLineDto { Label = "Dés", Pool = "regular", Pa = 0, Source = "dice", Manual = false } } };
+            BuildingPlanValidator.SerializeContent(content).Should().Contain("\"Source\":\"dice\"");
+        }
+
+        [Fact]
+        public void SerializeContent_RejectsUnknownTownLineSource()
+        {
+            var content = new BuildingPlanContentDto { TownLines = { new PlanTownLineDto { Label = "x", Pool = "regular", Pa = 0, Source = "piano" } } };
+            var act = () => BuildingPlanValidator.SerializeContent(content);
+            act.Should().Throw<MhoTechnicalException>();
+        }
+
+        [Fact]
+        public void SerializeContent_AcceptsTownLineWithoutSource()
+        {
+            var content = new BuildingPlanContentDto { TownLines = { new PlanTownLineDto { Label = "x", Pool = "regular", Pa = 3, Source = null } } };
+            var act = () => BuildingPlanValidator.SerializeContent(content);
+            act.Should().NotThrow();
+        }
+
+        [Fact]
         public void SerializeContent_AcceptsNegativeTownLines()
         {
             var content = new BuildingPlanContentDto { TownLines = { new PlanTownLineDto { Label = "Portes", Pool = "regular", Pa = -2 } } };

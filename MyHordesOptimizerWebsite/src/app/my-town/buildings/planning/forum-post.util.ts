@@ -1,7 +1,7 @@
 import { bannedPoolShown, CitizenCapacity } from './budget.util';
 import { BUILDING_EMOTES } from './building-emotes.const';
 import { StepResult } from './building-progress.util';
-import { budgetModeOf, BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO } from './plan.types';
+import { budgetModeOf, BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
 import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef, PlannedLoss } from './plan-evaluation.util';
 import { ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
 
@@ -231,9 +231,11 @@ function budgetLines(context: PostContext): string[] {
         if (pool === 'regular' && budgetModeOf(context.content) === 'simple' && rab !== 0) {
             lines.push(`:middot: ${$localize`Rab d'expé`} : ${signed(rab)}:ap:`);
         }
-        for (const line of context.content.townLines.filter((candidate: { pool: PlanPool }): boolean => candidate.pool === pool)) {
-            lines.push(`:middot: ${line.label === '' ? '—' : line.label} : ${signed(line.pa)}:ap:`);
-        }
+        context.content.townLines.forEach((line: PlanTownLineDTO, index: number): void => {
+            if (line.pool === pool) {
+                lines.push(`:middot: ${line.label === '' ? '—' : line.label} : ${signed(context.evaluation.linePa[index])}:ap:`);
+            }
+        });
         const warning: string = budget.remaining < 0 ? ' :warning:' : '';
         lines.push(`${$localize`Budget`} : ${budget.budget}:ap: · ${$localize`Coût`} : ${budget.cost}:ap: · ${$localize`Reste`} : ${budget.remaining}:ap:${warning}`);
     }
@@ -388,9 +390,12 @@ const HOME_UPGRADE_EMOTES: Readonly<Record<string, string>> = {
     hasFence: ':item_chain:'
 };
 
-/** Libellé d'une tâche personnelle, avec son coût quand il n'est pas nul. */
+/** Libellé d'une tâche personnelle, avec son coût quand il n'est pas nul ; une tâche libre (écrite à la main) n'a pas d'icône. */
 function taskLine(context: PostContext, task: PlanTaskDTO): string {
     const cost: string = task.pa > 0 ? ` (${task.pa}:ap:)` : '';
+    if (task.kind === 'free') {
+        return `${taskLabel(task, context.homes)}${cost}`;
+    }
     const upgrade_emote: string | undefined = task.kind === 'homeUpgrade' && typeof task.ref === 'string' ? HOME_UPGRADE_EMOTES[task.ref] : undefined;
     const icon: string = upgrade_emote ?? (task.kind === 'home' || task.kind === 'homeUpgrade' ? ':home:' : ':middot:');
     return `${icon} ${taskLabel(task, context.homes)}${cost}`;
@@ -459,8 +464,9 @@ function poolProgram(context: PostContext, pool: PlanPool): string[] {
     const lines: string[] = [];
     context.content.programs[pool].forEach((item: PlanItemDTO, index: number): void => {
         if (!isBuildingStep(item)) {
-            if (item.text.trim() !== '') {
-                lines.push(`» [i]${item.text.trim()}[/i]`);
+            const text: string = item.text.trim();
+            if (text !== '') {
+                lines.push(`[i]${text}[/i]`);
             }
             return;
         }

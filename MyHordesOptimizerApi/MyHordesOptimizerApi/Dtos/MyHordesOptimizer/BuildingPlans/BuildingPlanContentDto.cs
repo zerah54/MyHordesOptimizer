@@ -103,6 +103,10 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
         public string Pool { get; set; } = "regular";
         /// <summary>Positif = PA ajoutés au budget, négatif = PA retirés.</summary>
         public int Pa { get; set; }
+        /// <summary>Source du calcul automatique : <c>rest</c>, <c>dice</c>, <c>cards</c>, <c>guitar</c> ; null = ligne libre.</summary>
+        public string? Source { get; set; }
+        /// <summary>Vrai si la valeur saisie remplace le calcul de la source.</summary>
+        public bool? Manual { get; set; }
     }
 
     public class PlanProgramsDto

@@ -3,6 +3,7 @@ import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BuildingProgress, StepResult } from '../building-progress.util';
+import { BuildingUpgradesDTO } from '../building-upgrades.types';
 import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO } from '../plan.types';
 import { BuildingRef, DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
@@ -403,6 +404,19 @@ describe('PlanningProgramComponent', (): void => {
         expect(ids).toContain(3);
         expect(ids).not.toContain(1);
         expect(ids).not.toContain(2);
+    });
+
+    it('le vote du soir écarte les chantiers déjà au niveau maximum, sauf s\'ils sont déjà votés', async (): Promise<void> => {
+        await render();
+        fake.upgrades.set({ gate: { maxLevel: 2 } } as unknown as BuildingUpgradesDTO);
+        const evaluation: DayEvaluation = fake.evaluation() as DayEvaluation;
+        fake.evaluation.set({ ...evaluation, buildingLevelsBefore: new Map<string, number>([['gate', 2]]) });
+        const program: TestableProgram = fixture.componentInstance as unknown as TestableProgram;
+
+        expect(program.voteOptions().map((building: BuildingRef): number => building.id)).not.toContain(3);
+
+        fake.draft.update((draft: BuildingPlanContentDTO | null): BuildingPlanContentDTO | null => draft === null ? null : { ...draft, eveningVoteBuildingId: 3 });
+        expect(program.voteOptions().map((building: BuildingRef): number => building.id)).toContain(3);
     });
 
     it('le vote du soir garde le chantier déjà voté même s\'il n\'est pas construit', async (): Promise<void> => {

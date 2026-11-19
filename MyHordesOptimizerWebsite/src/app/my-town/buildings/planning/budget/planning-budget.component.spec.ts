@@ -135,32 +135,109 @@ describe('PlanningBudgetComponent', (): void => {
         expect(controls.every((control: HTMLElement): boolean => (control as HTMLButtonElement).disabled)).toBe(true);
     });
 
-    it('modèles de lignes ajoutés comme lignes ordinaires (mode simple)', async (): Promise<void> => {
-        await render({ ...content(), budgetMode: 'simple' });
-        const internals: { addPreset(preset: 'guitar' | 'dice' | 'cs'): void } = fixture.componentInstance as unknown as { addPreset(preset: 'guitar' | 'dice' | 'cs'): void };
+    it('un bouton par source ajoute la ligne liée, dans chaque poche affichée', async (): Promise<void> => {
+        await render();
 
-        internals.addPreset('guitar');
-        internals.addPreset('dice');
-        internals.addPreset('cs');
+        for (const source of ['guitar', 'dice', 'cards', 'rest']) {
+            root().querySelector<HTMLButtonElement>(`button[data-preset="${source}"]`)?.click();
+        }
 
         expect(fake.draft()?.townLines.slice(1)).toEqual([
-            { label: 'Guitare artisanale', pool: 'regular', pa: 0 },
-            { label: 'Dés / Cartes', pool: 'regular', pa: 0 },
-            { label: 'Coin sieste', pool: 'regular', pa: 0 }
+            { label: 'Guitare artisanale', pool: 'regular', pa: 0, source: 'guitar' },
+            { label: 'Guitare artisanale', pool: 'banned', pa: 0, source: 'guitar' },
+            { label: 'Dés', pool: 'regular', pa: 0, source: 'dice' },
+            { label: 'Dés', pool: 'banned', pa: 0, source: 'dice' },
+            { label: 'Jeu de cartes incomplet', pool: 'regular', pa: 0, source: 'cards' },
+            { label: 'Jeu de cartes incomplet', pool: 'banned', pa: 0, source: 'cards' },
+            { label: 'Coin sieste', pool: 'regular', pa: 0, source: 'rest' },
+            { label: 'Coin sieste', pool: 'banned', pa: 0, source: 'rest' }
         ]);
     });
 
-    it('le bouton de modèles n\'existe qu\'en mode simple et se désactive en lecture seule', async (): Promise<void> => {
-        await render();
-        expect(root().querySelector('[data-action="add-preset"]')).toBeNull();
-
-        fake.draft.set({ ...content(), budgetMode: 'simple' });
+    it('les boutons de source sont des icônes, en mode simple comme en détaillé', async (): Promise<void> => {
+        await render({ ...content(), budgetMode: 'simple' });
+        const simple: number = root().querySelectorAll('button[data-preset] img').length;
+        fake.draft.set(content());
         fixture.detectChanges();
-        expect(root().querySelector<HTMLButtonElement>('[data-action="add-preset"]')?.disabled).toBe(false);
 
+        expect(simple).toBe(4);
+        expect(root().querySelectorAll('button[data-preset] img').length).toBe(4);
+        expect(root().querySelector('button[data-preset="dice"] img')?.getAttribute('src')).toContain('item/item_dice.gif');
+        expect(root().querySelector('[data-action="add-preset"]')).toBeNull();
+    });
+
+    it('sans poche des bannis affichée, un bouton n\'ajoute que la ligne des non-bannis', async (): Promise<void> => {
+        await render();
+        fake.citizens.set(FAKE_REGULAR_CITIZENS);
+        fixture.detectChanges();
+
+        root().querySelector<HTMLButtonElement>('button[data-preset="guitar"]')?.click();
+
+        expect(fake.draft()?.townLines.slice(1)).toEqual([{ label: 'Guitare artisanale', pool: 'regular', pa: 0, source: 'guitar' }]);
+    });
+
+    describe('ligne liée à une source', (): void => {
+        /**
+         * Une ligne guitare côté non-bannis.
+         * @param {boolean} manual Valeur forcée.
+         * @returns {BuildingPlanContentDTO} Contenu.
+         */
+        function linked(manual: boolean): BuildingPlanContentDTO {
+            return { ...content(), townLines: [{ label: 'Guitare', pool: 'regular', pa: 7, source: 'guitar', manual }] };
+        }
+
+        it('affiche les PA calculés tant que la valeur n\'est pas forcée', async (): Promise<void> => {
+            await render(linked(false));
+            expect(root().querySelector<HTMLInputElement>('input[data-field="line-pa"]')?.value).toBe('2');
+            expect(root().querySelector('[data-action="reset-line-pa"]')).toBeNull();
+        });
+
+        it('sans évaluation (jour passé), affiche quand même les PA calculés', async (): Promise<void> => {
+            await render(linked(false));
+            fake.evaluation.set(null);
+            fixture.detectChanges();
+            await fixture.whenStable();
+            fixture.detectChanges();
+            expect(root().querySelector<HTMLInputElement>('input[data-field="line-pa"]')?.value).toBe('2');
+        });
+
+        it('une saisie force la valeur', async (): Promise<void> => {
+            await render(linked(false));
+            const internals: { onLinePa(index: number, value: unknown): void } = fixture.componentInstance as unknown as { onLinePa(index: number, value: unknown): void };
+
+            internals.onLinePa(0, '5');
+            fake.store.flushEdits();
+
+            expect(fake.draft()?.townLines[0]).toEqual(expect.objectContaining({ pa: 5, manual: true }));
+        });
+
+        it('une saisie sur une ligne libre ne la marque pas forcée', async (): Promise<void> => {
+            await render();
+            const internals: { onLinePa(index: number, value: unknown): void } = fixture.componentInstance as unknown as { onLinePa(index: number, value: unknown): void };
+
+            internals.onLinePa(0, '5');
+            fake.store.flushEdits();
+
+            expect(fake.draft()?.townLines[0]).toEqual({ label: 'Guitare', pool: 'regular', pa: 5 });
+        });
+
+        it('une valeur forcée s\'affiche et se remet au calcul', async (): Promise<void> => {
+            await render(linked(true));
+            expect(root().querySelector<HTMLInputElement>('input[data-field="line-pa"]')?.value).toBe('7');
+
+            root().querySelector<HTMLButtonElement>('[data-action="reset-line-pa"]')?.click();
+
+            expect(fake.draft()?.townLines[0].manual).toBe(false);
+        });
+    });
+
+    it('les boutons de source se désactivent en lecture seule', async (): Promise<void> => {
+        await render();
         fake.can_edit.set(false);
         fixture.detectChanges();
-        expect(root().querySelector<HTMLButtonElement>('[data-action="add-preset"]')?.disabled).toBe(true);
+        const buttons: HTMLButtonElement[] = Array.from(root().querySelectorAll<HTMLButtonElement>('button[data-preset]'));
+        expect(buttons.length).toBe(4);
+        expect(buttons.every((button: HTMLButtonElement): boolean => button.disabled)).toBe(true);
     });
 
     describe('budget validé', (): void => {

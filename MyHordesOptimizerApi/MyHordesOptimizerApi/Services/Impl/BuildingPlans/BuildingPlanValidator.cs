@@ -23,6 +23,7 @@ namespace MyHordesOptimizerApi.Services.Impl.BuildingPlans
         /// <summary>Utilisations d'une action dans la journée : 3 fouilles des galeries pour le Fouineur (MyHordes, <c>home_scavenge_pro</c>).</summary>
         private const int MaxActionUses = 3;
         private static readonly string[] Pools = { "banned", "regular" };
+        private static readonly HashSet<string> TownLineSources = new() { "rest", "dice", "cards", "guitar" };
         private static readonly string[] BuildingStepKinds = { "build", "repair" };
         private static readonly string[] BudgetModes = { "simple", "detailed" };
         private static readonly string[] PaTiers = { "b6", "b7" };
@@ -89,6 +90,7 @@ namespace MyHordesOptimizerApi.Services.Impl.BuildingPlans
                 Check(Pools.Contains(line.Pool), $"Poche inconnue : {line.Pool}.");
                 Check(line.Pa >= -MaxPa && line.Pa <= MaxPa, "PA de ligne ville invalides.");
                 Check(line.Label.Length <= MaxLabel, "Libellé de ligne trop long.");
+                Check(line.Source is null || TownLineSources.Contains(line.Source), $"Source de ligne inconnue : {line.Source}.");
             }
             foreach (var step in content.Programs.Banned.Concat(content.Programs.Regular))
             {

@@ -70,11 +70,18 @@ export interface ValidatedBudgetDTO {
     steps: { buildingId: number; kind: PlanStepKind; pool: PlanPool; paCost: number; invested: number; life?: number }[];
 }
 
+/** Source du calcul automatique d'une ligne ville : Coin sieste, dés, cartes, guitare. */
+export type TownLineSource = 'rest' | 'dice' | 'cards' | 'guitar';
+
 /** Ligne de budget de la ville : positive = PA ajoutés, négative = PA retirés. */
 export interface PlanTownLineDTO {
     label: string;
     pool: PlanPool;
     pa: number;
+    /** Source dont les PA sont calculés ; absente = ligne libre. */
+    source?: TownLineSource | null;
+    /** Vrai si la valeur saisie remplace le calcul de la source. */
+    manual?: boolean | null;
 }
 
 /** Programmes de chantiers de chaque poche, dans l'ordre d'exécution. */

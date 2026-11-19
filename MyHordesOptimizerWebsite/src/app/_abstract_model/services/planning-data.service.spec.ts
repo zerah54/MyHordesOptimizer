@@ -12,6 +12,8 @@ import { BankInfo } from '../types/bank-info.class';
 import { Building } from '../types/building.class';
 import { Citizen } from '../types/citizen.class';
 import { CitizenInfo } from '../types/citizen-info.class';
+import { Estimations } from '../types/estimations.class';
+import { EstimationsResult } from '../types/estimations-result.class';
 import { Expedition } from '../types/expedition.class';
 import { Item } from '../types/item.class';
 import { ApiService } from './api.service';
@@ -42,6 +44,8 @@ describe('PlanningDataService', (): void => {
     const get_bank: Mock<() => Observable<BankInfo>> = vi.fn();
     const get_expeditions: Mock<(day: number) => Observable<Expedition[]>> = vi.fn();
     const get_refinement: Mock<(day: number) => Observable<RefinementViewDTO>> = vi.fn();
+    const get_attack_calculation: Mock<(day: number, beta: boolean, quiet: boolean) => Observable<EstimationsResult>> = vi.fn();
+    const get_estimations: Mock<(day: number, quiet: boolean) => Observable<Estimations>> = vi.fn();
     let service: PlanningDataService;
 
     beforeEach((): void => {
@@ -63,7 +67,7 @@ describe('PlanningDataService', (): void => {
                 { provide: ApiService, useValue: { getBuildings: get_buildings, getItems: get_items, getItemEmotes: get_item_emotes } },
                 { provide: TownService, useValue: { getCitizens: get_citizens, getBank: get_bank } },
                 { provide: ExpeditionService, useValue: { getExpeditions: get_expeditions } },
-                { provide: TownStatisticsService, useValue: { getRefinement: get_refinement } }
+                { provide: TownStatisticsService, useValue: { getRefinement: get_refinement, getAttackCalculation: get_attack_calculation, getEstimations: get_estimations } }
             ]
         });
         service = TestBed.inject(PlanningDataService);
@@ -164,5 +168,49 @@ describe('PlanningDataService', (): void => {
 
         expect(result?.attack).toBeNull();
         expect(result?.expeditions).toEqual([expedition]);
+    });
+
+    describe('sans affinage', (): void => {
+        const no_refinement: Observable<RefinementViewDTO> = of(<RefinementViewDTO>{ attackMin: null, attackMax: null });
+
+        /**
+         * Attaque renvoyée par loadDay(10).
+         * @returns {number | null | undefined} Attaque.
+         */
+        function attackOf(): number | null | undefined {
+            let attack: number | null | undefined;
+            service.loadDay(10).subscribe((loaded: PlanningDay): void => {
+                attack = loaded.attack;
+            });
+            return attack;
+        }
+
+        it('prend le max calculé', (): void => {
+            get_refinement.mockReturnValue(no_refinement);
+            get_attack_calculation.mockReturnValue(of(Object.assign(new EstimationsResult(), { result: { min: 1200, max: 1300 } })));
+
+            expect(attackOf()).toBe(1300);
+            expect(get_attack_calculation).toHaveBeenCalledWith(10, false, true);
+            expect(get_estimations).not.toHaveBeenCalled();
+        });
+
+        it('sans calcul, prend le max de l\'estimation TDG la plus précise', (): void => {
+            get_refinement.mockReturnValue(throwError((): Error => new Error('400')));
+            get_attack_calculation.mockReturnValue(throwError((): Error => new Error('400')));
+            get_estimations.mockReturnValue(of(Object.assign(new Estimations(), {
+                estim: { 33: { min: 900, max: 1500 }, 66: { min: 1000, max: 1400 }, 100: { min: undefined, max: undefined } }
+            })));
+
+            expect(attackOf()).toBe(1400);
+            expect(get_estimations).toHaveBeenCalledWith(10, true);
+        });
+
+        it('sans aucune estimation, attaque nulle', (): void => {
+            get_refinement.mockReturnValue(no_refinement);
+            get_attack_calculation.mockReturnValue(of(Object.assign(new EstimationsResult(), { result: { min: undefined, max: undefined } })));
+            get_estimations.mockReturnValue(throwError((): Error => new Error('404')));
+
+            expect(attackOf()).toBeNull();
+        });
     });
 });

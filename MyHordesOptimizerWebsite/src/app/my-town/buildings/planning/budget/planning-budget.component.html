@@ -166,9 +166,15 @@
                     }
                     <td>
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                            <input matInput type="number" data-field="line-pa" [ngModel]="line.pa" [disabled]="!store.can_edit()"
+                            <input matInput type="number" data-field="line-pa" [ngModel]="linePa(line, index)" [disabled]="!store.can_edit()"
                                    (ngModelChange)="onLinePa(index, $event)">
                         </mat-form-field>
+                        @if (isForced(line)) {
+                            <button mat-icon-button type="button" data-action="reset-line-pa" [disabled]="!store.can_edit()" (click)="resetLinePa(index)"
+                                    i18n-matTooltip matTooltip="Revenir au calcul">
+                                <mat-icon>restart_alt</mat-icon>
+                            </button>
+                        }
                     </td>
                     <td>
                         <button mat-icon-button type="button" data-action="remove-line" [disabled]="!store.can_edit()" (click)="removeLine(index)"
@@ -181,15 +187,10 @@
         </tbody>
     </table>
     <button mat-stroked-button type="button" data-action="add-line" [disabled]="!store.can_edit()" (click)="addLine()" i18n>Ajouter une ligne</button>
-    @if (simple()) {
-        <button mat-stroked-button type="button" data-action="add-preset" [disabled]="!store.can_edit()" [matMenuTriggerFor]="preset_menu">
-            <ng-container i18n>Ajouter un modèle</ng-container>
-            <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+    @for (preset of presets; track preset.source) {
+        <button mat-icon-button type="button" [attr.data-preset]="preset.source" [disabled]="!store.can_edit()" (click)="addPreset(preset)"
+                [matTooltip]="preset.label">
+            <img [src]="HORDES_IMG_REPO + preset.icon" [alt]="preset.label">
         </button>
-        <mat-menu #preset_menu="matMenu">
-            <button mat-menu-item type="button" data-preset="guitar" (click)="addPreset('guitar')" i18n>Guitare artisanale</button>
-            <button mat-menu-item type="button" data-preset="dice" (click)="addPreset('dice')" i18n>Dés / Cartes</button>
-            <button mat-menu-item type="button" data-preset="cs" (click)="addPreset('cs')">{{ restLabel() }}</button>
-        </mat-menu>
     }
 }

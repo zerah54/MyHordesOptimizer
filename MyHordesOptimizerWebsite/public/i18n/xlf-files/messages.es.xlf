@@ -1922,10 +1922,6 @@
                 <source>Investissez vos <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> par paires pour ne rien perdre.</source>
                 <target state="translated">Invierte tus <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> por pares para no perder nada.</target>
             </trans-unit>
-            <trans-unit id="4983859294258055145" datatype="html">
-                <source>Dés / Cartes</source>
-                <target state="translated">Dados / Cartas</target>
-            </trans-unit>
             <trans-unit id="4986139580483965783" datatype="html">
                 <source>Ajouté</source>
                 <target state="translated">Añadido</target>
@@ -6746,6 +6742,10 @@
                 <source>Ignorée si la porte est ouverte</source>
                 <target state="final">Se ignora si la puerta está abierta</target>
             </trans-unit>
+            <trans-unit id="5304993850308166757" datatype="html">
+                <source>Revenir au calcul</source>
+                <target state="translated">Volver al cálculo</target>
+            </trans-unit>
             <trans-unit id="7102562601503761745" datatype="html" approved="yes">
                 <source>&lt;p&gt;Déplie le menu « Utiliser un objet » partout où le jeu le propose, et de nouveau après chaque changement de votre sac.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Despliega el menú «Usar un objeto» allí donde el juego lo ofrece, y de nuevo tras cada cambio de tu mochila.&lt;/p&gt;</target>
@@ -7750,10 +7750,6 @@
                 <source>Retirer le veilleur</source>
                 <target state="translated">Quitar al centinela</target>
             </trans-unit>
-            <trans-unit id="1989547770984383899" datatype="html">
-                <source>Ajouter un modèle</source>
-                <target state="translated">Añadir una plantilla</target>
-            </trans-unit>
             <trans-unit id="1990355517543678696" datatype="html" approved="yes">
                 <source>Citoyens tués</source>
                 <target state="final">Habitantes muertos</target>
@@ -8085,6 +8081,10 @@
             <trans-unit id="4281881265102804112" datatype="html" approved="yes">
                 <source>Taille de police</source>
                 <target state="final">Tamaño de fuente</target>
+            </trans-unit>
+            <trans-unit id="7530159340047138178" datatype="html">
+                <source>Jeu de cartes incomplet</source>
+                <target state="translated">Juego de cartas incompleto</target>
             </trans-unit>
             <trans-unit id="7533053521139949104" datatype="html" approved="yes">
                 <source>Distance minimum</source>

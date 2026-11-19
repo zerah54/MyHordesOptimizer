@@ -15,8 +15,8 @@ import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Building } from '../../../../_abstract_model/types/building.class';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
-import { BuildingProgress, repairLifeAfterPa, repairPaFor, StepIssue, StepResult } from '../building-progress.util';
-import { upgradeLevelText } from '../building-upgrades.types';
+import { repairLifeAfterPa, repairPaFor, StepIssue, StepResult } from '../building-progress.util';
+import { BuildingUpgradesDTO, upgradeLevelText } from '../building-upgrades.types';
 import { BuildingPlanContentDTO, isBuildingStep, PlanItemDTO, PlanPool, PlanStepDTO, PlanStepKind, PlanStepMode, stepMode } from '../plan.types';
 import { stepIssueLabel } from '../plan-alerts.util';
 import { BuildingRef, DayEvaluation, EveningVote, WORKSHOP_UID } from '../plan-evaluation.util';
@@ -392,18 +392,22 @@ export class PlanningProgramComponent {
     }
 
     /**
-     * Chantiers votables : à évolution et construits en fin de journée (déjà ou par le programme), plus le chantier déjà choisi.
+     * Chantiers votables : à évolution, sous leur niveau maximum et construits en fin de journée (déjà ou par le programme), plus le
+     * chantier déjà choisi.
      * @param {number | null} kept_id Chantier déjà choisi, toujours proposé.
      * @param {number | null} excluded_id Chantier à écarter.
      * @returns {BuildingRef[]} Chantiers triés par nom.
      */
     private upgradableOptions(kept_id: number | null, excluded_id: number | null): BuildingRef[] {
-        const progress: ReadonlyMap<number, BuildingProgress> | undefined = this.store.evaluation()?.progressAfter;
+        const evaluation: DayEvaluation | null = this.store.evaluation();
+        const upgrades: BuildingUpgradesDTO = this.store.upgrades();
         const upgradable: ReadonlySet<number> = new Set<number>(this.store.catalog().filter((building: Building): boolean => building.has_upgrade).map((building: Building): number => building.id));
+        const maxed: (building: BuildingRef) => boolean = (building: BuildingRef): boolean =>
+            (evaluation?.buildingLevelsBefore.get(building.uid) ?? 0) >= (upgrades[building.uid]?.maxLevel ?? Number.MAX_SAFE_INTEGER);
         return [...this.store.plannable_buildings()]
             .sort((a: BuildingRef, b: BuildingRef): number => a.label.localeCompare(b.label))
             .filter((building: BuildingRef): boolean => building.id !== excluded_id && (building.id === kept_id
-                || (upgradable.has(building.id) && (progress === undefined || progress.get(building.id)?.built === true))));
+                || (upgradable.has(building.id) && !maxed(building) && (evaluation === null || evaluation.progressAfter.get(building.id)?.built === true))));
     }
 
     /**

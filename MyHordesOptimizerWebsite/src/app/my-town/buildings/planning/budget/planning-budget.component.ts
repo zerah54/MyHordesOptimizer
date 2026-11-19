@@ -4,27 +4,32 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 
+import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { DailyActionEnum } from '../../../../_abstract_model/enum/daily-action.enum';
 import { HomeEnum } from '../../../../_abstract_model/enum/home.enum';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { IconCpComponent } from '../../../../_shared/icon-cp/icon-cp.component';
 import { budgetBreakdown, BudgetCategory, BudgetRow } from '../budget-breakdown.util';
-import { budgetModeOf, BuildingPlanContentDTO, PlanPool, PlanTownLineDTO } from '../plan.types';
+import { BuildingPlanContentDTO, PlanPool, PlanTownLineDTO, TownLineSource } from '../plan.types';
 import { DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { toInt } from '../planning-input.util';
+import { resolveTownLinePa } from '../town-line-source.util';
 
 const angular_common: Imports = [FormsModule];
-const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatMenuModule, MatSelectModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatTooltipModule];
 
-/** Modèle de ligne ville proposé en mode simple. */
-export type LinePreset = 'guitar' | 'dice' | 'cs';
+/** Bouton d'ajout d'une ligne liée à une source : libellé officiel et icône du jeu. */
+interface SourcePreset {
+    source: TownLineSource;
+    label: string;
+    icon: string;
+}
 
 /** Carte « Budget » : d'où viennent les PA de la journée et où ils partent, par poche ; lignes de la ville. */
 @Component({
@@ -45,11 +50,15 @@ export class PlanningBudgetComponent {
         return draft === null || evaluation === null ? [] : budgetBreakdown(draft, this.store.citizens(), evaluation);
     });
 
-    /** Mode simple : les modèles de lignes (guitare, dés / cartes, CS) sont proposés. */
-    protected readonly simple: Signal<boolean> = computed((): boolean => {
-        const draft: BuildingPlanContentDTO | null = this.store.draft();
-        return draft !== null && budgetModeOf(draft) === 'simple';
-    });
+    /** Sources proposées à l'ajout, dans l'ordre des boutons. */
+    protected readonly presets: readonly SourcePreset[] = [
+        { source: 'guitar', label: $localize`Guitare artisanale`, icon: 'item/item_guitar.gif' },
+        { source: 'dice', label: $localize`Dés`, icon: 'item/item_dice.gif' },
+        { source: 'cards', label: $localize`Jeu de cartes incomplet`, icon: 'item/item_cards.gif' },
+        { source: 'rest', label: HomeEnum.REST_LEVEL.getLabel(), icon: HomeEnum.REST_LEVEL.value.img }
+    ];
+
+    protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
     /** Date de validation du budget, mise en forme selon la langue du site ; nulle sans validation. */
     protected readonly validated_at: Signal<string | null> = computed((): string | null => {
@@ -124,25 +133,49 @@ export class PlanningBudgetComponent {
     }
 
     /**
-     * Libellé officiel du coin sieste.
-     * @returns {string} Libellé dans la langue du site.
+     * Ajoute la ligne liée à une source, côté non-bannis puis côté bannis si la poche est affichée.
+     * @param {SourcePreset} preset Source.
      */
-    protected restLabel(): string {
-        return HomeEnum.REST_LEVEL.getLabel();
+    protected addPreset(preset: SourcePreset): void {
+        const pools: PlanPool[] = this.store.banned_pool_shown() ? ['regular', 'banned'] : ['regular'];
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            for (const pool of pools) {
+                content.townLines.push({ label: preset.label, pool, pa: 0, source: preset.source });
+            }
+        });
     }
 
     /**
-     * Ajoute une ligne ville à 0 PA nommée d'après un modèle (guitare artisanale, dés / cartes, coin sieste), côté non-bannis.
-     * @param {LinePreset} preset Modèle.
+     * PA affichés d'une ligne ville : valeur résolue par l'évaluation, sinon calculée sur les citoyens actuels (jour passé).
+     * @param {PlanTownLineDTO} line Ligne.
+     * @param {number} index Rang de la ligne.
+     * @returns {number} PA.
      */
-    protected addPreset(preset: LinePreset): void {
-        const labels: Record<LinePreset, string> = {
-            guitar: $localize`Guitare artisanale`,
-            dice: $localize`Dés / Cartes`,
-            cs: this.restLabel()
-        };
+    protected linePa(line: PlanTownLineDTO, index: number): number {
+        const draft: BuildingPlanContentDTO | null = this.store.draft();
+        return this.store.evaluation()?.linePa[index] ?? (draft === null ? line.pa : resolveTownLinePa(line, this.store.citizens(), draft));
+    }
+
+    /**
+     * Vrai si la ligne est liée à une source et que sa valeur est forcée.
+     * @param {PlanTownLineDTO} line Ligne.
+     * @returns {boolean} Vrai si le retour au calcul est possible.
+     */
+    protected isForced(line: PlanTownLineDTO): boolean {
+        return line.source !== undefined && line.source !== null && line.manual === true;
+    }
+
+    /**
+     * Remet une ligne liée au calcul de sa source.
+     * @param {number} index Rang de la ligne.
+     */
+    protected resetLinePa(index: number): void {
+        this.store.flushEdits();
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
-            content.townLines.push({ label: labels[preset], pool: 'regular', pa: 0 });
+            const line: PlanTownLineDTO | undefined = content.townLines[index];
+            if (line !== undefined) {
+                line.manual = false;
+            }
         });
     }
 
@@ -193,6 +226,9 @@ export class PlanningBudgetComponent {
             const line: PlanTownLineDTO | undefined = content.townLines[index];
             if (line !== undefined) {
                 line.pa = pa;
+                if (line.source !== undefined && line.source !== null) {
+                    line.manual = true;
+                }
             }
         });
     }

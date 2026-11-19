@@ -1025,9 +1025,6 @@
             <trans-unit id="498248526992500843" datatype="html">
                 <source>Investissez vos <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> par paires pour ne rien perdre.</source>
             </trans-unit>
-            <trans-unit id="4983859294258055145" datatype="html">
-                <source>Dés / Cartes</source>
-            </trans-unit>
             <trans-unit id="4986139580483965783" datatype="html">
                 <source>Ajouté</source>
             </trans-unit>
@@ -5078,6 +5075,9 @@
             <trans-unit id="5304413680285619130" datatype="html">
                 <source>Ignorée si la porte est ouverte</source>
             </trans-unit>
+            <trans-unit id="5304993850308166757" datatype="html">
+                <source>Revenir au calcul</source>
+            </trans-unit>
             <trans-unit id="7102562601503761745" datatype="html">
                 <source>&lt;p&gt;Déplie le menu « Utiliser un objet » partout où le jeu le propose, et de nouveau après chaque changement de votre sac.&lt;/p&gt;</source>
             </trans-unit>
@@ -5311,9 +5311,6 @@
             </trans-unit>
             <trans-unit id="1984683690369653530" datatype="html">
                 <source>Retirer le veilleur</source>
-            </trans-unit>
-            <trans-unit id="1989547770984383899" datatype="html">
-                <source>Ajouter un modèle</source>
             </trans-unit>
             <trans-unit id="1990355517543678696" datatype="html">
                 <source>Citoyens tués</source>
@@ -6082,6 +6079,9 @@
             </trans-unit>
             <trans-unit id="4281881265102804112" datatype="html">
                 <source>Taille de police</source>
+            </trans-unit>
+            <trans-unit id="7530159340047138178" datatype="html">
+                <source>Jeu de cartes incomplet</source>
             </trans-unit>
             <trans-unit id="7533053521139949104" datatype="html">
                 <source>Distance minimum</source>

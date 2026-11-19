@@ -17,6 +17,7 @@ import { cascadeLevels } from './home-upgrades.util';
 import { nightLifeLoss, ownNightLoss } from './night-survival.util';
 import { budgetModeOf, BuildingPlanContentDTO, PlanCitizenDTO, PlanLossDTO, PlanLossKind, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
 import { missingResources, ResourceCount, sumResources } from './resources.util';
+import { resolveTownLinePa } from './town-line-source.util';
 import { freeThreshold } from './workshop.util';
 
 /** Uid du chantier « Atelier ». */
@@ -120,10 +121,14 @@ export interface DayEvaluation {
     results: StepResult[];
     progressAfter: Map<number, BuildingProgress>;
     progressBefore: ReadonlyMap<number, BuildingProgress>;
+    /** Niveau d'évolution des chantiers en début de journée, par uid. */
+    buildingLevelsBefore: ReadonlyMap<string, number>;
     nightLoss: ReadonlyMap<number, number>;
     capacities: CitizenCapacity[];
     expeditionPa: ReadonlyMap<number, number>;
     budgets: Record<PlanPool, PoolBudget>;
+    /** PA résolus des lignes ville, dans l'ordre de `content.townLines`. */
+    linePa: number[];
     completedIds: number[];
     needs: Map<number, number>;
     missing: ResourceCount[];
@@ -194,7 +199,8 @@ export function evaluateDay(input: DayInput): DayEvaluation {
             apOnlyTaskPa: tasksPa(tasks.filter((task: PlanTaskDTO): boolean => task.kind === 'home'))
         });
     });
-    const lines: BudgetLine[] = content.townLines.map((line: PlanTownLineDTO): BudgetLine => ({ pool: line.pool, pa: line.pa }));
+    const line_pa: number[] = content.townLines.map((line: PlanTownLineDTO): number => resolveTownLinePa(line, input.citizens, content));
+    const lines: BudgetLine[] = content.townLines.map((line: PlanTownLineDTO, index: number): BudgetLine => ({ pool: line.pool, pa: line_pa[index] }));
     if (simple) {
         lines.push({ pool: 'regular', pa: content.expeditionRab ?? 0 });
     }
@@ -245,10 +251,12 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         results,
         progressAfter: progress_after,
         progressBefore: input.progress,
+        buildingLevelsBefore: input.buildingLevels,
         nightLoss: night_loss,
         capacities,
         expeditionPa: input.expeditionPa,
         budgets,
+        linePa: line_pa,
         completedIds: completed_ids,
         needs,
         missing: missingResources(needs, input.bank),

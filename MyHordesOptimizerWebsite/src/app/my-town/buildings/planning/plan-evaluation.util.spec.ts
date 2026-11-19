@@ -376,6 +376,7 @@ describe('plan-evaluation.util', (): void => {
 
             expect(evaluation.vote).toEqual({ uid: 'gate', level: 2, defense: 30 });
             expect(evaluation.projectedDefense).toBe(1030);
+            expect(evaluation.buildingLevelsBefore.get('gate')).toBe(1);
         });
 
         it('le niveau atteint se reporte au lendemain ; au niveau maximum, plus de gain', (): void => {
@@ -700,6 +701,12 @@ describe('plan-evaluation.util', (): void => {
                 townLines: [{ pool: 'regular', label: 'Ligne', pa: 40 }]
             }));
             expect(evaluation.budgets.regular.budget).toBe(140);
+        });
+
+        it('une ligne liée à une source compte ses PA calculés', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ townLines: [{ pool: 'regular', label: 'Guitare', pa: 0, source: 'guitar' }] }));
+            expect(evaluation.linePa).toEqual([2]);
+            expect(evaluation.budgets.regular.lines).toBe(2);
         });
 
         it('en détaillé, le reste d\'expédition est ignoré et les PA d\'expédition et de tâches comptent', (): void => {
