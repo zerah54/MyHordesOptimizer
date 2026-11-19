@@ -2742,6 +2742,10 @@
                 <source>&lt;p&gt;Tous les objets, par catégorie. « Filtrer » cherche par nom (sans tenir compte des majuscules ni des accents) ; « Chercher des objets par propriétés » garde les objets qui ont au moins une des propriétés ou actions choisies.&lt;/p&gt; &lt;p&gt;Un clic sur un objet ouvre sa fiche : description, fréquence en fouille, recettes, objets qui l&apos;ouvrent et qu&apos;il ouvre, effet à la catapulte, décoration, arme de veille, encombrant, propriétés et actions.&lt;/p&gt; &lt;p&gt;La &lt;strong&gt;fréquence en fouille&lt;/strong&gt; est la chance d&apos;obtenir l&apos;objet lors d&apos;une fouille réussie, sur une zone non épuisée (ou épuisée, pour les deux objets qu&apos;on n&apos;y trouve que là) : un palier (de très courant à très rare), « ≈ 1 fouille réussie sur N » (« ≈ 5 fouilles réussies sur 8 » au-delà de 25 %) et le pourcentage exact.&lt;/p&gt; &lt;p&gt;Avec une ville active, le bouton caddie ajoute l&apos;objet à la liste de courses.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;All the items, by category. &quot;Filter&quot; searches by name (ignoring case and accents); &quot;Search items by properties&quot; keeps the items that have at least one of the chosen properties or actions.&lt;/p&gt; &lt;p&gt;Clicking an item opens its sheet: description, dig frequency, recipes, items that open it and that it opens, catapult effect, decoration, watch weapon, heavy, properties and actions.&lt;/p&gt; &lt;p&gt;The &lt;strong&gt;dig frequency&lt;/strong&gt; is the chance of obtaining the item during a successful dig, in a non-depleted zone (or a depleted one, for the two items that are only found there): a tier (from very common to very rare), &quot;≈ 1 successful dig out of N&quot; (&quot;≈ 5 successful digs out of 8&quot; above 25%) and the exact percentage.&lt;/p&gt; &lt;p&gt;With an active town, the cart button adds the item to the shopping list.&lt;/p&gt;</target>
             </trans-unit>
+            <trans-unit id="5872739682756299764" datatype="html">
+                <source>Utilisations</source>
+                <target state="translated">Uses</target>
+            </trans-unit>
             <trans-unit id="5877715604390460271" datatype="html">
                 <source>Supprimer la source</source>
                 <target state="translated">Remove the source</target>
@@ -3534,6 +3538,10 @@
                 <source>Veilles</source>
                 <target state="final">Watches</target>
             </trans-unit>
+            <trans-unit id="2681189342619065736" datatype="html">
+                <source>Banni — coché : oui · décoché : non · indéterminé : tous</source>
+                <target state="translated">Banished — checked: yes · unchecked: no · indeterminate: all</target>
+            </trans-unit>
             <trans-unit id="2682868487071320453" datatype="html" approved="yes">
                 <source>Violet</source>
                 <target state="final">Violet</target>
@@ -3549,6 +3557,10 @@
             <trans-unit id="5906896176186306776" datatype="html">
                 <source>Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense propre :</source>
                 <target state="translated">Defense actually gained by the town once finished (defense items consumed, effects on houses, coffins…). Own defense:</target>
+            </trans-unit>
+            <trans-unit id="5908620986304850507" datatype="html">
+                <source>Niveau suivant de chacun</source>
+                <target state="translated">Each citizen&apos;s next level</target>
             </trans-unit>
             <trans-unit id="5909537349952143751" datatype="html" approved="yes">
                 <source>Statistiques</source>
@@ -4561,6 +4573,10 @@
             <trans-unit id="5956461158010502750" datatype="html" approved="yes">
                 <source>Enregistrer dans un fichier Excel</source>
                 <target state="final">Save to an Excel file</target>
+            </trans-unit>
+            <trans-unit id="6533959590839709981" datatype="html">
+                <source>Proposées à chacun</source>
+                <target state="translated">Suggested per citizen</target>
             </trans-unit>
             <trans-unit id="6534526307832177556" datatype="html">
                 <source>Mes pré-villes</source>

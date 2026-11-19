@@ -54,6 +54,7 @@ describe('citizen-filter-sort.util', (): void => {
         bob.daily_actions = [pool];
         bob.bag = Object.assign(new Bag(), { items: [Object.assign(new Item(), { id: 42 })] });
         chloe.status = Object.assign(new Status(), { icons: [StatusEnum.getAllValues<StatusEnum>()[0]] });
+        chloe.is_shunned = true;
     });
 
     function shown(criteria: Partial<CitizenFilterCriteria>): number[] {
@@ -81,6 +82,11 @@ describe('citizen-filter-sort.util', (): void => {
         expect(shown({ bools: { daily_home_pool: true } })).toEqual([2]);
         expect(shown({ bools: { daily_home_pool: false } })).toEqual([1, 3]);
         expect(shown({ bools: { ['home_' + HomeEnum.HAS_ALARM.key]: false } })).toEqual([1, 2, 3]);
+    });
+
+    it('filtre oui / non sur le bannissement', (): void => {
+        expect(shown({ bools: { banned: true } })).toEqual([3]);
+        expect(shown({ bools: { banned: false } })).toEqual([1, 2]);
     });
 
     it('compte les critères actifs', (): void => {

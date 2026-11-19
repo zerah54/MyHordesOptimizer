@@ -15,7 +15,8 @@ interface DialogInternals {
     upgrade_key: WritableSignal<string | null>;
     level: WritableSignal<number | null>;
     label: WritableSignal<string>;
-    pa: WritableSignal<number>;
+    pa: WritableSignal<number | null>;
+    uses: WritableSignal<number | null>;
 }
 
 describe('PlanningBulkTaskDialogComponent', (): void => {
@@ -83,7 +84,8 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
         form().kind.set('homeUpgrade');
         form().upgrade_key.set('kitchenLevel');
 
-        const options: string[] = levelOptions();
+        const [next, ...options]: string[] = levelOptions();
+        expect(next).toBe('Niveau suivant de chacun');
         expect(options.length).toBeGreaterThan(0);
         options.forEach((option: string): void => expect(option).toMatch(/^niv\. \d+ \(\d+\)$/));
     });
@@ -116,19 +118,72 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
     });
 
     it('amélioration : niveau visé et PA du référentiel', async (): Promise<void> => {
-        await render();
+        await render([3]);
         form().kind.set('homeUpgrade');
         form().upgrade_key.set('kitchenLevel');
         form().level.set(2);
         confirm();
 
-        expect(tasksOf(1)[0]).toEqual(expect.objectContaining({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 9 }));
+        expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 2, pa: 9 }));
+    });
+
+    it('amélioration sans niveau choisi : niveau suivant de chacun, comme en ligne', async (): Promise<void> => {
+        await render([3]);
+        form().kind.set('homeUpgrade');
+        form().upgrade_key.set('kitchenLevel');
+        confirm();
+
+        expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'homeUpgrade', ref: 'kitchenLevel', level: 1, pa: 6 }));
+    });
+
+    it('amélioration à un seul niveau : pas de choix du niveau', async (): Promise<void> => {
+        await render([3]);
+        form().kind.set('homeUpgrade');
+        form().upgrade_key.set('hasLock');
+        fixture.detectChanges();
+
+        expect((fixture.nativeElement as HTMLElement).querySelector('[data-field="bulk-level"]')).toBeNull();
+        confirm();
+        expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'homeUpgrade', ref: 'hasLock', level: 1, pa: 6 }));
+    });
+
+    it('amélioration : seuls les citoyens qui ont une habitation la reçoivent, comme en ligne', async (): Promise<void> => {
+        await render([1, 3]);
+        form().kind.set('homeUpgrade');
+        form().upgrade_key.set('hasLock');
+        confirm();
+
+        expect(tasksOf(1)).toEqual([]);
+        expect(tasksOf(3).length).toBe(1);
+    });
+
+    it('action : nombre d\'utilisations choisi, borné aux possibilités de chacun', async (): Promise<void> => {
+        await render();
+        form().kind.set('action');
+        form().action_key.set('home_scavenge');
+        form().uses.set(2);
+        confirm();
+
+        expect(tasksOf(1)[0]).toEqual(expect.objectContaining({ ref: 'home_scavenge', count: 2, pa: 2 }));
+        expect(tasksOf(2)[0]).toEqual(expect.objectContaining({ ref: 'home_scavenge', pa: 2 }));
+        expect(tasksOf(2)[0].count).toBeUndefined();
+    });
+
+    it('PA saisis : imposés à tous, quel que soit le type', async (): Promise<void> => {
+        await render();
+        form().kind.set('action');
+        form().action_key.set('home_scavenge');
+        form().pa.set(5);
+        confirm();
+
+        expect(tasksOf(1)[0].pa).toBe(5);
+        expect(tasksOf(2)[0].pa).toBe(5);
     });
 
     it('amélioration déjà atteinte par un citoyen : il ne la reçoit pas', async (): Promise<void> => {
         await render([1, 3]);
         fake.citizens.set(FAKE_CITIZENS.map((citizen: CitizenRef): CitizenRef =>
-            (citizen.userId === 1 ? { ...citizen, upgradeLevels: new Map<string, number>([['kitchenLevel', 2]]) } : citizen)));
+            (citizen.userId === 1 ? { ...citizen, homeLevel: 1, upgradeLevels: new Map<string, number>([['kitchenLevel', 2]]) } : citizen)));
         form().kind.set('homeUpgrade');
         form().upgrade_key.set('kitchenLevel');
         form().level.set(2);

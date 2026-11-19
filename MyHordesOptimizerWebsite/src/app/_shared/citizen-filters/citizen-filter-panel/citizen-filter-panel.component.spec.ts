@@ -36,6 +36,12 @@ describe('CitizenFilterPanelComponent', (): void => {
         expect(store.boolValue('daily_home_pool')).toBe(true);
     });
 
+    it('un clic sur Banni fait tourner son filtre oui / non', (): void => {
+        root().querySelector<HTMLButtonElement>('[data-filter="banned"]')?.click();
+
+        expect(store.boolValue('banned')).toBe(true);
+    });
+
     it('propose les niveaux de maison présents et retient ceux choisis', (): void => {
         const toggles: HTMLButtonElement[] = Array.from(root().querySelectorAll<HTMLButtonElement>(`[data-filter="home_${HomeEnum.HOUSE_LEVEL.key}"] button`));
         expect(toggles.map((toggle: HTMLButtonElement): string => toggle.textContent?.trim() ?? '')).toEqual(['0', '1']);
@@ -43,6 +49,16 @@ describe('CitizenFilterPanelComponent', (): void => {
         toggles[0].click();
 
         expect(store.values('home_' + HomeEnum.HOUSE_LEVEL.key)).toEqual([0]);
+    });
+
+    it('une ligne de plus de 3 valeurs prend toute la largeur de la grille', (): void => {
+        const row = (): HTMLElement | null => root().querySelector<HTMLElement>(`[data-filter="home_${HomeEnum.HOUSE_LEVEL.key}"]`);
+        expect(row()?.classList.contains('wide')).toBe(false);
+
+        fixture.componentRef.setInput('value_options', { ['home_' + HomeEnum.HOUSE_LEVEL.key]: [1, 2, 3, 4, 5] });
+        fixture.detectChanges();
+
+        expect(row()?.classList.contains('wide')).toBe(true);
     });
 
     it('réinitialiser retire les critères ; fermer prévient la page', (): void => {

@@ -34,7 +34,7 @@ export interface CitizenSortField {
 /**
  * Critères de filtre des citoyens, tous combinés en ET. Un booléen absent ou une liste vide ne filtre pas.
  * Les identifiants de champ suivent les colonnes de la liste des citoyens : `daily_<clé>`, `heroic_<clé>`, `home_<clé>`,
- * `skill_<lettre>`, `camping_count`, `potions`, `immune`.
+ * `skill_<lettre>`, `camping_count`, `potions`, `immune`, `banned`.
  */
 export interface CitizenFilterCriteria {
     /** Citoyens retenus par leur identifiant. */
@@ -127,6 +127,9 @@ export function citizenBoolValue(citizen: Citizen, id: string, day: number): boo
     }
     if (id === 'immune') {
         return !!citizen.chamanic_detail?.is_immune_to_soul;
+    }
+    if (id === 'banned') {
+        return !!citizen.is_shunned;
     }
     const value: number | boolean | undefined = id.startsWith('heroic_')
         ? citizen.heroic_actions?.content?.find((entry: HeroicActionsWithValue): boolean => entry.element?.key === id.substring('heroic_'.length))?.value

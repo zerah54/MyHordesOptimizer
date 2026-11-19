@@ -2742,6 +2742,10 @@
                 <source>&lt;p&gt;Tous les objets, par catégorie. « Filtrer » cherche par nom (sans tenir compte des majuscules ni des accents) ; « Chercher des objets par propriétés » garde les objets qui ont au moins une des propriétés ou actions choisies.&lt;/p&gt; &lt;p&gt;Un clic sur un objet ouvre sa fiche : description, fréquence en fouille, recettes, objets qui l&apos;ouvrent et qu&apos;il ouvre, effet à la catapulte, décoration, arme de veille, encombrant, propriétés et actions.&lt;/p&gt; &lt;p&gt;La &lt;strong&gt;fréquence en fouille&lt;/strong&gt; est la chance d&apos;obtenir l&apos;objet lors d&apos;une fouille réussie, sur une zone non épuisée (ou épuisée, pour les deux objets qu&apos;on n&apos;y trouve que là) : un palier (de très courant à très rare), « ≈ 1 fouille réussie sur N » (« ≈ 5 fouilles réussies sur 8 » au-delà de 25 %) et le pourcentage exact.&lt;/p&gt; &lt;p&gt;Avec une ville active, le bouton caddie ajoute l&apos;objet à la liste de courses.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Alle Gegenstände, nach Kategorie. „Filtern“ sucht nach Name (ohne Beachtung von Groß-/Kleinschreibung und Akzenten); „Gegenstände nach Eigenschaften durchsuchen“ behält die Gegenstände, die mindestens eine der gewählten Eigenschaften oder Aktionen haben.&lt;/p&gt; &lt;p&gt;Ein Klick auf einen Gegenstand öffnet sein Infoblatt: Beschreibung, Häufigkeit beim Graben, Rezepte, Gegenstände, die ihn öffnen und die er öffnet, Wirkung beim Katapult, Dekoration, Wachwaffe, schwer, Eigenschaften und Aktionen.&lt;/p&gt; &lt;p&gt;Die &lt;strong&gt;Häufigkeit beim Graben&lt;/strong&gt; ist die Chance, den Gegenstand bei einer erfolgreichen Ausgrabung in einer nicht leergesuchten Zone zu erhalten (oder in einer leergesuchten, bei den zwei Gegenständen, die man nur dort findet): eine Stufe (von sehr gewöhnlich bis sehr selten), „≈ 1 erfolgreiche Ausgrabung von N“ („≈ 5 erfolgreiche Ausgrabungen von 8“ ab 25 %) und der genaue Prozentsatz.&lt;/p&gt; &lt;p&gt;Mit einer aktiven Stadt fügt die Einkaufswagen-Schaltfläche den Gegenstand der Einkaufsliste hinzu.&lt;/p&gt;</target>
             </trans-unit>
+            <trans-unit id="5872739682756299764" datatype="html">
+                <source>Utilisations</source>
+                <target state="translated">Nutzungen</target>
+            </trans-unit>
             <trans-unit id="5877715604390460271" datatype="html">
                 <source>Supprimer la source</source>
                 <target state="translated">Quelle löschen</target>
@@ -3534,6 +3538,10 @@
                 <source>Veilles</source>
                 <target state="final">Nachtwächter</target>
             </trans-unit>
+            <trans-unit id="2681189342619065736" datatype="html">
+                <source>Banni — coché : oui · décoché : non · indéterminé : tous</source>
+                <target state="translated">Verbannt — angehakt: ja · nicht angehakt: nein · unbestimmt: alle</target>
+            </trans-unit>
             <trans-unit id="2682868487071320453" datatype="html" approved="yes">
                 <source>Violet</source>
                 <target state="final">Violett</target>
@@ -3549,6 +3557,10 @@
             <trans-unit id="5906896176186306776" datatype="html">
                 <source>Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense propre :</source>
                 <target state="translated">Von der Stadt nach Fertigstellung tatsächlich gewonnene Verteidigung (verbrauchte Verteidigungsgegenstände, Auswirkungen auf Häuser, Särge…). Eigene Verteidigung:</target>
+            </trans-unit>
+            <trans-unit id="5908620986304850507" datatype="html">
+                <source>Niveau suivant de chacun</source>
+                <target state="translated">Nächste Stufe jedes Bürgers</target>
             </trans-unit>
             <trans-unit id="5909537349952143751" datatype="html" approved="yes">
                 <source>Statistiques</source>
@@ -4561,6 +4573,10 @@
             <trans-unit id="5956461158010502750" datatype="html" approved="yes">
                 <source>Enregistrer dans un fichier Excel</source>
                 <target state="final">In eine Excel-Datei speichern</target>
+            </trans-unit>
+            <trans-unit id="6533959590839709981" datatype="html">
+                <source>Proposées à chacun</source>
+                <target state="translated">Je Bürger vorgeschlagen</target>
             </trans-unit>
             <trans-unit id="6534526307832177556" datatype="html">
                 <source>Mes pré-villes</source>

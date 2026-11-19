@@ -50,7 +50,8 @@
                 gap: 0.25em 0.5em;
                 align-items: center;
 
-                h4 {
+                h4,
+                .wide {
                     grid-column: 1 / -1;
                 }
             }

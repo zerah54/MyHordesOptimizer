@@ -29,7 +29,8 @@
         </div>
         <mat-form-field subscriptSizing="dynamic">
             <mat-label i18n>Sac</mat-label>
-            <mho-select data-filter="bag" [ngModel]="selected_items()" (ngModelChange)="onItems($event)" [options]="item_options()" [bindLabel]="item_bind_label"
+            <mho-select data-filter="bag" [ngModel]="selected_items()" (ngModelChange)="onItems($event)" [options]="item_options()"
+                        [bindLabel]="item_bind_label"
                         bindIcon="img" multiple searchable></mho-select>
         </mat-form-field>
         <mat-form-field subscriptSizing="dynamic">
@@ -37,7 +38,7 @@
             <mho-select data-filter="status" [ngModel]="selected_status()" (ngModelChange)="onStatus($event)" [options]="all_status" bindIcon="img"
                         bindLabel="label" multiple searchable></mho-select>
         </mat-form-field>
-        <!-- Chamanique : potions puis immunité, sur une même ligne (ordre de la liste). -->
+        <!-- Potions, immunité puis bannissement, sur une même ligne. -->
         <div class="filter-row">
             @if (options(POTIONS_ID).length > 0) {
                 <span class="filter-label" i18n-matTooltip matTooltip="Potions bues">
@@ -50,17 +51,26 @@
                     }
                 </mat-button-toggle-group>
             }
-            <button type="button" class="bool-control" data-filter="immune" i18n-matTooltip matTooltip="Immunité — coché : oui · décoché : non · indéterminé : tous"
+            <button type="button" class="bool-control" data-filter="immune" i18n-matTooltip
+                    matTooltip="Immunité — coché : oui · décoché : non · indéterminé : tous"
                     (click)="store.cycleBool('immune')">
                 <mat-checkbox class="bool-filter" disableRipple tabindex="-1" [checked]="store.boolValue('immune') === true"
                               [indeterminate]="store.boolValue('immune') === null">
                     <img class="filter-icon" [src]="HORDES_IMG_REPO + 'icons/small_restoresp.gif'" i18n-alt alt="Immunité">
                 </mat-checkbox>
             </button>
+            <button type="button" class="bool-control" data-filter="banned" i18n-matTooltip
+                    matTooltip="Banni — coché : oui · décoché : non · indéterminé : tous"
+                    (click)="store.cycleBool('banned')">
+                <mat-checkbox class="bool-filter" disableRipple tabindex="-1" [checked]="store.boolValue('banned') === true"
+                              [indeterminate]="store.boolValue('banned') === null">
+                    <img class="filter-icon" [src]="HORDES_IMG_REPO + 'icons/banished.gif'" i18n-alt alt="Banni">
+                </mat-checkbox>
+            </button>
         </div>
     </section>
 
-    <section class="filters-section">
+    <section class="filters-section toggles">
         <h4 i18n>Actions quotidiennes</h4>
         @for (action of daily_actions(); track action.key) {
             <div class="filter-row bool-row">
@@ -89,7 +99,7 @@
                     </button>
                 </div>
             } @else if (options('heroic_' + action.key).length > 0) {
-                <div class="filter-row">
+                <div class="filter-row" [class.wide]="options('heroic_' + action.key).length > 3">
                     <span class="filter-label" [matTooltip]="action.getLabel()">
                         <img [src]="HORDES_IMG_REPO + action.value.img" [alt]="action.getLabel()">
                     </span>
@@ -118,7 +128,7 @@
                     </button>
                 </div>
             } @else if (options('home_' + home.key).length > 0) {
-                <div class="filter-row" [attr.data-filter]="'home_' + home.key">
+                <div class="filter-row" [attr.data-filter]="'home_' + home.key" [class.wide]="options('home_' + home.key).length > 3">
                     <span class="filter-label" [matTooltip]="home.getLabel()">
                         <img [src]="HORDES_IMG_REPO + homeIcon(home)" [alt]="home.getLabel()">
                     </span>
@@ -138,9 +148,10 @@
             <h4 i18n>Compétences et camping</h4>
             @for (family of hero_skill_families; track family.key) {
                 @if (options(HERO_SKILL_ID_PREFIX + family.key).length > 0) {
-                    <div class="filter-row">
+                    <div class="filter-row" [class.wide]="options(HERO_SKILL_ID_PREFIX + family.key).length > 3">
                         <span class="filter-label hero-skill-letter" [matTooltip]="hero_skill_names()[family.key]">{{ family.letter }}</span>
-                        <mat-button-toggle-group class="value-filter" hideMultipleSelectionIndicator multiple [value]="store.values(HERO_SKILL_ID_PREFIX + family.key)"
+                        <mat-button-toggle-group class="value-filter" hideMultipleSelectionIndicator multiple
+                                                 [value]="store.values(HERO_SKILL_ID_PREFIX + family.key)"
                                                  (change)="store.setValues(HERO_SKILL_ID_PREFIX + family.key, $event.value)">
                             @for (value of options(HERO_SKILL_ID_PREFIX + family.key); track value) {
                                 <mat-button-toggle [value]="value">{{ value }}</mat-button-toggle>
@@ -150,7 +161,7 @@
                 }
             }
             @if (options(CAMPING_COUNT_ID).length > 0) {
-                <div class="filter-row">
+                <div class="filter-row" [class.wide]="options(CAMPING_COUNT_ID).length > 3">
                     <span class="filter-label" [matTooltip]="camping_count_label">
                         <img [src]="HORDES_IMG_REPO + 'emotes/sleep.gif'" [alt]="camping_count_label">
                     </span>

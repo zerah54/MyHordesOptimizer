@@ -2684,6 +2684,9 @@
             <trans-unit id="4562667602252736363" datatype="html">
                 <source>&lt;p&gt;Tous les objets, par catégorie. « Filtrer » cherche par nom (sans tenir compte des majuscules ni des accents) ; « Chercher des objets par propriétés » garde les objets qui ont au moins une des propriétés ou actions choisies.&lt;/p&gt; &lt;p&gt;Un clic sur un objet ouvre sa fiche : description, fréquence en fouille, recettes, objets qui l&apos;ouvrent et qu&apos;il ouvre, effet à la catapulte, décoration, arme de veille, encombrant, propriétés et actions.&lt;/p&gt; &lt;p&gt;La &lt;strong&gt;fréquence en fouille&lt;/strong&gt; est la chance d&apos;obtenir l&apos;objet lors d&apos;une fouille réussie, sur une zone non épuisée (ou épuisée, pour les deux objets qu&apos;on n&apos;y trouve que là) : un palier (de très courant à très rare), « ≈ 1 fouille réussie sur N » (« ≈ 5 fouilles réussies sur 8 » au-delà de 25 %) et le pourcentage exact.&lt;/p&gt; &lt;p&gt;Avec une ville active, le bouton caddie ajoute l&apos;objet à la liste de courses.&lt;/p&gt;</source>
             </trans-unit>
+            <trans-unit id="5872739682756299764" datatype="html">
+                <source>Utilisations</source>
+            </trans-unit>
             <trans-unit id="5877715604390460271" datatype="html">
                 <source>Supprimer la source</source>
             </trans-unit>
@@ -3254,6 +3257,9 @@
             <trans-unit id="268108544779646824" datatype="html">
                 <source>Veilles</source>
             </trans-unit>
+            <trans-unit id="2681189342619065736" datatype="html">
+                <source>Banni — coché : oui · décoché : non · indéterminé : tous</source>
+            </trans-unit>
             <trans-unit id="2682868487071320453" datatype="html">
                 <source>Violet</source>
             </trans-unit>
@@ -3265,6 +3271,9 @@
             </trans-unit>
             <trans-unit id="5906896176186306776" datatype="html">
                 <source>Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense propre :</source>
+            </trans-unit>
+            <trans-unit id="5908620986304850507" datatype="html">
+                <source>Niveau suivant de chacun</source>
             </trans-unit>
             <trans-unit id="5909537349952143751" datatype="html">
                 <source>Statistiques</source>
@@ -4021,6 +4030,9 @@
             </trans-unit>
             <trans-unit id="5956461158010502750" datatype="html">
                 <source>Enregistrer dans un fichier Excel</source>
+            </trans-unit>
+            <trans-unit id="6533959590839709981" datatype="html">
+                <source>Proposées à chacun</source>
             </trans-unit>
             <trans-unit id="6534526307832177556" datatype="html">
                 <source>Mes pré-villes</source>
