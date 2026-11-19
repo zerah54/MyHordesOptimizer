@@ -376,12 +376,12 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
         [Fact]
         public void SerializeContent_AcceptsActionTaskWithSeveralUses()
         {
-            BuildingPlanValidator.SerializeContent(WithTasks(new PlanTaskDto { Id = "a1", Kind = "action", Ref = "home_scavenge", Count = 3, Pa = 3 }));
+            BuildingPlanValidator.SerializeContent(WithTasks(new PlanTaskDto { Id = "a1", Kind = "action", Ref = "trash", Count = 5, Pa = 5 }));
         }
 
         [Theory]
         [InlineData("action", 0)]
-        [InlineData("action", 4)]
+        [InlineData("action", 6)]
         [InlineData("free", 2)]
         public void SerializeContent_RejectsInvalidUses(string kind, int count)
         {

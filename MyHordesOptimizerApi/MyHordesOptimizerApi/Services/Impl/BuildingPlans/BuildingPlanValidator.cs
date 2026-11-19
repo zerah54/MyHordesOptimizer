@@ -1,4 +1,4 @@
-using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans;
+﻿using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using System.Collections.Generic;
@@ -20,8 +20,8 @@ namespace MyHordesOptimizerApi.Services.Impl.BuildingPlans
         private const int MaxItemValue = 10000;
         private const int MaxPlanTier = 2;
         private const int MaxUpgradeLevel = 20;
-        /// <summary>Utilisations d'une action dans la journée : 3 fouilles des galeries pour le Fouineur (MyHordes, <c>home_scavenge_pro</c>).</summary>
-        private const int MaxActionUses = 3;
+        /// <summary>Utilisations d'une action dans la journée : jusqu'à 5 fouilles des déchets (Fouineur 4, +1 par compétence héroïque).</summary>
+        private const int MaxActionUses = 5;
         private static readonly string[] Pools = { "banned", "regular" };
         private static readonly HashSet<string> TownLineSources = new() { "rest", "dice", "cards", "guitar" };
         private static readonly string[] BuildingStepKinds = { "build", "repair" };
