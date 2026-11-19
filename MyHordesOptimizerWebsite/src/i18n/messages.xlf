@@ -59,6 +59,9 @@
             <trans-unit id="739360280600269035" datatype="html">
                 <source>Aucun chantier ne correspond.</source>
             </trans-unit>
+            <trans-unit id="73974147979864893" datatype="html">
+                <source>Retirer l&apos;objet</source>
+            </trans-unit>
             <trans-unit id="5265009546543742591" datatype="html">
                 <source><x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> restants</source>
             </trans-unit>
@@ -116,6 +119,9 @@
             <trans-unit id="6508140536381023521" datatype="html">
                 <source>cumulable</source>
             </trans-unit>
+            <trans-unit id="6508974745847882085" datatype="html">
+                <source>Lier la pré-ville</source>
+            </trans-unit>
             <trans-unit id="650998181942021000" datatype="html">
                 <source>Laisser à N <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/></source>
             </trans-unit>
@@ -155,6 +161,9 @@
             <trans-unit id="7342094063217636527" datatype="html">
                 <source>dans un rayon de 3×3 cases</source>
             </trans-unit>
+            <trans-unit id="7347816007856030333" datatype="html">
+                <source>Statuts manquants</source>
+            </trans-unit>
             <trans-unit id="6505207217791485039" datatype="html">
                 <source>Chantier d’événement</source>
             </trans-unit>
@@ -172,6 +181,9 @@
             </trans-unit>
             <trans-unit id="2436654208607636758" datatype="html">
                 <source>MyHordes Optimizer peut envoyer ce que vous voyez dans le jeu à MyHordes Optimizer, Gest&apos;Hordes et Fata Morgana, en un clic. Cochez « Mise à jour des outils externes », puis les outils à mettre à jour et ce qu&apos;il faut envoyer à chacun.</source>
+            </trans-unit>
+            <trans-unit id="2439350658453270377" datatype="html">
+                <source>à rapatrier</source>
             </trans-unit>
             <trans-unit id="2441310650591980029" datatype="html">
                 <source>Consulter et s&apos;inscrire</source>
@@ -193,6 +205,9 @@
             </trans-unit>
             <trans-unit id="2791995237105691890" datatype="html">
                 <source>Palier 3</source>
+            </trans-unit>
+            <trans-unit id="2797140291914009508" datatype="html">
+                <source>Ville observée : lecture seule.</source>
             </trans-unit>
             <trans-unit id="2799096675787503297" datatype="html">
                 <source>Personne <x id="INTERPOLATION" equiv-text="{{ index + 1 }}"/></source>
@@ -283,6 +298,9 @@
             </trans-unit>
             <trans-unit id="3398530390425915671" datatype="html">
                 <source>Nom du thème</source>
+            </trans-unit>
+            <trans-unit id="3399210006531496130" datatype="html">
+                <source>Attribuer un objet…</source>
             </trans-unit>
             <trans-unit id="8780270810415322734" datatype="html">
                 <source>Second Souffle</source>
@@ -425,6 +443,9 @@
             <trans-unit id="8263357425236059440" datatype="html">
                 <source>Habitant</source>
             </trans-unit>
+            <trans-unit id="899743098389024874" datatype="html">
+                <source>Risque</source>
+            </trans-unit>
             <trans-unit id="8998140217207259342" datatype="html">
                 <source>Rassasié(e)</source>
             </trans-unit>
@@ -458,6 +479,9 @@
             <trans-unit id="6216056219276546927" datatype="html">
                 <source>&lt;p&gt;Cherche les recettes d&apos;assemblage (à la main) qui produisent un objet, puis celles qui produisent ses composants. Options : &lt;strong&gt;text&lt;/strong&gt; (nom de l&apos;objet, même partiel), &lt;strong&gt;language&lt;/strong&gt; (langue du nom, obligatoire), private-msg. Si les recettes sont trop nombreuses pour un message, la fin est tronquée et le bot l&apos;indique.&lt;/p&gt;</source>
             </trans-unit>
+            <trans-unit id="6224179245540137049" datatype="html">
+                <source>de base</source>
+            </trans-unit>
             <trans-unit id="6227779130323052819" datatype="html">
                 <source>Ermite</source>
             </trans-unit>
@@ -484,6 +508,9 @@
             </trans-unit>
             <trans-unit id="6520359063458937943" datatype="html">
                 <source>Apprivoiseur</source>
+            </trans-unit>
+            <trans-unit id="1440294832298589037" datatype="html">
+                <source>Discours rassurant multicolore</source>
             </trans-unit>
             <trans-unit id="1448487719057933782" datatype="html">
                 <source>Valables sur tout le trajet. Une consigne pour une case précise se pose dans la feuille de route.</source>
@@ -563,6 +590,9 @@
             <trans-unit id="8845816518654854448" datatype="html">
                 <source>Dupliquer le tracé</source>
             </trans-unit>
+            <trans-unit id="8440938975161293326" datatype="html">
+                <source>de réparations</source>
+            </trans-unit>
             <trans-unit id="8442830226345256856" datatype="html">
                 <source>&lt;p&gt;Activez « Mode édition » :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;« Ajouter un objet », dans la zone choisie (∞ pour toutes) ;&lt;/li&gt; &lt;li&gt;glissez les lignes pour les ordonner, changez dépôt, zone ou stock souhaité, supprimez une ligne ;&lt;/li&gt; &lt;li&gt;chaque modification est enregistrée automatiquement ;&lt;/li&gt; &lt;li&gt;une icône ⚠ signale le même objet deux fois dans la même zone : tant qu&apos;il reste un doublon, la liste n&apos;est pas enregistrée.&lt;/li&gt; &lt;/ul&gt;</source>
             </trans-unit>
@@ -575,6 +605,9 @@
             <trans-unit id="4811628210824588914" datatype="html">
                 <source>Profil <x id="INTERPOLATION" equiv-text="{{ row.camper.profile_number }}"/></source>
             </trans-unit>
+            <trans-unit id="4812275399189485878" datatype="html">
+                <source>Écart avec le budget validé</source>
+            </trans-unit>
             <trans-unit id="4813554456449727568" datatype="html">
                 <source>Peut être empoisonné</source>
             </trans-unit>
@@ -583,6 +616,12 @@
             </trans-unit>
             <trans-unit id="7070606596322847118" datatype="html">
                 <source>Peut être cuisiné</source>
+            </trans-unit>
+            <trans-unit id="7075715852234336134" datatype="html">
+                <source>Validé le</source>
+            </trans-unit>
+            <trans-unit id="7083164861916386576" datatype="html">
+                <source>Pré-ville</source>
             </trans-unit>
             <trans-unit id="7085625235884669711" datatype="html">
                 <source>Brut</source>
@@ -701,6 +740,9 @@
             <trans-unit id="2515846493317336302" datatype="html">
                 <source>&lt;ul&gt; &lt;li&gt;&lt;strong&gt;Notes de version&lt;/strong&gt; : ce qui a changé dans la version installée, avec un lien vers les versions plus anciennes. Une pastille violette sur le bouton signale des notes pas encore lues ; un bandeau les annonce après chaque mise à jour.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Mise à jour disponible&lt;/strong&gt; : n&apos;apparaît que si une version plus récente existe, avec une pastille rose sur le bouton. Le lien mène à la page de mise à jour de votre extension ou de votre script.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Des bugs ? Des idées ?&lt;/strong&gt; : lien vers le <x id="link" equiv-text="discord_link"/> de MyHordes Optimizer.&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Modifier mon ID externe pour les apps&lt;/strong&gt; : voir plus haut.&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;En cas d&apos;erreur de communication avec MyHordes Optimizer, le message indique la version installée et la version à jour.&lt;/p&gt;</source>
             </trans-unit>
+            <trans-unit id="2516008215118759127" datatype="html">
+                <source>Phrase prévue / réelle</source>
+            </trans-unit>
             <trans-unit id="7650742156060535549" datatype="html">
                 <source>Filtres supplémentaires</source>
             </trans-unit>
@@ -718,6 +760,9 @@
             </trans-unit>
             <trans-unit id="7659914592468009285" datatype="html">
                 <source>Ligne horizontale</source>
+            </trans-unit>
+            <trans-unit id="2525027550114457351" datatype="html">
+                <source>Améliorer sa maison </source>
             </trans-unit>
             <trans-unit id="2530467185206486896" datatype="html">
                 <source>Tous ceux qui le voient</source>
@@ -754,6 +799,9 @@
             </trans-unit>
             <trans-unit id="5394832192967179485" datatype="html">
                 <source>Le calcul utilise votre carte graphique ; le résultat est partagé avec votre ville</source>
+            </trans-unit>
+            <trans-unit id="5397635422845086961" datatype="html">
+                <source>Aucune pré-ville.</source>
             </trans-unit>
             <trans-unit id="4169579143978188553" datatype="html">
                 <source>Zone de rapatriement</source>
@@ -866,6 +914,9 @@
             <trans-unit id="8459968873953509940" datatype="html">
                 <source>Ramasser un objet de défense de zone </source>
             </trans-unit>
+            <trans-unit id="2549002466054602831" datatype="html">
+                <source>prévu, non vérifié</source>
+            </trans-unit>
             <trans-unit id="2553390219950487386" datatype="html">
                 <source>Créer un nouveau thème</source>
             </trans-unit>
@@ -887,11 +938,17 @@
             <trans-unit id="258326421230829262" datatype="html">
                 <source>Palier</source>
             </trans-unit>
+            <trans-unit id="2589872889962387705" datatype="html">
+                <source>Retirer de la liste</source>
+            </trans-unit>
             <trans-unit id="259496050546073448" datatype="html">
                 <source>Masquer pour ce jour</source>
             </trans-unit>
             <trans-unit id="2599949684121480686" datatype="html">
                 <source>PA de base</source>
+            </trans-unit>
+            <trans-unit id="3442896608946395746" datatype="html">
+                <source>Piocher : Jeu de cartes incomplet</source>
             </trans-unit>
             <trans-unit id="3448462145758383019" datatype="html">
                 <source>Total</source>
@@ -962,8 +1019,23 @@
             <trans-unit id="4981764130395872783" datatype="html">
                 <source>Cartographier le désert</source>
             </trans-unit>
+            <trans-unit id="4982224486411282938" datatype="html">
+                <source>Nommer organisateur</source>
+            </trans-unit>
             <trans-unit id="498248526992500843" datatype="html">
                 <source>Investissez vos <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> par paires pour ne rien perdre.</source>
+            </trans-unit>
+            <trans-unit id="4983859294258055145" datatype="html">
+                <source>Dés / Cartes</source>
+            </trans-unit>
+            <trans-unit id="4986139580483965783" datatype="html">
+                <source>Ajouté</source>
+            </trans-unit>
+            <trans-unit id="3413681168773811806" datatype="html">
+                <source>Liée : lecture seule</source>
+            </trans-unit>
+            <trans-unit id="341714432170817902" datatype="html">
+                <source>Du haut des remparts, vous vous sentez confiant. Vous attendez la hordes, que vous apercevez déjà.</source>
             </trans-unit>
             <trans-unit id="3420757244733292611" datatype="html">
                 <source>Fouilles réussies</source>
@@ -997,6 +1069,9 @@
             </trans-unit>
             <trans-unit id="180879386399550529" datatype="html">
                 <source>Supprimer</source>
+            </trans-unit>
+            <trans-unit id="4242072266313850129" datatype="html">
+                <source>Les modifications faites depuis la liaison sur les lignes ajoutées seront perdues.</source>
             </trans-unit>
             <trans-unit id="4242937041384260306" datatype="html">
                 <source>Classement</source>
@@ -1034,6 +1109,9 @@
             <trans-unit id="6916259089174820361" datatype="html">
                 <source>Campeur/Campeuse avisé(e)</source>
             </trans-unit>
+            <trans-unit id="6919484095172865011" datatype="html">
+                <source>piles sont consommées pour la veille</source>
+            </trans-unit>
             <trans-unit id="692526782263495294" datatype="html">
                 <source><x id="ap" equiv-text="ap"/> PA</source>
             </trans-unit>
@@ -1054,6 +1132,9 @@
             </trans-unit>
             <trans-unit id="4895554764332598662" datatype="html">
                 <source>Clic : détail de la zone · Ctrl + molette : zoom · glisser : se déplacer</source>
+            </trans-unit>
+            <trans-unit id="4897275022402974936" datatype="html">
+                <source>Dupliquer la pré-ville</source>
             </trans-unit>
             <trans-unit id="5678708974631071290" datatype="html">
                 <source>Arme de veille</source>
@@ -1133,6 +1214,9 @@
             <trans-unit id="6032118487199649794" datatype="html">
                 <source>Plein</source>
             </trans-unit>
+            <trans-unit id="6036234623452347992" datatype="html">
+                <source>Ouvrier</source>
+            </trans-unit>
             <trans-unit id="6038281835621310494" datatype="html">
                 <source>Outils</source>
             </trans-unit>
@@ -1148,17 +1232,32 @@
             <trans-unit id="5014730264289450708" datatype="html">
                 <source>Tout importer</source>
             </trans-unit>
+            <trans-unit id="5036204813296103236" datatype="html">
+                <source>Objet à attribuer</source>
+            </trans-unit>
             <trans-unit id="5036795245990193353" datatype="html">
                 <source>Coût</source>
             </trans-unit>
             <trans-unit id="5037437391296624618" datatype="html">
                 <source>Information</source>
             </trans-unit>
+            <trans-unit id="5037925350590342259" datatype="html">
+                <source>Chien</source>
+            </trans-unit>
+            <trans-unit id="5046390911661102208" datatype="html">
+                <source>Le plan de chantiers effectif de ce jour ne requiert aucun objet.</source>
+            </trans-unit>
             <trans-unit id="495015526996921327" datatype="html">
                 <source>Enregistrer les valeurs </source>
             </trans-unit>
             <trans-unit id="5939392791181422027" datatype="html">
                 <source> Importe tous les référentiels depuis l&apos;API MyHordes en une seule opération. </source>
+            </trans-unit>
+            <trans-unit id="725742421171098229" datatype="html">
+                <source>Copier depuis le jour</source>
+            </trans-unit>
+            <trans-unit id="7261119053991584864" datatype="html">
+                <source>Goule</source>
             </trans-unit>
             <trans-unit id="7266440197449540652" datatype="html">
                 <source>Citoyens vivants</source>
@@ -1190,6 +1289,9 @@
             <trans-unit id="300198309511639809" datatype="html">
                 <source>Italique</source>
             </trans-unit>
+            <trans-unit id="3003639840742740612" datatype="html">
+                <source>Lien copié</source>
+            </trans-unit>
             <trans-unit id="3007172383130908272" datatype="html">
                 <source>Villes des saisons passées</source>
             </trans-unit>
@@ -1214,6 +1316,9 @@
             <trans-unit id="2603426898451246707" datatype="html">
                 <source>Libre</source>
             </trans-unit>
+            <trans-unit id="2603936883391638201" datatype="html">
+                <source>Préparation</source>
+            </trans-unit>
             <trans-unit id="2605138465430014558" datatype="html">
                 <source>Se soigner</source>
             </trans-unit>
@@ -1229,6 +1334,9 @@
             <trans-unit id="263282012627842863" datatype="html">
                 <source>Toutes les saisons</source>
             </trans-unit>
+            <trans-unit id="9172355112975424399" datatype="html">
+                <source>Totaux indisponibles : le référentiel ou l&apos;état de la ville n&apos;est pas chargé.</source>
+            </trans-unit>
             <trans-unit id="9173494459485837959" datatype="html">
                 <source>Saison terminée</source>
             </trans-unit>
@@ -1240,6 +1348,15 @@
             </trans-unit>
             <trans-unit id="6872015512509288445" datatype="html">
                 <source>Reprend là où le quota avait interrompu la passe précédente. Décoche pour réimporter des villes déjà connues.</source>
+            </trans-unit>
+            <trans-unit id="6874413855566455787" datatype="html">
+                <source>Plafond de veilleurs dépassé</source>
+            </trans-unit>
+            <trans-unit id="6876710599723733240" datatype="html">
+                <source>Défense réelle</source>
+            </trans-unit>
+            <trans-unit id="6790264098251581129" datatype="html">
+                <source>Citoyens simulés :</source>
             </trans-unit>
             <trans-unit id="6790914208839292090" datatype="html">
                 <source>Tooltips détaillés</source>
@@ -1292,6 +1409,9 @@
             <trans-unit id="5234742419849902975" datatype="html">
                 <source>Statistiques des joueurs</source>
             </trans-unit>
+            <trans-unit id="3202887906710723012" datatype="html">
+                <source>Programme de veille à</source>
+            </trans-unit>
             <trans-unit id="3204845904551943382" datatype="html">
                 <source>+1 amélioration</source>
             </trans-unit>
@@ -1337,6 +1457,9 @@
             <trans-unit id="1082504990356851733" datatype="html">
                 <source>Options pour le forum de MyHordes, dans la catégorie « Améliorations de l&apos;interface ».</source>
             </trans-unit>
+            <trans-unit id="1087409167047719035" datatype="html">
+                <source>Piles</source>
+            </trans-unit>
             <trans-unit id="1087900872515566478" datatype="html">
                 <source>Objets</source>
             </trans-unit>
@@ -1375,6 +1498,9 @@
             </trans-unit>
             <trans-unit id="8415875870300524706" datatype="html">
                 <source>Lien</source>
+            </trans-unit>
+            <trans-unit id="8416134949077497645" datatype="html">
+                <source>Cocher ouvriers</source>
             </trans-unit>
             <trans-unit id="8425576653141537307" datatype="html">
                 <source>Capacité Repos (1 à 4) : Campeur pro et plafond en découlent. « ? » : à cocher à la main</source>
@@ -1415,6 +1541,9 @@
             <trans-unit id="3975323863652376792" datatype="html">
                 <source>attendu</source>
             </trans-unit>
+            <trans-unit id="3976541439106448791" datatype="html">
+                <source>liée</source>
+            </trans-unit>
             <trans-unit id="1163439985107240214" datatype="html">
                 <source>Niveau</source>
             </trans-unit>
@@ -1424,8 +1553,14 @@
             <trans-unit id="7219731406710347591" datatype="html">
                 <source>&lt;ul&gt; &lt;li&gt;une pastille signale les cases qui portent des consignes des expéditions du jour : le nombre de consignes, de la couleur du tracé suivi (grise pour une expédition sans tracé). Elle disparaît avec le tracé quand vous le masquez ;&lt;/li&gt; &lt;li&gt;au survol, l&apos;infobulle montre les consignes qui vous concernent (celles de toute votre expédition et les vôtres), puis résume les autres ;&lt;/li&gt; &lt;li&gt;le détail de la zone (clic) les liste toutes : les vôtres se cochent, chacune se modifie, et « Ajouter une consigne ici » propose les expéditions du jour, celles dont le tracé passe par la case en tête ;&lt;/li&gt; &lt;li&gt;la fiche d&apos;un tracé indique le nombre de consignes posées sur ses cases.&lt;/li&gt; &lt;/ul&gt;</source>
             </trans-unit>
+            <trans-unit id="7223342050062899983" datatype="html">
+                <source>Buvez avant la guitare, +1 {pa}</source>
+            </trans-unit>
             <trans-unit id="7224323358969869740" datatype="html">
                 <source>J<x id="day" equiv-text="day"/></source>
+            </trans-unit>
+            <trans-unit id="7228599931829672029" datatype="html">
+                <source>Debout sur les remparts de la ville, vous êtes très confiant quant à l’issue de cette soirée. Vous ne mourrez pas aujourd&apos;hui ! </source>
             </trans-unit>
             <trans-unit id="723802104549555213" datatype="html">
                 <source>Vous n&apos;êtes inscrit sur aucune expédition ce jour-là.</source>
@@ -1517,6 +1652,9 @@
             <trans-unit id="2857642044882264074" datatype="html">
                 <source>Nouveau thème</source>
             </trans-unit>
+            <trans-unit id="1941717768262017001" datatype="html">
+                <source>Créer une proposition</source>
+            </trans-unit>
             <trans-unit id="1948268959990709736" datatype="html">
                 <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</source>
             </trans-unit>
@@ -1534,6 +1672,9 @@
             </trans-unit>
             <trans-unit id="5317507283587519022" datatype="html">
                 <source>Filtrer sur la corrélation <x id="INTERPOLATION" equiv-text="{{ row.entry.correlationId }}"/></source>
+            </trans-unit>
+            <trans-unit id="5317951812053197030" datatype="html">
+                <source>Attaque estimée inconnue</source>
             </trans-unit>
             <trans-unit id="5318387099035005598" datatype="html">
                 <source>&lt;ul&gt; &lt;li&gt;Zoom : boutons − et +, Ctrl + molette, ou pincement sur un écran tactile ; « Ajuster à l&apos;écran » affiche toute la carte ;&lt;/li&gt; &lt;li&gt;« Ma position » centre la carte sur votre case ;&lt;/li&gt; &lt;li&gt;glissez la carte à la souris pour la déplacer ;&lt;/li&gt; &lt;li&gt;en zoom réduit, seul le coin bas droite des cases reste affiché ; en zoom fort, l&apos;illustration des bâtiments apparaît.&lt;/li&gt; &lt;/ul&gt;</source>
@@ -1604,6 +1745,9 @@
             <trans-unit id="3480682536108319081" datatype="html">
                 <source>État</source>
             </trans-unit>
+            <trans-unit id="3485164006062720488" datatype="html">
+                <source>Revalider le budget</source>
+            </trans-unit>
             <trans-unit id="3487914015264584995" datatype="html">
                 <source>Dézoomer</source>
             </trans-unit>
@@ -1616,11 +1760,17 @@
             <trans-unit id="3193976279273491157" datatype="html">
                 <source>Actions</source>
             </trans-unit>
+            <trans-unit id="3197202105243682681" datatype="html">
+                <source>Aucun plan de chantiers effectif lisible pour ce jour.</source>
+            </trans-unit>
             <trans-unit id="3197462990695345391" datatype="html">
                 <source>&lt;p&gt;Le bouton « Tracés » ouvre la liste des tracés de la ville, réservée à ses citoyens, vivants ou morts (il n&apos;apparaît pas en observant la ville d&apos;un autre) : les tracés de MyHordes Optimizer, rangés par expédition du jour, sans expédition et jours précédents, puis les itinéraires « Créés dans MyHordes » (relus à chaque mise à jour, effacés chaque nuit).&lt;/p&gt; &lt;ul&gt; &lt;li&gt;l&apos;œil masque ou affiche un tracé sur la carte ; sa couleur se change pour vous seul, ou pour toute la ville avec « Changer pour tous » si vous pouvez le modifier ;&lt;/li&gt; &lt;li&gt;un clic sur un tracé ouvre sa fiche : départ, arrivée, longueur, auteur, visibilité et expéditions qui le suivent ;&lt;/li&gt; &lt;li&gt;sur la fiche d&apos;un itinéraire créé dans MyHordes, « Copier dans MHO » en fait un tracé de MyHordes Optimizer : modifiable, liable à une expédition et gardé après la nuit ;&lt;/li&gt; &lt;li&gt;« Nouveau tracé » : chaque clic sur la carte ajoute une destination, le chemin entre deux clics suit le « Meilleur potentiel » ou « Le plus direct (en L) ». Échap retire la dernière destination ; un clic droit (ou un appui long) sur une case du tracé retire tout ce qui suit ;&lt;/li&gt; &lt;li&gt;donnez-lui un nom et une couleur, choisissez qui le voit et qui peut le modifier, puis « Enregistrer ». Un tracé lié à une expédition reste visible de toute la ville ;&lt;/li&gt; &lt;li&gt;pendant la saisie, la liste des destinations montre aussi les cases à consignes des expéditions du jour qui suivent le tracé, et celles qu&apos;il ne traverse plus (« Hors tracé »).&lt;/li&gt; &lt;/ul&gt;</source>
             </trans-unit>
             <trans-unit id="3199834953171289620" datatype="html">
                 <source>Distance (PA)</source>
+            </trans-unit>
+            <trans-unit id="8202111612388342478" datatype="html">
+                <source>Du haut des remparts, vous vous sentez invincible. Rien ne vous fera chanceler cette nuit.</source>
             </trans-unit>
             <trans-unit id="8203235161231309585" datatype="html">
                 <source>D&apos;où viennent les données</source>
@@ -1636,6 +1786,9 @@
             </trans-unit>
             <trans-unit id="8207036891462136434" datatype="html">
                 <source>Importer la ville</source>
+            </trans-unit>
+            <trans-unit id="8207776670487846129" datatype="html">
+                <source>Quantité attribuée supérieure au disponible :</source>
             </trans-unit>
             <trans-unit id="690346267619052282" datatype="html">
                 <source>Supprimer la ville</source>
@@ -1721,6 +1874,9 @@
             <trans-unit id="7806990246101483553" datatype="html">
                 <source>manque</source>
             </trans-unit>
+            <trans-unit id="7808583851072911056" datatype="html">
+                <source>âge inconnu</source>
+            </trans-unit>
             <trans-unit id="7822819378921556725" datatype="html">
                 <source>Chemin entre deux clics</source>
             </trans-unit>
@@ -1738,6 +1894,9 @@
             </trans-unit>
             <trans-unit id="7287607689388981179" datatype="html">
                 <source>Expert</source>
+            </trans-unit>
+            <trans-unit id="7292133942591917693" datatype="html">
+                <source>Membres</source>
             </trans-unit>
             <trans-unit id="7299849936272637676" datatype="html">
                 <source>Séquence</source>
@@ -1798,6 +1957,9 @@
             </trans-unit>
             <trans-unit id="125095210926844541" datatype="html">
                 <source>{VAR_PLURAL, plural, =0 {objet} =1 {objet} other {objets}}</source>
+            </trans-unit>
+            <trans-unit id="1254853259955887554" datatype="html">
+                <source>Citoyens simulés</source>
             </trans-unit>
             <trans-unit id="1256499862458321093" datatype="html">
                 <source>Bas gauche</source>
@@ -1877,6 +2039,9 @@
             <trans-unit id="1653227668373898364" datatype="html">
                 <source>zone</source>
             </trans-unit>
+            <trans-unit id="1654597656653944683" datatype="html">
+                <source>Données de sac périmées ou inconnues, le réel est peut-être faux pour :</source>
+            </trans-unit>
             <trans-unit id="1654995770303703868" datatype="html">
                 <source>Potions bues</source>
             </trans-unit>
@@ -1903,6 +2068,9 @@
             </trans-unit>
             <trans-unit id="8990629910323339983" datatype="html">
                 <source>Fermer l&apos;éditeur</source>
+            </trans-unit>
+            <trans-unit id="8991101699648603906" datatype="html">
+                <source>Demain : attaque</source>
             </trans-unit>
             <trans-unit id="8991308190521486230" datatype="html">
                 <source>Alertes</source>
@@ -1934,6 +2102,9 @@
             <trans-unit id="7145973005882973258" datatype="html">
                 <source>Sortir du groupe</source>
             </trans-unit>
+            <trans-unit id="7145994133323111361" datatype="html">
+                <source>Statuts prévus</source>
+            </trans-unit>
             <trans-unit id="165011294537677821" datatype="html">
                 <source>Améliorations</source>
             </trans-unit>
@@ -1945,6 +2116,9 @@
             </trans-unit>
             <trans-unit id="1075511902879442503" datatype="html">
                 <source>Laisser <x id="label" equiv-text="label"/> à <x id="remaining" equiv-text="step.targetRemaining"/>:ap:</source>
+            </trans-unit>
+            <trans-unit id="1078748911595288262" datatype="html">
+                <source>Debout sur les remparts de la ville, vous êtes très confiant quant à l’issue de cette soirée. Vous ne mourrez pas aujourd&apos;hui !</source>
             </trans-unit>
             <trans-unit id="2891923341232420157" datatype="html">
                 <source>objets correspondent</source>
@@ -2021,11 +2195,17 @@
             <trans-unit id="2214907218498223387" datatype="html">
                 <source>Partie <x id="INTERPOLATION" equiv-text="{{ part_index + 1 }}"/></source>
             </trans-unit>
+            <trans-unit id="2222572714228197422" datatype="html">
+                <source><x id="name" equiv-text="plan.name"/> (copie)</source>
+            </trans-unit>
             <trans-unit id="2228045942343486283" datatype="html">
                 <source>Se cacher plus tard</source>
             </trans-unit>
             <trans-unit id="2232754981073069655" datatype="html">
                 <source>Plafond de 99 % (Repos niveau 4)</source>
+            </trans-unit>
+            <trans-unit id="2234911399396817963" datatype="html">
+                <source>Modification refusée : <x id="holder" equiv-text="lockHolderLabel(state, citizens)"/></source>
             </trans-unit>
             <trans-unit id="4731110158513700954" datatype="html">
                 <source>1 – Secteur partiellement repéré</source>
@@ -2051,9 +2231,6 @@
             <trans-unit id="6014923275411407635" datatype="html">
                 <source>Consulter la banque</source>
             </trans-unit>
-            <trans-unit id="6018531475876742676" datatype="html">
-                <source>Amélioration de maison</source>
-            </trans-unit>
             <trans-unit id="6019139638926667991" datatype="html">
                 <source>Ajouter au sac</source>
             </trans-unit>
@@ -2077,6 +2254,9 @@
             </trans-unit>
             <trans-unit id="6405569034950868714" datatype="html">
                 <source>Horizontal puis vertical, sans tenir compte des fouilles.</source>
+            </trans-unit>
+            <trans-unit id="5930890380870737301" datatype="html">
+                <source>Place déjà prise par <x id="pseudo" equiv-text="this.lockHolderName(state)"/></source>
             </trans-unit>
             <trans-unit id="5932960630557670586" datatype="html">
                 <source>Immunisé</source>
@@ -2117,8 +2297,14 @@
             <trans-unit id="2389814396008499761" datatype="html">
                 <source>Jours de survie</source>
             </trans-unit>
+            <trans-unit id="3851576978162888591" datatype="html">
+                <source>Copie impossible : le presse-papiers est inaccessible. Réessayez.</source>
+            </trans-unit>
             <trans-unit id="3854032884475026094" datatype="html">
                 <source>Mode âmes</source>
+            </trans-unit>
+            <trans-unit id="3857906544777437569" datatype="html">
+                <source>Quantité à attribuer</source>
             </trans-unit>
             <trans-unit id="3860715110536742352" datatype="html">
                 <source>restants</source>
@@ -2222,6 +2408,9 @@
             <trans-unit id="2633316885507998490" datatype="html">
                 <source>Copier au format forum</source>
             </trans-unit>
+            <trans-unit id="2635401317808705434" datatype="html">
+                <source>Nom de la pré-ville</source>
+            </trans-unit>
             <trans-unit id="2637874082250667584" datatype="html">
                 <source>Tirets</source>
             </trans-unit>
@@ -2233,6 +2422,9 @@
             </trans-unit>
             <trans-unit id="1134813073366387267" datatype="html">
                 <source>{VAR_PLURAL, plural, =0 {citoyen} =1 {citoyen} other {citoyens}}</source>
+            </trans-unit>
+            <trans-unit id="1137036203477225741" datatype="html">
+                <source>Toi, dans un autre onglet</source>
             </trans-unit>
             <trans-unit id="1139309491993682939" datatype="html">
                 <source>Supprimer la consigne</source>
@@ -2249,6 +2441,12 @@
             <trans-unit id="1146649801223955350" datatype="html">
                 <source>Incompatible avec le niveau d&apos;exploration : <x id="max" equiv-text="range.max"/> passages</source>
             </trans-unit>
+            <trans-unit id="1148089278841997168" datatype="html">
+                <source>à contacter</source>
+            </trans-unit>
+            <trans-unit id="4165705760001583442" datatype="html">
+                <source>La comparaison porte sur la proposition effective du jour : affichez-la pour voir l&apos;écart entre le prévu et le réel. </source>
+            </trans-unit>
             <trans-unit id="562741246556113481" datatype="html">
                 <source><x id="minutes" equiv-text="minutes"/>m</source>
             </trans-unit>
@@ -2257,6 +2455,9 @@
             </trans-unit>
             <trans-unit id="5635394140100875088" datatype="html">
                 <source>/translate (/traduire)</source>
+            </trans-unit>
+            <trans-unit id="5637553715791188697" datatype="html">
+                <source>Les expéditions du jour n&apos;ont pas pu être rechargées.</source>
             </trans-unit>
             <trans-unit id="371083623089400819" datatype="html">
                 <source>Ardoise</source>
@@ -2288,14 +2489,26 @@
             <trans-unit id="3754089615594038887" datatype="html">
                 <source>Cette proposition a été modifiée par</source>
             </trans-unit>
+            <trans-unit id="3754959679762896375" datatype="html">
+                <source>À contacter</source>
+            </trans-unit>
+            <trans-unit id="3760931533594330875" datatype="html">
+                <source>Bilan</source>
+            </trans-unit>
             <trans-unit id="3763884071190628578" datatype="html">
                 <source>Vous n&apos;êtes inscrit sur aucune expédition aujourd&apos;hui.</source>
+            </trans-unit>
+            <trans-unit id="3764708127311802515" datatype="html">
+                <source>Pour les <x id="emote" equiv-text="emote"/> <x id="pool" equiv-text="poolLabel(pool)"/></source>
             </trans-unit>
             <trans-unit id="2565276430680693432" datatype="html">
                 <source>&lt;ul&gt; &lt;li&gt;&lt;strong&gt;Afficher les zones du scrutateur&lt;/strong&gt; : choisissez une ou plusieurs directions sur la rose des vents pour tracer la limite des zones de régénération correspondantes (une direction cochée est foncée, une direction décochée grise ; le point central coche ou décoche tout) ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Afficher les zones en distance&lt;/strong&gt; : « Ajouter une zone » trace la limite d&apos;une distance en km ou en PA (en PA, « Aller / Retour » divise la distance par deux). Chaque zone ajoutée se retire avec sa corbeille.&lt;/li&gt; &lt;/ul&gt;</source>
             </trans-unit>
             <trans-unit id="2061348079638801621" datatype="html">
                 <source>Places : </source>
+            </trans-unit>
+            <trans-unit id="2066025248749897035" datatype="html">
+                <source>Améliorer sa maison</source>
             </trans-unit>
             <trans-unit id="2069011822213141936" datatype="html">
                 <source>&lt;p&gt;Une ville ouverte depuis l&apos;annuaire s&apos;affiche en lecture seule : un bandeau « Mode observateur » et la pastille « Observation » de l&apos;en-tête le rappellent, et la section « Ma ville » du menu prend le nom de la ville observée.&lt;/p&gt; &lt;ul&gt; &lt;li&gt;La carte, la banque, les citoyens, la liste de courses, les statistiques et les expéditions se consultent, sans modification possible ;&lt;/li&gt; &lt;li&gt;des citoyens d&apos;une ville dont vous n&apos;êtes pas membre, seule l&apos;identité est visible (ni sac, ni coffre, ni états) ;&lt;/li&gt; &lt;li&gt;le bouton « Mettre à jour » de l&apos;en-tête est masqué : il ne concerne que votre propre ville.&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;« Revenir à ma ville », en tête du menu, quitte l&apos;observation.&lt;/p&gt;</source>
@@ -2329,6 +2542,9 @@
             </trans-unit>
             <trans-unit id="4132230770112488436" datatype="html">
                 <source>Place <x id="place" equiv-text="index + 1"/> (<x id="job" equiv-text="job"/>)</source>
+            </trans-unit>
+            <trans-unit id="4138795500458027363" datatype="html">
+                <source>Modification refusée : en cours de modification par <x id="pseudo" equiv-text="holderName(state, citizens) ?? &apos;?&apos;"/></source>
             </trans-unit>
             <trans-unit id="5444790026778117235" datatype="html">
                 <source>Expédition prête</source>
@@ -2372,6 +2588,9 @@
             <trans-unit id="9201198932056179343" datatype="html">
                 <source>Consignes perso</source>
             </trans-unit>
+            <trans-unit id="9209837568459563747" datatype="html">
+                <source>Défense prévue</source>
+            </trans-unit>
             <trans-unit id="2086288790931147290" datatype="html">
                 <source>Supprimer la place</source>
             </trans-unit>
@@ -2405,6 +2624,9 @@
             <trans-unit id="7187576242263998565" datatype="html">
                 <source>Consignes individuelles et expédition au-delà de vos <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> de base.</source>
             </trans-unit>
+            <trans-unit id="4703250746384450769" datatype="html">
+                <source>défense insuffisante</source>
+            </trans-unit>
             <trans-unit id="4706107632040873825" datatype="html">
                 <source>Êtes-vous sûr de vouloir supprimer ce thème ?</source>
             </trans-unit>
@@ -2428,6 +2650,9 @@
             </trans-unit>
             <trans-unit id="1731498196085048589" datatype="html">
                 <source>Rappels</source>
+            </trans-unit>
+            <trans-unit id="1732073181084389437" datatype="html">
+                <source>Consommation des chantiers</source>
             </trans-unit>
             <trans-unit id="1733854993134147751" datatype="html">
                 <source>Les tracés n&apos;ont pas pu être chargés.</source>
@@ -2453,6 +2678,9 @@
             <trans-unit id="200593759703778342" datatype="html">
                 <source>Ancienne ville</source>
             </trans-unit>
+            <trans-unit id="455533223439215398" datatype="html">
+                <source>Aucune proposition effective pour ce jour : rendez-en une effective pour comparer le prévu et le réel.</source>
+            </trans-unit>
             <trans-unit id="4556406938156030508" datatype="html">
                 <source>Bleu</source>
             </trans-unit>
@@ -2471,11 +2699,17 @@
             <trans-unit id="2152251227315577896" datatype="html">
                 <source>Jaune</source>
             </trans-unit>
+            <trans-unit id="2664363138888466417" datatype="html">
+                <source>Impossible de charger les plans de veille.</source>
+            </trans-unit>
             <trans-unit id="266970505720345721" datatype="html">
                 <source>Actions sur la proposition</source>
             </trans-unit>
             <trans-unit id="2671569320052707173" datatype="html">
                 <source>Inscrits</source>
+            </trans-unit>
+            <trans-unit id="2673225812535963198" datatype="html">
+                <source>Valider le budget</source>
             </trans-unit>
             <trans-unit id="7160647639895873995" datatype="html">
                 <source>Ce message a été généré à partir du site MyHordes Optimizer. Vous pouvez retrouver les expéditions en suivant [link=<x id="PH" equiv-text="environment.website_url"/>my-town/expeditions]ce lien[/link]</source>
@@ -2492,11 +2726,20 @@
             <trans-unit id="7845138276293360211" datatype="html">
                 <source>Les expéditions ont bien été copiées au format forum</source>
             </trans-unit>
+            <trans-unit id="7849759430135915335" datatype="html">
+                <source>Du haut des remparts, vous êtes chancelant et vous le moral au plus bas, vous ne savez pas si vous verrez la lumière du jour...</source>
+            </trans-unit>
             <trans-unit id="5407759070423985131" datatype="html">
                 <source>Ville</source>
             </trans-unit>
             <trans-unit id="5408671121354947038" datatype="html">
                 <source>Ajouter </source>
+            </trans-unit>
+            <trans-unit id="5409122557692986335" datatype="html">
+                <source>Veilleur</source>
+            </trans-unit>
+            <trans-unit id="5411765625204303239" datatype="html">
+                <source>Organisateur</source>
             </trans-unit>
             <trans-unit id="3012908712486845984" datatype="html">
                 <source>Désert</source>
@@ -2506,6 +2749,9 @@
             </trans-unit>
             <trans-unit id="3023540725272652730" datatype="html">
                 <source>/suggestion et /bug</source>
+            </trans-unit>
+            <trans-unit id="3024785405521900593" datatype="html">
+                <source>Ajouter un veilleur…</source>
             </trans-unit>
             <trans-unit id="4692406295845779700" datatype="html">
                 <source>Estimation :</source>
@@ -2597,6 +2843,9 @@
             <trans-unit id="4740081045248720016" datatype="html">
                 <source>Saisies modifiées pendant le scan, relancez l&apos;affinage</source>
             </trans-unit>
+            <trans-unit id="474068043572117155" datatype="html">
+                <source>Mode de budget</source>
+            </trans-unit>
             <trans-unit id="4752880524312751918" datatype="html">
                 <source>Aucune connue</source>
             </trans-unit>
@@ -2641,6 +2890,9 @@
             </trans-unit>
             <trans-unit id="4234813468622202940" datatype="html">
                 <source>Ce nom est déjà pris.</source>
+            </trans-unit>
+            <trans-unit id="4235741661672303588" datatype="html">
+                <source>Défense prévue / réelle</source>
             </trans-unit>
             <trans-unit id="910580320741062020" datatype="html">
                 <source>Mon citoyen</source>
@@ -2747,6 +2999,9 @@
             <trans-unit id="7980053000569541434" datatype="html">
                 <source>Saisies modifiées depuis le dernier affinage : relance nécessaire</source>
             </trans-unit>
+            <trans-unit id="7988871351422822307" datatype="html">
+                <source>Ajouter un veilleur</source>
+            </trans-unit>
             <trans-unit id="7988932087526518393" datatype="html">
                 <source>Les changements apportés au tracé seront perdus.</source>
             </trans-unit>
@@ -2770,6 +3025,12 @@
             </trans-unit>
             <trans-unit id="5187389962742892218" datatype="html">
                 <source>Liste des bâtiments possibles</source>
+            </trans-unit>
+            <trans-unit id="5187861012693687837" datatype="html">
+                <source>Montez tôt.</source>
+            </trans-unit>
+            <trans-unit id="5199043817197274122" datatype="html">
+                <source>à trouver</source>
             </trans-unit>
             <trans-unit id="5199154911984332382" datatype="html">
                 <source>Gratuit demain si ≤</source>
@@ -2798,11 +3059,20 @@
             <trans-unit id="4578421942293066044" datatype="html">
                 <source>Coéquipiers</source>
             </trans-unit>
+            <trans-unit id="4582059789370791766" datatype="html">
+                <source>Utiliser : Ballon de foot</source>
+            </trans-unit>
             <trans-unit id="458640201868278392" datatype="html">
                 <source>Niveau actuel dans ta ville</source>
             </trans-unit>
+            <trans-unit id="4589356149444114456" datatype="html">
+                <source>Du haut des remparts, vous observez l&apos;horizon. Vous espérez voir le soleil se lever demain, encore une fois.</source>
+            </trans-unit>
             <trans-unit id="4596392011247776227" datatype="html">
                 <source>&lt;p&gt;Si vous êtes goule, le pourcentage de voracité s&apos;ajoute au texte de la jauge.&lt;/p&gt;</source>
+            </trans-unit>
+            <trans-unit id="4597226944138483984" datatype="html">
+                <source>Chien avec steak</source>
             </trans-unit>
             <trans-unit id="4597855385036057201" datatype="html">
                 <source>Auteur</source>
@@ -2836,6 +3106,9 @@
             </trans-unit>
             <trans-unit id="577664839739965914" datatype="html">
                 <source>Exploration</source>
+            </trans-unit>
+            <trans-unit id="5776935694997739286" datatype="html">
+                <source>Aucun veilleur dans cette proposition.</source>
             </trans-unit>
             <trans-unit id="3556624464192130973" datatype="html">
                 <source>Gestion des bannis </source>
@@ -2891,8 +3164,14 @@
             <trans-unit id="3926113908909885977" datatype="html">
                 <source> La dévastation force : porte ouverte depuis longtemps (+25) et tous les logements au niveau 0 (facteur de zombies actifs). La défense personnelle n&apos;est pas remise à 0 : seule sa part liée au logement l&apos;est, le reste (métier héroïque, améliorations, objets) survit. </source>
             </trans-unit>
+            <trans-unit id="2677341107476774217" datatype="html">
+                <source>Attribuer</source>
+            </trans-unit>
             <trans-unit id="267812886893458943" datatype="html">
                 <source>C&apos;est prêt</source>
+            </trans-unit>
+            <trans-unit id="2678851768907405556" datatype="html">
+                <source>Ajouter un joueur</source>
             </trans-unit>
             <trans-unit id="267923422419323222" datatype="html">
                 <source>Nombre d&apos;objets</source>
@@ -2914,6 +3193,9 @@
             </trans-unit>
             <trans-unit id="9124116642798030771" datatype="html">
                 <source>&lt;p&gt;Tous les objets du jeu. Un clic sur un objet affiche son détail, selon les sous-options des tooltips détaillés (propriétés, actions, recettes, traductions…).&lt;/p&gt; &lt;p&gt;Si vous êtes incarné, les objets absents de la liste de courses sont suivis d&apos;un bouton caddie : un clic les y ajoute.&lt;/p&gt;</source>
+            </trans-unit>
+            <trans-unit id="9124657341876308043" datatype="html">
+                <source>Lier à « <x id="town" equiv-text="preview.townName ?? $localize`votre ville actuelle`"/> » : <x id="added" equiv-text="preview.added"/> ajoutés, <x id="skipped" equiv-text="preview.skipped"/> ignorés. Les notes déjà présentes sont ignorées.</source>
             </trans-unit>
             <trans-unit id="9128561600499527021" datatype="html">
                 <source>Agrandissements</source>
@@ -2962,9 +3244,6 @@
             </trans-unit>
             <trans-unit id="6707835694182571975" datatype="html">
                 <source>Quitter sans enregistrer</source>
-            </trans-unit>
-            <trans-unit id="671106503328243572" datatype="html">
-                <source>Maison</source>
             </trans-unit>
             <trans-unit id="6713347271514219101" datatype="html">
                 <source>Aller simple</source>
@@ -3128,6 +3407,9 @@
             <trans-unit id="7719906810144423479" datatype="html">
                 <source>Attaque affinée</source>
             </trans-unit>
+            <trans-unit id="7722766667014462914" datatype="html">
+                <source>Copier vers le jour…</source>
+            </trans-unit>
             <trans-unit id="5928149856971796156" datatype="html">
                 <source>Chances de réussite, selon l&apos;état de la ville.</source>
             </trans-unit>
@@ -3136,6 +3418,9 @@
             </trans-unit>
             <trans-unit id="6880130371070591431" datatype="html">
                 <source>Total ville : <x id="PH" equiv-text="picto.town_total_count ?? 0"/></source>
+            </trans-unit>
+            <trans-unit id="688323123212986463" datatype="html">
+                <source>Lier à ma ville actuelle</source>
             </trans-unit>
             <trans-unit id="6885844978916799621" datatype="html">
                 <source>Budget</source>
@@ -3170,9 +3455,6 @@
             <trans-unit id="1450057143705358122" datatype="html">
                 <source>Budget dépassé de <x id="overrun" equiv-text="overrun"/> PA</source>
             </trans-unit>
-            <trans-unit id="1450742260910116157" datatype="html">
-                <source>Action de chantier</source>
-            </trans-unit>
             <trans-unit id="1457465744784609195" datatype="html">
                 <source>Clair</source>
             </trans-unit>
@@ -3202,6 +3484,9 @@
             </trans-unit>
             <trans-unit id="6081697647486005114" datatype="html">
                 <source>Chargement…</source>
+            </trans-unit>
+            <trans-unit id="6084352607453572232" datatype="html">
+                <source>Goules</source>
             </trans-unit>
             <trans-unit id="6087053332019687771" datatype="html">
                 <source>Compétences disponibles</source>
@@ -3245,8 +3530,14 @@
             <trans-unit id="8126905319123088958" datatype="html">
                 <source>Compteur pour gérer l&apos;anti-abus</source>
             </trans-unit>
+            <trans-unit id="8132422970373673478" datatype="html">
+                <source>Retirer le rôle d&apos;organisateur</source>
+            </trans-unit>
             <trans-unit id="8134020872097067377" datatype="html">
                 <source>Aucune consigne</source>
+            </trans-unit>
+            <trans-unit id="8138603639839515061" datatype="html">
+                <source>Du haut des remparts, Vous vous sentez hésitant et le moral faible. Il n&apos;y aura peut-être pas de lendemain pour vous...</source>
             </trans-unit>
             <trans-unit id="813997989421897781" datatype="html">
                 <source>Estimation enregistrée - Min</source>
@@ -3323,6 +3614,9 @@
             <trans-unit id="4859066023239197472" datatype="html">
                 <source>&lt;p&gt;Ajouté à un serveur, le bot est disponible pour tous ses membres. Il faut la permission « Gérer le serveur ». C&apos;est nécessaire pour publier des consignes avec /instructions.&lt;/p&gt; &lt;p&gt;Cliquez sur le <x id="link" equiv-text="install_link"/> et choisissez « Ajouter à un serveur ».&lt;/p&gt;</source>
             </trans-unit>
+            <trans-unit id="4859403985778580277" datatype="html">
+                <source>Du haut des remparts, vous observez l&apos;horizon. Vous espérez voir le soleil se lever demain, encore une fois. </source>
+            </trans-unit>
             <trans-unit id="4861874001990569865" datatype="html">
                 <source>Gueule de bois</source>
             </trans-unit>
@@ -3380,6 +3674,9 @@
             <trans-unit id="4116386114121651279" datatype="html">
                 <source>Aménagement de la zone</source>
             </trans-unit>
+            <trans-unit id="4118437376370903206" datatype="html">
+                <source> Travaux personnels </source>
+            </trans-unit>
             <trans-unit id="2351682177600193996" datatype="html">
                 <source>Programme chantiers dans l&apos;ordre</source>
             </trans-unit>
@@ -3394,6 +3691,12 @@
             </trans-unit>
             <trans-unit id="2365273625237440349" datatype="html">
                 <source>Activité</source>
+            </trans-unit>
+            <trans-unit id="2369315112971560885" datatype="html">
+                <source><x id="alias" equiv-text="alias"/> (copie)</source>
+            </trans-unit>
+            <trans-unit id="2402641725142240122" datatype="html">
+                <source>Réparables</source>
             </trans-unit>
             <trans-unit id="2405286474181510887" datatype="html">
                 <source>A</source>
@@ -3455,6 +3758,9 @@
             <trans-unit id="7875511719404518889" datatype="html">
                 <source>Impressionnante trouvaille</source>
             </trans-unit>
+            <trans-unit id="7877562014183257046" datatype="html">
+                <source>Si vous n&apos;avez pas cette phrase :</source>
+            </trans-unit>
             <trans-unit id="787782299397948132" datatype="html">
                 <source>État de départ</source>
             </trans-unit>
@@ -3475,6 +3781,9 @@
             </trans-unit>
             <trans-unit id="869213916176333095" datatype="html">
                 <source>places</source>
+            </trans-unit>
+            <trans-unit id="8693128769271099009" datatype="html">
+                <source>Saisie manuelle</source>
             </trans-unit>
             <trans-unit id="8695019972318995873" datatype="html">
                 <source><x id="count" equiv-text="order.quantity ?? 1"/> tas</source>
@@ -3632,6 +3941,15 @@
             <trans-unit id="1720465908124743358" datatype="html">
                 <source>Détaillé</source>
             </trans-unit>
+            <trans-unit id="1720720580679445238" datatype="html">
+                <source>Copier vers le jour</source>
+            </trans-unit>
+            <trans-unit id="1722024264016568216" datatype="html">
+                <source>Aucun objet attribué aux veilleurs.</source>
+            </trans-unit>
+            <trans-unit id="1723154166956156381" datatype="html">
+                <source>Citoyen <x id="n" equiv-text="n"/></source>
+            </trans-unit>
             <trans-unit id="1726155374051128509" datatype="html">
                 <source>Les données du jeu, consultables sans compte. Le badge « Spoil » du menu signale les pages qui peuvent dévoiler des nouveautés de la saison en cours.</source>
             </trans-unit>
@@ -3674,8 +3992,14 @@
             <trans-unit id="7577164906903446545" datatype="html">
                 <source>Impossible de charger cette ville</source>
             </trans-unit>
+            <trans-unit id="9076280890907325441" datatype="html">
+                <source>Veilles passées</source>
+            </trans-unit>
             <trans-unit id="9078553085877152788" datatype="html">
                 <source>&lt;p&gt;Estime ce qui arrive aux citoyens quand l&apos;attaque dépasse la défense, en reproduisant l&apos;attaque du jeu sur des milliers de tirages.&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Ma ville&lt;/strong&gt; (avec une ville active) reprend le jour, le chaos, la dévastation, l&apos;attaque estimée, les citoyens vivants, leurs habitations et une défense minimale par citoyen (maison, métier, améliorations, objets de défense du coffre) ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Attaque&lt;/strong&gt; : attaque estimée (âmes rouges comprises), défense de la ville (ignorée si la porte est ouverte), défense de veille, état de la porte ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Ville&lt;/strong&gt; : jour, citoyens vivants, population, habitations par niveau, chaos, dévastation ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Répartition&lt;/strong&gt; : défense de maison par défaut (appliquée aux nouvelles lignes seulement), nombre de simulations, défense de chaque citoyen.&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;Résultats : le débordement, les zombies qui attaquent vraiment et les citoyens ciblés (plus nombreux à partir du jour 10), les morts attendus avec une fourchette favorable / défavorable, et le détail par citoyen, par défense et la répartition des morts. Les résultats varient légèrement d&apos;un calcul à l&apos;autre.&lt;/p&gt;</source>
+            </trans-unit>
+            <trans-unit id="9083525323276203750" datatype="html">
+                <source>Risque de mort non nul</source>
             </trans-unit>
             <trans-unit id="9083757686923501079" datatype="html">
                 <source>Échap</source>
@@ -3700,6 +4024,9 @@
             </trans-unit>
             <trans-unit id="5956461158010502750" datatype="html">
                 <source>Enregistrer dans un fichier Excel</source>
+            </trans-unit>
+            <trans-unit id="6534526307832177556" datatype="html">
+                <source>Mes pré-villes</source>
             </trans-unit>
             <trans-unit id="6543454535550731961" datatype="html">
                 <source>Effet</source>
@@ -3800,6 +4127,9 @@
             <trans-unit id="4293941797766451611" datatype="html">
                 <source>&lt;p&gt;Dans « Affichage », « Coins des cases » choisit l&apos;information de chacun des quatre coins, pour le type de carte affiché. Le réglage se présente comme une case coupée en quatre : cliquez sur le quart du coin à changer, puis choisissez dans la liste : note, citoyens présents, points de contrôle, zombies (en italique quand c&apos;est l&apos;estimation d&apos;un éclaireur plus récente), zombies tués, fouilles restantes, fouilles réussies enregistrées, zone excavée, objets au sol, distance en km ou en PA, ancienneté de la mise à jour. « Réinitialiser » rétablit la disposition d&apos;origine.&lt;/p&gt;</source>
             </trans-unit>
+            <trans-unit id="4296483565858463621" datatype="html">
+                <source>Risque prévu / réel</source>
+            </trans-unit>
             <trans-unit id="8141956022659606503" datatype="html">
                 <source>Sacs</source>
             </trans-unit>
@@ -3860,6 +4190,9 @@
             <trans-unit id="5559973343890533582" datatype="html">
                 <source>Non définie</source>
             </trans-unit>
+            <trans-unit id="436981821405829542" datatype="html">
+                <source>Délier la pré-ville</source>
+            </trans-unit>
             <trans-unit id="4371354790217279889" datatype="html">
                 <source>&lt;p&gt;Ajoute des notes que vous seul voyez, enregistrées dans MyHordes Optimizer :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;sur la page d&apos;historique d&apos;une ville : une note sur la ville, et une icône crayon à côté de chaque citoyen pour une note sur lui dans cette ville ;&lt;/li&gt; &lt;li&gt;dans la bulle de n&apos;importe quel joueur : une note sur ce joueur, valable dans toutes les villes.&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;Un clic sur le crayon ouvre la saisie. Un crayon estompé signale une note vide. Ces notes sont aussi visibles sur le site (Annuaire, profils, citoyens morts).&lt;/p&gt;</source>
             </trans-unit>
@@ -3874,6 +4207,9 @@
             </trans-unit>
             <trans-unit id="4378147649219625174" datatype="html">
                 <source>Zone</source>
+            </trans-unit>
+            <trans-unit id="4378742234231982508" datatype="html">
+                <source>(théorique)</source>
             </trans-unit>
             <trans-unit id="4209980706371465802" datatype="html">
                 <source>Quantité souhaitée</source>
@@ -3913,6 +4249,9 @@
             </trans-unit>
             <trans-unit id="1610201751434297017" datatype="html">
                 <source>Cette liste a été générée à partir du site MyHordes Optimizer. Vous pouvez la retrouver en suivant [link=<x id="PH" equiv-text="environment.website_url"/>my-town/wishlist]ce lien[/link]</source>
+            </trans-unit>
+            <trans-unit id="1611354227953581024" datatype="html">
+                <source>Nouvelles pré-villes</source>
             </trans-unit>
             <trans-unit id="7154378000246014406" datatype="html">
                 <source>Faire une sieste</source>
@@ -4040,6 +4379,9 @@
             <trans-unit id="6636912229609448537" datatype="html">
                 <source>Utilisateur inconnu</source>
             </trans-unit>
+            <trans-unit id="4314784038589905764" datatype="html">
+                <source>Modifié</source>
+            </trans-unit>
             <trans-unit id="4315455391205252512" datatype="html">
                 <source> Réinitialiser </source>
             </trans-unit>
@@ -4055,6 +4397,9 @@
             <trans-unit id="1555492596982404976" datatype="html">
                 <source>Mon programme</source>
             </trans-unit>
+            <trans-unit id="6421128448674403015" datatype="html">
+                <source>Reste à trouver</source>
+            </trans-unit>
             <trans-unit id="642711739654223165" datatype="html">
                 <source>Ajoutez les campeurs dans l&apos;ordre où ils se cachent pour voir leurs chances.</source>
             </trans-unit>
@@ -4069,6 +4414,9 @@
             </trans-unit>
             <trans-unit id="822128813012956222" datatype="html">
                 <source>Cette page peut contenir des spoils de la saison 19</source>
+            </trans-unit>
+            <trans-unit id="8227596913155490392" datatype="html">
+                <source>Simple</source>
             </trans-unit>
             <trans-unit id="1683013333674263118" datatype="html">
                 <source>Proposition</source>
@@ -4121,9 +4469,6 @@
             <trans-unit id="3605978488400419603" datatype="html">
                 <source>Zoomer</source>
             </trans-unit>
-            <trans-unit id="3609810454802463821" datatype="html">
-                <source>banni</source>
-            </trans-unit>
             <trans-unit id="3611732553361660128" datatype="html">
                 <source>PDC : <x id="INTERPOLATION" equiv-text="{{ row.pdc }}"/></source>
             </trans-unit>
@@ -4151,8 +4496,8 @@
             <trans-unit id="3627195783808556934" datatype="html">
                 <source>Autorisez MyHordes Optimizer</source>
             </trans-unit>
-            <trans-unit id="3627197202513313727" datatype="html">
-                <source> Amélioration de maison </source>
+            <trans-unit id="2285870783075209049" datatype="html">
+                <source>En cours de modification par <x id="pseudo" equiv-text="holderName(state, citizens) ?? &apos;?&apos;"/></source>
             </trans-unit>
             <trans-unit id="2287398703048181232" datatype="html">
                 <source>Camping</source>
@@ -4165,6 +4510,9 @@
             </trans-unit>
             <trans-unit id="8624567640321872397" datatype="html">
                 <source>Déplacer ou modifier la consigne</source>
+            </trans-unit>
+            <trans-unit id="8626073394935992330" datatype="html">
+                <source>Délier</source>
             </trans-unit>
             <trans-unit id="8628198843764595469" datatype="html">
                 <source>Survivants</source>
@@ -4214,6 +4562,9 @@
             <trans-unit id="5222230073969796438" datatype="html">
                 <source> Le détail ci-dessous simule le facteur comme en jeu (retiré à chaque nuit). Entre parenthèses : deux simulations séparées à facteur figé au minimum et au maximum, pour isoler le hasard de répartition entre citoyens. </source>
             </trans-unit>
+            <trans-unit id="5228826125409727792" datatype="html">
+                <source>Réparations</source>
+            </trans-unit>
             <trans-unit id="5229076476869461152" datatype="html">
                 <source>PV avant → après / PV max</source>
             </trans-unit>
@@ -4262,6 +4613,9 @@
             <trans-unit id="5851560788527570644" datatype="html">
                 <source>Notifications</source>
             </trans-unit>
+            <trans-unit id="585281428036254522" datatype="html">
+                <source>Propositions du jour</source>
+            </trans-unit>
             <trans-unit id="3793819955692174765" datatype="html">
                 <source>Site</source>
             </trans-unit>
@@ -4306,6 +4660,9 @@
             </trans-unit>
             <trans-unit id="7203336193845533401" datatype="html">
                 <source>Second chantier voté ce soir</source>
+            </trans-unit>
+            <trans-unit id="7206853785431340885" datatype="html">
+                <source>Aucune proposition pour ce jour.</source>
             </trans-unit>
             <trans-unit id="7207482748149833374" datatype="html">
                 <source>Ville observée</source>
@@ -4361,6 +4718,9 @@
             <trans-unit id="1631100148233050387" datatype="html">
                 <source><x id="days" equiv-text="Math.floor(hours / 24)"/>j</source>
             </trans-unit>
+            <trans-unit id="1631711859453911145" datatype="html">
+                <source>Ressources utilisées</source>
+            </trans-unit>
             <trans-unit id="2858654381448149019" datatype="html">
                 <source>Dupliquer les consignes du tracé </source>
             </trans-unit>
@@ -4412,6 +4772,9 @@
             <trans-unit id="4540401638459620535" datatype="html">
                 <source>/timer (/minuteur)</source>
             </trans-unit>
+            <trans-unit id="4544480037847434461" datatype="html">
+                <source>Travaux personnels</source>
+            </trans-unit>
             <trans-unit id="4549325529510411217" datatype="html">
                 <source>+<x id="ap" equiv-text="preview.ap"/> PA · <x id="items" equiv-text="preview.items"/> objets repérés</source>
             </trans-unit>
@@ -4442,8 +4805,14 @@
             <trans-unit id="3232833120289015874" datatype="html">
                 <source>Calculateur</source>
             </trans-unit>
+            <trans-unit id="3236700102116596586" datatype="html">
+                <source>nouveau</source>
+            </trans-unit>
             <trans-unit id="3237092555407906237" datatype="html">
                 <source>Ivre</source>
+            </trans-unit>
+            <trans-unit id="3911471209141815940" datatype="html">
+                <source>Objets manquants</source>
             </trans-unit>
             <trans-unit id="3915433859665099927" datatype="html">
                 <source>Nombre de pelures de peau et de toiles de tentes dans le sac</source>
@@ -4453,6 +4822,9 @@
             </trans-unit>
             <trans-unit id="2202317394689763719" datatype="html">
                 <source>Le tracé vient d&apos;être modifié par quelqu&apos;un d&apos;autre : réessayez.</source>
+            </trans-unit>
+            <trans-unit id="2203219611016451492" datatype="html">
+                <source>Marge contre l&apos;attaque estimée</source>
             </trans-unit>
             <trans-unit id="2203355246154702076" datatype="html">
                 <source>Ancienneté</source>
@@ -4538,6 +4910,9 @@
             <trans-unit id="7010351467879295397" datatype="html">
                 <source>Besoin</source>
             </trans-unit>
+            <trans-unit id="7011831556114373455" datatype="html">
+                <source>Vérifiez la consigne du steak</source>
+            </trans-unit>
             <trans-unit id="7012975968357498770" datatype="html">
                 <source> Chantier laissé détruire : il compte encore pour l&apos;attaque de cette nuit, puis perd sa défense et son évolution dès le lendemain. Bonus d&apos;évolution perdu (Lance-grenades sans pamplemousses, chantier à eau sans eau…) : son évolution ne compte pas cette nuit, à condition que la défense actuelle le compte encore. </source>
             </trans-unit>
@@ -4586,6 +4961,9 @@
             <trans-unit id="2905351469058808754" datatype="html">
                 <source>Très rare</source>
             </trans-unit>
+            <trans-unit id="6000811524500820166" datatype="html">
+                <source>Retiré</source>
+            </trans-unit>
             <trans-unit id="6001853323158304644" datatype="html">
                 <source>Secteur partiellement repéré</source>
             </trans-unit>
@@ -4595,11 +4973,20 @@
             <trans-unit id="600826171923626163" datatype="html">
                 <source>Se transforme en goule</source>
             </trans-unit>
+            <trans-unit id="6009680310140815199" datatype="html">
+                <source>Rechargeables</source>
+            </trans-unit>
             <trans-unit id="3774627028364286981" datatype="html">
                 <source>Région éloignée</source>
             </trans-unit>
+            <trans-unit id="3778793214361854317" datatype="html">
+                <source>Dans les sacs</source>
+            </trans-unit>
             <trans-unit id="3131499204058979166" datatype="html">
                 <source>Pandémonium</source>
+            </trans-unit>
+            <trans-unit id="406246734239119077" datatype="html">
+                <source>Programmes</source>
             </trans-unit>
             <trans-unit id="4068382494466269539" datatype="html">
                 <source>La liste est impactée par la distance choisie</source>
@@ -4639,6 +5026,9 @@
             </trans-unit>
             <trans-unit id="6333113021144556429" datatype="html">
                 <source>Attaque</source>
+            </trans-unit>
+            <trans-unit id="6333181403622236642" datatype="html">
+                <source>Copier le message forum</source>
             </trans-unit>
             <trans-unit id="633718324030532963" datatype="html">
                 <source>Réafficher</source>
@@ -4778,6 +5168,9 @@
             <trans-unit id="9219280791179619120" datatype="html">
                 <source>Répartition</source>
             </trans-unit>
+            <trans-unit id="9222330152375559662" datatype="html">
+                <source>Créer</source>
+            </trans-unit>
             <trans-unit id="928726635862596808" datatype="html">
                 <source>Centrer</source>
             </trans-unit>
@@ -4792,6 +5185,9 @@
             </trans-unit>
             <trans-unit id="8873057759661090080" datatype="html">
                 <source>Nombre de simulations</source>
+            </trans-unit>
+            <trans-unit id="8873105990614225381" datatype="html">
+                <source>Impossible de charger vos pré-villes.</source>
             </trans-unit>
             <trans-unit id="592126949524629723" datatype="html">
                 <source>Déroulé de l&apos;attaque</source>
@@ -4868,8 +5264,14 @@
             <trans-unit id="8726507972322583535" datatype="html">
                 <source>Supprimer </source>
             </trans-unit>
+            <trans-unit id="8730954411756117913" datatype="html">
+                <source>Objets en trop</source>
+            </trans-unit>
             <trans-unit id="8732148525847736912" datatype="html">
                 <source> Aucun débordement : les défenses et les veilleurs absorbent toute l&apos;attaque, aucune maison n&apos;est attaquée. </source>
+            </trans-unit>
+            <trans-unit id="4992221947381617603" datatype="html">
+                <source>Cassés en ville</source>
             </trans-unit>
             <trans-unit id="4992284663790689893" datatype="html">
                 <source>Ce qui frappe les maisons</source>
@@ -4879,6 +5281,9 @@
             </trans-unit>
             <trans-unit id="3984811377363261575" datatype="html">
                 <source>Non-bannis : budget dépassé de <x id="overrun" equiv-text="overrun"/> PA</source>
+            </trans-unit>
+            <trans-unit id="3985324212762051582" datatype="html">
+                <source>Copier depuis le jour…</source>
             </trans-unit>
             <trans-unit id="3991402486708715978" datatype="html">
                 <source>Autres expéditions</source>
@@ -4895,11 +5300,20 @@
             <trans-unit id="2750737420531472528" datatype="html">
                 <source>Citoyens réellement touchés</source>
             </trans-unit>
+            <trans-unit id="1976030051146133454" datatype="html">
+                <source>Copier le lien</source>
+            </trans-unit>
             <trans-unit id="1978371842922429666" datatype="html">
                 <source>Lié à une expédition : le tracé reste visible de toute la ville.</source>
             </trans-unit>
             <trans-unit id="1981605871091368455" datatype="html">
                 <source>Mise à jour</source>
+            </trans-unit>
+            <trans-unit id="1984683690369653530" datatype="html">
+                <source>Retirer le veilleur</source>
+            </trans-unit>
+            <trans-unit id="1989547770984383899" datatype="html">
+                <source>Ajouter un modèle</source>
             </trans-unit>
             <trans-unit id="1990355517543678696" datatype="html">
                 <source>Citoyens tués</source>
@@ -4913,6 +5327,9 @@
             <trans-unit id="8371107154065428305" datatype="html">
                 <source>Objets à compter</source>
             </trans-unit>
+            <trans-unit id="8376452183690482353" datatype="html">
+                <source>Du haut des remparts, vous avez le cœur serré. Vous sentez que votre vie ne tient qu&apos;à un fil...</source>
+            </trans-unit>
             <trans-unit id="2166231947450707710" datatype="html">
                 <source>Jour affiché</source>
             </trans-unit>
@@ -4921,6 +5338,9 @@
             </trans-unit>
             <trans-unit id="2178210234493895735" datatype="html">
                 <source>aujourd&apos;hui</source>
+            </trans-unit>
+            <trans-unit id="2181569138200017544" datatype="html">
+                <source>Merci de le signaler !</source>
             </trans-unit>
             <trans-unit id="7407148621236486183" datatype="html">
                 <source>Copier dans MHO</source>
@@ -5024,6 +5444,9 @@
             <trans-unit id="7750878462463016975" datatype="html">
                 <source>(vous)</source>
             </trans-unit>
+            <trans-unit id="7751921434206844998" datatype="html">
+                <source>Objet absent du référentiel de veille (défense comptée à 0) :</source>
+            </trans-unit>
             <trans-unit id="7756667499287813896" datatype="html">
                 <source>Vidé</source>
             </trans-unit>
@@ -5048,6 +5471,9 @@
             <trans-unit id="6890236536786684128" datatype="html">
                 <source>Réparer <x id="label" equiv-text="label"/> pour passer la nuit (≈ <x id="cost" equiv-text="cost"/>:ap:)</source>
             </trans-unit>
+            <trans-unit id="6897599775571199088" datatype="html">
+                <source>Action </source>
+            </trans-unit>
             <trans-unit id="4635453384629622126" datatype="html">
                 <source>Simulation</source>
             </trans-unit>
@@ -5068,6 +5494,9 @@
             </trans-unit>
             <trans-unit id="5084956189590550738" datatype="html">
                 <source>Vous êtes envoyé sur MyHordes, qui vous demande d&apos;autoriser MyHordes Optimizer à lire vos informations de jeu.</source>
+            </trans-unit>
+            <trans-unit id="5094652900603021460" datatype="html">
+                <source>périmé</source>
             </trans-unit>
             <trans-unit id="5098096530802962989" datatype="html">
                 <source>Probabilité exacte</source>
@@ -5168,6 +5597,9 @@
             <trans-unit id="4422529925541866305" datatype="html">
                 <source><x id="PH" equiv-text="this.formatPercent(this.factor_min)"/> – <x id="PH_1" equiv-text="this.formatPercent(this.factor_max)"/> de l&apos;attaque <x id="PH_2" equiv-text="this.formatPercent(overflow_min)"/> – <x id="PH_3" equiv-text="this.formatPercent(overflow_max)"/> du débordement</source>
             </trans-unit>
+            <trans-unit id="4430429836340044045" datatype="html">
+                <source>Stock saisi à la main</source>
+            </trans-unit>
             <trans-unit id="7274167604200090151" datatype="html">
                 <source>Soif</source>
             </trans-unit>
@@ -5201,6 +5633,12 @@
             <trans-unit id="5202852848657576458" datatype="html">
                 <source>Le bouton se trouve en haut à droite de la page.</source>
             </trans-unit>
+            <trans-unit id="5203614855903048022" datatype="html">
+                <source>Guitare artisanale</source>
+            </trans-unit>
+            <trans-unit id="5207293985063957237" datatype="html">
+                <source>Lancer : Dés</source>
+            </trans-unit>
             <trans-unit id="5209342669951226392" datatype="html">
                 <source>Zombies actifs</source>
             </trans-unit>
@@ -5219,6 +5657,9 @@
             <trans-unit id="3960240249403805893" datatype="html">
                 <source>Infecté(e)</source>
             </trans-unit>
+            <trans-unit id="3966079068085343945" datatype="html">
+                <source>En cours de modification par</source>
+            </trans-unit>
             <trans-unit id="3967570858685153349" datatype="html">
                 <source>Ouvrir automatiquement « Utiliser un objet de mon sac »</source>
             </trans-unit>
@@ -5227,6 +5668,9 @@
             </trans-unit>
             <trans-unit id="949667327980384213" datatype="html">
                 <source>Dézoomer (Ctrl + molette)</source>
+            </trans-unit>
+            <trans-unit id="950220408918905793" datatype="html">
+                <source>Du haut des remparts, vous vous sentez serein. Vous comptez bien être encore en vie demain.</source>
             </trans-unit>
             <trans-unit id="951119124120113693" datatype="html">
                 <source>La couleur n&apos;a pas pu être changée.</source>
@@ -5282,6 +5726,9 @@
             <trans-unit id="3384089052583731654" datatype="html">
                 <source>Compétences et camping</source>
             </trans-unit>
+            <trans-unit id="3387197750091991711" datatype="html">
+                <source>Quitter</source>
+            </trans-unit>
             <trans-unit id="6781675583173132570" datatype="html">
                 <source>Première utilisation du site</source>
             </trans-unit>
@@ -5320,6 +5767,9 @@
             </trans-unit>
             <trans-unit id="1967317889090534226" datatype="html">
                 <source>Total : <x id="INTERPOLATION" equiv-text="{{ candidate.total_distance }}"/></source>
+            </trans-unit>
+            <trans-unit id="1968143272546663012" datatype="html">
+                <source>Soir de veille</source>
             </trans-unit>
             <trans-unit id="4154335047242270585" datatype="html">
                 <source>Défense</source>
@@ -5378,6 +5828,9 @@
             <trans-unit id="814524093468498547" datatype="html">
                 <source>Pouvoir</source>
             </trans-unit>
+            <trans-unit id="8146926039461005482" datatype="html">
+                <source>Impossible de lire l&apos;état de la ville pour ce jour</source>
+            </trans-unit>
             <trans-unit id="8151564538369708979" datatype="html">
                 <source>Tout sélectionner</source>
             </trans-unit>
@@ -5389,6 +5842,9 @@
             </trans-unit>
             <trans-unit id="7031255060364978694" datatype="html">
                 <source>Jours héros nécessaires</source>
+            </trans-unit>
+            <trans-unit id="7032534635716264026" datatype="html">
+                <source>votre ville actuelle</source>
             </trans-unit>
             <trans-unit id="4902063701425237331" datatype="html">
                 <source>&lt;p&gt;Les commandes /suggestion et /bug transmettent vos idées et vos problèmes à l&apos;équipe. Vous pouvez aussi venir en parler sur le <x id="link" equiv-text="support_link"/>.&lt;/p&gt;</source>
@@ -5444,6 +5900,12 @@
             <trans-unit id="6612231965181822095" datatype="html">
                 <source>Droits de modification</source>
             </trans-unit>
+            <trans-unit id="6618043628248822066" datatype="html">
+                <source>Du haut des remparts, vous êtes chancelant et vous le moral au plus bas, vous ne savez pas si vous verrez la lumière du jour... </source>
+            </trans-unit>
+            <trans-unit id="6618104935047210634" datatype="html">
+                <source>Aucun niveau à atteindre</source>
+            </trans-unit>
             <trans-unit id="5963154118817481493" datatype="html">
                 <source>&lt;p&gt;En bas du menu :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Langue&lt;/strong&gt; : English, Français, Español, Deutsch. La page se recharge ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Thème&lt;/strong&gt; : Par défaut, Rose, Brun. En saison, le thème Noël (du 1er au 25 décembre) ou Halloween (du 15 octobre au 1er novembre) s&apos;ajoute, et « Par défaut » l&apos;utilise ; Noël est toujours clair, Halloween toujours sombre ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Mode&lt;/strong&gt; : clair, sombre, ou selon le système.&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;Ces choix sont mémorisés dans votre navigateur. Le pied du menu mène aussi au Discord, à Crowdin (pour traduire le site) et aux remerciements.&lt;/p&gt;</source>
             </trans-unit>
@@ -5479,6 +5941,9 @@
             </trans-unit>
             <trans-unit id="1901586583455050319" datatype="html">
                 <source>Affichage de la banque</source>
+            </trans-unit>
+            <trans-unit id="1918829248753288689" datatype="html">
+                <source>Du haut des remparts, Vous vous sentez hésitant et le moral faible. Il n&apos;y aura peut-être pas de lendemain pour vous... </source>
             </trans-unit>
             <trans-unit id="1925851199600823942" datatype="html">
                 <source>Options de la catégorie « Informations complémentaires » : elles ajoutent aux pages du jeu des données que MyHordes n&apos;affiche pas.</source>
@@ -5620,6 +6085,9 @@
             </trans-unit>
             <trans-unit id="7533053521139949104" datatype="html">
                 <source>Distance minimum</source>
+            </trans-unit>
+            <trans-unit id="3650552568053594254" datatype="html">
+                <source>Décocher ouvriers</source>
             </trans-unit>
             <trans-unit id="3650811572225502565" datatype="html">
                 <source>Type d&apos;ajout</source>
