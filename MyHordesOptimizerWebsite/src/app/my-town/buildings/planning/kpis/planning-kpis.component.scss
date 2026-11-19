@@ -14,10 +14,7 @@
         mat-form-field {
             width: 12rem;
 
-            @include mat.form-field-overrides((
-                container-height: 32px,
-                container-vertical-padding: 4px,
-            ));
+            @include mat.form-field-density(-5);
         }
     }
 }

@@ -69,11 +69,12 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
 
     /**
      * Ouvre la liste des niveaux visés.
+     * @param {string} field Liste : niveaux d'amélioration ou de maison.
      * @returns {string[]} Libellés des niveaux, espaces normalisées.
      */
-    function levelOptions(): string[] {
+    function levelOptions(field: string = 'task-upgrade-level'): string[] {
         fixture.detectChanges();
-        (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('mat-select[data-field="bulk-level"] .mat-mdc-select-trigger')?.click();
+        (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>(`mat-select[data-field="${field}"] .mat-mdc-select-trigger`)?.click();
         fixture.detectChanges();
         return Array.from(document.querySelectorAll<HTMLElement>('mat-option'))
             .map((option: HTMLElement): string => (option.textContent ?? '').replace(/\s+/g, ' ').trim());
@@ -95,7 +96,8 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
         fake.unlimited_home_levels.set(true);
         form().kind.set('home');
 
-        const options: string[] = levelOptions();
+        const [next, ...options]: string[] = levelOptions('task-home-level');
+        expect(next).toBe('Niveau suivant de chacun');
         expect(options.length).toBeGreaterThan(0);
         options.forEach((option: string): void => expect(option).toMatch(/\S \(\d+\)$/));
     });
@@ -142,7 +144,7 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
         form().upgrade_key.set('hasLock');
         fixture.detectChanges();
 
-        expect((fixture.nativeElement as HTMLElement).querySelector('[data-field="bulk-level"]')).toBeNull();
+        expect((fixture.nativeElement as HTMLElement).querySelector('[data-field="task-upgrade-level"]')).toBeNull();
         confirm();
         expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'homeUpgrade', ref: 'hasLock', level: 1, pa: 6 }));
     });
@@ -222,6 +224,33 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
         expect(tasksOf(1)).toEqual([]);
         expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'home', level: 2, pa: 4 }));
         expect(close).toHaveBeenCalledWith(1);
+    });
+
+    it('maison hors chaos : seul le niveau suivant de chacun est proposé', async (): Promise<void> => {
+        await render();
+        form().kind.set('home');
+
+        expect(levelOptions('task-home-level')).toEqual(['Niveau suivant de chacun']);
+    });
+
+    it('maison en chaos sans niveau choisi : niveau suivant de chacun', async (): Promise<void> => {
+        await render([3]);
+        fake.unlimited_home_levels.set(true);
+        form().kind.set('home');
+        confirm();
+
+        expect(tasksOf(3)[0]).toEqual(expect.objectContaining({ kind: 'home', level: 2, pa: 4 }));
+    });
+
+    it('« Travaux personnels » grisé si aucun citoyen visé n’a d’habitation', async (): Promise<void> => {
+        await render([1]);
+        fixture.detectChanges();
+        (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>('mat-select[data-field="task-kind"] .mat-mdc-select-trigger')?.click();
+        fixture.detectChanges();
+
+        const disabled: string[] = Array.from(document.querySelectorAll<HTMLElement>('mat-option[aria-disabled="true"]'))
+            .map((option: HTMLElement): string => (option.textContent ?? '').trim());
+        expect(disabled).toContain('Travaux personnels');
     });
 
     it('maison en chaos : niveau visé, PA de chaque niveau manquant', async (): Promise<void> => {

@@ -1242,10 +1242,6 @@
                 <source>Jeux</source>
                 <target state="final">Juegos</target>
             </trans-unit>
-            <trans-unit id="6462755436416515489" datatype="html">
-                <source>Niveau suivant de chaque citoyen (un agrandissement par jour)</source>
-                <target state="translated">Siguiente nivel de cada ciudadano (una ampliación por día)</target>
-            </trans-unit>
             <trans-unit id="6466167548949900449" datatype="html" approved="yes">
                 <source>Démineur</source>
                 <target state="final">Buscaminas</target>
@@ -5477,10 +5473,6 @@
             <trans-unit id="5789373353616019087" datatype="html">
                 <source>Défense hors chantiers</source>
                 <target state="translated">Defensa fuera de las construcciones</target>
-            </trans-unit>
-            <trans-unit id="5791141068754641721" datatype="html">
-                <source>Nombre d&apos;utilisations dans la journée</source>
-                <target state="translated">Número de usos al día</target>
             </trans-unit>
             <trans-unit id="5792949529901716121" datatype="html" approved="yes">
                 <source>Le bouton « Mettre à jour les outils externes »</source>

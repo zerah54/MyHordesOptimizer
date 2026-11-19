@@ -166,10 +166,7 @@
                qu'une largeur fixe qui pourrait dépasser une colonne devenue plus étroite. */
             width: 100%;
 
-            @include mat.form-field-overrides((
-                container-height: 32px,
-                container-vertical-padding: 4px,
-            ));
+            @include mat.form-field-density(-5);
         }
     }
 }

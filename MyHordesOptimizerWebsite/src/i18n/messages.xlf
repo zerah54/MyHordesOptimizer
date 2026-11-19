@@ -1826,9 +1826,6 @@
             <trans-unit id="1548322983678517060" datatype="html">
                 <source>Jeux</source>
             </trans-unit>
-            <trans-unit id="6462755436416515489" datatype="html">
-                <source>Niveau suivant de chaque citoyen (un agrandissement par jour)</source>
-            </trans-unit>
             <trans-unit id="6466167548949900449" datatype="html">
                 <source>Démineur</source>
             </trans-unit>
@@ -4459,9 +4456,6 @@
             </trans-unit>
             <trans-unit id="5789373353616019087" datatype="html">
                 <source>Défense hors chantiers</source>
-            </trans-unit>
-            <trans-unit id="5791141068754641721" datatype="html">
-                <source>Nombre d&apos;utilisations dans la journée</source>
             </trans-unit>
             <trans-unit id="5792949529901716121" datatype="html">
                 <source>Le bouton « Mettre à jour les outils externes »</source>

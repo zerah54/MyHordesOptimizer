@@ -1,15 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Signal, signal, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 
 import { dailyActionAp, dailyActionDefaultUses, DailyActionEnum, dailyActionMaxUses } from '../../../../_abstract_model/enum/daily-action.enum';
 import { Imports } from '../../../../_abstract_model/types/_types';
 import { Citizen } from '../../../../_abstract_model/types/citizen.class';
 import { HeroSkillLevels } from '../../../../_abstract_model/types/hero-skill-levels';
-import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { bulkAddTask, BulkTaskTemplate } from '../bulk-task.util';
 import { cascadeAp, HomeUpgradeRef, upgradesAllowed } from '../home-upgrades.util';
 import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } from '../plan.types';
@@ -17,8 +13,9 @@ import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.u
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
 import { actionAllowedFor, plannableActions, upgradeAp } from '../task-edit.util';
+import { PlanningTaskFieldsComponent, TaskFieldsHomeLevel } from '../task-fields/planning-task-fields.component';
 
-const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule];
+const material_modules: Imports = [MatButtonModule, MatDialogModule];
 
 /** Citoyens à qui donner la consigne (ceux cochés à l'ouverture). */
 export interface PlanningBulkTaskDialogData {
@@ -31,7 +28,7 @@ export interface PlanningBulkTaskDialogData {
     templateUrl: './planning-bulk-task-dialog.component.html',
     styleUrls: ['./planning-bulk-task-dialog.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [IconApComponent, ...material_modules]
+    imports: [PlanningTaskFieldsComponent, ...material_modules]
 })
 export class PlanningBulkTaskDialogComponent {
 
@@ -43,15 +40,23 @@ export class PlanningBulkTaskDialogComponent {
     protected readonly action_options: Signal<DailyActionEnum[]> = computed((): DailyActionEnum[] => plannableActions(this.store.displayable_actions())
         .filter((action: DailyActionEnum): boolean => this.data.user_ids.some((user_id: number): boolean => this.actionAllowed(action, user_id))));
 
-    /** Niveaux de maison proposés, triés. */
-    protected readonly home_levels: Signal<HomeLevelRef[]> = computed((): HomeLevelRef[] => Array.from(this.store.homes().values())
-        .filter((home: HomeLevelRef): boolean => home.level >= 1)
-        .sort((a: HomeLevelRef, b: HomeLevelRef): number => a.level - b.level));
+    /** Niveaux de maison proposés en plus du niveau suivant de chacun : tous en chaos ou en Pandémonium, aucun sinon (un agrandissement par jour). */
+    protected readonly home_levels: Signal<TaskFieldsHomeLevel[]> = computed((): TaskFieldsHomeLevel[] => !this.store.unlimited_home_levels() ? []
+        : Array.from(this.store.homes().values())
+            .filter((home: HomeLevelRef): boolean => home.level >= 1)
+            .sort((a: HomeLevelRef, b: HomeLevelRef): number => a.level - b.level));
+
+    /** Travaux personnels permis à au moins un citoyen visé (habitation au niveau 1 ou plus). */
+    protected readonly upgrade_allowed: Signal<boolean> = computed((): boolean =>
+        this.data.user_ids.some((user_id: number): boolean => upgradesAllowed(this.draftTasks(user_id), currentHomeLevel(this.citizenRef(user_id), null))));
+
+    protected readonly uses_default_label: string = $localize`Proposées à chacun`;
+    protected readonly level_default_label: string = $localize`Niveau suivant de chacun`;
 
     protected readonly kind: WritableSignal<PlanTaskKind> = signal<PlanTaskKind>(this.action_options().length > 0 ? 'action' : 'free');
     protected readonly action_key: WritableSignal<string | null> = signal<string | null>(this.action_options()[0]?.key ?? null);
     protected readonly upgrade_key: WritableSignal<string | null> = signal<string | null>(this.store.home_upgrades()[0]?.key ?? null);
-    /** Niveau visé (maison ou amélioration) ; nul pour une amélioration = niveau suivant de chacun. */
+    /** Niveau visé (maison ou amélioration) ; nul = niveau suivant de chacun. */
     protected readonly level: WritableSignal<number | null> = signal<number | null>(null);
     protected readonly label: WritableSignal<string> = signal('');
     /** Utilisations de l'action, bornées aux possibilités de chacun ; nulles = celles proposées à chacun. */
@@ -83,7 +88,7 @@ export class PlanningBulkTaskDialogComponent {
             case 'homeUpgrade':
                 return this.upgrade() !== undefined;
             case 'home':
-                return this.level() !== null || !this.store.unlimited_home_levels();
+                return true;
             default:
                 return this.label().trim() !== '';
         }
@@ -178,9 +183,8 @@ export class PlanningBulkTaskDialogComponent {
     }
 
     /**
-     * Niveau visé de chaque citoyen pour un travail de maison : le suivant du sien pour un agrandissement hors chaos et Pandémonium
-     * ou une amélioration sans niveau choisi, sinon le niveau choisi ; nul pour qui l'a déjà atteint, dont le niveau suivant est
-     * inconnu, ou sans habitation pour une amélioration (comme dans l'édition en ligne).
+     * Niveau visé de chaque citoyen pour un travail de maison : le niveau choisi, sinon le suivant du sien ; nul pour qui l'a déjà
+     * atteint, dont le niveau suivant est inconnu, ou sans habitation pour une amélioration (comme dans l'édition en ligne).
      * @returns {((user_id: number) => number | null) | undefined} Calcul du niveau, absent hors travaux de maison.
      */
     private levelOf(): ((user_id: number) => number | null) | undefined {
@@ -192,10 +196,9 @@ export class PlanningBulkTaskDialogComponent {
         const upgrade_key: string | null = upgrade?.key ?? null;
         const target: number | null = this.level();
         const homes: ReadonlyMap<number, HomeLevelRef> = this.store.homes();
-        const next_only: boolean = kind === 'home' && !this.store.unlimited_home_levels();
         return (user_id: number): number | null => {
             const current: number | null = currentHomeLevel(this.citizenRef(user_id), upgrade_key);
-            if (next_only) {
+            if (kind === 'home' && target === null) {
                 return current !== null && homes.has(current + 1) ? current + 1 : null;
             }
             if (upgrade !== undefined && !upgradesAllowed(this.draftTasks(user_id), currentHomeLevel(this.citizenRef(user_id), null))) {

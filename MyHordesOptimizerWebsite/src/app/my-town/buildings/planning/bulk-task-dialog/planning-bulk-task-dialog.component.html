@@ -3,102 +3,14 @@
     <p class="target">
         <ng-container i18n>Citoyens visés :</ng-container>
         <strong>{{ data.user_ids.length }}</strong></p>
-    <div class="fields">
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label i18n>Type</mat-label>
-            <mat-select data-field="bulk-kind" [value]="kind()" (selectionChange)="setKind($event.value)">
-                <mat-option value="home" i18n>Améliorer sa maison</mat-option>
-                <mat-option value="homeUpgrade" i18n>Travaux personnels</mat-option>
-                <mat-option value="action" [disabled]="action_options().length === 0">
-                    <ng-container i18n>Action</ng-container>
-                </mat-option>
-                <mat-option value="free" i18n>Libre</mat-option>
-            </mat-select>
-        </mat-form-field>
-
-        @switch (kind()) {
-            @case ('action') {
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>Action</mat-label>
-                    <mat-select data-field="bulk-action" [value]="action_key()" (selectionChange)="setAction($event.value)">
-                        @for (action of action_options(); track action.key) {
-                            <mat-option [value]="action.key">{{ action.getLabel() }}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-                @if (max_uses() > 1) {
-                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label i18n>Utilisations</mat-label>
-                        <mat-select data-field="bulk-count" [value]="uses()" (selectionChange)="uses.set($event.value)">
-                            <mat-option [value]="null" i18n>Proposées à chacun</mat-option>
-                            @for (count of use_options(); track count) {
-                                <mat-option [value]="count">×{{ count }}</mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                }
-            }
-            @case ('homeUpgrade') {
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>Travaux personnels</mat-label>
-                    <mat-select data-field="bulk-upgrade" [value]="upgrade_key()" (selectionChange)="setUpgrade($event.value)">
-                        @for (option of store.home_upgrades(); track option.key) {
-                            <mat-option [value]="option.key">{{ option.label }}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-                @if (upgrade(); as upgrade) {
-                    @if (upgrade.max_level > 1) {
-                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label i18n>Niveau visé</mat-label>
-                        <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
-                            <mat-option [value]="null" i18n>Niveau suivant de chacun</mat-option>
-                            @for (option of upgrade.levels; track option.level) {
-                                <mat-option [value]="option.level">
-                                    <ng-container i18n>niv.</ng-container>
-                                    {{ option.level }}
-                                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
-                                    (<mho-icon-ap [value]="option.ap"/>)
-                                    <!-- @formatter:on -->
-                                </mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                    }
-                }
-            }
-            @case ('home') {
-                @if (store.unlimited_home_levels()) {
-                    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                        <mat-label i18n>Niveau visé</mat-label>
-                        <mat-select data-field="bulk-level" [value]="level()" (selectionChange)="level.set($event.value)">
-                            @for (home of home_levels(); track home.level) {
-                                <mat-option [value]="home.level">{{ home.label }}
-                                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
-                                    (<mho-icon-ap [value]="home.ap"/>)
-                                    <!-- @formatter:on -->
-                                </mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                } @else {
-                    <p class="next-level" data-field="bulk-next-level" i18n>Niveau suivant de chaque citoyen (un agrandissement par jour)</p>
-                }
-            }
-            @default {
-                <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                    <mat-label i18n>Consigne</mat-label>
-                    <input matInput type="text" maxlength="64" data-field="bulk-label" [value]="label()" (input)="label.set($any($event.target).value)">
-                </mat-form-field>
-            }
-        }
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label>
-                <mho-icon-ap/>
-            </mat-label>
-            <input matInput type="number" min="0" data-field="bulk-pa" [value]="pa() ?? ''" (input)="onPa($any($event.target).value)">
-        </mat-form-field>
-    </div>
+    <mho-planning-task-fields [kind]="kind()" [disabled]="!store.can_edit()"
+                              [actionOptions]="action_options()" [actionRef]="action_key()" [useOptions]="use_options()" [uses]="uses()"
+                              [usesDefaultLabel]="uses_default_label"
+                              [upgradeAllowed]="upgrade_allowed()" [upgrades]="store.home_upgrades()" [upgradeRef]="upgrade_key()" [upgradeLevel]="level()"
+                              [homeLevels]="home_levels()" [homeLevel]="level()" [levelDefaultLabel]="level_default_label" [label]="label()" [pa]="pa()"
+                              (kindChange)="setKind($event)" (actionChange)="setAction($event)" (usesChange)="uses.set($event)"
+                              (upgradeChange)="setUpgrade($event)" (upgradeLevelChange)="level.set($event)" (homeLevelChange)="level.set($event)"
+                              (labelChange)="label.set($event)" (paChange)="onPa($event)"/>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button type="button" mat-dialog-close i18n>Annuler</button>

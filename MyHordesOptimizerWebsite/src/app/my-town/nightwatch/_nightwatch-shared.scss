@@ -57,9 +57,6 @@
 // Champ de saisie compact (tableaux, cartes).
 @mixin compact-field {
     mat-form-field {
-        @include mat.form-field-overrides((
-            container-height: 40px,
-            container-vertical-padding: 8px,
-        ));
+        @include mat.form-field-density(-4);
     }
 }

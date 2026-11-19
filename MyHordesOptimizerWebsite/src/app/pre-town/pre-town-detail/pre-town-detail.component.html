@@ -16,6 +16,8 @@
                             <mat-spinner diameter="20"/>
                         } @else {
                             <mat-icon>add_link</mat-icon>
+                        }
+                        @if (!busy()) {
                             <ng-container i18n>Lier à ma ville actuelle</ng-container>
                         }
                     </button>
@@ -26,6 +28,8 @@
                             <mat-spinner diameter="20"/>
                         } @else {
                             <mat-icon>link_off</mat-icon>
+                        }
+                        @if (!busy()) {
                             <ng-container i18n>Délier</ng-container>
                         }
                     </button>
@@ -35,6 +39,8 @@
                         <mat-spinner diameter="20"/>
                     } @else {
                         <mat-icon>content_copy</mat-icon>
+                    }
+                    @if (!busy()) {
                         <ng-container i18n>Dupliquer</ng-container>
                     }
                 </button>
@@ -51,6 +57,8 @@
                         <mat-spinner diameter="20"/>
                     } @else {
                         <mat-icon>save</mat-icon>
+                    }
+                    @if (!busy()) {
                         <ng-container i18n>Renommer</ng-container>
                     }
                 </button>
@@ -68,6 +76,8 @@
                         <mat-spinner diameter="20"/>
                     } @else {
                         <mat-icon>save</mat-icon>
+                    }
+                    @if (!busy()) {
                         <ng-container i18n>Enregistrer</ng-container>
                     }
                 </button>

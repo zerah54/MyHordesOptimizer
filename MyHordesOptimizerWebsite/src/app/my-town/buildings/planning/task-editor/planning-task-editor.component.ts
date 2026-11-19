@@ -1,10 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, InputSignal, Signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { dailyActionAp, DailyActionEnum, dailyActionMaxUses } from '../../../../_abstract_model/enum/daily-action.enum';
@@ -17,9 +13,9 @@ import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.u
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
 import { actionAllowedFor, actionDefaults, entryFor, plannableActions, upgradeAp, upgradeDefaults } from '../task-edit.util';
+import { PlanningTaskFieldsComponent } from '../task-fields/planning-task-fields.component';
 
-const angular_common: Imports = [FormsModule];
-const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatIconModule, MatTooltipModule];
 
 /**
  * Range le nombre d'utilisations d'une consigne d'action : seulement s'il dépasse 1 (absent = une utilisation).
@@ -40,7 +36,7 @@ function setTaskCountField(task: PlanTaskDTO, count: number): void {
     templateUrl: './planning-task-editor.component.html',
     styleUrls: ['./planning-task-editor.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...angular_common, ...material_modules]
+    imports: [PlanningTaskFieldsComponent, ...material_modules]
 })
 export class PlanningTaskEditorComponent {
 
@@ -256,6 +252,26 @@ export class PlanningTaskEditorComponent {
                 task.pa = pa;
             }
         });
+    }
+
+    /**
+     * Niveau d'amélioration choisi.
+     * @param {number | null} level Niveau visé (jamais nul en ligne).
+     */
+    protected onUpgradeLevel(level: number | null): void {
+        if (level !== null) {
+            this.setTaskUpgradeLevel(level);
+        }
+    }
+
+    /**
+     * Niveau de maison choisi.
+     * @param {number | null} level Niveau visé (jamais nul en ligne).
+     */
+    protected onHomeLevel(level: number | null): void {
+        if (level !== null) {
+            this.setTaskLevel(level);
+        }
     }
 
     /**

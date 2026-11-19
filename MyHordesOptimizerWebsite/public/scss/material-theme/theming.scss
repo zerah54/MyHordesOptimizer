@@ -63,6 +63,8 @@
         filled-container-color: var(--mho-field-bg),
         filled-label-display: block,
         filled-active-indicator-color: var(--mho-line-strong),
+        // Ligne de 24px attendue par les marges de densité (en px) ; 1.5rem ne fait que 21px ici car html porte body-medium.
+        container-text-line-height: 24px,
     ));
 
     @include mat.tabs-overrides((

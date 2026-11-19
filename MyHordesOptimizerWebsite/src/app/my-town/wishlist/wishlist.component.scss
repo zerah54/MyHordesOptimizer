@@ -4,12 +4,7 @@
     display: contents;
 
     .mat-mdc-form-field {
-        @include mat.form-field-overrides((
-            container-height: 32px,
-            container-vertical-padding: 4px,
-            filled-with-label-container-padding-top: 4px,
-            filled-with-label-container-padding-bottom: 4px,
-        ));
+        @include mat.form-field-density(-5);
     }
 
     .mho-wishlist-header {

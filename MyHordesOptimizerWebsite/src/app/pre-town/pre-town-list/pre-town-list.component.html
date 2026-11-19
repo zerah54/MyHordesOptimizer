@@ -15,6 +15,8 @@
                 <mat-spinner diameter="20"/>
             } @else {
                 <mat-icon>add</mat-icon>
+            }
+            @if (!creating()) {
                 <ng-container i18n>Créer</ng-container>
             }
         </button>

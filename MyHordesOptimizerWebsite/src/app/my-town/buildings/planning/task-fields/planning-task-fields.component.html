@@ -1,0 +1,95 @@
+<mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label i18n>Type</mat-label>
+    <mat-select data-field="task-kind" [value]="kind()" [disabled]="disabled()" (selectionChange)="kindChange.emit($event.value)">
+        <mat-option value="home" i18n>Améliorer sa maison</mat-option>
+        <mat-option value="homeUpgrade" [disabled]="kind() !== 'homeUpgrade' && !upgradeAllowed()">
+            <ng-container i18n>Travaux personnels</ng-container>
+        </mat-option>
+        <mat-option value="action" [disabled]="actionOptions().length === 0">
+            <ng-container i18n>Action</ng-container>
+        </mat-option>
+        <mat-option value="free" i18n>Libre</mat-option>
+    </mat-select>
+</mat-form-field>
+@if (kind() === 'home') {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Niveau visé</mat-label>
+        <mat-select data-field="task-home-level" [value]="homeLevel()" [disabled]="disabled()" (selectionChange)="homeLevelChange.emit($event.value)">
+            @if (levelDefaultLabel(); as default_label) {
+                <mat-option [value]="null">{{ default_label }}</mat-option>
+            }
+            @for (home of homeLevels(); track home.level) {
+                <mat-option [value]="home.level">{{ home.label }}
+                    <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                    (<mho-icon-ap [value]="home.ap"/>)
+                    <!-- @formatter:on -->
+                </mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+} @else if (kind() === 'action') {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Action</mat-label>
+        <mat-select data-field="task-action" [value]="actionRef()" [disabled]="disabled()" (selectionChange)="actionChange.emit($event.value)">
+            @for (action of actionOptions(); track action.key) {
+                <mat-option [value]="action.key">{{ action.getLabel() }}</mat-option>
+            } @empty {
+                <mat-option disabled i18n>Aucun chantier qui donne une action n'est construit</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    @if (useOptions().length > 1) {
+        <mat-form-field class="uses" appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Utilisations</mat-label>
+            <mat-select data-field="task-count" [value]="uses()" [disabled]="disabled()" (selectionChange)="usesChange.emit($event.value)">
+                @if (usesDefaultLabel(); as default_label) {
+                    <mat-option [value]="null">{{ default_label }}</mat-option>
+                }
+                @for (count of useOptions(); track count) {
+                    <mat-option [value]="count">×{{ count }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    }
+} @else if (kind() === 'homeUpgrade' && upgrade(); as upgrade) {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Travaux personnels</mat-label>
+        <mat-select data-field="task-upgrade" [value]="upgradeRef()" [disabled]="disabled()" (selectionChange)="upgradeChange.emit($event.value)">
+            @for (option of upgrades(); track option.key) {
+                <mat-option [value]="option.key">{{ option.label }}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+    @if (upgrade.max_level > 1) {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Niveau visé</mat-label>
+            <mat-select data-field="task-upgrade-level" [value]="upgradeLevel()" [disabled]="disabled()"
+                        (selectionChange)="upgradeLevelChange.emit($event.value)">
+                @if (levelDefaultLabel(); as default_label) {
+                    <mat-option [value]="null">{{ default_label }}</mat-option>
+                }
+                @for (option of upgrade.levels; track option.level) {
+                    <mat-option [value]="option.level">
+                        <ng-container i18n>niv.</ng-container>
+                        {{ option.level }}
+                        <!-- @formatter:off : coupé en plusieurs lignes, les parenthèses seraient rendues avec une espace -->
+                        (<mho-icon-ap [value]="option.ap"/>)
+                        <!-- @formatter:on -->
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    }
+} @else {
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Consigne</mat-label>
+        <input matInput type="text" maxlength="64" data-field="task-label" [value]="label()" [disabled]="disabled()"
+               (input)="labelChange.emit($any($event.target).value)">
+    </mat-form-field>
+}
+<mat-form-field class="pa" appearance="outline" subscriptSizing="dynamic">
+    <mat-label>
+        <mho-icon-ap/>
+    </mat-label>
+    <input matInput type="number" min="0" data-field="task-pa" [value]="pa() ?? ''" [disabled]="disabled()" (input)="paChange.emit($any($event.target).value)">
+</mat-form-field>

@@ -4,17 +4,23 @@
     display: block;
 
     .task-editor {
-        // Champs plus compacts que le 56px par défaut, via l'API officielle Material.
-        mat-form-field {
-            @include mat.form-field-overrides((
-                container-height: 36px,
-                container-vertical-padding: 4px,
-            ));
+        // Champs compacts (36px) : la densité Material règle hauteur et marges ensemble.
+        @include mat.form-field-density(-5);
+
+        // Le panneau de mat-menu n'a pas de marge horizontale : le contenu la porte.
+        display: flex;
+        flex-direction: column;
+        gap: 0.75em;
+        padding: 0.5em 0.75em 0;
+
+        mho-planning-task-fields {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75em;
         }
 
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.35em;
+        [data-action="remove-task"] {
+            align-self: flex-end;
+        }
     }
 }
