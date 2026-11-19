@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DailyActionEnum } from '../../../../_abstract_model/enum/daily-action.enum';
 import { UNKNOWN_HERO_SKILL_LEVELS } from '../../../../_abstract_model/types/hero-skill-levels';
-import { BuildingPlanContentDTO, emptyPlanContent, PlanTaskDTO, PlanTaskKind } from '../plan.types';
 import { CitizenRef, HomeLevelRef } from '../plan-evaluation.util';
+import { BuildingPlanContentDTO, emptyPlanContent, PlanTaskDTO, PlanTaskKind } from '../plan.types';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_CITIZENS, FakePlanningStore } from '../planning.store.fake';
 import { PlanningTaskEditorComponent } from './planning-task-editor.component';
@@ -144,7 +144,21 @@ describe('PlanningTaskEditorComponent', (): void => {
         internals().setTaskAction('home_scavenge');
         expect(task()).toEqual({ kind: 'action', ref: 'home_scavenge', pa: 3, count: 3 });
         expect(internals().actionOptions(task() ?? { kind: 'free', pa: 0 }).map((action: DailyActionEnum): string => action.key))
-            .toEqual(['home_crows', 'home_scavenge', 'trash']);
+            .toEqual(['home_crows', 'home_scavenge']);
+    });
+
+    it('Fouiller les déchets : proposé aux bannis, ou à tous en chaos, et gardé si déjà choisi', async (): Promise<void> => {
+        await render({ ...emptyPlanContent(), citizens: [{ userId: 2, tasks: [{ kind: 'free', label: 'RDE', pa: 3 }] }] }, 2);
+        const keys = (task_value: PlanTaskDTO): string[] => internals().actionOptions(task_value).map((action: DailyActionEnum): string => action.key);
+        expect(keys({ kind: 'free', pa: 0 })).toContain('trash');
+
+        TestBed.resetTestingModule();
+        await render();
+        expect(keys({ kind: 'free', pa: 0 })).not.toContain('trash');
+        expect(keys({ kind: 'action', ref: 'trash', pa: 1 })).toContain('trash');
+
+        fake.chaos_forced.set(true);
+        expect(keys({ kind: 'free', pa: 0 })).toContain('trash');
     });
 
     it('fouilles des galeries : le Fouineur choisit de 1 à 3 fouilles, à 1 PA chacune', async (): Promise<void> => {

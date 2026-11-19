@@ -37,6 +37,13 @@
                               matTooltip="Toujours active : la ville a un banni ou le Bureau des esclavagistes, ou la proposition a du contenu côté bannis"
                               i18n>Gestion des bannis
             </mat-slide-toggle>
+            @if (store.selected_day() > store.current_day) {
+                <mat-slide-toggle data-field="planned-chaos" [checked]="store.chaos()" [disabled]="!store.can_edit() || store.chaos_forced()"
+                                  (change)="onPlannedChaos($event.checked)" [matTooltipDisabled]="!store.chaos_forced()"
+                                  i18n-matTooltip matTooltip="Imposé : la ville est déjà en chaos, ou un jour précédent le prévoit"
+                                  i18n>Ville en chaos
+                </mat-slide-toggle>
+            }
         }
         <span class="save-state" data-field="save-state" role="status">
             @if (store.save_state() === 'pending' || store.save_state() === 'saving') {

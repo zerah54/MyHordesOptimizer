@@ -620,6 +620,55 @@ describe('PlanningStore', (): void => {
         expect(store.unlimited_home_levels()).toBe(true);
     });
 
+    describe('chaos', (): void => {
+        it('ville en chaos selon l\'API : chaos imposé tous les jours', (): void => {
+            setTown(Object.assign(new TownDetails(), { town_id: 42, day: TODAY, town_type: 'RNE', is_chaos: true }));
+            store = create(plans_dto([plan({ day: TODAY + 1 })]));
+            store.selectDay(TODAY + 1);
+
+            expect(store.chaos()).toBe(true);
+            expect(store.chaos_forced()).toBe(true);
+        });
+
+        it('jour à venir : chaos coché sur la proposition', (): void => {
+            store = create(plans_dto([plan({ day: TODAY + 1, content: { ...emptyPlanContent(), chaos: true } })]));
+            store.selectDay(TODAY + 1);
+
+            expect(store.chaos()).toBe(true);
+            expect(store.chaos_forced()).toBe(false);
+            expect(store.unlimited_home_levels()).toBe(true);
+        });
+
+        it('le jour même, seule l\'API fait foi', (): void => {
+            store = create(plans_dto([plan({ content: { ...emptyPlanContent(), chaos: true } })]));
+
+            expect(store.chaos()).toBe(false);
+        });
+
+        it('chaos prévu un jour à venir : imposé aux jours suivants par la proposition retenue', (): void => {
+            store = create(plans_dto([
+                plan({ id: 1, day: TODAY + 1, isEffective: true, content: { ...emptyPlanContent(), chaos: true } }),
+                plan({ id: 2, day: TODAY + 1, isEffective: false }),
+                plan({ id: 3, day: TODAY + 2 })
+            ]));
+            store.selectDay(TODAY + 2);
+
+            expect(store.chaos()).toBe(true);
+            expect(store.chaos_forced()).toBe(true);
+        });
+
+        it('chaos sur une proposition non retenue d\'un jour précédent : sans effet', (): void => {
+            store = create(plans_dto([
+                plan({ id: 1, day: TODAY + 1, isEffective: true }),
+                plan({ id: 2, day: TODAY + 1, isEffective: false, content: { ...emptyPlanContent(), chaos: true } }),
+                plan({ id: 3, day: TODAY + 2 })
+            ]));
+            store.selectDay(TODAY + 2);
+
+            expect(store.chaos()).toBe(false);
+        });
+    });
+
     it('homes : avec le Plan d\'urbanisme construit, les niveaux de maison portent les PA et ressources Urbanisme', (): void => {
         const urbanism: Building = new Building({
             id: 6, uid: URBANISM_UID, img: '', label: { fr: 'Plan d\'urbanisme' }, description: { fr: '' }, parentId: null, displayOrder: 0,

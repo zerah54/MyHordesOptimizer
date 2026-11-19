@@ -76,6 +76,16 @@ export class PlanningHeaderComponent {
         });
     }
 
+    /**
+     * Prévoit ou non la ville en chaos le jour affiché (jour à venir).
+     * @param {boolean} checked Nouvel état.
+     */
+    protected onPlannedChaos(checked: boolean): void {
+        this.store.updateDraft((content: BuildingPlanContentDTO): void => {
+            content.chaos = checked;
+        });
+    }
+
     /** Crée une proposition : vide, ou copie de la proposition affichée. */
     protected newPlan(): void {
         this.askName({ title: $localize`Nouvelle proposition`, name: $localize`Plan`, offerCopy: this.store.selected_plan() !== null },

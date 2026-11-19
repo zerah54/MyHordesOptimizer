@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
 {
@@ -14,6 +14,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans
         public int? EveningSecondVoteBuildingId { get; set; }
         /// <summary>Gestion des bannis activée à la main sur cette proposition.</summary>
         public bool ManageBanned { get; set; }
+        /// <summary>Ville prévue en chaos ce jour (jour à venir) ; vaut aussi pour les jours suivants.</summary>
+        public bool Chaos { get; set; }
         public int BasePa { get; set; } = 19;
         public List<PlanCitizenDto> Citizens { get; set; } = new();
         public List<PlanTownLineDto> TownLines { get; set; } = new();

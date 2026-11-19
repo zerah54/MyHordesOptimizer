@@ -16,7 +16,7 @@ import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } fro
 import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
-import { plannableActions, upgradeAp } from '../task-edit.util';
+import { actionAllowedFor, plannableActions, upgradeAp } from '../task-edit.util';
 
 const material_modules: Imports = [MatButtonModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule];
 
@@ -39,8 +39,9 @@ export class PlanningBulkTaskDialogComponent {
     protected readonly data: PlanningBulkTaskDialogData = inject<PlanningBulkTaskDialogData>(MAT_DIALOG_DATA);
     private readonly dialog_ref: MatDialogRef<PlanningBulkTaskDialogComponent, number> = inject<MatDialogRef<PlanningBulkTaskDialogComponent, number>>(MatDialogRef);
 
-    /** Actions proposables ce jour, comme dans l'édition en ligne. */
-    protected readonly action_options: Signal<DailyActionEnum[]> = computed((): DailyActionEnum[] => plannableActions(this.store.displayable_actions()));
+    /** Actions proposables ce jour et permises à au moins un citoyen visé, comme dans l'édition en ligne. */
+    protected readonly action_options: Signal<DailyActionEnum[]> = computed((): DailyActionEnum[] => plannableActions(this.store.displayable_actions())
+        .filter((action: DailyActionEnum): boolean => this.data.user_ids.some((user_id: number): boolean => this.actionAllowed(action, user_id))));
 
     /** Niveaux de maison proposés, triés. */
     protected readonly home_levels: Signal<HomeLevelRef[]> = computed((): HomeLevelRef[] => Array.from(this.store.homes().values())
@@ -133,9 +134,11 @@ export class PlanningBulkTaskDialogComponent {
         const pa_of: (user_id: number) => number = this.paOf();
         const count_of: ((user_id: number) => number) | undefined = this.countOf();
         const level_of: ((user_id: number) => number | null) | undefined = this.levelOf();
+        const action: DailyActionEnum | undefined = this.kind() === 'action' ? DailyActionEnum.getByKey<DailyActionEnum>(this.action_key() ?? '') : undefined;
+        const user_ids: number[] = this.data.user_ids.filter((user_id: number): boolean => action === undefined || this.actionAllowed(action, user_id));
         let added: number = 0;
         this.store.updateDraft((content: BuildingPlanContentDTO): void => {
-            added = bulkAddTask(content, this.data.user_ids, template, pa_of, count_of, level_of);
+            added = bulkAddTask(content, user_ids, template, pa_of, count_of, level_of);
         });
         this.dialog_ref.close(added);
     }
@@ -234,6 +237,16 @@ export class PlanningBulkTaskDialogComponent {
             default:
                 return (): number => 0;
         }
+    }
+
+    /**
+     * Action permise à un citoyen (Fouiller les déchets : bannis, ou tous en chaos).
+     * @param {DailyActionEnum} action Action.
+     * @param {number} user_id Identifiant du citoyen.
+     * @returns {boolean} Vrai si permise.
+     */
+    private actionAllowed(action: DailyActionEnum, user_id: number): boolean {
+        return actionAllowedFor(action, this.citizenRef(user_id)?.banned === true, this.store.chaos());
     }
 
     /**

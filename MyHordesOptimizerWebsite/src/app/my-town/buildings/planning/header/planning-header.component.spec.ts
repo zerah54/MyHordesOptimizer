@@ -61,6 +61,41 @@ describe('PlanningHeaderComponent', (): void => {
         expect(fake.actions['selectDay']).toHaveBeenCalledWith(11);
     });
 
+    describe('ville en chaos', (): void => {
+        function toggle(): HTMLButtonElement | null {
+            return root().querySelector<HTMLButtonElement>('mat-slide-toggle[data-field="planned-chaos"] button[role="switch"]');
+        }
+
+        it('absente le jour même : API seule', async (): Promise<void> => {
+            await render();
+
+            expect(toggle()).toBeNull();
+        });
+
+        it('jour à venir : cochée, elle est portée par la proposition', async (): Promise<void> => {
+            await render();
+            fake.selected_day.set(11);
+            fixture.detectChanges();
+
+            expect(toggle()?.getAttribute('aria-checked')).toBe('false');
+            toggle()?.click();
+            fixture.detectChanges();
+
+            expect(fake.draft()?.chaos).toBe(true);
+            expect(toggle()?.getAttribute('aria-checked')).toBe('true');
+        });
+
+        it('cochée et bloquée quand le chaos est imposé', async (): Promise<void> => {
+            await render();
+            fake.selected_day.set(11);
+            fake.chaos_forced.set(true);
+            fixture.detectChanges();
+
+            expect(toggle()?.getAttribute('aria-checked')).toBe('true');
+            expect(toggle()?.disabled).toBe(true);
+        });
+    });
+
     describe('gestion des bannis', (): void => {
         function toggle(): HTMLButtonElement {
             return root().querySelector<HTMLButtonElement>('mat-slide-toggle[data-field="manage-banned"] button[role="switch"]') as HTMLButtonElement;

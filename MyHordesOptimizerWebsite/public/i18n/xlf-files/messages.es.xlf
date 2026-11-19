@@ -2066,6 +2066,10 @@
                 <source>Créer une proposition</source>
                 <target state="translated">Crear una propuesta</target>
             </trans-unit>
+            <trans-unit id="1947929888826955734" datatype="html">
+                <source>Imposé : la ville est déjà en chaos, ou un jour précédent le prévoit</source>
+                <target state="translated">Impuesto: el pueblo ya está en caos, o un día anterior lo prevé</target>
+            </trans-unit>
             <trans-unit id="1948268959990709736" datatype="html" approved="yes">
                 <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</source>
                 <target state="translated">Al menos un superviviente: <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</target>

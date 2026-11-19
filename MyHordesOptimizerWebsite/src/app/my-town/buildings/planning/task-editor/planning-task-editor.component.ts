@@ -16,7 +16,7 @@ import { BuildingPlanContentDTO, PlanCitizenDTO, PlanTaskDTO, PlanTaskKind } fro
 import { CitizenRef, currentHomeLevel, HomeLevelRef } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
-import { actionDefaults, entryFor, plannableActions, upgradeAp, upgradeDefaults } from '../task-edit.util';
+import { actionAllowedFor, actionDefaults, entryFor, plannableActions, upgradeAp, upgradeDefaults } from '../task-edit.util';
 
 const angular_common: Imports = [FormsModule];
 const material_modules: Imports = [MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatTooltipModule];
@@ -95,12 +95,15 @@ export class PlanningTaskEditorComponent {
     }
 
     /**
-     * Actions proposables pour une consigne : celles de l'outil Chantiers disponibles ce jour, plus l'action déjà choisie.
+     * Actions proposables pour une consigne : celles de l'outil Chantiers disponibles ce jour et permises au citoyen, plus l'action déjà choisie.
      * @param {PlanTaskDTO} task Consigne.
      * @returns {DailyActionEnum[]} Actions, dans l'ordre du référentiel.
      */
     protected actionOptions(task: PlanTaskDTO): DailyActionEnum[] {
-        return plannableActions(this.store.displayable_actions(), task.ref ?? null);
+        const banned: boolean = this.citizenRef()?.banned === true;
+        const chaos: boolean = this.store.chaos();
+        return plannableActions(this.store.displayable_actions(), task.ref ?? null)
+            .filter((action: DailyActionEnum): boolean => action.key === task.ref || actionAllowedFor(action, banned, chaos));
     }
 
     /**

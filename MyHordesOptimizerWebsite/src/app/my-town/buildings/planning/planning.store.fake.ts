@@ -156,6 +156,7 @@ export interface FakePlanningStore {
     displayable_actions: WritableSignal<DailyActionEnum[]>;
     home_upgrades: WritableSignal<HomeUpgradeRef[]>;
     unlimited_home_levels: WritableSignal<boolean>;
+    chaos_forced: WritableSignal<boolean>;
     lock: WritableSignal<PlanLockState>;
     save_state: WritableSignal<PlanSaveState>;
     actions: Record<'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'copyPlanBetweenDays' | 'copyPlanFromDay' | 'deletePlan' | 'setEffective' | 'save' | 'dismissConflict' | 'saveItemValues' | 'renamePlan' | 'validateBudget' | 'setTaskDone' | 'takeLock' | 'leave', Mock>;
@@ -203,6 +204,7 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         displayable_actions: signal<DailyActionEnum[]>(planningDailyActions(new Set<string>(['small_gallery_#00', 'small_watchmen_#01']))),
         home_upgrades: signal<HomeUpgradeRef[]>(FAKE_UPGRADES),
         unlimited_home_levels: signal(false),
+        chaos_forced: signal(false),
         lock: signal<PlanLockState>({ kind: 'free' }),
         save_state: signal<PlanSaveState>('idle')
     };
@@ -235,6 +237,7 @@ export function createFakeStore(content: BuildingPlanContentDTO = emptyPlanConte
         homes: signal<ReadonlyMap<number, HomeLevelRef>>(FAKE_HOMES),
         banned_pool_forced: computed((): boolean => bannedPoolForced(draft() ?? emptyPlanContent(), fake.citizens(), fake.evaluation()?.hasSlavery ?? false)),
         banned_pool_shown,
+        chaos: computed((): boolean => fake.chaos_forced() || (fake.selected_day() > 10 && draft()?.chaos === true)),
         visible_pools: computed((): PlanPool[] => banned_pool_shown() ? ['banned', 'regular'] : ['regular']),
         alerts: computed((): PlanAlert[] => {
             const evaluation: DayEvaluation | null = fake.evaluation();

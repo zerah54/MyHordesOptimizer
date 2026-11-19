@@ -1652,6 +1652,9 @@
             <trans-unit id="1941717768262017001" datatype="html">
                 <source>Créer une proposition</source>
             </trans-unit>
+            <trans-unit id="1947929888826955734" datatype="html">
+                <source>Imposé : la ville est déjà en chaos, ou un jour précédent le prévoit</source>
+            </trans-unit>
             <trans-unit id="1948268959990709736" datatype="html">
                 <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</source>
             </trans-unit>

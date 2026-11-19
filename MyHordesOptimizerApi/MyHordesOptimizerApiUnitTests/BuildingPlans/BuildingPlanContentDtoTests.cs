@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.BuildingPlans;
 using MyHordesOptimizerApi.Extensions;
 using System.Collections.Generic;
@@ -76,6 +76,15 @@ namespace MyHordesOptimizerApiUnitTests.BuildingPlans
             restored.BasePaTier.Should().BeNull();
             restored.ExpeditionRab.Should().Be(0);
             restored.ValidatedBudget.Should().BeNull();
+        }
+
+        [Fact]
+        public void Content_RoundTripsPlannedChaos()
+        {
+            var restored = new BuildingPlanContentDto { Chaos = true }.ToJson().FromJson<BuildingPlanContentDto>();
+
+            restored.Chaos.Should().BeTrue();
+            new BuildingPlanContentDto().ToJson().FromJson<BuildingPlanContentDto>().Chaos.Should().BeFalse();
         }
 
         [Fact]

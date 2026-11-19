@@ -116,6 +116,8 @@ export interface BuildingPlanContentDTO {
     eveningSecondVoteBuildingId?: number | null;
     /** Gestion des bannis activée à la main sur cette proposition. */
     manageBanned: boolean;
+    /** Ville prévue en chaos ce jour (jour à venir) ; vaut aussi pour les jours suivants. */
+    chaos?: boolean;
     basePa: number;
     /** Mode de budget ; absent = détaillé. */
     budgetMode?: PlanBudgetMode | null;

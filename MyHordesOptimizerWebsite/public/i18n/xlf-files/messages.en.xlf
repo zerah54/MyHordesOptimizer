@@ -2066,6 +2066,10 @@
                 <source>Créer une proposition</source>
                 <target state="translated">Create a proposal</target>
             </trans-unit>
+            <trans-unit id="1947929888826955734" datatype="html">
+                <source>Imposé : la ville est déjà en chaos, ou un jour précédent le prévoit</source>
+                <target state="translated">Forced: the town is already in chaos, or an earlier day plans it</target>
+            </trans-unit>
             <trans-unit id="1948268959990709736" datatype="html" approved="yes">
                 <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</source>
                 <target state="translated">At least one survivor: <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</target>

@@ -22,7 +22,7 @@ import { bannedPoolForced, bannedPoolShown } from './budget.util';
 import { BudgetDiff, budgetDiff, snapshotBudget } from './budget-diff.util';
 import { BuildingProgress } from './building-progress.util';
 import { BuildingUpgradesDTO } from './building-upgrades.types';
-import { TomorrowCoverage,tomorrowCoverage } from './defense.util';
+import { TomorrowCoverage, tomorrowCoverage } from './defense.util';
 import { HomeUpgradeRef, homeUpgradeRefs } from './home-upgrades.util';
 import { KeyedDebounce } from './keyed-debounce.util';
 import {
@@ -256,8 +256,22 @@ export class PlanningStore {
         return { parents, progress: evaluation.progressBefore, nightLoss: evaluation.nightLoss };
     });
 
+    /** Chaos imposé au jour affiché : ville en chaos selon l'API, ou chaos prévu par la proposition retenue d'un jour à venir précédent. */
+    public readonly chaos_forced: Signal<boolean> = computed((): boolean => {
+        if (getTown()?.is_chaos === true) {
+            return true;
+        }
+        const day: number = this._selected_day();
+        return (this.plans_dto()?.plans ?? []).some((plan: BuildingPlanDTO): boolean =>
+            plan.isEffective && plan.day > this.current_day && plan.day < day && plan.content.chaos === true);
+    });
+
+    /** Ville en chaos le jour affiché : imposé, ou coché sur la proposition d'un jour à venir. */
+    public readonly chaos: Signal<boolean> = computed((): boolean =>
+        this.chaos_forced() || (this._selected_day() > this.current_day && this._draft()?.chaos === true));
+
     /** Agrandissements de maison sans limite d'un par jour : ville en chaos ou en Pandémonium. */
-    public readonly unlimited_home_levels: Signal<boolean> = computed((): boolean => getTown()?.is_chaos === true || this.hardMode());
+    public readonly unlimited_home_levels: Signal<boolean> = computed((): boolean => this.chaos() || this.hardMode());
 
     /** Niveaux de maison du référentiel, indexés par niveau, au coût de la ville d'après l'état synchronisé. */
     public readonly homes: Signal<ReadonlyMap<number, HomeLevelRef>> = computed((): ReadonlyMap<number, HomeLevelRef> => {

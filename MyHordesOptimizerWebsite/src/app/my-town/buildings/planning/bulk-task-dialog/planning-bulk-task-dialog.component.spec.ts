@@ -169,6 +169,27 @@ describe('PlanningBulkTaskDialogComponent', (): void => {
         expect(tasksOf(2)[0].count).toBeUndefined();
     });
 
+    it('Fouiller les déchets : seuls les bannis le reçoivent hors chaos', async (): Promise<void> => {
+        await render([1, 2]);
+        form().kind.set('action');
+        form().action_key.set('trash');
+        confirm();
+
+        expect(tasksOf(1)).toEqual([]);
+        expect(tasksOf(2)[0]).toEqual(expect.objectContaining({ ref: 'trash' }));
+        expect(close).toHaveBeenCalledWith(1);
+    });
+
+    it('Fouiller les déchets : proposé seulement si un citoyen visé est banni, ou en chaos', async (): Promise<void> => {
+        await render([1]);
+        const keys = (): string[] => (fixture.componentInstance as unknown as { action_options: () => { key: string }[] }).action_options()
+            .map((action: { key: string }): string => action.key);
+        expect(keys()).not.toContain('trash');
+
+        fake.chaos_forced.set(true);
+        expect(keys()).toContain('trash');
+    });
+
     it('PA saisis : imposés à tous, quel que soit le type', async (): Promise<void> => {
         await render();
         form().kind.set('action');

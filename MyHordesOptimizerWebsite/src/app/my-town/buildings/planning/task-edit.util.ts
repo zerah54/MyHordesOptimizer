@@ -41,6 +41,17 @@ export function plannableActions(available: readonly DailyActionEnum[], current_
 }
 
 /**
+ * Action permise à un citoyen : Fouiller les déchets est réservé aux bannis, sauf ville en chaos (comme dans le jeu).
+ * @param {DailyActionEnum} action Action.
+ * @param {boolean} banned Citoyen banni.
+ * @param {boolean} chaos Ville en chaos.
+ * @returns {boolean} Vrai si permise.
+ */
+export function actionAllowedFor(action: DailyActionEnum, banned: boolean, chaos: boolean): boolean {
+    return action !== DailyActionEnum.TRASH || banned || chaos;
+}
+
+/**
  * Valeurs d'une consigne d'action : utilisations proposées au citoyen (absentes = une seule) et leurs PA.
  * @param {DailyActionEnum} action Action.
  * @param {string | null} job_key Clé `JobEnum` du métier, nulle si inconnu.
