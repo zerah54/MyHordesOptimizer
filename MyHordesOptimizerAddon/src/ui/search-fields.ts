@@ -19,6 +19,7 @@ import { cancelWaitForElement, waitForElement } from '../utils/dom-wait';
 import { getI18N } from '../utils/i18n';
 import { normalizeString } from '../utils/notifications';
 import { pageIsCitizens, pageIsConstructions, pageIsDump, pageIsMsgReceived, pageIsOmniscience, pageIsTrap, trapItemsTableElement } from '../utils/page';
+import { ensureRegistryToolbar } from './registry-toolbar';
 
 // Local helper: TypeScript's arrFrom(any) sometimes infers element type
 // 'unknown' rather than 'any' when the source isn't a statically-typed
@@ -431,76 +432,39 @@ export function displaySearchFieldOnTrap(): void {
 }
 
 
-export function displaySearchFieldOnRegistry() {
-    let search_field = document.getElementById(mho_search_registry_field_id);
-    if (state.mho_parameters.display_search_field_registry) {
+/** Si l'option associée est activée, ajoute un champ de recherche compact dans l'encadré MHO du registre */
+export function displaySearchFieldOnRegistry(): void {
+    const existing_field: HTMLElement | null = document.getElementById(mho_search_registry_field_id);
 
-        if (search_field) return;
-
-        const logs = document.querySelector('hordes-log');
-
-        if (logs) {
-            const search_field_container = document.createElement('div');
-            const logs_title = logs.parentElement.previousElementSibling;
-
-            search_field = document.createElement('input');
-            search_field.type = 'text';
-            search_field.id = mho_search_registry_field_id;
-            search_field.classList.add('mho-input');
-            search_field.placeholder = getI18N(params_categories.find((category) => category.id === 'display').params.find((param) => param.id === 'sort_and_filter').children.find((param) => param.id === 'display_search_fields').children.find((child) => child.id === 'display_search_field_registry').label);
-            search_field.setAttribute('style', 'padding-left: 24px; margin-bottom: 0.25em;');
-
-            search_field_container.appendChild(search_field);
-
-            const header_mho_img = document.createElement('img');
-            header_mho_img.src = mh_optimizer_icon;
-            header_mho_img.style.height = '24px';
-            header_mho_img.style.position = 'absolute';
-
-            search_field_container.appendChild(header_mho_img);
-
-            if (logs_title) {
-                if (logs_title.tagName.toLowerCase() === 'H5'.toLowerCase()) {
-
-                    search_field_container.style.marginRight = '0.5em';
-                    search_field_container.style.float = 'right';
-                    search_field_container.style.position = 'relative';
-                    search_field_container.style.bottom = '7px';
-
-                    search_field.classList.add('inline');
-
-
-                    const first_link = logs_title.querySelector('a');
-                    if (first_link) {
-                        first_link.style.marginLeft = 'auto';
-                    }
-
-                    header_mho_img.style.left = (0) as any;
-                } else {
-                    search_field_container.style.display = 'flex';
-                    search_field_container.style.justifyContent = 'center';
-
-                    header_mho_img.style.left = '4px';
-                }
-
-                logs_title.appendChild(search_field_container);
-
-
-                search_field.addEventListener('keyup', (event) => {
-                    const logs_list = arrFrom(document.querySelectorAll('.log-entry .log-part-content') || []);
-                    logs_list.forEach((log) => {
-                        if (normalizeString(log.innerText).indexOf(normalizeString(search_field.value)) > -1) {
-                            log.parentElement.classList.remove('hidden');
-                        } else {
-                            log.parentElement.classList.add('hidden');
-                        }
-                    });
-                });
-            }
-        }
-    } else if (search_field) {
-        search_field.parentElement.remove();
+    if (!state.mho_parameters.display_search_field_registry) {
+        const toolbar: HTMLElement | null | undefined = existing_field?.parentElement;
+        existing_field?.remove();
+        /** L'encadré ne reste jamais réduit à son icône */
+        if (toolbar && toolbar.children.length <= 1) toolbar.remove();
+        return;
     }
+
+    if (existing_field) return;
+
+    const toolbar: HTMLElement | null = ensureRegistryToolbar();
+    if (!toolbar) return;
+
+    const search_field: HTMLInputElement = document.createElement('input');
+    search_field.type = 'text';
+    search_field.id = mho_search_registry_field_id;
+    search_field.classList.add('mho-input', 'mho-registry-search');
+    search_field.placeholder = getI18N(texts.search_short_placeholder);
+    toolbar.appendChild(search_field);
+
+    search_field.addEventListener('keyup', (): void => {
+        arrFrom(document.querySelectorAll('.log-entry .log-part-content')).forEach((log: HTMLElement) => {
+            if (normalizeString(log.innerText).indexOf(normalizeString(search_field.value)) > -1) {
+                log.parentElement.classList.remove('hidden');
+            } else {
+                log.parentElement.classList.add('hidden');
+            }
+        });
+    });
 }
 
 /** Si l'option associée est activée, affiche le nombre de pa nécessaires pour réparer un bâtiment suffisemment pour qu'il ne soit pas détruit lors de l'attaque */

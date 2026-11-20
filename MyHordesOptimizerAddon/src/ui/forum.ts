@@ -434,18 +434,33 @@ function buildForumImgurBlock(href: string, embed_url: string, caption: string |
 }
 
 let is_media_blocks_copy_guard_installed: boolean = false;
+let is_reemitting_import: boolean = false;
 
 /**
- * Copier/Citer du jeu importent le `innerHTML` du post dans l'éditeur via un événement `import`
- * (non bouillonnant) : on l'intercepte en phase de capture pour en retirer nos blocs média.
+ * Copier/Citer/Éditer du jeu importent le `innerHTML` du post dans l'éditeur via un événement `import`
+ * (non bouillonnant). On l'intercepte en phase de capture et on le remplace par une copie sans nos blocs
+ * média : `detail` n'étant pas partagé entre le monde du script et celui de la page, le modifier en place
+ * ne suffit pas.
  */
 function installMediaBlocksCopyGuard(): void {
     if (is_media_blocks_copy_guard_installed) return;
     is_media_blocks_copy_guard_installed = true;
 
     document.addEventListener('import', (event: Event) => {
+        if (is_reemitting_import) return;
         const detail: { html?: unknown } | null = (event as CustomEvent<{ html?: unknown } | null>).detail;
-        if (detail && typeof detail.html === 'string') detail.html = stripForumMediaBlocks(detail.html);
+        if (!detail || typeof detail.html !== 'string') return;
+
+        const cleaned_html: string = stripForumMediaBlocks(detail.html);
+        if (cleaned_html === detail.html) return;
+
+        event.stopImmediatePropagation();
+        is_reemitting_import = true;
+        try {
+            event.target?.dispatchEvent(new CustomEvent('import', { bubbles: false, cancelable: false, detail: { ...detail, html: cleaned_html } }));
+        } finally {
+            is_reemitting_import = false;
+        }
     }, true);
 }
 

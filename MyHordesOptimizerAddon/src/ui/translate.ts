@@ -1,39 +1,42 @@
 import { getTranslation } from '../api/translation';
-import { lang, mh_optimizer_icon, mho_display_translate_input_id, mho_header_space_id, repo_img_hordes_url, supported_languages } from '../config/constants';
+import { lang, mho_display_translate_input_id, mho_header_space_id, repo_img_hordes_url, supported_languages } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
 import { createSelectWithSearch } from '../utils/dom';
 import { getI18N } from '../utils/i18n';
 import { copyToClipboard } from '../utils/misc';
+import { createHeaderButton, getHeaderButtonsContainer } from './header-space';
 
+export const mho_translate_button_id: string = 'mho-translate-button';
+
+/** Affiche l'outil de traduction : un bouton du cadre MHO qui ouvre un panneau de recherche sous l'en-tête. */
 export function displayTranslateTool() {
     /** On doit laisser l'interval tourner quand l'option est activée, sinon l'input est supprimé lors de changements de page dans l'application */
     const display_translate_input = document.getElementById(mho_display_translate_input_id);
+    const translate_button: HTMLElement | null = document.getElementById(mho_translate_button_id);
     if (state.mho_parameters.display_translate_tool) {
-        if (display_translate_input) return;
+        if (display_translate_input && translate_button) return;
+        display_translate_input?.remove();
+        translate_button?.remove();
 
         const mho_header_space = document.getElementById(mho_header_space_id);
-        if (!mho_header_space) return;
+        const buttons_container: HTMLElement | null = getHeaderButtonsContainer();
+        if (!mho_header_space || !buttons_container) return;
 
         const mho_display_translate_input_div = createSelectWithSearch();
         mho_display_translate_input_div.id = mho_display_translate_input_id;
-        mho_display_translate_input_div.setAttribute('style', 'margin: 0; width: 200px; height: 22px;');
+        mho_display_translate_input_div.classList.add('hidden');
+        mho_display_translate_input_div.tabIndex = -1;
         const label = mho_display_translate_input_div.firstElementChild;
+        label.setAttribute('style', 'display: flex; align-items: stretch; position: relative; margin: 0;');
 
         const input = label.firstElementChild;
-        input.setAttribute('style', 'width: calc(100% - 35px); display: inline-block; padding-right: 40px; height: 22px');
-
-        const btn_mho_img = document.createElement('img');
-        btn_mho_img.src = mh_optimizer_icon;
-        btn_mho_img.style.height = '22px';
-        btn_mho_img.style.float = 'right';
-        btn_mho_img.style.position = 'relative';
-        btn_mho_img.style.top = '-22px';
-        label.insertBefore(btn_mho_img, label.lastElementChild);
+        input.setAttribute('style', 'flex: 1; min-width: 0; margin: 0; padding-right: 20px; box-sizing: border-box;');
+        label.lastElementChild.setAttribute('style', 'position: absolute; right: 4px; top: 50%; transform: translateY(-50%); line-height: 1; color: #5c2b20; cursor: pointer;');
 
         const select = document.createElement('select');
         select.classList.add('small');
-        select.setAttribute('style', 'height: 22px; width: 35px; font-size: 12px; outline: unset');
+        select.setAttribute('style', 'width: 40px; margin: 0; font-size: 12px; outline: unset; box-sizing: border-box;');
         select.value = lang;
 
         supported_languages.forEach((language) => {
@@ -48,7 +51,7 @@ export function displayTranslateTool() {
         label.insertBefore(select, input);
 
         const block_to_display = mho_display_translate_input_div.lastElementChild;
-        block_to_display.setAttribute('style', 'float: right; z-index: 10; position: absolute; right: 0; min-width: 350px; background: #5c2b20; border: 1px solid #ddab76; box-shadow: 0 0 3px #000; outline: 1px solid #000; color: #ddab76; max-height: 50vh; overflow: auto;');
+        block_to_display.setAttribute('style', 'color: #ddab76; max-height: 50vh; overflow: auto;');
         input.addEventListener('keyup', (event) => {
             const temp_input = input.value.replace(/\W*/gm, '');
             if (temp_input.length > 2) {
@@ -133,8 +136,23 @@ export function displayTranslateTool() {
                 });
             }
         });
-        mho_header_space.insertBefore(mho_display_translate_input_div, mho_header_space.firstChild);
-    } else if (display_translate_input) {
-        display_translate_input.remove();
+        const button: HTMLDivElement = createHeaderButton(mho_translate_button_id, `${repo_img_hordes_url}/lang/${lang}.png`);
+        // Garde le focus dans le panneau : le clic sur le bouton ne déclenche pas le focusout qui le refermerait.
+        button.addEventListener('mousedown', (event: MouseEvent) => event.preventDefault());
+        button.addEventListener('click', () => {
+            const opening: boolean = mho_display_translate_input_div.classList.toggle('hidden') === false;
+            if (opening) (input as HTMLInputElement).focus();
+        });
+        mho_display_translate_input_div.addEventListener('focusout', (event: FocusEvent) => {
+            if (!mho_display_translate_input_div.contains(event.relatedTarget as Node | null)) {
+                mho_display_translate_input_div.classList.add('hidden');
+            }
+        });
+
+        buttons_container.appendChild(button);
+        mho_header_space.appendChild(mho_display_translate_input_div);
+    } else {
+        display_translate_input?.remove();
+        translate_button?.remove();
     }
 }

@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { getMap } from '../api/map';
+import { repo_img_hordes_url } from '../config/constants';
+import { texts } from '../i18n/texts';
 import { state } from '../state';
+import { getI18N } from '../utils/i18n';
 import { getCellDetailsByPosition } from '../utils/position';
-import { clearRuinSubBlockIfNoRuin, displayCellDetailsOnPage, ensureRuinSubBlock, formatRemainingDigs } from './cell-details';
+import { clearRuinSubBlockIfNoRuin, digLevelIcon, displayCellDetailsOnPage, ensureRuinSubBlock, formatRemainingDigs } from './cell-details';
 
 /**
  * `texts.ts` appelle `getScriptInfo()` au chargement du module pour construire le lien de
@@ -20,7 +23,7 @@ vi.mock('../utils/version', () => ({
     toggleNewVersion: (): undefined => undefined,
     getOrigin: (): string => 'script',
     isScript: (): boolean => true,
-    getScriptInfo: (): { version: string; updateURL: string } => ({ version: '0.0.0', updateURL: 'about:blank' }),
+    getScriptInfo: (): { name: string; version: string; updateURL: string } => ({ name: 'MHO Test', version: '0.0.0', updateURL: 'about:blank' }),
     getChangelog: (): string => ''
 }));
 
@@ -136,6 +139,28 @@ describe('formatRemainingDigs', () => {
     });
 });
 
+describe('digLevelIcon', () => {
+    it('suit les paliers du jeu : épuisée, presque épuisée, à moitié vide, abondante', () => {
+        expect(digLevelIcon(0)).toBe('icons/Small_broken.gif');
+        expect(digLevelIcon(1)).toBe('icons/collec_lv1.gif');
+        expect(digLevelIcon(2)).toBe('icons/collec_lv1.gif');
+        expect(digLevelIcon(3)).toBe('icons/collec_lv2.gif');
+        expect(digLevelIcon(6)).toBe('icons/collec_lv2.gif');
+        expect(digLevelIcon(7)).toBe('icons/collec_lv3.gif');
+    });
+});
+
+describe('ensureRuinSubBlock (icône)', () => {
+    it('affiche une icône de bâtiment en préfixe, sans titre de section', () => {
+        const cell_informations: HTMLDivElement = createCellInformationsFixture();
+
+        ensureRuinSubBlock(cell_informations, 42);
+
+        expect(cell_informations.querySelector('#cell-ruin-header')).toBeNull();
+        expect(cell_informations.querySelector('#cell-ruin > img').getAttribute('src')).toBe(`${repo_img_hordes_url}/icons/small_enter.gif`);
+    });
+});
+
 describe('clearRuinSubBlockIfNoRuin', () => {
     it('clears stale ruin content and returns true when the current cell has no ruin (regression: content from a previously visited ruin stayed forever)', () => {
         const cell_informations: HTMLDivElement = createCellInformationsFixture();
@@ -207,5 +232,52 @@ describe('displayCellDetailsOnPage', () => {
 
         resolveFetch({});
         await flushMapFetch();
+    });
+
+    it('monte sa section dans le bloc commun, sans bloc ni icône propres', () => {
+        displayCellDetailsOnPage();
+
+        const section: HTMLElement = document.querySelector('#mho-block-content > #cell-informations');
+        expect(section).not.toBeNull();
+        expect(document.querySelector('#cell-informations-content #cell-note')).not.toBeNull();
+        expect(document.querySelector('#cell-informations-header').textContent).toContain('🗘');
+        const own_icons: number = document.querySelectorAll('#mho-block img').length - document.querySelectorAll('#cell-informations-content img').length;
+        expect(own_icons).toBe(1);
+        expect(document.querySelectorAll('#cell-informations')).toHaveLength(1);
+    });
+
+    it('représente le niveau 3 par une icône en préfixe, sans titre de sous-section', () => {
+        displayCellDetailsOnPage();
+
+        expect(document.querySelector('#cell-note-header')).toBeNull();
+        expect(document.querySelector('#cell-digs-header')).toBeNull();
+        expect(document.querySelector('#cell-note > img').getAttribute('src')).toBe(`${repo_img_hordes_url}/icons/small_talk.gif`);
+    });
+
+    it('montre les fouilles sur une ligne, avec l\'icône du palier (6 restantes : à moitié vide)', () => {
+        displayCellDetailsOnPage();
+
+        expect(document.querySelector('#cell-digs > img').getAttribute('src')).toBe(`${repo_img_hordes_url}/icons/collec_lv2.gif`);
+        expect(document.querySelector('#cell-digs-content').textContent)
+            .toBe(`10 ${getI18N(texts.digs_max_short)} · 6 ${getI18N(texts.digs_average_short)}`);
+    });
+
+    it('prend l\'icône « vide » quand la zone est épuisée', () => {
+        getCellDetailsByPositionMock.mockReturnValue(cellFixture({ maxPotentialRemainingDig: 0, averagePotentialRemainingDig: 0 }));
+
+        displayCellDetailsOnPage();
+
+        expect(document.querySelector('#cell-digs > img').getAttribute('src')).toBe(`${repo_img_hordes_url}/icons/Small_broken.gif`);
+    });
+
+    it('garde la ligne de note visible : phrase « pas de note » sans note, la note sinon', () => {
+        displayCellDetailsOnPage();
+        expect((document.querySelector('#cell-note') as HTMLElement).style.display).not.toBe('none');
+        expect(document.querySelector('#cell-note-content').textContent).toBe(getI18N(texts.no_note));
+
+        getCellDetailsByPositionMock.mockReturnValue(cellFixture({ note: 'RAS' }));
+        displayCellDetailsOnPage();
+
+        expect(document.querySelector('#cell-note-content').textContent).toBe('RAS');
     });
 });

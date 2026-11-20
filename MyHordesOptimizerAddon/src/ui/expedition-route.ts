@@ -1,8 +1,7 @@
 import { fetchTownCitizenRefs } from '../api/citizens';
 import { loadMyExpeditions, myExpeditionsKey } from '../api/expeditions';
 import { loadRoutesWithoutExpedition } from '../api/map-routes';
-import { mh_optimizer_icon } from '../config/constants';
-import { expedition_texts } from '../i18n/texts';
+import { expedition_texts, program_texts } from '../i18n/texts';
 import { state } from '../state';
 import type { ApiExpedition, ApiMapRoute, I18nLabel } from '../types';
 import {
@@ -27,6 +26,7 @@ import { pageIsDesert } from '../utils/page';
 import { unwatchRendered, watchMap } from '../utils/render-watch';
 import type { TownCitizenRef } from '../utils/successful-digs-page';
 import { appendPassageGroups, createLine, createRouteLine } from './cell-orders';
+import { ensureMhoSection, type MhoSection, removeMhoSection } from './mho-block';
 
 /** Tracé MHO de mon expédition dans l'Outre-Monde : flèches du jeu vers la case suivante du tracé en rose MHO, et bloc sous la carte (direction, consignes de la case, tracé suivi au choix). */
 
@@ -171,7 +171,7 @@ function clearArrows(map_element: HTMLElement | null): void {
 /** Retire les flèches colorées et le bloc. */
 export function clearExpeditionRoute(): void {
     clearArrows(desertMap());
-    document.getElementById(expedition_route_block_id)?.remove();
+    removeMhoSection(expedition_route_block_id);
     last_signature = undefined;
 }
 
@@ -246,36 +246,14 @@ function routeSelect(block: HTMLElement): HTMLSelectElement | null {
     return block.querySelector<HTMLSelectElement>('select.mho-expedition-route-choice');
 }
 
-/** Bloc sous la carte, à côté de celui des informations complémentaires ; `null` hors de la page du désert. */
+/** Section « Expédition » du bloc MHO sous la carte, créée au besoin ; `null` hors de la page du désert. */
 function ensureBlock(): HTMLElement | null {
     const existing: HTMLElement | null = document.getElementById(expedition_route_block_id);
-    if (existing) return existing;
+    const section: MhoSection | null = ensureMhoSection(expedition_route_block_id, getI18N(program_texts.tab_expedition) ?? '', 'first');
+    if (!section) return null;
+    if (existing === section.root) return existing;
 
-    const container: HTMLElement | null | undefined = document.querySelector('.map-box')?.parentElement?.parentElement;
-    if (!container) return null;
-
-    const block: HTMLDivElement = document.createElement('div');
-    block.id = expedition_route_block_id;
-    block.classList.add('row');
-
-    const inner: HTMLDivElement = document.createElement('div');
-    inner.classList.add('background', 'cell');
-    inner.style.width = '100%';
-    block.appendChild(inner);
-
-    const header: HTMLHeadingElement = document.createElement('h5');
-    header.classList.add('mho-expedition-route-header');
-    inner.appendChild(header);
-
-    const title: HTMLDivElement = document.createElement('div');
-    title.classList.add('mho-expedition-route-title');
-    header.appendChild(title);
-
-    const icon: HTMLImageElement = document.createElement('img');
-    icon.src = mh_optimizer_icon;
-    icon.alt = '';
-    icon.classList.add('mho-expedition-route-icon');
-    title.appendChild(icon);
+    section.content.classList.add('mho-expedition-route-content');
 
     const select: HTMLSelectElement = document.createElement('select');
     select.classList.add('mho-expedition-route-choice');
@@ -288,7 +266,7 @@ function ensureBlock(): HTMLElement | null {
         last_signature = undefined;
         renderExpeditionRoute();
     });
-    title.appendChild(select);
+    section.header.appendChild(select);
 
     const reload: HTMLDivElement = document.createElement('div');
     reload.classList.add('mho-expedition-route-reload');
@@ -299,22 +277,11 @@ function ensureBlock(): HTMLElement | null {
         reloadExpeditions(parsePosition(desertMap()?.querySelector('.current-location')?.textContent), true);
         reloadTownRoutes(true);
     });
-    header.appendChild(reload);
+    section.header.appendChild(reload);
 
-    const content: HTMLDivElement = document.createElement('div');
-    content.classList.add('mho-expedition-route-content');
-    inner.appendChild(content);
-
-    /** Bloc neuf (le jeu a pu retirer l'ancien) : son contenu est vide, la signature mémorisée ne doit plus le court-circuiter */
+    /** Section neuve (le jeu a pu retirer l'ancienne) : son contenu est vide, la signature mémorisée ne doit plus le court-circuiter */
     last_signature = undefined;
-
-    const cell_informations: Element | null = document.getElementById('cell-informations');
-    if (cell_informations?.parentElement === container) {
-        cell_informations.insertAdjacentElement('afterend', block);
-    } else {
-        container.appendChild(block);
-    }
-    return block;
+    return section.root;
 }
 
 /** Contenu du bloc pour l'entrée suivie ; vide sans tracé suivi. Un tracé sans expédition n'a pas de consignes. */

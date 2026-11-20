@@ -71,7 +71,11 @@ export const firefox_amo_url = 'https://addons.mozilla.org/firefox/addon/mho-add
 
 export const mh_optimizer_site_url = 'https://myhordes-optimizer.web.app';
 export const mh_optimizer_beta_site_url: string = 'https://myhordes-optimizer-beta.web.app';
-export const mh_optimizer_icon = 'https://myhordes-optimizer.web.app/img/logo/logo_mho_64x64_outlined.png';
+/** Identifiant du contenu du bloc « Informations complémentaires » */
+export const cell_informations_content_id: string = 'cell-informations-content';
+export const mh_optimizer_icon ='https://myhordes-optimizer.web.app/img/logo/logo_mho_64x64_outlined.png';
+/** Variante sans contour, pour l'encadré d'en-tête */
+export const mh_optimizer_icon_flat: string = repo_img_url + 'logo/logo_mho_64x64.png';
 /** Variante 16x16 : à utiliser telle quelle plutôt que de redimensionner l'icône 64x64 en CSS */
 export const mh_optimizer_icon_16x16: string = repo_img_url + 'logo/logo_mho_16x16.png';
 

@@ -1,40 +1,67 @@
 import { getMap } from '../api/map';
 import { getRuins } from '../api/ruins';
-import { mh_optimizer_icon, repo_img_hordes_url } from '../config/constants';
+import { cell_informations_content_id, repo_img_hordes_url } from '../config/constants';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
 import { getI18N } from '../utils/i18n';
 import { pageIsDesert } from '../utils/page';
 import { getCellDetailsByPosition } from '../utils/position';
 import { unwatchRendered, watchMap } from '../utils/render-watch';
+import { ensureMhoSection, type MhoSection } from './mho-block';
 
 /** Évite d'enchaîner plusieurs chargements concurrents */
 let is_loading_map: boolean = false;
 let is_loading_ruins: boolean = false;
 
-const cell_informations_content_id: string = 'cell-informations-content';
+const ICON_NOTE: string = 'icons/small_talk.gif';
+const ICON_BUILDING: string = 'icons/small_enter.gif';
+const ICON_RUIN_EXPLORABLE: string = 'icons/small_exploration.gif';
+const DIG_LEVEL_ICONS: readonly string[] = ['icons/Small_broken.gif', 'icons/collec_lv1.gif', 'icons/collec_lv2.gif', 'icons/collec_lv3.gif'];
 
 /**
- * Crée une sous-section (titre + zone de contenu) dans le conteneur donné.
- * @param container Élément dans lequel insérer la sous-section
- * @param id Identifiant DOM de la sous-section, réutilisé en suffixe pour le titre et le contenu
- * @param title Libellé affiché en titre de la sous-section
+ * Icône du palier d'abondance du jeu : 0 épuisée, 1-2 presque épuisée, 3-6 à moitié vide, 7+ abondante.
+ * @param remaining Fouilles restantes arrondies
+ * @returns Chemin de l'icône, relatif à `repo_img_hordes_url`
  */
-function createSubBlock(container: Element, id: string, title: string): void {
+export function digLevelIcon(remaining: number): string {
+    if (remaining <= 0) return DIG_LEVEL_ICONS[0];
+    if (remaining <= 2) return DIG_LEVEL_ICONS[1];
+    if (remaining <= 6) return DIG_LEVEL_ICONS[2];
+    return DIG_LEVEL_ICONS[3];
+}
+
+/** Met à jour l'icône en préfixe d'une sous-section. */
+function setSubBlockIcon(container: Element, id: string, icon: string): void {
+    const img: HTMLImageElement | null = container.querySelector('#' + id + ' > img');
+    if (img) {
+        img.src = `${repo_img_hordes_url}/${icon}`;
+    }
+}
+
+/**
+ * Crée une sous-section « icône en préfixe + contenu » dans le conteneur donné.
+ * @param container Élément dans lequel insérer la sous-section
+ * @param id Identifiant DOM de la sous-section, réutilisé en suffixe pour le contenu
+ * @param title Libellé de la sous-section, affiché en infobulle de l'icône
+ * @param icon Icône du jeu, relative à `repo_img_hordes_url`
+ */
+function createSubBlock(container: Element, id: string, title: string, icon: string): void {
     const sub_block: HTMLDivElement = document.createElement('div');
     sub_block.id = id;
+    sub_block.style.display = 'flex';
+    sub_block.style.alignItems = 'flex-start';
+    sub_block.style.gap = '0.5em';
     container.appendChild(sub_block);
 
-    const sub_block_header: HTMLHeadingElement = document.createElement('h5');
-    sub_block_header.id = id + '-header';
-    sub_block_header.style.marginTop = '0';
-    sub_block_header.style.borderBottomWidth = '1px';
-    sub_block_header.style.fontWeight = 'normal';
-    sub_block_header.innerText = title;
-    sub_block.appendChild(sub_block_header);
+    const sub_block_icon: HTMLImageElement = document.createElement('img');
+    sub_block_icon.src = `${repo_img_hordes_url}/${icon}`;
+    sub_block_icon.title = title;
+    sub_block_icon.alt = title;
+    sub_block.appendChild(sub_block_icon);
 
     const sub_block_content: HTMLDivElement = document.createElement('div');
     sub_block_content.id = id + '-content';
+    sub_block_content.style.flex = '1';
     sub_block.appendChild(sub_block_content);
 }
 
@@ -55,7 +82,7 @@ export function ensureRuinSubBlock(cell_informations: Element, id_ruin: number |
         return;
     }
 
-    createSubBlock(content, 'cell-ruin', getI18N(texts.ruin_state_header));
+    createSubBlock(content, 'cell-ruin', getI18N(texts.ruin_state_header), ICON_BUILDING);
 }
 
 /**
@@ -129,39 +156,19 @@ export function displayCellDetailsOnPage() {
     }
 
     state.current_cell = cell;
-    let cell_informations = document.querySelector('#cell-informations');
+    const section: MhoSection | null = ensureMhoSection('cell-informations', getI18N(texts.additional_informations), 'last');
+    if (!section) {
+        return;
+    }
+    const cell_informations: HTMLElement = section.root;
 
-    if (!cell_informations) {
-        const map_box = document.querySelector('.map-box');
-        if (!map_box?.parentElement?.parentElement) {
-            return;
-        }
-
-        cell_informations = document.createElement('div');
-        cell_informations.id = 'cell-informations';
-        cell_informations.classList.add('row');
-
-        const cell_informations_div = document.createElement('div');
-        cell_informations_div.style.width = '100%';
-        cell_informations_div.classList.add('background', 'cell');
-        cell_informations.appendChild(cell_informations_div);
-
-        const cell_informations_header = document.createElement('h5');
-        cell_informations_header.style.marginTop = '0';
-        cell_informations_header.style.display = 'flex';
-        cell_informations_header.style.justifyContent = 'space-between';
-        cell_informations_header.style.alignItems = 'center';
-        cell_informations_div.appendChild(cell_informations_header);
-
-        const cell_informations_header_left = document.createElement('div');
-        cell_informations_header_left.innerHTML = `<img src="${mh_optimizer_icon}" style="width: 24px; height: 24px; margin-right: 0.5em">${getI18N(texts.additional_informations)}`;
-        cell_informations_header.appendChild(cell_informations_header_left);
-
+    if (!section.header.querySelector('.mho-cell-informations-reload')) {
         const cell_informations_header_right = document.createElement('div');
-        cell_informations_header_right.innerText = '🗘';
+        cell_informations_header_right.classList.add('mho-cell-informations-reload');
+        cell_informations_header_right.textContent = '🗘';
         cell_informations_header_right.style.fontSize = '16px';
         cell_informations_header_right.style.cursor = 'pointer';
-        cell_informations_header.appendChild(cell_informations_header_right);
+        section.header.appendChild(cell_informations_header_right);
 
         cell_informations_header_right.addEventListener('click', () => {
             if (cell_informations.querySelector('#cell-note-content')) {
@@ -178,18 +185,11 @@ export function displayCellDetailsOnPage() {
                 updateInformations(cell);
             });
         });
+    }
 
-        const cell_informations_content = document.createElement('div');
-        cell_informations_content.id = cell_informations_content_id;
-        cell_informations_content.style.display = 'flex';
-        cell_informations_content.style.flexDirection = 'column';
-        cell_informations_content.style.gap = '0.5em';
-        cell_informations_div.appendChild(cell_informations_content);
-
-        map_box.parentElement.parentElement.appendChild(cell_informations);
-
-        createSubBlock(cell_informations_content, 'cell-note', getI18N(texts.note));
-        createSubBlock(cell_informations_content, 'cell-digs', getI18N(texts.digs_state_header));
+    if (!cell_informations.querySelector('#cell-note')) {
+        createSubBlock(section.content, 'cell-note', getI18N(texts.note), ICON_NOTE);
+        createSubBlock(section.content, 'cell-digs', getI18N(texts.digs_state_header), DIG_LEVEL_ICONS[3]);
     }
 
     /**
@@ -209,11 +209,12 @@ export function displayCellDetailsOnPage() {
     };
 
     const insertCellDigs = (cell) => {
-        if (cell_informations.querySelector('#cell-digs-content')) {
-            cell_informations.querySelector('#cell-digs-content').innerHTML = `
-                    <div>${getI18N(texts.digs_max)} : ${formatRemainingDigs(cell.maxPotentialRemainingDig)}</div>
-                    <div>${getI18N(texts.digs_average)} : ${formatRemainingDigs(cell.averagePotentialRemainingDig)}</div>
-                `;
+        const digs_content: Element | null = cell_informations.querySelector('#cell-digs-content');
+        if (digs_content) {
+            const max: number = formatRemainingDigs(cell.maxPotentialRemainingDig);
+            const average: number = formatRemainingDigs(cell.averagePotentialRemainingDig);
+            setSubBlockIcon(cell_informations, 'cell-digs', digLevelIcon(average));
+            digs_content.textContent = `${max} ${getI18N(texts.digs_max_short)} · ${average} ${getI18N(texts.digs_average_short)}`;
         }
     };
 
@@ -234,6 +235,7 @@ export function displayCellDetailsOnPage() {
             return;
         }
         const current_ruin = state.ruins.find((ruin) => ruin.id === state.current_cell.idRuin);
+        setSubBlockIcon(cell_informations, 'cell-ruin', current_ruin?.explorable ? ICON_RUIN_EXPLORABLE : ICON_BUILDING);
         const empty_text = `<div style="opacity: 0.5; font-style: italic; font-size: 12px;">${getI18N(texts.ruin_dried)}</div>`;
         const complete_text = `<div>${getI18N(texts.ruin_not_dried)}</div>`;
         let ruin_drops = '';

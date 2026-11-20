@@ -268,6 +268,12 @@ export const texts = {
         de: 'Kopieren Sie sichtbare Stadtregister',
         es: 'Copiar entradas de registro del pueblo visibles'
     },
+    search_short_placeholder: {
+        en: 'Search…',
+        fr: 'Rechercher…',
+        de: 'Suchen…',
+        es: 'Buscar…'
+    },
     translation_file_context: {
         en: 'Context (translation file)',
         fr: 'Contexte (fichier de traduction)',
@@ -585,6 +591,18 @@ export const texts = {
         fr: 'Fouilles moyennes restantes',
         de: 'Verbleibende mittlere Ausgrabungen',
         es: 'Restos de excavaciones medianas'
+    },
+    digs_max_short: {
+        en: 'max',
+        fr: 'max',
+        de: 'max',
+        es: 'máx.'
+    },
+    digs_average_short: {
+        en: 'avg.',
+        fr: 'moy.',
+        de: 'Ø',
+        es: 'prom.'
     },
     digs_max: {
         en: 'Maximum remaining digs',

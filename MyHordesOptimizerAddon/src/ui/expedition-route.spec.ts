@@ -15,12 +15,13 @@ import {
     route_directions_attribute,
     route_mode_attribute
 } from './expedition-route';
+import { ensureMhoSection, type MhoSection, removeMhoSection } from './mho-block';
 
 /** `texts.ts` lit `getScriptInfo()` au chargement : sans Tampermonkey ni extension en jsdom, il est simulé */
 vi.mock('../utils/version', () => ({
     convertResponsePromiseToError: (): Promise<never> => Promise.reject(new Error('mock')),
     getErrorFromApi: (error: unknown): unknown => error,
-    getScriptInfo: (): { version: string; updateURL: string } => ({ version: '0.0.0', updateURL: 'about:blank' })
+    getScriptInfo: (): { name: string; version: string; updateURL: string } => ({ name: 'MHO Test', version: '0.0.0', updateURL: 'about:blank' })
 }));
 
 vi.mock('../utils/page', () => ({
@@ -183,6 +184,81 @@ describe('expedition-route', (): void => {
 
         renderExpeditionRoute();
 
+        expect(blockText('.mho-expedition-route-status')).toBe('Follow the route: north ⇧');
+    });
+
+    /** Monte la section « Informations complémentaires » comme le fait `cell-details.ts` */
+    function addInformations(): MhoSection {
+        return ensureMhoSection('cell-informations', 'Informations', 'last');
+    }
+
+    function sectionIds(): string[] {
+        return Array.from(document.querySelectorAll('#mho-block-content > .mho-block-section')).map((section: Element): string => section.id);
+    }
+
+    it('un seul bloc « MHO Addon » titré du nom et de la version, une seule icône, liste conservée', (): void => {
+        routeChoiceMock.mockReturnValue('part:12');
+        buildDesert('Position : 0 / 1');
+        addInformations();
+
+        renderExpeditionRoute();
+        renderExpeditionRoute();
+
+        expect(document.querySelectorAll('#mho-block')).toHaveLength(1);
+        expect(document.querySelectorAll('#mho-block img')).toHaveLength(1);
+        expect(document.querySelector('#mho-block > .background > h5').textContent).toContain('MHO Test v0.0.0');
+        expect(document.querySelectorAll(`#${expedition_route_block_id}`)).toHaveLength(1);
+        expect(routeSelect()).not.toBeNull();
+        expect(blockText('.mho-expedition-route-status')).toBe('Follow the route: north ⇧');
+    });
+
+    it('expédition avant les informations, quel que soit l\'ordre de création', (): void => {
+        routeChoiceMock.mockReturnValue('part:12');
+        buildDesert('Position : 0 / 1');
+        renderExpeditionRoute();
+        addInformations();
+        expect(sectionIds()).toEqual([expedition_route_block_id, 'cell-informations']);
+
+        clearExpeditionRoute();
+        buildDesert('Position : 0 / 1');
+        addInformations();
+        renderExpeditionRoute();
+        expect(sectionIds()).toEqual([expedition_route_block_id, 'cell-informations']);
+    });
+
+    it('sans informations : le bloc porte la seule section Expédition', (): void => {
+        routeChoiceMock.mockReturnValue('part:12');
+        buildDesert('Position : 0 / 1');
+
+        renderExpeditionRoute();
+
+        expect(sectionIds()).toEqual([expedition_route_block_id]);
+        expect(document.querySelector(`#${expedition_route_block_id}-header`).textContent).toContain('Expedition');
+    });
+
+    it('retrait du tracé : le bloc garde les informations ; retrait des deux : le bloc disparaît', (): void => {
+        routeChoiceMock.mockReturnValue('part:12');
+        buildDesert('Position : 0 / 1');
+        addInformations();
+        renderExpeditionRoute();
+
+        clearExpeditionRoute();
+        expect(sectionIds()).toEqual(['cell-informations']);
+        expect(document.getElementById('mho-block')).not.toBeNull();
+
+        removeMhoSection('cell-informations');
+        expect(document.getElementById('mho-block')).toBeNull();
+    });
+
+    it('section retirée par le jeu : reconstruite au rendu suivant, sans doublon', (): void => {
+        routeChoiceMock.mockReturnValue('part:12');
+        buildDesert('Position : 0 / 1');
+        renderExpeditionRoute();
+        document.getElementById('mho-block').remove();
+
+        renderExpeditionRoute();
+
+        expect(document.querySelectorAll(`#${expedition_route_block_id}`)).toHaveLength(1);
         expect(blockText('.mho-expedition-route-status')).toBe('Follow the route: north ⇧');
     });
 

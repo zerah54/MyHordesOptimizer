@@ -1,32 +1,20 @@
-import { mh_optimizer_icon, mh_optimizer_map_window_id, mho_display_map_id, mho_header_space_id, mho_map_key, repo_img_hordes_url } from '../config/constants';
+import { mh_optimizer_map_window_id, mho_display_map_id, mho_map_key, repo_img_hordes_url } from '../config/constants';
 import { getBBHMap, getBBHRuin } from '../external/bbh';
 import { getFMMap, getFMRuin } from '../external/fata-morgana';
 import { getGHMap, getGHRuin } from '../external/gest-hordes';
 import { state } from '../state';
 import { getStorageItem } from '../utils/storage';
+import { createHeaderButton, getHeaderButtonsContainer } from './header-space';
 import { createMapWindow } from './window';
 
 export function createDisplayMapButton() {
     const display_map_btn = document.getElementById(mho_display_map_id);
 
     if (state.mho_parameters.display_map) {
-        const mho_header_space = document.getElementById(mho_header_space_id);
+        const mho_header_space = getHeaderButtonsContainer();
         if (display_map_btn || !mho_header_space) return;
 
-        const btn_container = document.createElement('div');
-        btn_container.id = mho_display_map_id;
-
-        const postbox_img = document.querySelector('#postbox img');
-
-        const btn_mho_img = document.createElement('img');
-        btn_mho_img.src = mh_optimizer_icon;
-        btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
-        btn_container.appendChild(btn_mho_img);
-
-        const btn_img = document.createElement('img');
-        btn_img.src = repo_img_hordes_url + 'emotes/explo.gif';
-        btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
-        btn_container.appendChild(btn_img);
+        const btn_container = createHeaderButton(mho_display_map_id, repo_img_hordes_url + 'emotes/explo.gif');
 
         btn_container.addEventListener('click', (event) => {
             event.stopPropagation();

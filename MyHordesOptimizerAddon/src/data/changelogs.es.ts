@@ -1,4 +1,12 @@
 export const changelogs: Record<string, string> = {
+    '1.1.67': `
+        [Mejora] Desierto: la información de la casilla, la expedición y otras herramientas MHO se agrupan en un único bloque «MHO Addon» bajo el mapa, con iconos del juego en lugar de títulos
+        [Mejora] Cabecera: los botones MHO se agrupan en un marco con el logo; la herramienta de traducción pasa a ser un botón que abre un panel
+        [Mejora] Registro: el botón de copia y el campo de búsqueda se agrupan en un marco MHO compacto
+
+        [Corrección] Casa de otro ciudadano: el botón de actualización ya no falla cuando la autenticación MHO aún no ha terminado
+        [Corrección] Foro: editar un mensaje ya no importa los bloques multimedia del script
+        `,
     '1.1.66': `
         [Novedad] Lista de ciudadanos: dos pestañas nuevas, «Viviendas» (viviendas y obras) y «Acciones heroicas»
         [Novedad] Casa de otro ciudadano: botón para actualizar su casa en MyHordes Optimizer

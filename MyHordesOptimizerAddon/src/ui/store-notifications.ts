@@ -1,12 +1,6 @@
-import {
-    mh_optimizer_icon,
-    mho_expeditions_window_id,
-    mho_header_space_id,
-    mho_store_notifications_id,
-    mho_store_notifications_window_id,
-    repo_img_hordes_url
-} from '../config/constants';
+import { mho_expeditions_window_id, mho_store_notifications_id, mho_store_notifications_window_id, repo_img_hordes_url } from '../config/constants';
 import { state } from '../state';
+import { createHeaderButton, getHeaderButtonsContainer } from './header-space';
 import { createWindow } from './window';
 
 export function createStoreNotificationsBtn() {
@@ -15,7 +9,7 @@ export function createStoreNotificationsBtn() {
 
         createWindow(mho_store_notifications_window_id, false);
         const notifications_space = document.querySelector('#notifications');
-        const mho_header_space = document.getElementById(mho_header_space_id);
+        const mho_header_space = getHeaderButtonsContainer();
         if (stored_notifications_btn || !mho_header_space || !notifications_space) return;
 
         // Créez une instance de MutationObserver
@@ -35,20 +29,7 @@ export function createStoreNotificationsBtn() {
         // Commencez à observer l'élément cible pour les modifications configurées
         observer.observe(notifications_space, config);
 
-        const btn_container = document.createElement('div');
-        btn_container.id = mho_store_notifications_id;
-
-        const postbox_img = document.querySelector('#postbox img');
-
-        const btn_mho_img = document.createElement('img');
-        btn_mho_img.src = mh_optimizer_icon;
-        btn_mho_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
-        btn_container.appendChild(btn_mho_img);
-
-        const btn_img = document.createElement('img');
-        btn_img.src = repo_img_hordes_url + '/icons/news.gif';
-        btn_img.style.height = postbox_img && postbox_img.height ? postbox_img.height + 'px' : '16px';
-        btn_container.appendChild(btn_img);
+        const btn_container = createHeaderButton(mho_store_notifications_id, repo_img_hordes_url + '/icons/news.gif');
 
         btn_container.addEventListener('click', (event) => {
             event.stopPropagation();

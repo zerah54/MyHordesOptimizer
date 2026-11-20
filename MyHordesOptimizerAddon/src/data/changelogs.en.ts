@@ -1,4 +1,12 @@
 export const changelogs: Record<string, string> = {
+    '1.1.67': `
+        [Improvement] Desert: cell information, expedition and other MHO tools are grouped in a single "MHO Addon" block under the map, with game icons instead of titles
+        [Improvement] Header: MHO buttons are grouped in a frame with the logo; the translation tool is now a button opening a panel
+        [Improvement] Registry: the copy button and search field are grouped in a compact MHO frame
+
+        [Fix] Another citizen's house: the update button no longer crashes when MHO authentication is not finished yet
+        [Fix] Forum: editing a message no longer imports the script's media blocks
+        `,
     '1.1.66': `
         [New] Citizen list: two new tabs, “Homes” (houses and upgrades) and “Heroic Actions”
         [New] Another citizen's home: button to update their house in MyHordes Optimizer

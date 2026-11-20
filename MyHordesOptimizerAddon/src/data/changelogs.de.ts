@@ -1,4 +1,12 @@
 export const changelogs: Record<string, string> = {
+    '1.1.67': `
+        [Verbesserung] Wüste: Feldinfos, Expedition und weitere MHO-Werkzeuge sind in einem einzigen Block „MHO Addon“ unter der Karte gebündelt, mit Spielsymbolen statt Titeln
+        [Verbesserung] Kopfzeile: Die MHO-Schaltflächen sind mit dem Logo in einem Rahmen gebündelt; das Übersetzungswerkzeug ist jetzt eine Schaltfläche, die ein Panel öffnet
+        [Verbesserung] Register: Kopierschaltfläche und Suchfeld sind in einem kompakten MHO-Rahmen gebündelt
+
+        [Korrektur] Haus eines anderen Bürgers: Die Aktualisierungsschaltfläche stürzt nicht mehr ab, wenn die MHO-Authentifizierung noch nicht abgeschlossen ist
+        [Korrektur] Forum: Beim Bearbeiten eines Beitrags werden die Medienblöcke des Skripts nicht mehr importiert
+        `,
     '1.1.66': `
         [Neu] Bürgerliste: zwei neue Tabs, „Häuser“ (Behausungen und Bauarbeiten) und „Heldentaten“
         [Neu] Haus eines anderen Bürgers: Schaltfläche, um sein Haus in MyHordes Optimizer zu aktualisieren

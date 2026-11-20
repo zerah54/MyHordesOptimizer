@@ -668,18 +668,6 @@ div.item-tag.mho-item-tag-no-img {
     border: 1px solid #011d37;
 }
 
-#__MHO_DISPLAY_MAP_ID__, #__MHO_STORE_NOTIFICATIONS_ID__, #__MHO_DISPLAY_EXPEDITIONS_ID__ {
-    background-color: rgba(62, 36, 23, .75);
-    border-radius: 6px;
-    color: #ddab76;
-    cursor: pointer;
-    font-size: 10px;
-    padding: 3px 5px;
-    transition: background-color .5s ease-in-out;
-    display: flex;
-    gap: 0.5em;
-}
-
 .mho-map tr td {
     border: 1px dotted;
     width: 30px;
@@ -1774,34 +1762,48 @@ $mho-route-arrow-stroke: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org
     }
 }
 
-#mho-expedition-route {
-    .mho-expedition-route-header {
+/* Bloc unique « MHO Addon » sous la carte (ui/mho-block.ts) */
+#mho-block {
+    h5 .mho-block-icon {
+        flex: none;
+        width: 24px;
+        height: 24px;
+        margin-right: 0.5em;
+        vertical-align: middle;
+    }
+
+    #mho-block-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+    }
+
+    .mho-block-section > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+    }
+
+    .mho-block-section-header {
         margin-top: 0;
+        border-bottom-width: 1px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 0.5em;
     }
 
-    .mho-expedition-route-title {
-        display: flex;
-        align-items: center;
-        flex: 1;
-        min-width: 0;
+    .mho-block-section-title {
+        flex: none;
+        font-weight: bold;
     }
+}
 
+#mho-expedition-route {
     .mho-expedition-route-choice {
         flex: 1;
         min-width: 0;
         width: auto;
-    }
-
-    .mho-expedition-route-icon {
-        flex: none;
-        width: 24px;
-        height: 24px;
-        margin-right: 0.5em;
-        vertical-align: middle;
     }
 
     .mho-expedition-route-content {
@@ -2042,5 +2044,81 @@ $mho-route-arrow-stroke: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org
 
     .mho-homes-stale {
         color: red;
+    }
+}
+
+#mho-header-space {
+    .mho-header-inner {
+        display: flex;
+        align-items: center;
+        column-gap: 0.5em;
+        line-height: 0;
+    }
+
+    .mho-header-logo {
+        cursor: default;
+    }
+
+    // Le jeu force aussi `width: 32px` en mobile : on garde les proportions (drapeau, logo).
+    #mho-header-frame img {
+        width: auto;
+    }
+
+    // Survol : seul le bouton visé ressort, le cadre ne s'éclaircit pas en bloc.
+    #mho-header-frame:hover {
+        background-color: rgba(62, 36, 23, .75);
+    }
+
+    .mho-header-inner > :not(.mho-header-logo) img {
+        transition: filter .2s;
+    }
+
+    .mho-header-inner > :not(.mho-header-logo):hover img {
+        filter: brightness(1.2);
+    }
+
+    #mho-display-translate-input {
+        position: absolute;
+        top: calc(100% + 4px);
+        right: 0;
+        width: 350px;
+        padding: 4px;
+        background: #5c2b20;
+        border: 1px solid #ddab76;
+        box-shadow: 0 0 3px #000;
+        outline: 1px solid #000;
+        line-height: normal;
+    }
+}
+
+// Hauteur 16px par défaut, hors imbrication pour garder une spécificité minimale et céder à `.header-icon img { height: 32px }` du jeu en mobile.
+:where(#mho-header-frame) img {
+    height: 16px;
+}
+
+#mho-header-frame:not(:has(.mho-header-inner > :not(.mho-header-logo))) {
+    display: none !important;
+}
+
+#mho-registry-toolbar {
+    display: flex;
+    align-items: center;
+    column-gap: 4px;
+    width: fit-content;
+    background-color: rgba(62, 36, 23, .75);
+    border-radius: 6px;
+    padding: 3px 5px;
+
+    img {
+        image-rendering: pixelated;
+    }
+
+    .mho-registry-search {
+        width: 10ch;
+        transition: width 0.2s;
+
+        &:focus {
+            width: 20ch;
+        }
     }
 }

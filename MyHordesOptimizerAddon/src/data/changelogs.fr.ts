@@ -1,4 +1,12 @@
 export const changelogs: Record<string, string> = {
+    '1.1.67': `
+        [Amélioration] Désert : les informations de la case, l'expédition et les autres outils MHO sont regroupés dans un bloc unique « MHO Addon » sous la carte, avec des icônes du jeu à la place des titres
+        [Amélioration] En-tête : les boutons MHO sont regroupés dans un encadré avec le logo ; l'outil de traduction devient un bouton qui ouvre un panneau
+        [Amélioration] Registre : le bouton de copie et le champ de recherche sont regroupés dans un encadré MHO compact
+
+        [Correction] Maison d'un autre citoyen : le bouton de mise à jour ne plante plus quand l'authentification MHO n'est pas encore terminée
+        [Correction] Forum : éditer un message n'importe plus les blocs médias du script
+        `,
     '1.1.66': `
         [Nouveauté] Liste des citoyens : deux nouveaux onglets, « Maisons » (habitations et travaux) et « Actions héroïques »
         [Nouveauté] Maison d'un autre citoyen : bouton pour mettre à jour sa maison dans MyHordes Optimizer
