@@ -1366,10 +1366,6 @@
         <source>Investissez vos <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> par paires pour ne rien perdre.</source>
         <target state="translated">Invierte tus <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> por pares para no perder nada.</target>
       </trans-unit>
-      <trans-unit id="4983859294258055145" datatype="html">
-        <source>Dés / Cartes</source>
-        <target state="translated">Dados / Cartas</target>
-      </trans-unit>
       <trans-unit id="4986139580483965783" datatype="html">
         <source>Ajouté</source>
         <target state="translated">Añadido</target>
@@ -2208,6 +2204,10 @@
         <source>Créer une proposition</source>
         <target state="translated">Crear una propuesta</target>
       </trans-unit>
+      <trans-unit id="1947929888826955734" datatype="html">
+        <source>Imposé : la ville est déjà en chaos, ou un jour précédent le prévoit</source>
+        <target state="translated">Impuesto: el pueblo ya está en caos, o un día anterior lo prevé</target>
+      </trans-unit>
       <trans-unit id="1948268959990709736" datatype="html" approved="yes">
         <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</source>
         <target state="final">Al menos un superviviente: <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:'1.0-1':locale }}"/> %</target>
@@ -2435,10 +2435,6 @@
       <trans-unit id="1548322983678517060" datatype="html" approved="yes">
         <source>Jeux</source>
         <target state="final">Juegos</target>
-      </trans-unit>
-      <trans-unit id="6462755436416515489" datatype="html">
-        <source>Niveau suivant de chaque citoyen (un agrandissement par jour)</source>
-        <target state="translated">Siguiente nivel de cada ciudadano (una ampliación por día)</target>
       </trans-unit>
       <trans-unit id="6466167548949900449" datatype="html" approved="yes">
         <source>Démineur</source>
@@ -3584,6 +3580,10 @@
         <source>&lt;p&gt;Tous les objets, par catégorie. « Filtrer » cherche par nom (sans tenir compte des majuscules ni des accents) ; « Chercher des objets par propriétés » garde les objets qui ont au moins une des propriétés ou actions choisies.&lt;/p&gt; &lt;p&gt;Un clic sur un objet ouvre sa fiche : description, fréquence en fouille, recettes, objets qui l&apos;ouvrent et qu&apos;il ouvre, effet à la catapulte, décoration, arme de veille, encombrant, propriétés et actions.&lt;/p&gt; &lt;p&gt;La &lt;strong&gt;fréquence en fouille&lt;/strong&gt; est la chance d&apos;obtenir l&apos;objet lors d&apos;une fouille réussie, sur une zone non épuisée (ou épuisée, pour les deux objets qu&apos;on n&apos;y trouve que là) : un palier (de très courant à très rare), « ≈ 1 fouille réussie sur N » (« ≈ 5 fouilles réussies sur 8 » au-delà de 25 %) et le pourcentage exact.&lt;/p&gt; &lt;p&gt;Avec une ville active, le bouton caddie ajoute l&apos;objet à la liste de courses.&lt;/p&gt;</source>
         <target state="final">&lt;p&gt;Todos los objetos, por categoría. «Filtrar» busca por nombre (sin distinguir mayúsculas ni acentos); «Buscar objetos por propiedades» conserva los objetos que tienen al menos una de las propiedades o acciones elegidas.&lt;/p&gt; &lt;p&gt;Un clic en un objeto abre su ficha: descripción, frecuencia al excavar, recetas, objetos que lo abren y que él abre, efecto en la catapulta, decoración, arma centinela, pesado, propiedades y acciones.&lt;/p&gt; &lt;p&gt;La &lt;strong&gt;frecuencia al excavar&lt;/strong&gt; es la probabilidad de obtener el objeto en una excavación exitosa, en una zona no agotada (o agotada, para los dos objetos que solo se encuentran allí): un nivel (de muy común a muy raro), «≈ 1 excavación exitosa de cada N» («≈ 5 excavaciones exitosas de cada 8» por encima del 25 %) y el porcentaje exacto.&lt;/p&gt; &lt;p&gt;Con un pueblo activo, el botón de carrito añade el objeto a la lista de la compra.&lt;/p&gt;</target>
       </trans-unit>
+      <trans-unit id="5872739682756299764" datatype="html">
+        <source>Utilisations</source>
+        <target state="translated">Usos</target>
+      </trans-unit>
       <trans-unit id="5877715604390460271" datatype="html" approved="yes">
         <source>Supprimer la source</source>
         <target state="final">Eliminar la fuente</target>
@@ -4344,6 +4344,10 @@
         <source>Veilles</source>
         <target state="final">Vigilias</target>
       </trans-unit>
+      <trans-unit id="2681189342619065736" datatype="html">
+        <source>Banni — coché : oui · décoché : non · indéterminé : tous</source>
+        <target state="translated">Desterrado — marcado: sí · desmarcado: no · indeterminado: todos</target>
+      </trans-unit>
       <trans-unit id="2682868487071320453" datatype="html" approved="yes">
         <source>Violet</source>
         <target state="final">Violeta</target>
@@ -4359,6 +4363,10 @@
       <trans-unit id="5906896176186306776" datatype="html">
         <source>Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense propre :</source>
         <target state="translated">Defensa realmente ganada por la ciudad una vez terminada (objetos de defensa consumidos, efectos sobre las casas, ataúdes…). Defensa propia:</target>
+      </trans-unit>
+      <trans-unit id="5908620986304850507" datatype="html">
+        <source>Niveau suivant de chacun</source>
+        <target state="translated">Siguiente nivel de cada uno</target>
       </trans-unit>
       <trans-unit id="5909537349952143751" datatype="html" approved="yes">
         <source>Statistiques</source>
@@ -5368,6 +5376,10 @@
         <source>Enregistrer dans un fichier Excel</source>
         <target state="final">Guardar en un archivo Excel</target>
       </trans-unit>
+      <trans-unit id="6533959590839709981" datatype="html">
+        <source>Proposées à chacun</source>
+        <target state="translated">Propuestos a cada uno</target>
+      </trans-unit>
       <trans-unit id="6534526307832177556" datatype="html">
         <source>Mes pré-villes</source>
         <target state="translated">Mis ciudades previas</target>
@@ -5931,10 +5943,6 @@
       <trans-unit id="5789373353616019087" datatype="html" approved="yes">
         <source>Défense hors chantiers</source>
         <target state="final">Defensa fuera de las construcciones</target>
-      </trans-unit>
-      <trans-unit id="5791141068754641721" datatype="html">
-        <source>Nombre d&apos;utilisations dans la journée</source>
-        <target state="translated">Número de usos al día</target>
       </trans-unit>
       <trans-unit id="5792949529901716121" datatype="html" approved="yes">
         <source>Le bouton « Mettre à jour les outils externes »</source>
@@ -6772,6 +6780,10 @@
         <source>Ignorée si la porte est ouverte</source>
         <target state="final">Se ignora si la puerta está abierta</target>
       </trans-unit>
+      <trans-unit id="5304993850308166757" datatype="html">
+        <source>Revenir au calcul</source>
+        <target state="translated">Volver al cálculo</target>
+      </trans-unit>
       <trans-unit id="7102562601503761745" datatype="html" approved="yes">
         <source>&lt;p&gt;Déplie le menu « Utiliser un objet » partout où le jeu le propose, et de nouveau après chaque changement de votre sac.&lt;/p&gt;</source>
         <target state="final">&lt;p&gt;Despliega el menú «Usar un objeto» allí donde el juego lo ofrece, y de nuevo tras cada cambio de tu mochila.&lt;/p&gt;</target>
@@ -7083,10 +7095,6 @@
       <trans-unit id="1984683690369653530" datatype="html">
         <source>Retirer le veilleur</source>
         <target state="translated">Quitar al centinela</target>
-      </trans-unit>
-      <trans-unit id="1989547770984383899" datatype="html">
-        <source>Ajouter un modèle</source>
-        <target state="translated">Añadir una plantilla</target>
       </trans-unit>
       <trans-unit id="1990355517543678696" datatype="html" approved="yes">
         <source>Citoyens tués</source>
@@ -8111,6 +8119,10 @@
       <trans-unit id="4281881265102804112" datatype="html" approved="yes">
         <source>Taille de police</source>
         <target state="final">Tamaño de fuente</target>
+      </trans-unit>
+      <trans-unit id="7530159340047138178" datatype="html">
+        <source>Jeu de cartes incomplet</source>
+        <target state="translated">Juego de cartas incompleto</target>
       </trans-unit>
       <trans-unit id="7533053521139949104" datatype="html" approved="yes">
         <source>Distance minimum</source>
