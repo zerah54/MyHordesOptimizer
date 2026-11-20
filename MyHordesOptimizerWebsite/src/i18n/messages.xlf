@@ -1025,9 +1025,6 @@
             <trans-unit id="498248526992500843" datatype="html">
                 <source>Investissez vos <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> par paires pour ne rien perdre.</source>
             </trans-unit>
-            <trans-unit id="4983859294258055145" datatype="html">
-                <source>Dés / Cartes</source>
-            </trans-unit>
             <trans-unit id="4986139580483965783" datatype="html">
                 <source>Ajouté</source>
             </trans-unit>
@@ -1655,6 +1652,9 @@
             <trans-unit id="1941717768262017001" datatype="html">
                 <source>Créer une proposition</source>
             </trans-unit>
+            <trans-unit id="1947929888826955734" datatype="html">
+                <source>Imposé : la ville est déjà en chaos, ou un jour précédent le prévoit</source>
+            </trans-unit>
             <trans-unit id="1948268959990709736" datatype="html">
                 <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</source>
             </trans-unit>
@@ -1825,9 +1825,6 @@
             </trans-unit>
             <trans-unit id="1548322983678517060" datatype="html">
                 <source>Jeux</source>
-            </trans-unit>
-            <trans-unit id="6462755436416515489" datatype="html">
-                <source>Niveau suivant de chaque citoyen (un agrandissement par jour)</source>
             </trans-unit>
             <trans-unit id="6466167548949900449" datatype="html">
                 <source>Démineur</source>
@@ -2687,6 +2684,9 @@
             <trans-unit id="4562667602252736363" datatype="html">
                 <source>&lt;p&gt;Tous les objets, par catégorie. « Filtrer » cherche par nom (sans tenir compte des majuscules ni des accents) ; « Chercher des objets par propriétés » garde les objets qui ont au moins une des propriétés ou actions choisies.&lt;/p&gt; &lt;p&gt;Un clic sur un objet ouvre sa fiche : description, fréquence en fouille, recettes, objets qui l&apos;ouvrent et qu&apos;il ouvre, effet à la catapulte, décoration, arme de veille, encombrant, propriétés et actions.&lt;/p&gt; &lt;p&gt;La &lt;strong&gt;fréquence en fouille&lt;/strong&gt; est la chance d&apos;obtenir l&apos;objet lors d&apos;une fouille réussie, sur une zone non épuisée (ou épuisée, pour les deux objets qu&apos;on n&apos;y trouve que là) : un palier (de très courant à très rare), « ≈ 1 fouille réussie sur N » (« ≈ 5 fouilles réussies sur 8 » au-delà de 25 %) et le pourcentage exact.&lt;/p&gt; &lt;p&gt;Avec une ville active, le bouton caddie ajoute l&apos;objet à la liste de courses.&lt;/p&gt;</source>
             </trans-unit>
+            <trans-unit id="5872739682756299764" datatype="html">
+                <source>Utilisations</source>
+            </trans-unit>
             <trans-unit id="5877715604390460271" datatype="html">
                 <source>Supprimer la source</source>
             </trans-unit>
@@ -3257,6 +3257,9 @@
             <trans-unit id="268108544779646824" datatype="html">
                 <source>Veilles</source>
             </trans-unit>
+            <trans-unit id="2681189342619065736" datatype="html">
+                <source>Banni — coché : oui · décoché : non · indéterminé : tous</source>
+            </trans-unit>
             <trans-unit id="2682868487071320453" datatype="html">
                 <source>Violet</source>
             </trans-unit>
@@ -3268,6 +3271,9 @@
             </trans-unit>
             <trans-unit id="5906896176186306776" datatype="html">
                 <source>Défense réellement gagnée par la ville une fois terminé (objets de défense consommés, effets sur les maisons, cercueils…). Défense propre :</source>
+            </trans-unit>
+            <trans-unit id="5908620986304850507" datatype="html">
+                <source>Niveau suivant de chacun</source>
             </trans-unit>
             <trans-unit id="5909537349952143751" datatype="html">
                 <source>Statistiques</source>
@@ -4025,6 +4031,9 @@
             <trans-unit id="5956461158010502750" datatype="html">
                 <source>Enregistrer dans un fichier Excel</source>
             </trans-unit>
+            <trans-unit id="6533959590839709981" datatype="html">
+                <source>Proposées à chacun</source>
+            </trans-unit>
             <trans-unit id="6534526307832177556" datatype="html">
                 <source>Mes pré-villes</source>
             </trans-unit>
@@ -4447,9 +4456,6 @@
             </trans-unit>
             <trans-unit id="5789373353616019087" datatype="html">
                 <source>Défense hors chantiers</source>
-            </trans-unit>
-            <trans-unit id="5791141068754641721" datatype="html">
-                <source>Nombre d&apos;utilisations dans la journée</source>
             </trans-unit>
             <trans-unit id="5792949529901716121" datatype="html">
                 <source>Le bouton « Mettre à jour les outils externes »</source>
@@ -5078,6 +5084,9 @@
             <trans-unit id="5304413680285619130" datatype="html">
                 <source>Ignorée si la porte est ouverte</source>
             </trans-unit>
+            <trans-unit id="5304993850308166757" datatype="html">
+                <source>Revenir au calcul</source>
+            </trans-unit>
             <trans-unit id="7102562601503761745" datatype="html">
                 <source>&lt;p&gt;Déplie le menu « Utiliser un objet » partout où le jeu le propose, et de nouveau après chaque changement de votre sac.&lt;/p&gt;</source>
             </trans-unit>
@@ -5311,9 +5320,6 @@
             </trans-unit>
             <trans-unit id="1984683690369653530" datatype="html">
                 <source>Retirer le veilleur</source>
-            </trans-unit>
-            <trans-unit id="1989547770984383899" datatype="html">
-                <source>Ajouter un modèle</source>
             </trans-unit>
             <trans-unit id="1990355517543678696" datatype="html">
                 <source>Citoyens tués</source>
@@ -6082,6 +6088,9 @@
             </trans-unit>
             <trans-unit id="4281881265102804112" datatype="html">
                 <source>Taille de police</source>
+            </trans-unit>
+            <trans-unit id="7530159340047138178" datatype="html">
+                <source>Jeu de cartes incomplet</source>
             </trans-unit>
             <trans-unit id="7533053521139949104" datatype="html">
                 <source>Distance minimum</source>
