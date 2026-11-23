@@ -81,7 +81,7 @@ describe('myProgram', (): void => {
 
     it('rappelle le second chantier voté seulement avec le Brasier Sacrificiel', (): void => {
         const plan: BuildingPlanContentDTO = content({ eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
-        const double: DayEvaluation = { ...fakeEvaluation(plan), doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0 } };
+        const double: DayEvaluation = { ...fakeEvaluation(plan), doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0, water: 0 } };
 
         expect((program_of(1, plan, double) as MyProgram).secondVoteBuildingId).toBe(3);
         expect((program_of(1, plan) as MyProgram).secondVoteBuildingId).toBeNull();

@@ -81,8 +81,8 @@
     }
 
     .edit {
-        --mat-icon-button-state-layer-size: 28px;
-        --mat-icon-button-icon-size: 18px;
+        // Taille du bouton seule : réduire aussi la taille d'icône recalculerait la marge sans réduire mat-icon (pictogramme décentré).
+        @include mat.icon-button-overrides((state-layer-size: 28px));
     }
 
     .defense[data-state='gap'] .gap,

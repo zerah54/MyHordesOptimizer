@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 :host {
     display: block;
 }
@@ -44,8 +46,7 @@
         min-height: 32px;
 
         .mat-mdc-icon-button {
-            --mat-icon-button-state-layer-size: 32px;
-            --mat-icon-button-icon-size: 18px;
+            @include mat.icon-button-overrides((state-layer-size: 32px));
         }
 
         .improvement-day {
@@ -154,8 +155,7 @@
 
     // Trois boutons par ligne : ramenés à 28 px pour laisser la place au nom
     .mat-mdc-icon-button {
-        --mat-icon-button-state-layer-size: 28px;
-        --mat-icon-button-icon-size: 18px;
+        @include mat.icon-button-overrides((state-layer-size: 28px));
         flex-shrink: 0;
     }
 

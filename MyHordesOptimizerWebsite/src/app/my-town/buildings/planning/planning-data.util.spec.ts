@@ -175,6 +175,11 @@ describe('planning-data.util', (): void => {
             expect(refs[0].technician).toBe(false);
         });
 
+        it('reconnaît les héros par leur métier, inconnu sans métier', (): void => {
+            const refs: CitizenRef[] = citizenRefs([citizen({ id: 1, job: JobEnum.CITIZEN }), citizen({ id: 2, job: JobEnum.TECHNICIAN }), citizen({ id: 3 })]);
+            expect(refs.map((ref: CitizenRef): boolean | undefined => ref.heroic)).toEqual([false, true, undefined]);
+        });
+
         it('lit le niveau de maison, null quand il est absent', (): void => {
             const home: Home = Object.assign(new Home(), { content: [{ element: HomeEnum.HOUSE_LEVEL, value: 3 }] });
             expect(citizenRefs([citizen({ home })])[0].homeLevel).toBe(3);

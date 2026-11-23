@@ -30,8 +30,19 @@ function computeUpgradesDefense(citizen: Citizen): number {
     const renfortLevelValue: number | boolean | undefined = homeContentValue(citizen, HomeEnum.HOUSE_DEFENSE);
     const renfortLevel: number = Math.max(0, typeof renfortLevelValue === 'number' ? renfortLevelValue : 0);
     const hasFence: boolean = !!homeContentValue(citizen, HomeEnum.HAS_FENCE);
-    const renfortDefense: number = renfortLevel <= 6 ? renfortLevel : 6 + 2 * (renfortLevel - 6);
-    return renfortDefense + (hasFence ? 3 : 0);
+    return reinforcementDefense(renfortLevel) + (hasFence ? FENCE_DEFENSE : 0);
+}
+
+/** Défense de la clôture d'un héros (`calculate_home_def`). */
+export const FENCE_DEFENSE: number = 3;
+
+/**
+ * Défense des renforts d'un héros selon leur niveau (`calculate_home_def`) : +1 par niveau jusqu'à 6, +2 au-delà.
+ * @param {number} level Niveau des renforts.
+ * @returns {number} Défense.
+ */
+export function reinforcementDefense(level: number): number {
+    return level <= 6 ? level : 6 + 2 * (level - 6);
 }
 
 function homeContentValue(citizen: Citizen, element: HomeEnum): number | boolean | undefined {

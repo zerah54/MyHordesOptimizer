@@ -93,7 +93,6 @@
 
     .label-cell .temporary {
         flex: none;
-        color: var(--mho-danger);
     }
 
     .label-cell .blueprint {
@@ -124,6 +123,12 @@
 
     .def.loss {
         color: var(--mho-danger);
+    }
+
+    // La goutte occupe le bas de son sprite : centrée sur les chiffres par le haut du texte, pas par `middle`.
+    .water img,
+    .ratio img {
+        vertical-align: text-top;
     }
 
     .dash,

@@ -186,15 +186,16 @@ const GAIN_RANKS: ReadonlyMap<string, number> = new Map<string, number>([
 ]);
 /** Le vote sur les Fixations compte juste après elles, avant les chantiers qui consomment des objets de défense. */
 const VOTE_RANK: number = 2;
-/** Le vote sur l'Ajustement défensif compte avant tout autre chantier, qui compte alors à l'échelle votée. */
-const SCALE_VOTE_RANK: number = 0;
+/** Le vote sur l'Ajustement défensif compte en dernier : son échelle s'applique à toute la défense du soir, gains du jour compris. */
+const SCALE_VOTE_RANK: number = 6;
 const DEFAULT_RANK: number = 4;
 
 /**
  * Défense affichée par chantier, dans l'état du soir (chantiers terminés dans la journée et vote) ; les chantiers du jour sont
  * ajoutés l'un après l'autre, si bien que leur somme et le vote égalent le gain de la journée :
- * - Ajustement défensif, Fixations de défenses, leurs votes et Cimetière cadenassé comptent sur l'état actuel de la ville ; les
+ * - Ajustement défensif, Fixations de défenses, leur vote et Cimetière cadenassé comptent sur l'état actuel de la ville ; les
  *   autres chantiers comptent à leur échelle, à leur multiplicateur d'objets et avec le cimetière ;
+ * - le vote sur l'Ajustement défensif compte en dernier, sur toute la défense du soir ;
  * - Quartiers circulaires comptent en dernier, avec les maisons ajoutées dans la journée (Habitations fortifiées, montées de maison).
  * Un chantier non terminé dans la journée compte comme s'il s'ajoutait à l'état du soir, ses ancêtres à effets en cascade
  * supposés construits.

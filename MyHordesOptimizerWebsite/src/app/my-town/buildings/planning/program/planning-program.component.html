@@ -273,6 +273,11 @@
                         <img class="game-icon" [src]="HORDES_IMG_REPO + 'icons/small_def.gif'" i18n-alt alt="déf">
                     </span>
                 }
+                @if (gain.water > 0) {
+                    <span class="water" i18n-matTooltip matTooltip="Rations d'eau versées au puits cette nuit">+{{ gain.water }}<img class="game-icon"
+                                                                                                                                     [src]="HORDES_IMG_REPO + 'icons/water.gif'"
+                                                                                                                                     alt=""></span>
+                }
                 @if (gain.text; as text) {
                     <span class="vote-text">{{ text }}</span>
                 }

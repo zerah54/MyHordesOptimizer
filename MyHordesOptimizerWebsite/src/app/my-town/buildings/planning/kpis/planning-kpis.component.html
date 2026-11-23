@@ -31,6 +31,31 @@
                     </button>
                 }
             </span>
+            <span class="sub gains">
+                <ng-container i18n>Gains du jour :</ng-container>
+                <span data-field="gain-buildings"><ng-container i18n>chantiers</ng-container>
+                    {{ signed(evaluation.defenseGains.buildings) }}</span>
+                @if (evaluation.defenseGains.repairs !== 0) {
+                    · <span data-field="gain-repairs"><ng-container i18n>réparations</ng-container>
+                        {{ signed(evaluation.defenseGains.repairs) }}</span>
+                }
+                · <span data-field="gain-homes"><ng-container i18n>maisons</ng-container>
+                {{ signed(evaluation.defenseGains.homes) }}</span>
+                @if (evaluation.defenseGains.votes !== 0) {
+                    · <span data-field="gain-votes"><ng-container i18n>évolutions</ng-container>
+                        {{ signed(evaluation.defenseGains.votes) }}</span>
+                }
+                @if (evaluation.defenseGains.sources !== 0) {
+                    · <span data-field="gain-sources"><ng-container i18n>sources</ng-container>
+                        {{ signed(evaluation.defenseGains.sources) }}</span>
+                }
+                @if (evaluation.defenseGains.losses !== 0) {
+                    · <span data-field="gain-losses"><ng-container i18n>pertes</ng-container>
+                        {{ signed(-evaluation.defenseGains.losses) }}</span>
+                }
+                · <strong data-field="gain-total"><ng-container i18n>total</ng-container>
+                {{ signed(evaluation.defenseGains.total) }}</strong>
+            </span>
             @if (store.tomorrow(); as tomorrow) {
                 <span class="sub tomorrow" [attr.data-state]="tomorrow.gap > 0 ? 'gap' : 'surplus'">
                     <ng-container i18n>Demain : attaque</ng-container>

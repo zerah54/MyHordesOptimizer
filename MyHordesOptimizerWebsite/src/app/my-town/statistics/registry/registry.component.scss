@@ -48,8 +48,6 @@
                     width: 50px;
 
                     .mat-mdc-icon-button {
-                        --mat-icon-button-icon-size: 16;
-
                         /* Bouton actif : fond ET contour, pour ne pas dépendre de la seule couleur. */
                         &.active {
                             background-color: var(--mho-accent-soft);

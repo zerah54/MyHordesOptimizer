@@ -7,8 +7,9 @@ import { Building } from '../../../../_abstract_model/types/building.class';
 import { TownDetails } from '../../../../_abstract_model/types/town-details.class';
 import { setTown } from '../../../../_core/utilities/localstorage.util';
 import { BuildingProgress } from '../building-progress.util';
-import { DayEvaluation } from '../plan-evaluation.util';
+import { WELL_WATER_EFFECT } from '../building-upgrades.types';
 import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool } from '../plan.types';
+import { DayEvaluation, WORKSHOP_UID } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeCatalog, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { PlanningTreeDrawerComponent } from './planning-tree-drawer.component';
@@ -101,7 +102,7 @@ describe('PlanningTreeDrawerComponent', (): void => {
         Object.assign(catalog.find((building: Building): boolean => building.id === 1) as Building, { temporary: true, rarity: 3 });
         await render('regular', content(), catalog);
 
-        expect(row(1).querySelector('.label-cell .temporary')).not.toBeNull();
+        expect(row(1).querySelector('.label-cell img.temporary')?.getAttribute('src')).toContain('icons/small_warning.gif');
         expect(row(1).querySelector('.label-cell img.blueprint')?.getAttribute('src')).toContain('item_bplan_r.gif');
         expect(row(3).querySelector('.label-cell .temporary')).toBeNull();
         expect(row(3).querySelector('.label-cell img.blueprint')).toBeNull();
@@ -223,6 +224,18 @@ describe('PlanningTreeDrawerComponent', (): void => {
 
         expect(row(2).querySelector('.def')?.textContent?.trim()).toBe('20');
         expect(row(2).querySelector('.ratio')?.textContent?.trim()).not.toBe('—');
+    });
+
+    it('un chantier à eau affiche les rations versées au puits et son ratio eau par PA', async (): Promise<void> => {
+        await render();
+        click('unlocked-only');
+        fake.upgrades.set({ [WORKSHOP_UID]: { maxLevel: 0, effects: { [WELL_WATER_EFFECT]: { levels: [50], default: 50, source: '' } } } });
+        fixture.detectChanges();
+
+        expect(row(2).querySelector('.water')?.textContent?.trim()).toBe('50');
+        expect(row(2).querySelector('.ratio')?.textContent?.trim()).toBe('2.50');
+        expect(row(2).querySelector('.ratio img')).not.toBeNull();
+        expect(row(1).querySelector('.water')).toBeNull();
     });
 
     it('les ressources que la banque ne couvre pas sont signalées', async (): Promise<void> => {

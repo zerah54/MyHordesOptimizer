@@ -82,6 +82,18 @@ a {
     align-items: center;
 }
 
+// Icônes MyHordes dans un mat-icon-button : taille native (Material les force à --mat-icon-button-icon-size) et centrage.
+.mat-mdc-icon-button.mat-mdc-button-base:has(> img) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    > img {
+        width: auto;
+        height: auto;
+    }
+}
+
 // Material projette les <mat-icon> vers un ng-content dédié qui leur applique taille et
 // alignement. Un @if / @for autour de l'icône casse cette projection (elle est résolue à la
 // compilation) : le contenu retombe dans .mdc-button__label et perd ces styles. On les rétablit.

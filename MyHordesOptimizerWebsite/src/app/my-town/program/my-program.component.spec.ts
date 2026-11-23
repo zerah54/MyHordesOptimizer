@@ -405,7 +405,7 @@ describe('MyProgramComponent', (): void => {
     it('avec le Brasier Sacrificiel, affiche les deux chantiers votés ce soir', async (): Promise<void> => {
         const plan: BuildingPlanContentDTO = content({ eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
         await render(plan);
-        fake.evaluation.set({ ...fakeEvaluation(plan), doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0 } });
+        fake.evaluation.set({ ...fakeEvaluation(plan), doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0, water: 0 } });
         fixture.detectChanges();
 
         expect(text('.vote')).toContain('Évolutions votées ce soir');

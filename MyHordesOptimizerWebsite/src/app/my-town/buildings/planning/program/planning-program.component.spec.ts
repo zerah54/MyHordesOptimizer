@@ -483,6 +483,17 @@ describe('PlanningProgramComponent', (): void => {
         expect(gain?.textContent).toContain('La porte apporte 15 points de défense.');
     });
 
+    it('le vote affiche les rations versées au puits', async (): Promise<void> => {
+        const plan: BuildingPlanContentDTO = content();
+        plan.eveningVoteBuildingId = 3;
+        await render(plan);
+        fake.upgrades.set({ gate: { maxLevel: 2, effects: { waterIncrement: { levels: [5, 20, 30], default: 0, source: 'BuildingUpgradeListener' } } } });
+        fake.evaluation.set(fakeEvaluation(plan, { upgrades: fake.upgrades() }));
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('[data-field="vote-gain"] .water')?.textContent?.trim()).toBe('+20');
+    });
+
     it('le vote du soir sur l\'atelier affiche le seuil gratuit des chantiers restants', async (): Promise<void> => {
         const plan: BuildingPlanContentDTO = content();
         plan.eveningVoteBuildingId = 2;
@@ -521,7 +532,7 @@ describe('PlanningProgramComponent', (): void => {
         });
 
         it('le second vote affiche sa défense gagnée pour la nuit', async (): Promise<void> => {
-            await renderDouble({ ...content(), eveningSecondVoteBuildingId: 3 }, { secondVote: { uid: 'gate', level: 2, defense: 30 } });
+            await renderDouble({ ...content(), eveningSecondVoteBuildingId: 3 }, { secondVote: { uid: 'gate', level: 2, defense: 30, water: 0 } });
 
             expect(root().querySelector('[data-field="second-vote-gain"]')?.textContent).toContain('+30');
         });

@@ -558,6 +558,10 @@
                 <source>Verrou</source>
                 <target state="final">Cerrojo</target>
             </trans-unit>
+            <trans-unit id="7353585844525196449" datatype="html">
+                <source>chantiers</source>
+                <target state="translated">construcciones</target>
+            </trans-unit>
             <trans-unit id="7359182511958867754" datatype="html">
                 <source>Ouvrir</source>
                 <target state="translated">Abrir</target>
@@ -1122,6 +1126,10 @@
                 <source>Clic droit (ou appui long) sur une case du tracé : tout ce qui suit est retiré.</source>
                 <target state="final">Clic derecho (o pulsación larga) en una casilla de la ruta: se elimina todo lo que sigue.</target>
             </trans-unit>
+            <trans-unit id="4829569900134225613" datatype="html">
+                <source>réparations</source>
+                <target state="translated">reparaciones</target>
+            </trans-unit>
             <trans-unit id="9158398402266627347" datatype="html" approved="yes">
                 <source>Une erreur s&apos;est produite lors de la connexion</source>
                 <target state="final">Se ha producido un error durante el inicio de sesión</target>
@@ -1526,6 +1534,10 @@
                 <source>Alternative Technicien</source>
                 <target state="final">Alternativa del técnico</target>
             </trans-unit>
+            <trans-unit id="79486738287577589" datatype="html">
+                <source>Gains du jour :</source>
+                <target state="translated">Ganancias del día:</target>
+            </trans-unit>
             <trans-unit id="4731110158513700954" datatype="html">
                 <source>1 – Secteur partiellement repéré</source>
                 <target state="translated">1 – Sector parcialmente localizado</target>
@@ -1813,6 +1825,10 @@
             <trans-unit id="5987572317992662165" datatype="html" approved="yes">
                 <source> Meilleure survie </source>
                 <target state="final"> Mejor supervivencia </target>
+            </trans-unit>
+            <trans-unit id="5994401295106811444" datatype="html">
+                <source>Rations d&apos;eau versées au puits une fois terminé</source>
+                <target state="translated">Raciones de agua añadidas al pozo una vez terminado</target>
             </trans-unit>
             <trans-unit id="5996532318582244309" datatype="html">
                 <source>Cliquez une case pour y aller</source>
@@ -3410,6 +3426,10 @@
                 <source> La dévastation force : porte ouverte depuis longtemps (+25) et tous les logements au niveau 0 (facteur de zombies actifs). La défense personnelle n&apos;est pas remise à 0 : seule sa part liée au logement l&apos;est, le reste (métier héroïque, améliorations, objets) survit. </source>
                 <target state="final"> La devastación fuerza: puerta abierta desde hace tiempo (+25) y todas las viviendas al nivel 0 (factor de zombies activos). La defensa personal no se reinicia a 0: solo lo hace su parte ligada a la vivienda, el resto (oficio heroico, mejoras, objetos) se mantiene. </target>
             </trans-unit>
+            <trans-unit id="3928664129044319049" datatype="html">
+                <source>Rations d&apos;eau par PA</source>
+                <target state="translated">Raciones de agua por PA</target>
+            </trans-unit>
             <trans-unit id="2677341107476774217" datatype="html">
                 <source>Attribuer</source>
                 <target state="translated">Asignar</target>
@@ -3698,6 +3718,10 @@
                 <source>&lt;p&gt;Les joueurs : pseudo (filtrable), nombre de villes, meilleure survie et dernière ville. Connecté, vous pouvez y écrire une note privée sur chaque joueur. Un clic ouvre son profil (villes et pictos).&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Los jugadores: nombre de usuario (filtrable), número de pueblos, mejor supervivencia y último pueblo. Con la sesión iniciada, puedes escribir ahí una nota privada sobre cada jugador. Un clic abre su perfil (pueblos y distinciones).&lt;/p&gt;</target>
             </trans-unit>
+            <trans-unit id="4654392097835361595" datatype="html">
+                <source>maisons</source>
+                <target state="translated">casas</target>
+            </trans-unit>
             <trans-unit id="4660686038225270640" datatype="html">
                 <source>Valeurs des objets en <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/></source>
                 <target state="translated">Valores de los objetos en <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/></target>
@@ -3877,6 +3901,10 @@
             <trans-unit id="669866572497610362" datatype="html" approved="yes">
                 <source>Attaque J<x id="PH" equiv-text="day"/> calculée - Min</source>
                 <target state="translated">Ataque D<x id="PH" equiv-text="day"/> calculado - Mín</target>
+            </trans-unit>
+            <trans-unit id="8953953417231506966" datatype="html">
+                <source>Rations d&apos;eau versées au puits cette nuit</source>
+                <target state="translated">Raciones de agua añadidas al pozo esta noche</target>
             </trans-unit>
             <trans-unit id="8957575198110805301" datatype="html" approved="yes">
                 <source>Les tracés sont réservés aux citoyens de la ville.</source>
@@ -6318,6 +6346,10 @@
                 <source>Bonus en équivalent PA</source>
                 <target state="final">Bonus en equivalente de PA</target>
             </trans-unit>
+            <trans-unit id="6489441800790477240" datatype="html">
+                <source>total</source>
+                <target state="translated">total</target>
+            </trans-unit>
             <trans-unit id="4328907410933636413" datatype="html" approved="yes">
                 <source>Le citoyen</source>
                 <target state="final">El habitante</target>
@@ -7850,6 +7882,10 @@
                 <source>Se doucher</source>
                 <target state="translated">Tomar una ducha</target>
             </trans-unit>
+            <trans-unit id="5587775504680006376" datatype="html">
+                <source>évolutions</source>
+                <target state="translated">mejoras</target>
+            </trans-unit>
             <trans-unit id="6500925437908105799" datatype="html" approved="yes">
                 <source>Distribution réaliste</source>
                 <target state="final">Distribución realista</target>
@@ -7922,6 +7958,10 @@
                 <source>Options de la catégorie « Informations complémentaires » : elles ajoutent aux pages du jeu des données que MyHordes n&apos;affiche pas.</source>
                 <target state="final">Opciones de la categoría «Informaciones complementarias»: añaden a las páginas del juego datos que MyHordes no muestra.</target>
             </trans-unit>
+            <trans-unit id="192700802535731981" datatype="html">
+                <source>sources</source>
+                <target state="translated">fuentes</target>
+            </trans-unit>
             <trans-unit id="444601773189456419" datatype="html" approved="yes">
                 <source>Jours précédents</source>
                 <target state="final">Días anteriores</target>
@@ -7977,6 +8017,10 @@
             <trans-unit id="3835013333520355539" datatype="html" approved="yes">
                 <source>Indisponible</source>
                 <target state="final">No disponible</target>
+            </trans-unit>
+            <trans-unit id="3835878766747597330" datatype="html">
+                <source>pertes</source>
+                <target state="translated">pérdidas</target>
             </trans-unit>
             <trans-unit id="4379904882658374793" datatype="html" approved="yes">
                 <source>RE</source>

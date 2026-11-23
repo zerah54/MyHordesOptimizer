@@ -40,6 +40,7 @@ interface ModeOption {
 interface VoteGain {
     level: number;
     defense: number;
+    water: number;
     text: string | null;
 }
 
@@ -419,7 +420,7 @@ export class PlanningProgramComponent {
         if (vote === null) {
             return null;
         }
-        return { level: vote.level, defense: vote.defense, text: upgradeLevelText(this.store.upgrades(), vote.uid, vote.level, this.locale) };
+        return { level: vote.level, defense: vote.defense, water: vote.water, text: upgradeLevelText(this.store.upgrades(), vote.uid, vote.level, this.locale) };
     }
 
     /**

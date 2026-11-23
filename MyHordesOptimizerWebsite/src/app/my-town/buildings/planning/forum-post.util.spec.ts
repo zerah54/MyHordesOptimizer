@@ -507,7 +507,7 @@ describe('forum-post.util', (): void => {
 
         it('avec le Brasier Sacrificiel, annonce les deux évolutions du soir', (): void => {
             const base: PostContext = context({ ...plan(), eveningVoteBuildingId: 2, eveningSecondVoteBuildingId: 3 });
-            const text: string = joined(programPost({ ...base, evaluation: { ...base.evaluation, doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0 } } }));
+            const text: string = joined(programPost({ ...base, evaluation: { ...base.evaluation, doubleVote: true, secondVote: { uid: 'gate', level: 1, defense: 0, water: 0 } } }));
 
             expect(text).toContain(':fortify: [b]Évolutions votées ce soir[/b] : :refine: Atelier, Porte');
         });

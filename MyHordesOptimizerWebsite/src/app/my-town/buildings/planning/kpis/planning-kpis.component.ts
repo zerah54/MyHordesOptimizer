@@ -15,7 +15,7 @@ import { alertAnchor, PlanAlert } from '../plan-alerts.util';
 import { DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { toNonNegativeInt } from '../planning-input.util';
-import { itemLabel } from '../planning-labels.util';
+import { itemLabel, signed } from '../planning-labels.util';
 import { ResourceCount } from '../resources.util';
 
 const angular_common: Imports = [FormsModule];
@@ -41,6 +41,7 @@ export class PlanningKpisComponent {
     protected readonly editing: WritableSignal<boolean> = signal(false);
 
     private readonly locale: string = moment.locale();
+    protected readonly signed: (value: number) => string = signed;
 
 
     /**

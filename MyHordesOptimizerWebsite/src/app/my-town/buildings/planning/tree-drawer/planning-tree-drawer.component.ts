@@ -28,6 +28,7 @@ import { normalizeString } from '../../../../_core/utilities/string.utils';
 import { CompactStepperComponent } from '../../../../_shared/compact-stepper/compact-stepper.component';
 import { IconApComponent } from '../../../../_shared/icon-ap/icon-ap.component';
 import { BuildingProgress, remainingAp } from '../building-progress.util';
+import { wellWater } from '../building-upgrades.types';
 import { rankByDefPerPa } from '../defense.util';
 import { PlanningKpisComponent } from '../kpis/planning-kpis.component';
 import { BuildingPlanContentDTO, isBuildingStep, PlanItemDTO, PlanPool, stepMode } from '../plan.types';
@@ -79,7 +80,11 @@ interface TreeRow {
     pa: number | null;
     /** Défense réellement gagnée par la ville (celle du programme) ; défense propre sans évaluation ou une fois construit. */
     defence: number;
+    /** Rations d'eau versées au puits à la construction, 0 sans. */
+    water: number;
     ratio: number | null;
+    /** Eau par PA (coût réel), affichée à défaut de ratio de défense ; nulle sans eau. */
+    waterRatio: number | null;
     tier: { value: number; max: number; icon: string } | null;
     resources: ResourceView[];
     checked: boolean;
@@ -244,6 +249,10 @@ export class PlanningTreeDrawerComponent {
         const ratio: number | null = built || defence <= 0
             ? null
             : rankByDefPerPa([{ label: '', kind: 'building', def: defence, pa: pa ?? 0, resources }], this.store.item_values())[0].ratio;
+        const water: number = wellWater(this.store.upgrades(), building.uid);
+        const water_ratio: number | null = built || water <= 0
+            ? null
+            : rankByDefPerPa([{ label: '', kind: 'building', def: water, pa: pa ?? 0, resources }], this.store.item_values())[0].ratio;
         const useful: 0 | 1 | 2 = usefulPlanReadings(building);
         const parent: Building | undefined = building.parent_id === null ? undefined : this.tree().by_id.get(building.parent_id);
 
@@ -259,7 +268,9 @@ export class PlanningTreeDrawerComponent {
             remaining,
             pa,
             defence,
+            water,
             ratio,
+            waterRatio: water_ratio,
             tier: this.hard_mode && !synced && useful > 0 && hasReachablePlanLevel(building)
                 ? { value: tier, max: useful, icon: planStepperIcon(building) }
                 : null,

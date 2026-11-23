@@ -1,3 +1,4 @@
+import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
 import { CitizenCapacity } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { RankedCandidate } from './defense.util';
@@ -217,6 +218,40 @@ describe('plan-evaluation.util', (): void => {
             expect(evaluation.capacities[0].capacity).toBe(15);
         });
 
+        describe('renforts et clôture (travaux personnels)', (): void => {
+            const tasks: BuildingPlanContentDTO['citizens'] = [{
+                userId: 1,
+                tasks: [{ kind: 'homeUpgrade', ref: HomeEnum.HOUSE_DEFENSE.key, level: 8, pa: 6 }, { kind: 'homeUpgrade', ref: HomeEnum.HAS_FENCE.key, level: 1, pa: 3 }]
+            }];
+
+            /**
+             * Citoyen aux renforts niveau 5, sans clôture.
+             * @param {boolean} heroic Héros.
+             * @returns {CitizenRef[]} Citoyens.
+             */
+            function builder(heroic: boolean): CitizenRef[] {
+                return [{
+                    userId: 1, name: 'A', banned: false, technician: false, heroic, homeLevel: 1,
+                    upgradeLevels: new Map<string, number>([[HomeEnum.HOUSE_DEFENSE.key, 5], [HomeEnum.HAS_FENCE.key, 0]])
+                }];
+            }
+
+            it('un héros gagne +1 par renfort jusqu\'au niveau 6, +2 au-delà, et +3 pour la clôture, comptés comme sa maison', (): void => {
+                const evaluation: DayEvaluation = evaluateDay(input({ citizens: tasks }, { citizens: builder(true) }));
+
+                // Renforts 5 → 8 : 5 → 10 ; clôture : +3 ; 8 de défense de maison, dont la ville compte 40 %.
+                expect(evaluation.defenseGains.homes).toBe(3);
+                expect(evaluation.projectedDefense).toBe(1003);
+            });
+
+            it('un habitant (non héros) ne gagne rien', (): void => {
+                const evaluation: DayEvaluation = evaluateDay(input({ citizens: tasks }, { citizens: builder(false) }));
+
+                expect(evaluation.defenseGains.homes).toBe(0);
+                expect(evaluation.projectedDefense).toBe(1000);
+            });
+        });
+
         it('une tâche de maison sans niveau actuel connu n\'invente aucune défense', (): void => {
             const homes: Map<number, HomeLevelRef> = new Map<number, HomeLevelRef>([[2, { level: 2, label: 'B', def: 4, ap: 4, apUrbanism: 4, resources: [], resourcesUrbanism: [] }]]);
 
@@ -374,7 +409,7 @@ describe('plan-evaluation.util', (): void => {
         it('compte le gain du niveau suivant dans la défense de la nuit même', (): void => {
             const evaluation: DayEvaluation = evaluateDay(input({ eveningVoteBuildingId: 3 }, { upgrades, buildingLevels: levels }));
 
-            expect(evaluation.vote).toEqual({ uid: 'gate', level: 2, defense: 30 });
+            expect(evaluation.vote).toEqual({ uid: 'gate', level: 2, defense: 30, water: 0 });
             expect(evaluation.projectedDefense).toBe(1030);
             expect(evaluation.buildingLevelsBefore.get('gate')).toBe(1);
         });
@@ -425,7 +460,7 @@ describe('plan-evaluation.util', (): void => {
 
             expect(evaluation.doubleVote).toBe(true);
             expect(evaluation.vote?.uid).toBe(WORKSHOP_UID);
-            expect(evaluation.secondVote).toEqual({ uid: 'gate', level: 2, defense: 30 });
+            expect(evaluation.secondVote).toEqual({ uid: 'gate', level: 2, defense: 30, water: 0 });
             expect(evaluation.projectedDefense).toBe(1030);
             const next: ReturnType<typeof advanceDay> = advanceDay(evaluation, day);
             expect(next.buildingLevels.get('gate')).toBe(2);
@@ -511,7 +546,7 @@ describe('plan-evaluation.util', (): void => {
             const day: DayInput = fixingsInput({});
             const evaluation: DayEvaluation = evaluateDay(day);
 
-            expect(evaluation.vote).toEqual({ uid: DEFENSE_FIXINGS_UID, level: 1, defense: 4 });
+            expect(evaluation.vote).toEqual({ uid: DEFENSE_FIXINGS_UID, level: 1, defense: 4, water: 0 });
             expect(evaluation.projectedDefense).toBe(1004);
             expect(advanceDay(evaluation, day).defenseFactors.itemFactor).toBe(2);
         });
@@ -538,7 +573,7 @@ describe('plan-evaluation.util', (): void => {
 
     describe('vote sur l\'Ajustement défensif', (): void => {
         const ADJUSTMENT: BuildingRef = ref({ id: 6, uid: DEFENSE_ADJUSTMENT_UID, label: 'Ajustement', pa: 10 });
-        const TOWER: BuildingRef = ref({ id: 7, uid: 'tower', label: 'Tour', pa: 10, defence: 30 });
+        const TOWER: BuildingRef = ref({ id: 7, uid: 'tower', label: 'Tour', pa: 10, defence: 300 });
 
         /**
          * Ajustement défensif construit au niveau 0 (échelle 1,1), défense de départ 1100, Tour à construire.
@@ -564,17 +599,38 @@ describe('plan-evaluation.util', (): void => {
             const day: DayInput = adjustmentInput({});
             const evaluation: DayEvaluation = evaluateDay(day);
 
-            expect(evaluation.vote).toEqual({ uid: DEFENSE_ADJUSTMENT_UID, level: 1, defense: 10 });
+            expect(evaluation.vote).toEqual({ uid: DEFENSE_ADJUSTMENT_UID, level: 1, defense: 10, water: 0 });
             expect(evaluation.projectedDefense).toBe(1110);
             expect(advanceDay(evaluation, day).defenseFactors.scale).toBe(1.11);
         });
 
-        it('un chantier terminé le même jour compte à l\'échelle votée', (): void => {
+        it('le vote compte sur la défense du soir, chantiers du jour compris', (): void => {
             const evaluation: DayEvaluation = evaluateDay(adjustmentInput({ programs: { banned: [], regular: [step(7, 0)] } }));
 
-            expect(evaluation.vote?.defense).toBe(10);
-            expect(evaluation.realDefense.get(7)).toBe(33);
-            expect(evaluation.projectedDefense).toBe(1143);
+            expect(evaluation.realDefense.get(7)).toBe(330);
+            expect(evaluation.vote?.defense).toBe(13);
+            expect(evaluation.projectedDefense).toBe(1443);
+            expect(evaluation.defenseGains).toEqual({ buildings: 330, repairs: 0, homes: 0, votes: 13, sources: 0, losses: 0, total: 343 });
+        });
+    });
+
+    describe('vote sur un chantier qui verse des rations au puits', (): void => {
+        it('annonce les rations versées au puits au niveau atteint', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ eveningVoteBuildingId: 3 }, {
+                upgrades: { gate: { maxLevel: 2, effects: { waterIncrement: { levels: [5, 20, 30], default: 0, source: '' } } } },
+                buildingLevels: new Map<string, number>([['gate', 0]])
+            }));
+
+            expect(evaluation.vote?.water).toBe(20);
+        });
+
+        it('au niveau maximum, plus aucune eau', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ eveningVoteBuildingId: 3 }, {
+                upgrades: { gate: { maxLevel: 2, effects: { waterIncrement: { levels: [5, 20, 30], default: 0, source: '' } } } },
+                buildingLevels: new Map<string, number>([['gate', 2]])
+            }));
+
+            expect(evaluation.vote?.water).toBe(0);
         });
     });
 
@@ -591,7 +647,7 @@ describe('plan-evaluation.util', (): void => {
                 buildingLevels: new Map<string, number>([[CEMETERY_UID, 0]])
             }));
 
-            expect(evaluation.vote).toEqual({ uid: CEMETERY_UID, level: 1, defense: 22 });
+            expect(evaluation.vote).toEqual({ uid: CEMETERY_UID, level: 1, defense: 22, water: 0 });
             expect(evaluation.projectedDefense).toBe(1122);
         });
     });

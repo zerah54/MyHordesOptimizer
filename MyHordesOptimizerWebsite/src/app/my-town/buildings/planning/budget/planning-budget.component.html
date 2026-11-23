@@ -186,11 +186,13 @@
             }
         </tbody>
     </table>
-    <button mat-stroked-button type="button" data-action="add-line" [disabled]="!store.can_edit()" (click)="addLine()" i18n>Ajouter une ligne</button>
-    @for (preset of presets; track preset.source) {
-        <button mat-icon-button type="button" [attr.data-preset]="preset.source" [disabled]="!store.can_edit()" (click)="addPreset(preset)"
-                [matTooltip]="preset.label">
-            <img [src]="HORDES_IMG_REPO + preset.icon" [alt]="preset.label">
-        </button>
-    }
+    <div class="line-actions">
+        <button mat-stroked-button type="button" data-action="add-line" [disabled]="!store.can_edit()" (click)="addLine()" i18n>Ajouter une ligne</button>
+        @for (preset of presets; track preset.source) {
+            <button mat-icon-button type="button" [attr.data-preset]="preset.source" [disabled]="!store.can_edit()" (click)="addPreset(preset)"
+                    [matTooltip]="preset.label">
+                <img [src]="HORDES_IMG_REPO + preset.icon" [alt]="preset.label">
+            </button>
+        }
+    </div>
 }

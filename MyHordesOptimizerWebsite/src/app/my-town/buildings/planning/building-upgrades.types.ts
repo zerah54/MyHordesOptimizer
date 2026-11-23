@@ -26,6 +26,10 @@ export const DEFENSE_INCREMENT_EFFECT: string = 'defenseIncrement';
 export const DEFENSE_MULTIPLIER_EFFECT: string = 'defenseMultiplier';
 /** Échelle de toute la défense par niveau de l'Ajustement défensif (`BuildingQueryListener`). */
 export const TOWN_DEFENSE_SCALE_EFFECT: string = 'OverallTownDefenseScale';
+/** Eau versée au puits à la construction, sans niveau (`BuildingConstructionListener`). */
+export const WELL_WATER_EFFECT: string = 'spawn_well_water';
+/** Eau versée au puits par le vote, selon le niveau atteint (`BuildingUpgradeListener`). */
+export const WATER_INCREMENT_EFFECT: string = 'waterIncrement';
 /** Défense par mort selon le niveau du Cimetière (`TownHandler::calculate_town_def`). */
 export const CEMETERY_RATIO_EFFECT: string = 'calculate_town_def.ratio';
 
@@ -43,6 +47,16 @@ export function upgradeEffect(upgrades: BuildingUpgradesDTO, uid: string, effect
         return null;
     }
     return values.levels[level] ?? values.default;
+}
+
+/**
+ * Eau versée au puits par un chantier à sa construction.
+ * @param {BuildingUpgradesDTO} upgrades Évolutions.
+ * @param {string} uid Chantier.
+ * @returns {number} Rations d'eau, 0 sans.
+ */
+export function wellWater(upgrades: BuildingUpgradesDTO, uid: string): number {
+    return upgradeEffect(upgrades, uid, WELL_WATER_EFFECT, 0) ?? 0;
 }
 
 /**

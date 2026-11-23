@@ -213,6 +213,7 @@ export function citizenRefs(citizens: Citizen[]): CitizenRef[] {
                 banned: citizen.is_shunned === true,
                 ghoul: citizen.status?.is_ghoul === true,
                 technician: citizen.job?.key === JobEnum.TECHNICIAN.key,
+                heroic: citizen.job === undefined || citizen.job === null ? undefined : citizen.job.key !== JobEnum.CITIZEN.key,
                 homeLevel: typeof house?.value === 'number' ? Math.max(house.value, 0) : null,
                 upgradeLevels: upgradeLevelsOf(citizen)
             };

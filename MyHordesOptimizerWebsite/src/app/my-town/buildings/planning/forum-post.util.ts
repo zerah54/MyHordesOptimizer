@@ -3,7 +3,7 @@ import { BUILDING_EMOTES } from './building-emotes.const';
 import { StepResult } from './building-progress.util';
 import { budgetModeOf, BuildingPlanContentDTO, isBuildingStep, PlanCitizenDTO, PlanItemDTO, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
 import { BuildingRef, CitizenRef, DayEvaluation, HomeLevelRef, PlannedLoss } from './plan-evaluation.util';
-import { ratioLabel, stepLabel, taskLabel } from './planning-labels.util';
+import { ratioLabel, signed, stepLabel, taskLabel } from './planning-labels.util';
 
 /** Taille maximale d'un message généré : sous la limite du jeu (16 384 caractères) pour garder de la marge. */
 export const FORUM_POST_LIMIT: number = 16000;
@@ -196,11 +196,6 @@ function buildingLabel(context: PostContext, building_id: number): string {
     }
     const emote: string | undefined = BUILDING_EMOTES[building.uid];
     return emote === undefined ? building.label : `${emote} ${building.label}`;
-}
-
-/** Nombre signé : `+40`, `-2`, `0`. */
-function signed(value: number): string {
-    return value > 0 ? `+${value}` : `${value}`;
 }
 
 /** Libellé d'une poche. */

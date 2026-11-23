@@ -56,6 +56,18 @@
             }
         }
     },
+    "item_firework_tube_#00": {
+        "maxLevel": 0,
+        "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    5
+                ],
+                "default": 5,
+                "source": "BuildingConstructionListener"
+            }
+        }
+    },
     "item_home_def_#00": {
         "maxLevel": 5,
         "texts": {
@@ -337,6 +349,18 @@
             }
         }
     },
+    "item_tube_#01": {
+        "maxLevel": 0,
+        "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    2
+                ],
+                "default": 2,
+                "source": "BuildingConstructionListener"
+            }
+        }
+    },
     "item_vegetable_tasty_#00": {
         "maxLevel": 4,
         "texts": {
@@ -410,6 +434,30 @@
             }
         }
     },
+    "small_derrick_#00": {
+        "maxLevel": 0,
+        "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    75
+                ],
+                "default": 75,
+                "source": "BuildingConstructionListener"
+            }
+        }
+    },
+    "small_derrick_#01": {
+        "maxLevel": 0,
+        "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    100
+                ],
+                "default": 100,
+                "source": "BuildingConstructionListener"
+            }
+        }
+    },
     "small_door_closed_#00": {
         "maxLevel": 3,
         "texts": {
@@ -450,6 +498,18 @@
                 ],
                 "default": 0,
                 "source": "BuildingUpgradeListener"
+            }
+        }
+    },
+    "small_eden_#00": {
+        "maxLevel": 0,
+        "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    50
+                ],
+                "default": 50,
+                "source": "BuildingConstructionListener"
             }
         }
     },
@@ -643,6 +703,18 @@
             }
         }
     },
+    "small_rocketperf_#00": {
+        "maxLevel": 0,
+        "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    60
+                ],
+                "default": 60,
+                "source": "BuildingConstructionListener"
+            }
+        }
+    },
     "small_round_path_#00": {
         "maxLevel": 3,
         "texts": {
@@ -791,6 +863,18 @@
             ]
         },
         "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    15,
+                    15,
+                    15,
+                    15,
+                    15,
+                    15
+                ],
+                "default": 15,
+                "source": "BuildingConstructionListener"
+            },
             "waterIncrement": {
                 "levels": [
                     5,
@@ -802,6 +886,30 @@
                 ],
                 "default": 0,
                 "source": "BuildingUpgradeListener"
+            }
+        }
+    },
+    "small_water_#01": {
+        "maxLevel": 0,
+        "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    50
+                ],
+                "default": 50,
+                "source": "BuildingConstructionListener"
+            }
+        }
+    },
+    "small_waterdetect_#00": {
+        "maxLevel": 0,
+        "effects": {
+            "spawn_well_water": {
+                "levels": [
+                    100
+                ],
+                "default": 100,
+                "source": "BuildingConstructionListener"
             }
         }
     }

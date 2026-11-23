@@ -1,6 +1,15 @@
+import { HomeEnum } from '../../../_abstract_model/enum/home.enum';
+import { FENCE_DEFENSE, reinforcementDefense } from '../../../_abstract_model/utils/citizen-home-defense.util';
 import { BudgetLine, CitizenCapacity, citizenCapacity, detailedBasePa, PoolBudget, poolBudgets, resolveGhoul, simpleCitizenCapacity } from './budget.util';
 import { BuildingProgress, evaluateProgram, remainingAp, StepResult } from './building-progress.util';
-import { BuildingUpgradesDTO, CEMETERY_RATIO_EFFECT, TOWN_DEFENSE_SCALE_EFFECT, upgradeDefenseBonus, upgradeEffect } from './building-upgrades.types';
+import {
+    BuildingUpgradesDTO,
+    CEMETERY_RATIO_EFFECT,
+    TOWN_DEFENSE_SCALE_EFFECT,
+    upgradeDefenseBonus,
+    upgradeEffect,
+    WATER_INCREMENT_EFFECT
+} from './building-upgrades.types';
 import { defenseGap, projectedDefense, rankByDefPerPa, RankCandidate, RankedCandidate } from './defense.util';
 import {
     buildingDefenseGain,
@@ -56,6 +65,8 @@ export interface CitizenRef {
     banned: boolean;
     ghoul?: boolean;
     technician: boolean;
+    /** Métier héroïque : seuls les héros tirent de la défense des renforts et de la clôture ; absent = inconnu, compté comme héros. */
+    heroic?: boolean;
     homeLevel: number | null;
     /** Niveau de chaque amélioration de maison par clé `HomeEnum` (absente = 0) ; nul sans données de maison. */
     upgradeLevels: ReadonlyMap<string, number> | null;
@@ -112,6 +123,24 @@ export interface EveningVote {
     uid: string;
     level: number;
     defense: number;
+    /** Rations d'eau versées au puits par l'évolution, 0 sans. */
+    water: number;
+}
+
+/** Défense gagnée dans la journée, par origine ; `total` = défense projetée − défense de départ. */
+export interface DefenseGains {
+    /** Chantiers terminés dans la journée (effets indirects compris). */
+    buildings: number;
+    repairs: number;
+    /** Montées et améliorations de maison. */
+    homes: number;
+    /** Évolutions votées le soir. */
+    votes: number;
+    /** Sources de défense saisies à la main. */
+    sources: number;
+    /** Bonus d'évolution perdus cette nuit, en positif. */
+    losses: number;
+    total: number;
 }
 
 /** Résultat de l'évaluation d'une journée. */
@@ -137,6 +166,8 @@ export interface DayEvaluation {
     attack: number | null;
     target: number | null;
     projectedDefense: number;
+    /** Défense gagnée dans la journée, par origine. */
+    defenseGains: DefenseGains;
     /** Défense de départ du lendemain : sans défense temporaire ni chantiers tombés ou détruits cette nuit. */
     nextDayDefense: number;
     defenseGap: number | null;
@@ -222,7 +253,7 @@ export function evaluateDay(input: DayInput): DayEvaluation {
     const completed_refs: BuildingRef[] = completed_ids
         .map((id: number): BuildingRef | undefined => input.buildings.get(id))
         .filter((building: BuildingRef | undefined): building is BuildingRef => building !== undefined);
-    const home_raw_gain: number = homesDefense(home_tasks, input.homes);
+    const home_raw_gain: number = homesDefense(home_tasks, input.homes) + homeUpgradesDefense(content, input.citizens);
     const double_vote: boolean = builtInEvening(progress_after, input.buildings, PYRE_UID);
     const vote_ids: (number | null)[] = eveningVoteIds(content, double_vote);
     const voted_item_step: number = votedItemStep(input, vote_ids);
@@ -238,13 +269,21 @@ export function evaluateDay(input: DayInput): DayEvaluation {
     const [vote, second_vote]: (EveningVote | null)[] = vote_ids.map((vote_id: number | null): EveningVote | null =>
         eveningVote(input, vote_id, gain.factorsAfter.scale, vote_id !== null && vote_id === indirect_vote_id ? planned.vote : 0));
     const losses: PlannedLoss[] = plannedLosses(input, progress_after, [vote, second_vote], gain.factorsAfter.scale);
+    const defense_gains: Omit<DefenseGains, 'total'> = {
+        buildings: gain.total - homes_gain - planned.vote,
+        repairs: repairsDefense(results, input.progress, progress_after),
+        homes: homes_gain,
+        votes: (vote?.defense ?? 0) + (second_vote?.defense ?? 0),
+        sources: content.defenseSources.reduce((sum: number, source: { def: number; qty: number }): number => sum + source.def * source.qty, 0),
+        losses: lossTotal(losses, 'bonus')
+    };
     const projected: number = projectedDefense({
         baseDefense: input.baseDefense,
-        completedBuildingsDef: gain.total - homes_gain - planned.vote,
-        repairsDef: repairsDefense(results, input.progress, progress_after),
-        homesDef: homes_gain,
-        upgradeDef: (vote?.defense ?? 0) + (second_vote?.defense ?? 0),
-        lostDef: lossTotal(losses, 'bonus'),
+        completedBuildingsDef: defense_gains.buildings,
+        repairsDef: defense_gains.repairs,
+        homesDef: defense_gains.homes,
+        upgradeDef: defense_gains.votes,
+        lostDef: defense_gains.losses,
         sources: content.defenseSources.map((source: { def: number; qty: number }): { def: number; qty: number } => ({ def: source.def, qty: source.qty }))
     });
     const attack: number | null = content.attackOverride ?? input.attack;
@@ -267,6 +306,7 @@ export function evaluateDay(input: DayInput): DayEvaluation {
         attack,
         target: attack === null ? null : attack - content.allowedOverflow,
         projectedDefense: projected,
+        defenseGains: { ...defense_gains, total: projected - input.baseDefense },
         defenseGap: attack === null ? null : defenseGap(attack, content.allowedOverflow, projected),
         freeThresholds: freeThresholds(input),
         ranking: rankByDefPerPa(rankCandidates(input, gain_context), input.itemValues),
@@ -357,7 +397,7 @@ function lossTotal(losses: PlannedLoss[], kind: PlanLossKind): number {
  * @param {number | null} vote_id Chantier voté.
  * @param {number} scale Échelle de la défense au soir.
  * @param {number} item_defense Défense gagnée par les objets de défense (vote sur les Fixations), échelle comprise.
- * @returns {EveningVote | null} Niveau atteint et défense gagnée, nul sans vote.
+ * @returns {EveningVote | null} Niveau atteint, défense gagnée et eau versée au puits, nul sans vote.
  */
 function eveningVote(input: DayInput, vote_id: number | null, scale: number, item_defense: number): EveningVote | null {
     const building: BuildingRef | undefined = vote_id === null ? undefined : input.buildings.get(vote_id);
@@ -370,7 +410,8 @@ function eveningVote(input: DayInput, vote_id: number | null, scale: number, ite
     const gain: number = upgradeDefenseBonus(input.upgrades, building.uid, building.defence, level)
         - upgradeDefenseBonus(input.upgrades, building.uid, building.defence, current)
         + (building.uid === CEMETERY_UID ? cemeteryRatioGain(input.upgrades, current, level) * input.defenseFactors.dead : 0);
-    return { uid: building.uid, level, defense: Math.round(gain * scale) + item_defense };
+    const water: number = level > current ? (upgradeEffect(input.upgrades, building.uid, WATER_INCREMENT_EFFECT, level) ?? 0) : 0;
+    return { uid: building.uid, level, defense: Math.round(gain * scale) + item_defense, water };
 }
 
 /**
@@ -700,6 +741,36 @@ function homesDefense(tasks: { citizen: CitizenRef | undefined; level: number }[
         const current: HomeLevelRef | undefined = current_level === null ? undefined : homes.get(current_level);
         if (target !== undefined && current !== undefined) {
             total += Math.max(0, target.def - current.def);
+        }
+    }
+    return total;
+}
+
+/**
+ * Défense de maison brute gagnée par les renforts et la clôture des héros (`calculate_home_def`), au plus haut niveau visé par
+ * citoyen ; 0 quand le niveau actuel est inconnu.
+ * @param {BuildingPlanContentDTO} content Contenu du plan.
+ * @param {CitizenRef[]} citizens Citoyens.
+ * @returns {number} Défense brute, avant le pourcentage compté par la ville.
+ */
+function homeUpgradesDefense(content: BuildingPlanContentDTO, citizens: CitizenRef[]): number {
+    let total: number = 0;
+    for (const entry of content.citizens) {
+        const citizen: CitizenRef | undefined = citizens.find((candidate: CitizenRef): boolean => candidate.userId === entry.userId);
+        if (citizen === undefined || citizen.heroic === false) {
+            continue;
+        }
+        const target: (key: string) => number | null = (key: string): number | null => entry.tasks
+            .filter((task: PlanTaskDTO): boolean => task.kind === 'homeUpgrade' && task.ref === key && typeof task.level === 'number')
+            .reduce((max: number | null, task: PlanTaskDTO): number | null => Math.max(max ?? 0, task.level ?? 0), null);
+        const reinforcement: number | null = target(HomeEnum.HOUSE_DEFENSE.key);
+        const reinforcement_now: number | null = currentHomeLevel(citizen, HomeEnum.HOUSE_DEFENSE.key);
+        if (reinforcement !== null && reinforcement_now !== null) {
+            total += Math.max(0, reinforcementDefense(reinforcement) - reinforcementDefense(reinforcement_now));
+        }
+        const fence: number | null = target(HomeEnum.HAS_FENCE.key);
+        if (fence !== null && fence > 0 && currentHomeLevel(citizen, HomeEnum.HAS_FENCE.key) === 0) {
+            total += FENCE_DEFENSE;
         }
     }
     return total;

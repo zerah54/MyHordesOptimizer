@@ -30,6 +30,15 @@ export function itemIcon(items: readonly Item[], item_id: number): string {
 }
 
 /**
+ * Nombre signé : `+40`, `-2`, `0`.
+ * @param {number} value Nombre.
+ * @returns {string} Texte.
+ */
+export function signed(value: number): string {
+    return value > 0 ? `+${value}` : `${value}`;
+}
+
+/**
  * Rapport défense / coût affiché : deux décimales, « ∞ » pour un coût nul avec de la défense, « — » sans rapport.
  * @param {number | null} ratio Rapport calculé.
  * @returns {string} Texte affichable.

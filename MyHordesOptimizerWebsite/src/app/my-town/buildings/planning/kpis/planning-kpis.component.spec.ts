@@ -2,6 +2,7 @@ import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BuildingPlanContentDTO, emptyPlanContent } from '../plan.types';
+import { DayEvaluation } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, FakePlanningStore } from '../planning.store.fake';
 import { PlanningKpisComponent } from './planning-kpis.component';
@@ -70,6 +71,24 @@ describe('PlanningKpisComponent', (): void => {
         expect(tomorrow()?.textContent).toContain('20');
     });
 
+    it('récapitule les gains de défense du jour : chantiers, maisons, total, et le reste seulement s\'il compte', async (): Promise<void> => {
+        await render();
+        fake.evaluation.set({
+            ...fake.evaluation() as DayEvaluation,
+            defenseGains: { buildings: 330, repairs: 0, homes: 12, votes: 13, sources: 0, losses: 5, total: 350 }
+        });
+        fixture.detectChanges();
+
+        const gain: (field: string) => string | undefined = (field: string): string | undefined => root().querySelector(`.kpi.defense [data-field="gain-${field}"]`)?.textContent?.replace(/\s+/g, ' ').trim();
+        expect(gain('buildings')).toContain('+330');
+        expect(gain('homes')).toContain('+12');
+        expect(gain('votes')).toContain('+13');
+        expect(gain('losses')).toContain('-5');
+        expect(gain('total')).toContain('+350');
+        expect(gain('repairs')).toBeUndefined();
+        expect(gain('sources')).toBeUndefined();
+    });
+
     it('affiche les PA restants de chaque poche, négatifs en évidence', async (): Promise<void> => {
         await render({ ...emptyPlanContent(), basePa: 0, programs: { banned: [], regular: [{ buildingId: 1, kind: 'build', mode: 'finish', targetRemaining: 0 }] } });
 
@@ -112,12 +131,13 @@ describe('PlanningKpisComponent', (): void => {
         expect(missing.querySelector('.value.list')?.textContent).toMatch(/^1 /);
     });
 
-    it('en mode réduit : la défense seule, et rien de cliquable hors sa modification', async (): Promise<void> => {
+    it('en mode réduit : la défense et ses gains seuls, et rien de cliquable hors sa modification', async (): Promise<void> => {
         await render(finishingWall());
         fixture.componentRef.setInput('flat', true);
         fixture.detectChanges();
 
         expect(root().querySelector('.kpis.flat .kpi.defense')).not.toBeNull();
+        expect(root().querySelector('.kpis.flat [data-field="gain-total"]')).not.toBeNull();
         expect(root().querySelector('.kpi.pool')).toBeNull();
         expect(root().querySelector('[data-action="missing"]')).toBeNull();
         expect(root().querySelector('[data-action="alerts"]')).toBeNull();
