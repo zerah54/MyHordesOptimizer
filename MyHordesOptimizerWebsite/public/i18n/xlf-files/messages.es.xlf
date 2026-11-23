@@ -450,8 +450,8 @@
         <source>Bleu canard</source>
         <target state="final">Azul petróleo</target>
       </trans-unit>
-      <trans-unit id="349574492903631397" datatype="html" approved="yes">
-        <source>Passage en Force</source>
+      <trans-unit id="3750153803525026360" datatype="html" approved="yes">
+        <source>Passage en force</source>
         <target state="final">Pasaje en vigor</target>
       </trans-unit>
       <trans-unit id="3495827345194332174" datatype="html">
@@ -517,10 +517,6 @@
       <trans-unit id="1260504455353929494" datatype="html" approved="yes">
         <source>À faire</source>
         <target state="final">Por hacer</target>
-      </trans-unit>
-      <trans-unit id="1262634552784987007" datatype="html">
-        <source><x id="needed" equiv-text="check.needed"/> PA nécessaires, <x id="available" equiv-text="check.available"/> PA disponibles</source>
-        <target state="translated"><x id="needed" equiv-text="check.needed"/> PA necesarios, <x id="available" equiv-text="check.available"/> PA disponibles</target>
       </trans-unit>
       <trans-unit id="1269215144979610420" datatype="html" approved="yes">
         <source>Aucun programme effectif pour ce jour.</source>
@@ -1037,6 +1033,10 @@
       <trans-unit id="3802614335560711985" datatype="html" approved="yes">
         <source>Dans MyHordes uniquement</source>
         <target state="final">Solo en MyHordes</target>
+      </trans-unit>
+      <trans-unit id="3803584960843438129" datatype="html">
+        <source>Version suivante</source>
+        <target state="translated">Versión siguiente</target>
       </trans-unit>
       <trans-unit id="8648912876673109537" datatype="html" approved="yes">
         <source>Ne pas ramener</source>
@@ -3996,6 +3996,10 @@
         <source>Plans inhabituels sortis</source>
         <target state="final">Planos inusuales obtenidos</target>
       </trans-unit>
+      <trans-unit id="797617825509474791" datatype="html">
+        <source>Version précédente</source>
+        <target state="translated">Versión anterior</target>
+      </trans-unit>
       <trans-unit id="7980053000569541434" datatype="html" approved="yes">
         <source>Saisies modifiées depuis le dernier affinage : relance nécessaire</source>
         <target state="final">Datos modificados desde el último refinamiento: es necesario relanzar</target>
@@ -4771,6 +4775,10 @@
       <trans-unit id="3518677477781469053" datatype="html" approved="yes">
         <source>Enregistrer la mienne</source>
         <target state="final">Guardar la mía</target>
+      </trans-unit>
+      <trans-unit id="3519043400185913657" datatype="html">
+        <source>dernière</source>
+        <target state="translated">última</target>
       </trans-unit>
       <trans-unit id="3520759538347525799" datatype="html" approved="yes">
         <source>{VAR_PLURAL, plural, =1 {1 consigne :} other {<x id="INTERPOLATION"/> consignes :}}</source>
@@ -8083,6 +8091,10 @@
       <trans-unit id="7788061501151326787" datatype="html" approved="yes">
         <source>Atelier, Chaman uniquement</source>
         <target state="final">Taller, solo chamán</target>
+      </trans-unit>
+      <trans-unit id="8923758037319060801" datatype="html">
+        <source>Tracé : <x id="route_ap" equiv-text="check.route_ap"/> PA + <x id="route_sp" equiv-text="check.route_sp"/> PE, disponibles : <x id="available" equiv-text="check.available"/> PA + <x id="sp" equiv-text="check.sp"/> PE</source>
+        <target state="translated">Ruta: <x id="route_ap" equiv-text="check.route_ap"/> PA + <x id="route_sp" equiv-text="check.route_sp"/> PE, disponibles: <x id="available" equiv-text="check.available"/> PA + <x id="sp" equiv-text="check.sp"/> PE</target>
       </trans-unit>
       <trans-unit id="8924763758161915362" datatype="html" approved="yes">
         <source>Type de recette</source>
