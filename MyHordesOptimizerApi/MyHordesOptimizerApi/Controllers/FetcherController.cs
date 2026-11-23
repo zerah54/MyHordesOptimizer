@@ -100,13 +100,32 @@ namespace MyHordesOptimizerApi.Controllers
         [Route("Bank")]
         [Authorize]
         [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.Bank, "townId" })]
-        public ActionResult<BankLastUpdateDto> GetBank(int? townId)
+        public ActionResult<BankLastUpdateDto> GetBank(int? townId, int? lastUpdateId)
         {
+            if (lastUpdateId.HasValue && !townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty when {nameof(lastUpdateId)} is set");
+            }
             // Avec townId : lecture pure en base (mode observateur), sans synchro MyHordes
-            var bank = townId.HasValue
-                ? _myHordesFetcherService.GetBank(townId.Value)
-                : _myHordesFetcherService.GetBank();
-            return bank;
+            if (!townId.HasValue)
+            {
+                return _myHordesFetcherService.GetBank();
+            }
+            var bank = _myHordesFetcherService.GetBank(townId.Value, lastUpdateId);
+            return bank is null ? NotFound() : bank;
+        }
+
+        [HttpGet]
+        [Route("Bank/Versions")]
+        [Authorize]
+        [TypeFilter(typeof(ETagCacheFilter), Arguments = new object[] { ETagResource.Bank, "townId" })]
+        public ActionResult<List<BankVersionDto>> GetBankVersions(int? townId)
+        {
+            if (!townId.HasValue)
+            {
+                return BadRequest($"{nameof(townId)} cannot be empty");
+            }
+            return _myHordesFetcherService.GetBankVersions(townId.Value);
         }
 
 

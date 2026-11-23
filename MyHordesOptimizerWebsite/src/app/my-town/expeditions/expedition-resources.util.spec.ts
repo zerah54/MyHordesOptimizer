@@ -1,8 +1,8 @@
 import { DailyActionEnum } from '../../_abstract_model/enum/daily-action.enum';
 import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { SpRequirementOperator } from '../../_abstract_model/types/_types';
-import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenExpedition } from '../../_abstract_model/types/citizen-expedition.class';
 import { DailyAction } from '../../_abstract_model/types/daily-action.class';
 import { MapRoutePoint } from '../../_abstract_model/types/map-route.class';
 import {
@@ -10,6 +10,7 @@ import {
     apCheck,
     ApLeg,
     ApResources,
+    guaranteedSp,
     meetsRequirements,
     nextSpOperator,
     scoutsLairBuilt,
@@ -246,9 +247,34 @@ describe('expedition-resources.util', (): void => {
             const exact: ApCheck = apCheck([leg], resources(0, 6, 0), town);
             const below: ApCheck = apCheck([leg], resources(0, 5, 0), town);
             const above: ApCheck = apCheck([leg], resources(0, 5, 2), town);
-            expect(exact).toEqual({ needed: 6, available: 6, short: false });
-            expect(below).toEqual({ needed: 6, available: 5, short: true });
-            expect(above).toEqual({ needed: 6, available: 7, short: false });
+            expect(exact).toEqual(expect.objectContaining({ needed: 6, available: 6, short: false }));
+            expect(below).toEqual(expect.objectContaining({ needed: 6, available: 5, short: true }));
+            expect(above).toEqual(expect.objectContaining({ needed: 6, available: 7, short: false }));
+        });
+
+        it('details the route in AP and in steps payable in SP, and the available SP', (): void => {
+            const check: ApCheck = apCheck([{ route: round_trip, ruin_visits: 2 }], resources(1, 6, 3), town);
+            expect(check).toEqual({ route_ap: 7, route_sp: 1, needed: 7, available: 9, sp: 1, short: false });
+        });
+    });
+
+    describe('guaranteedSp', (): void => {
+        function placeWith(required_sp: number | undefined, required_sp_operator?: SpRequirementOperator): CitizenExpedition {
+            return Object.assign(new CitizenExpedition(), { required_sp, required_sp_operator });
+        }
+
+        it('guarantees the required SP for at least and exactly', (): void => {
+            expect(guaranteedSp(placeWith(2))).toBe(2);
+            expect(guaranteedSp(placeWith(2, 'min'))).toBe(2);
+            expect(guaranteedSp(placeWith(3, 'exact'))).toBe(3);
+        });
+
+        it('guarantees no SP for at most', (): void => {
+            expect(guaranteedSp(placeWith(2, 'max'))).toBe(0);
+        });
+
+        it('is undefined without requirement', (): void => {
+            expect(guaranteedSp(placeWith(undefined))).toBeUndefined();
         });
     });
 });

@@ -1838,7 +1838,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Import
                     HasLuckyFind = true,
                     HasCheatDeath = true,
                     HasHeroicReturn = true,
-                    // ...sauf APAG, Passage en Force et Camaraderie, laissés inconnus (null).
+                    // ...sauf APAG, Passage en force et Camaraderie, laissés inconnus (null).
 
                     // Améliorations de maison : commencent à 0 / non construit.
                     HouseLevel = 0,

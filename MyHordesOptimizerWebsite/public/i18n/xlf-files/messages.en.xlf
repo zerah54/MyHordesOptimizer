@@ -450,9 +450,9 @@
                 <source>Bleu canard</source>
                 <target state="final">Teal</target>
             </trans-unit>
-            <trans-unit id="349574492903631397" datatype="html" approved="yes">
-                <source>Passage en Force</source>
-                <target state="final">Break Through</target>
+            <trans-unit id="3750153803525026360" datatype="html" approved="yes">
+                <source>Passage en force</source>
+                <target state="translated">Break Through</target>
             </trans-unit>
             <trans-unit id="3495827345194332174" datatype="html">
                 <source>Consigne : <x id="upgrade" equiv-text="upgrade"/> niv. <x id="level" equiv-text="level"/></source>
@@ -517,10 +517,6 @@
             <trans-unit id="1260504455353929494" datatype="html">
                 <source>À faire</source>
                 <target state="translated">To do</target>
-            </trans-unit>
-            <trans-unit id="1262634552784987007" datatype="html">
-                <source><x id="needed" equiv-text="check.needed"/> PA nécessaires, <x id="available" equiv-text="check.available"/> PA disponibles</source>
-                <target state="translated"><x id="needed" equiv-text="check.needed"/> AP needed, <x id="available" equiv-text="check.available"/> AP available</target>
             </trans-unit>
             <trans-unit id="1269215144979610420" datatype="html">
                 <source>Aucun programme effectif pour ce jour.</source>
@@ -1037,6 +1033,10 @@
             <trans-unit id="3802614335560711985" datatype="html" approved="yes">
                 <source>Dans MyHordes uniquement</source>
                 <target state="final">In MyHordes only</target>
+            </trans-unit>
+            <trans-unit id="3803584960843438129" datatype="html">
+                <source>Version suivante</source>
+                <target state="translated">Next version</target>
             </trans-unit>
             <trans-unit id="4324278734280268890" datatype="html" approved="yes">
                 <source>Non défini</source>
@@ -3194,6 +3194,10 @@
                 <source>Plans inhabituels sortis</source>
                 <target state="final">Uncommon blueprints obtained</target>
             </trans-unit>
+            <trans-unit id="797617825509474791" datatype="html">
+                <source>Version précédente</source>
+                <target state="translated">Previous version</target>
+            </trans-unit>
             <trans-unit id="7980053000569541434" datatype="html" approved="yes">
                 <source>Saisies modifiées depuis le dernier affinage : relance nécessaire</source>
                 <target state="final">Entries changed since the last refinement: restart required</target>
@@ -3965,6 +3969,10 @@
             <trans-unit id="3518677477781469053" datatype="html" approved="yes">
                 <source>Enregistrer la mienne</source>
                 <target state="final">Save mine</target>
+            </trans-unit>
+            <trans-unit id="3519043400185913657" datatype="html">
+                <source>dernière</source>
+                <target state="translated">latest</target>
             </trans-unit>
             <trans-unit id="3520759538347525799" datatype="html" approved="yes">
                 <source>{VAR_PLURAL, plural, =1 {1 consigne :} other {<x id="INTERPOLATION"/> consignes :}}</source>
@@ -8058,6 +8066,10 @@
                 <source>Atelier, Chaman uniquement</source>
                 <target state="final">Workshop, Shaman only</target>
             </trans-unit>
+            <trans-unit id="8923758037319060801" datatype="html">
+                <source>Tracé : <x id="route_ap" equiv-text="check.route_ap"/> PA + <x id="route_sp" equiv-text="check.route_sp"/> PE, disponibles : <x id="available" equiv-text="check.available"/> PA + <x id="sp" equiv-text="check.sp"/> PE</source>
+                <target state="translated">Route: <x id="route_ap" equiv-text="check.route_ap"/> AP + <x id="route_sp" equiv-text="check.route_sp"/> EP, available: <x id="available" equiv-text="check.available"/> AP + <x id="sp" equiv-text="check.sp"/> EP</target>
+            </trans-unit>
             <trans-unit id="8924763758161915362" datatype="html" approved="yes">
                 <source>Type de recette</source>
                 <target state="final">Type of recipe</target>
@@ -8120,27 +8132,27 @@
             </trans-unit>
             <trans-unit id="mho_update_label" datatype="html">
                 <source>Mettre à jour</source>
-                <target>Update</target>
+                <target state="translated">Update</target>
             </trans-unit>
             <trans-unit id="mho_external_tools_update_pending" datatype="html">
                 <source>mise à jour en cours</source>
-                <target>updating</target>
+                <target state="translated">updating</target>
             </trans-unit>
             <trans-unit id="mho_external_tools_update_success" datatype="html">
                 <source>à jour</source>
-                <target>up to date</target>
+                <target state="translated">up to date</target>
             </trans-unit>
             <trans-unit id="mho_external_tools_update_error" datatype="html">
                 <source>échec</source>
-                <target>failed</target>
+                <target state="translated">failed</target>
             </trans-unit>
             <trans-unit id="mho_external_tools_update_timeout" datatype="html">
                 <source>Délai dépassé</source>
-                <target>Timed out</target>
+                <target state="translated">Timed out</target>
             </trans-unit>
             <trans-unit id="mho_update_start_failed" datatype="html">
                 <source>La mise à jour n&apos;a pas pu être lancée</source>
-                <target>The update could not be started</target>
+                <target state="translated">The update could not be started</target>
             </trans-unit>
         </body>
     </file>

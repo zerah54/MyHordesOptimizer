@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
+using MyHordesOptimizerApi.Serilog;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -56,10 +57,10 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             {
                 var client = CreateClient();
                 AddCustomHeaders(client, customHeaders);
-                Logger.LogDebug($"POST call initiated [HttpRequestUrl={url}]");
+                Logger.LogDebug($"POST call initiated [HttpRequestUrl={LogRedaction.Redact(url)}]");
                 var content = GenerateContent(mediaTypeIn, body);
                 var response = client.PostAsync(url, content).Result;
-                Logger.LogDebug($"Async POST call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
+                Logger.LogDebug($"Async POST call completed [HttpRequestUrl={LogRedaction.Redact(url)}] [HttpResponseStatus={response.StatusCode}]");
 
                 if (ensureStatusCode)
                 {
@@ -115,10 +116,10 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             {
                 var client = CreateClient();
                 AddCustomHeaders(client, customHeaders);
-                Logger.LogDebug($"PATCH call initiated [HttpRequestUrl={url}]");
+                Logger.LogDebug($"PATCH call initiated [HttpRequestUrl={LogRedaction.Redact(url)}]");
                 var content = GenerateContent(mediaTypeIn, body);
                 var response = client.PatchAsync(url, content).Result;
-                Logger.LogDebug($"Async PATCH call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
+                Logger.LogDebug($"Async PATCH call completed [HttpRequestUrl={LogRedaction.Redact(url)}] [HttpResponseStatus={response.StatusCode}]");
 
                 if (ensureStatusCode)
                 {
@@ -173,10 +174,10 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             {
                 var client = CreateClient();
                 AddCustomHeaders(client, customHeaders);
-                Logger.LogDebug($"PUT call initiated [HttpRequestUrl={url}]");
+                Logger.LogDebug($"PUT call initiated [HttpRequestUrl={LogRedaction.Redact(url)}]");
                 var content = GenerateContent(mediaTypeIn, body);
                 var response = client.PutAsync(url, content).Result;
-                Logger.LogDebug($"Async PUT call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
+                Logger.LogDebug($"Async PUT call completed [HttpRequestUrl={LogRedaction.Redact(url)}] [HttpResponseStatus={response.StatusCode}]");
 
                 if (ensureStatusCode)
                 {
@@ -228,10 +229,10 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             {
                 var client = CreateClient();
                 AddCustomHeaders(client, customHeaders);
-                Logger.LogDebug($"GET call initiated [HttpRequestUrl={url}]");
+                Logger.LogDebug($"GET call initiated [HttpRequestUrl={LogRedaction.Redact(url)}]");
                 var query = parameters != null ? QueryHelpers.AddQueryString(url, parameters!) : url;
                 var response = client.GetAsync(query).Result;
-                Logger.LogDebug($"Async GET call completed [HttpRequestUrl={url}] [HttpResponseStatus={response.StatusCode}]");
+                Logger.LogDebug($"Async GET call completed [HttpRequestUrl={LogRedaction.Redact(url)}] [HttpResponseStatus={response.StatusCode}]");
 
                 if (ensureStatusCode)
                 {
@@ -332,7 +333,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
                         {
                             stringBody = string.Empty;
                         }
-                        Logger.LogDebug($"Request [HttpBody={stringBody}]");
+                        Logger.LogDebug($"Request [HttpBody={LogRedaction.Redact(stringBody)}]");
                         return new StringContent(stringBody, Encoding.UTF8, mediaTypeName);
                     }
                 default:
@@ -350,7 +351,7 @@ namespace MyHordesOptimizerApi.Repository.Abstract
             {
                 stringBody = string.Empty;
             }
-            Logger.LogDebug($"Request [HttpBody={stringBody}]");
+            Logger.LogDebug($"Request [HttpBody={LogRedaction.Redact(stringBody)}]");
             return new StringContent(stringBody, Encoding.UTF8, MediaTypeNames.Application.Json);
         }
     }

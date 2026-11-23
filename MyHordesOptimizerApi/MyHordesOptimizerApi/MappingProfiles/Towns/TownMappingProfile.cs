@@ -7,6 +7,7 @@ using MyHordesOptimizerApi.Extensions;
 using MyHordesOptimizerApi.Extensions.Models;
 using MyHordesOptimizerApi.MappingProfiles.Resolvers.MyHordes;
 using MyHordesOptimizerApi.Models;
+using MyHordesOptimizerApi.Services.Impl.Items;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -105,8 +106,8 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
 
             CreateMap<MyHordesItem, TownBankItem>()
                 .ForMember(dest => dest.Count, opt => opt.MapFrom(src => src.Count))
-                .ForMember(dest => dest.IdItem, opt => opt.MapFrom((src, dest, srcMember, context) => ResoudreObjet(context, src.Id)?.IdItem ?? 0))
-                .ForMember(dest => dest.IdItemNavigation, opt => opt.MapFrom((src, dest, srcMember, context) => ResoudreObjet(context, src.Id)))
+                .ForMember(dest => dest.IdItem, opt => opt.MapFrom((src, dest, srcMember, context) => ResoudreObjet(context, src)?.IdItem ?? 0))
+                .ForMember(dest => dest.IdItemNavigation, opt => opt.MapFrom((src, dest, srcMember, context) => ResoudreObjet(context, src)))
                 .ForMember(dest => dest.IdLastUpdateInfo, opt => opt.Ignore())
                 .ForMember(dest => dest.IdLastUpdateInfoNavigation, opt => opt.Ignore())
                 .ForMember(dest => dest.IdTown, opt => opt.Ignore())
@@ -257,23 +258,20 @@ namespace MyHordesOptimizerApi.MappingProfiles.Towns
                 .ForMember(model => model.TownMessage, opt => opt.MapFrom(dto => dto.Comment));
         }
 
+        private const string ItemResolverKey = "MyHordesItemResolver";
+
         /// <summary>
-        /// Traduit un identifiant d'objet reçu de MyHordes en objet de notre référentiel.
+        /// Traduit un objet reçu de MyHordes en objet de notre référentiel (voir <see cref="MyHordesItemResolver"/>),
+        /// avec un résolveur construit une fois par opération de mapping.
         /// </summary>
-        /// <remarks>
-        /// Le rapprochement se fait sur <c>mhId</c> et non sur la clé : l'identifiant de MyHordes
-        /// est un auto-incrément de fixtures, qui change d'une instance du jeu à l'autre. Les deux
-        /// coïncident aujourd'hui pour les objets — c'est cette coïncidence qu'on cesse de
-        /// supposer. Un objet dont le <c>mhId</c> n'est pas encore renseigné est lu sous sa clé :
-        /// c'est ce qu'elle signifiait avant le découplage.
-        /// </remarks>
-        private static Item? ResoudreObjet(ResolutionContext context, int? mhId)
+        private static Item? ResoudreObjet(ResolutionContext context, MyHordesItem source)
         {
-            if (!mhId.HasValue)
+            if (!context.Items.TryGetValue(ItemResolverKey, out var resolver))
             {
-                return null;
+                resolver = new MyHordesItemResolver(context.GetAllItems());
+                context.Items[ItemResolverKey] = resolver;
             }
-            return context.GetAllItems().FirstOrDefault(item => (item.MhId ?? item.IdItem) == mhId.Value);
+            return ((MyHordesItemResolver)resolver).Resolve(source);
         }
     }
 }

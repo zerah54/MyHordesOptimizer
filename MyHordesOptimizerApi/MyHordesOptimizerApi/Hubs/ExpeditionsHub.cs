@@ -233,13 +233,13 @@ namespace MyHordesOptimizerApi.Hubs
             }
         }
 
-        /// <summary>Verrous actifs de la ville courante.</summary>
+        /// <summary>Verrous actifs de la ville courante ; aucun sans ville (joueur hors ville sur la page).</summary>
         public async Task<List<ExpeditionLockDto>> GetExpeditionLocks()
         {
             var townId = CurrentTownId();
             if (townId <= 0)
             {
-                throw new HubException("No town");
+                return [];
             }
             await TownAccessService.EnsureCanWriteMapAsync(townId);
             return LockRegistry.ActiveHolders(key => key.MapId == townId)

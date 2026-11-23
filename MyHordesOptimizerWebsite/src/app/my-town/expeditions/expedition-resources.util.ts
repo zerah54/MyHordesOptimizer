@@ -64,11 +64,20 @@ export interface ApResources {
     readonly sp: number;
 }
 
-/** PA nécessaires au parcours, PA disponibles, et si les seconds ne suffisent pas. */
+/** Coût du parcours et ressources : PA du tracé (visites comprises), pas payables en PE, PA nécessaires une fois les PE dépensés, PA et PE disponibles. */
 export interface ApCheck {
+    readonly route_ap: number;
+    readonly route_sp: number;
     readonly needed: number;
     readonly available: number;
+    readonly sp: number;
     readonly short: boolean;
+}
+
+/** PE garantis par l'exigence d'une place : « au moins » et « exactement » N donnent N, « au plus » N ne garantit rien ; sans exigence : indéfini. */
+export function guaranteedSp(place: CitizenExpedition): number | undefined {
+    if (place.required_sp === undefined || place.required_sp === null) return undefined;
+    return place.required_sp_operator === 'max' ? 0 : place.required_sp;
 }
 
 /** Repaire des Éclaireurs construit, condition de « Cartographier le désert » ; chantiers inconnus : non construits. */
@@ -126,7 +135,8 @@ export function apCheck(legs: readonly ApLeg[], resources: ApResources, town: Ma
             else ap_moves++;
         }
     }
-    const needed: number = ap_moves + ruin_visits + Math.max(0, sp_moves - resources.sp);
+    const route_ap: number = ap_moves + ruin_visits;
+    const needed: number = route_ap + Math.max(0, sp_moves - resources.sp);
     const available: number = resources.base_ap + resources.bag_ap;
-    return { needed, available, short: available < needed };
+    return { route_ap, route_sp: sp_moves, needed, available, sp: resources.sp, short: available < needed };
 }

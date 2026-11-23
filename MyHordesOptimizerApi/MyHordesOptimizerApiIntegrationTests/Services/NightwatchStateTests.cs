@@ -103,6 +103,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var db = NewContext();
             var items = TwoItems(db);
             var lastUpdateId = db.TownCitizens.First(row => row.IdTown == town.TownId).IdLastUpdateInfo;
+            db.TownBankSnapshots.Add(new TownBankSnapshot { IdTown = town.TownId, IdLastUpdateInfo = lastUpdateId, Day = Day, ContentHash = new string('a', 64) });
             db.TownBankItems.Add(new TownBankItem { IdTown = town.TownId, IdItem = items[0], IdLastUpdateInfo = lastUpdateId, Count = 5, IsBroken = false });
             db.TownBankItems.Add(new TownBankItem { IdTown = town.TownId, IdItem = items[1], IdLastUpdateInfo = lastUpdateId, Count = 2, IsBroken = true });
             var desert = new MapCell { IdTown = town.TownId, X = 1, Y = 1, IsTown = false };

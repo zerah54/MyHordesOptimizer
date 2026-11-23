@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Services.Impl.Bank;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch.Request;
 using MyHordesOptimizerApi.Exceptions;
@@ -98,7 +99,8 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
                 };
             }).ToList();
 
-            var bankRows = await DbContext.TownBankItems.AsNoTracking().Where(row => row.IdTown == town.IdTown)
+            var latestBankId = TownBankHistory.LatestSnapshotId(DbContext, town.IdTown);
+            var bankRows = await DbContext.TownBankItems.AsNoTracking().Where(row => row.IdTown == town.IdTown && row.IdLastUpdateInfo == latestBankId)
                 .Select(row => new { row.IdItem, row.Count, row.IsBroken }).ToListAsync();
             (state.Bank, state.BankBroken) = Aggregate(bankRows.Select(row => (row.IdItem, row.Count, row.IsBroken)));
             var desertRows = await DbContext.MapCellItems.AsNoTracking()

@@ -50,7 +50,7 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
     }
 
     /// <summary>Fake de IHubCallerClients : seul Group(...) est utilisé par ExpeditionsHub.</summary>
-    public class FakeHubCallerClients : IHubCallerClients
+    public class FakeHubCallerClients : IHubCallerClients, IHubClients
     {
         private readonly FakeClientProxy _proxy = new();
 
@@ -75,6 +75,14 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
         }
         public IClientProxy User(string userId) => _proxy;
         public IClientProxy Users(IReadOnlyList<string> userIds) => _proxy;
+    }
+
+    /// <summary>Fake de IHubContext du hub des expéditions, pour les contrôleurs qui diffusent hors hub.</summary>
+    public class FakeExpeditionsHubContext : IHubContext<MyHordesOptimizerApi.Hubs.ExpeditionsHub>
+    {
+        public FakeHubCallerClients CallerClients { get; } = new();
+        public IHubClients Clients => CallerClients;
+        public IGroupManager Groups { get; } = new FakeGroupManager();
     }
 
     /// <summary>Fake de IGroupManager : retient les groupes courants de chaque connexion.</summary>
@@ -151,7 +159,13 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions.Fakes
             return Task.FromResult(expeditionOrder);
         }
         public void DeleteExpeditionOrder(int expeditionOrderId) => throw new NotSupportedException();
-        public ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto) => throw new NotSupportedException();
+        /// <summary>Consigne reçue lors du dernier appel à UpdateExpeditionOrder, renvoyée telle quelle.</summary>
+        public ExpeditionOrderDto? LastUpdatedOrder { get; private set; }
+        public ExpeditionOrderDto UpdateExpeditionOrder(ExpeditionOrderDto expeditionOrderDto)
+        {
+            LastUpdatedOrder = expeditionOrderDto;
+            return expeditionOrderDto;
+        }
         public Task<ExpeditionBagDto> UpdateExpeditionBag(int citizenId, ExpeditionBagRequestDto expeditionBagDto) => throw new NotSupportedException();
         public List<ExpeditionBagDto> DeleteExpeditionBag(int bagId) => throw new NotSupportedException();
         public IReadOnlyList<MapRouteChangeDto> TakeMapRouteChanges()

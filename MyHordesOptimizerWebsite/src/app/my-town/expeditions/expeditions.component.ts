@@ -89,6 +89,7 @@ import {
     ApCheck,
     apCheck,
     ApLeg,
+    guaranteedSp,
     meetsRequirements,
     nextSpOperator,
     scoutsLairBuilt,
@@ -328,7 +329,7 @@ export class ExpeditionsComponent implements OnInit {
         const place: CitizenExpedition = (person_id ? part_places.find((candidate: CitizenExpedition | undefined): boolean => candidate !== undefined) : undefined) ?? row;
 
         const citizen: Citizen | undefined = getCitizenFromId(this.all_citizens(), place.citizen_id);
-        const sp: number | undefined = place.required_sp ?? (citizen ? startingSp(citizen, expedition_day, this.currentDay(), this.scouts_lair_built()) : undefined);
+        const sp: number | undefined = guaranteedSp(place) ?? (citizen ? startingSp(citizen, expedition_day, this.currentDay(), this.scouts_lair_built()) : undefined);
         if (sp === undefined) return null;
 
         const legs: ApLeg[] = expedition.parts.flatMap((part: ExpeditionPart, index: number): ApLeg[] => {
@@ -340,7 +341,7 @@ export class ExpeditionsComponent implements OnInit {
 
     /** Infobulle de l'avertissement de PA. */
     protected apWarningLabel(check: ApCheck): string {
-        return $localize`${check.needed}:needed: PA nécessaires, ${check.available}:available: PA disponibles`;
+        return $localize`Tracé : ${check.route_ap}:route_ap: PA + ${check.route_sp}:route_sp: PE, disponibles : ${check.available}:available: PA + ${check.sp}:sp: PE`;
     }
 
     /** PE de la place hors édition : l'exigence et son symbole, sinon les PE calculés de la personne placée. */

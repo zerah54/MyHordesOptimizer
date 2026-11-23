@@ -338,8 +338,8 @@
             <trans-unit id="3493022559900788436" datatype="html">
                 <source>Bleu canard</source>
             </trans-unit>
-            <trans-unit id="349574492903631397" datatype="html">
-                <source>Passage en Force</source>
+            <trans-unit id="3750153803525026360" datatype="html">
+                <source>Passage en force</source>
             </trans-unit>
             <trans-unit id="3495827345194332174" datatype="html">
                 <source>Consigne : <x id="upgrade" equiv-text="upgrade"/> niv. <x id="level" equiv-text="level"/></source>
@@ -388,9 +388,6 @@
             </trans-unit>
             <trans-unit id="1260504455353929494" datatype="html">
                 <source>À faire</source>
-            </trans-unit>
-            <trans-unit id="1262634552784987007" datatype="html">
-                <source><x id="needed" equiv-text="check.needed"/> PA nécessaires, <x id="available" equiv-text="check.available"/> PA disponibles</source>
             </trans-unit>
             <trans-unit id="1269215144979610420" datatype="html">
                 <source>Aucun programme effectif pour ce jour.</source>
@@ -778,6 +775,9 @@
             </trans-unit>
             <trans-unit id="3802614335560711985" datatype="html">
                 <source>Dans MyHordes uniquement</source>
+            </trans-unit>
+            <trans-unit id="3803584960843438129" datatype="html">
+                <source>Version suivante</source>
             </trans-unit>
             <trans-unit id="8648912876673109537" datatype="html">
                 <source>Ne pas ramener</source>
@@ -2996,6 +2996,9 @@
             <trans-unit id="7969447827855107408" datatype="html">
                 <source>Plans inhabituels sortis</source>
             </trans-unit>
+            <trans-unit id="797617825509474791" datatype="html">
+                <source>Version précédente</source>
+            </trans-unit>
             <trans-unit id="7980053000569541434" datatype="html">
                 <source>Saisies modifiées depuis le dernier affinage : relance nécessaire</source>
             </trans-unit>
@@ -3577,6 +3580,9 @@
             </trans-unit>
             <trans-unit id="3518677477781469053" datatype="html">
                 <source>Enregistrer la mienne</source>
+            </trans-unit>
+            <trans-unit id="3519043400185913657" datatype="html">
+                <source>dernière</source>
             </trans-unit>
             <trans-unit id="3520759538347525799" datatype="html">
                 <source>{VAR_PLURAL, plural, =1 {1 consigne :} other {<x id="INTERPOLATION"/> consignes :}}</source>
@@ -6061,6 +6067,9 @@
             </trans-unit>
             <trans-unit id="7788061501151326787" datatype="html">
                 <source>Atelier, Chaman uniquement</source>
+            </trans-unit>
+            <trans-unit id="8923758037319060801" datatype="html">
+                <source>Tracé : <x id="route_ap" equiv-text="check.route_ap"/> PA + <x id="route_sp" equiv-text="check.route_sp"/> PE, disponibles : <x id="available" equiv-text="check.available"/> PA + <x id="sp" equiv-text="check.sp"/> PE</source>
             </trans-unit>
             <trans-unit id="8924763758161915362" datatype="html">
                 <source>Type de recette</source>

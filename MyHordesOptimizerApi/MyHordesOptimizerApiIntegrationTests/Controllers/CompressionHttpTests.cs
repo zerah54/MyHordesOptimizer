@@ -74,6 +74,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
                     context.Items.Add(item);
                 }
                 context.SaveChanges();
+                context.TownBankSnapshots.Add(new TownBankSnapshot { IdTown = mapId, IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo, Day = 1, ContentHash = new string('a', 64) });
                 foreach (var item in items)
                 {
                     context.TownBankItems.Add(new TownBankItem { IdTown = mapId, IdItem = item.IdItem, IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo, IsBroken = false, Count = 1 });

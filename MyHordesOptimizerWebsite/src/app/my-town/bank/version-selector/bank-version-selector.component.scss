@@ -1,0 +1,21 @@
+:host {
+    display: inline-flex;
+}
+
+.version-selector {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.version,
+.selected {
+    font-weight: 600;
+}
+
+.latest {
+    margin-left: 0.3em;
+    font-size: 0.85em;
+    font-weight: 400;
+    opacity: 0.7;
+}

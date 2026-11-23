@@ -44,10 +44,14 @@ namespace MyHordesOptimizerApi.Services.Impl
 
         // Fetcher/Bank sans townId synchronise MyHordes en écriture (voir MyHordesFetcherService.GetBank()) :
         // pas de version bon marché possible pour ce chemin, on ne met jamais en cache.
+        // Town.Day inclus : il décide des versions visibles (voir BankHistoryRules.VisibleVersions).
         private string? BankVersion(int mapId)
         {
             var townId = _dbContext.ResolveTownId(mapId);
-            return CountMaxVersion(_dbContext.TownBankItems.Where(x => x.IdTown == townId).Select(x => (int?)x.IdLastUpdateInfo));
+            var version = CountMaxVersion(_dbContext.TownBankSnapshots.Where(x => x.IdTown == townId).Select(x => (int?)x.IdLastUpdateInfo));
+            if (version is null) return null;
+            var day = _dbContext.Towns.Where(t => t.IdTown == townId).Select(t => t.Day).FirstOrDefault();
+            return $"{version}:{day}";
         }
 
         // Empreinte de tout ce que sert MyHordesFetcherService.GetCitizens : beaucoup de champs s'écrivent sans IdLastUpdateInfo
@@ -112,17 +116,32 @@ namespace MyHordesOptimizerApi.Services.Impl
             return updated.HasValue ? updated.Value.Ticks.ToString() : null;
         }
 
-        // Agrège aussi IdScoutEstimationLastUpdateInfo : MyHordesOptimizerCellDto sérialise les deux
-        // horodatages indépendamment (estimation Éclaireur distincte de la donnée confirmée).
+        // Empreinte de tout ce que sert MyHordesFetcherService.GetMap (voir MapMappingProfile) : fouilles, campements,
+        // positions des citoyens et Town.Day (niveau de campement courant) changent sans nouvel IdLastUpdateInfo.
         private string? MapVersion(int mapId)
         {
             var townId = _dbContext.ResolveTownId(mapId);
-            // AsNoTracking : sans ça, un DbContext scoped réutilisé (résolution d'identité EF) renverrait
-            // l'entité déjà suivie depuis un appel précédent au lieu de relire l'état courant en base.
-            var cells = _dbContext.MapCells.AsNoTracking().Where(c => c.IdTown == townId).ToList();
-            if (cells.Count == 0) return null;
-            var max = cells.Max(c => Math.Max(c.IdLastUpdateInfo ?? 0, c.IdScoutEstimationLastUpdateInfo ?? 0));
-            return $"{cells.Count}:{max}";
+            var lastUpdateIds = new HashSet<int>();
+            var cells = _dbContext.MapCells.Where(c => c.IdTown == townId);
+            var rows = RowsOf(cells, lastUpdateIds);
+            if (rows.Count == 0) return null;
+
+            var cellItems = _dbContext.MapCellItems.Where(i => cells.Any(c => c.IdCell == i.IdCell));
+            var digs = _dbContext.MapCellDigs.Where(d => cells.Any(c => c.IdCell == d.IdCell));
+            var citizens = _dbContext.TownCitizens.Where(c => c.IdTown == townId);
+            rows.AddRange(RowsOf(cellItems, lastUpdateIds));
+            rows.AddRange(RowsOf(digs, lastUpdateIds));
+            rows.AddRange(Serialized(nameof(TownCitizen), citizens.Select(c => new { c.IdUser, c.PositionX, c.PositionY, c.Dead })));
+            rows.AddRange(Serialized(nameof(User), _dbContext.Users.Where(u => citizens.Any(c => c.IdUser == u.IdUser)).Select(u => new { u.IdUser, u.Name, u.Avatar })));
+            // Seuls les champs de Town servis par MapMappingProfile : wishlist, rôles, score… n'invalident pas la carte.
+            rows.AddRange(Serialized(nameof(Town), _dbContext.Towns.Where(t => t.IdTown == townId)
+                .Select(t => new { t.IdTown, t.Day, t.IsChaos, t.IsDevasted, t.IsDoorOpen, t.Height, t.Width, t.X, t.Y, t.WaterWell })));
+            // Ids calculés une fois : même raison que dans CitizensVersion.
+            var itemIds = cellItems.Select(i => i.IdItem).Distinct().ToList();
+            rows.AddRange(RowsOf(_dbContext.Items.Where(it => itemIds.Contains(it.IdItem)), lastUpdateIds));
+            rows.AddRange(Serialized(nameof(LastUpdateInfo), _dbContext.LastUpdateInfos.Where(l => lastUpdateIds.Contains(l.IdLastUpdateInfo))
+                .Select(l => new { l.IdLastUpdateInfo, l.DateUpdate, l.IdUser, UserName = l.IdUserNavigation != null ? l.IdUserNavigation.Name : null })));
+            return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(string.Join('\n', rows.Order(StringComparer.Ordinal)))));
         }
 
         private string? MapDigsVersion(int mapId)

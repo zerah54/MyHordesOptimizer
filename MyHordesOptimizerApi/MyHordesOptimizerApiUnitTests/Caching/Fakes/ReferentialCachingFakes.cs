@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Internal;
+using System.Collections.Generic;
 using MyHordesOptimizerApi.Data.Buildings;
 using MyHordesOptimizerApi.Dtos.MyHordes.MyHordesOptimizer;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
@@ -79,8 +80,10 @@ namespace MyHordesOptimizerApiUnitTests.Caching.Fakes
         public SimpleMeDto BuildSimpleMeFromDbByUserKey(string userKey) => throw new NotSupportedException();
         public bool VerifyUserKeyOwnership(string userKey, int userId) => throw new NotSupportedException();
         public BankLastUpdateDto GetBank() => throw new NotSupportedException();
-        public BankLastUpdateDto GetBank(int townId) => throw new NotSupportedException();
-        public Task<bool> ImportUserPictosAsync(int userId) => throw new NotSupportedException();
+        public BankLastUpdateDto? GetBank(int townId, int? lastUpdateId) => throw new NotSupportedException();
+        public List<BankVersionDto> GetBankVersions(int townId) => throw new NotSupportedException();
+        public Task<bool> ImportUserPictosAsync(int userId, int? currentMapId = null) => throw new NotSupportedException();
+        public void QueuePictosImportInBackground(int userId, int currentMapId) => throw new NotSupportedException();
         public CitizensLastUpdateDto GetCitizens(int townId) => throw new NotSupportedException();
         public MyHordesOptimizerMapDto GetMap(int townId) => throw new NotSupportedException();
         public IEnumerable<MyHordesOptimizerMapDigDto> GetMapDigs(int townId) => throw new NotSupportedException();

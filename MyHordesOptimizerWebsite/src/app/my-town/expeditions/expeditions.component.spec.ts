@@ -676,7 +676,7 @@ describe('ExpeditionsComponent', () => {
         it('warns when the route costs more than base AP, bag and SP', () => {
             const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID, base_ap: 4 }))), 0, 0, 5);
 
-            expect(check).toEqual({ needed: 5, available: 4, short: true });
+            expect(check).toEqual(expect.objectContaining({ needed: 5, available: 4, short: true }));
         });
 
         it('does not warn when the bag covers the missing AP', () => {
@@ -693,7 +693,7 @@ describe('ExpeditionsComponent', () => {
 
             const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ citizen_id: CITIZEN_ID }), [explore])), 0, 0, 5);
 
-            expect(check).toEqual({ needed: 5, available: 6, short: false });
+            expect(check).toEqual(expect.objectContaining({ needed: 5, available: 6, short: false }));
         });
 
         it('checks an empty place against its SP requirement', () => {
@@ -716,8 +716,8 @@ describe('ExpeditionsComponent', () => {
                 partWith(routeOut(2), placeWith({ citizen_id: CITIZEN_ID, base_ap: 99 }))
             );
 
-            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual({ needed: 4, available: 3, short: true });
-            expect(internals.apWarning(expedition, 1, 0, 5)).toEqual({ needed: 4, available: 3, short: true });
+            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual(expect.objectContaining({ needed: 4, available: 3, short: true }));
+            expect(internals.apWarning(expedition, 1, 0, 5)).toEqual(expect.objectContaining({ needed: 4, available: 3, short: true }));
         });
 
         it('gives each row the check of the person shown on it, whatever her rank in each part', () => {
@@ -730,8 +730,8 @@ describe('ExpeditionsComponent', () => {
                 partWithPlaces(routeOut(2), placeWith({ citizen_id: CITIZEN_ID, base_ap: 3 }), placeWith({ citizen_id: 8, base_ap: 10 })),
                 partWithPlaces(routeOut(2), placeWith({ citizen_id: 8, base_ap: 99, orders: [explore] }), placeWith({ citizen_id: CITIZEN_ID, base_ap: 99 }))
             );
-            const first_person: ApCheck = { needed: 4, available: 3, short: true };
-            const second_person: ApCheck = { needed: 5, available: 10, short: false };
+            const first_person: Partial<ApCheck> = expect.objectContaining({ needed: 4, available: 3, short: true });
+            const second_person: Partial<ApCheck> = expect.objectContaining({ needed: 5, available: 10, short: false });
 
             expect(internals.apWarning(expedition, 0, 0, 5)).toEqual(first_person);
             expect(internals.apWarning(expedition, 0, 1, 5)).toEqual(second_person);
@@ -746,7 +746,7 @@ describe('ExpeditionsComponent', () => {
                 partWithPlaces(routeOut(2), placeWith({ citizen_id: CITIZEN_ID }))
             );
 
-            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual({ needed: 2, available: 3, short: false });
+            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual(expect.objectContaining({ needed: 2, available: 3, short: false }));
         });
 
         it('follows the person of the first part in each part, whatever its rank there', () => {
@@ -756,7 +756,7 @@ describe('ExpeditionsComponent', () => {
                 partWithPlaces(routeOut(2), placeWith({ citizen_id: 8 }), placeWith({ citizen_id: CITIZEN_ID, orders: [explore] }))
             );
 
-            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual({ needed: 5, available: 6, short: false });
+            expect(internals.apWarning(expedition, 0, 0, 5)).toEqual(expect.objectContaining({ needed: 5, available: 6, short: false }));
         });
 
         it('does not count a part where the person of the first part has no place', () => {
@@ -786,11 +786,16 @@ describe('ExpeditionsComponent', () => {
             expect(internals.apWarning(expedition, 0, 0, 6)?.needed).toBe(5);
         });
 
-        it('details the check in the tooltip', () => {
-            const label: string = internals.apWarningLabel({ needed: 14, available: 12, short: true });
+        it('details the route and the resources in AP and SP in the tooltip', () => {
+            const label: string = internals.apWarningLabel({ route_ap: 26, route_sp: 3, needed: 28, available: 27, sp: 1, short: true });
 
-            expect(label).toContain('14 PA nécessaires');
-            expect(label).toContain('12 PA disponibles');
+            expect(label).toBe('Tracé : 26 PA + 3 PE, disponibles : 27 PA + 1 PE');
+        });
+
+        it('guarantees no SP to an empty place requiring at most N SP', () => {
+            const check: ApCheck | null = internals.apWarning(expeditionOf(partWith(routeOut(5), placeWith({ required_sp: 2, required_sp_operator: 'max' }))), 0, 0, 5);
+
+            expect(check?.needed).toBe(5);
         });
 
         it('shows the requirement with its symbol, else the SP of the placed citizen', () => {

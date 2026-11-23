@@ -21,8 +21,10 @@ using MyHordesOptimizerApi.MappingProfiles.Items;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Bank;
 using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Impl.Maps;
+using MyHordesOptimizerApi.Services.Impl.Towns;
 using MyHordesOptimizerApi.Services.Interfaces;
 using Newtonsoft.Json.Linq;
 using System;
@@ -80,7 +82,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             {
                 townId = DbContext.ResolveTownId(townId.Value);
                 sw.Start();
-                var townBankItemLastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => (int?)tbi.IdLastUpdateInfo);
+                var townBankItemLastUpdateId = TownBankHistory.LatestSnapshotId(DbContext, townId.Value);
                 var items = DbContext.Items
                     // Catalogue : les prototypes que MyHordes ne renvoie plus n'ont plus à être
                     // proposés. Leur ligne reste en base et reste résolvable par navigation — la
@@ -351,7 +353,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // Clé de verrou : l'IdTown provisoire (-mapId) écrit par le mapping ci-dessous.
                 await using var townLock = await TownSyncLock.AcquireTownAsync(-myHordeMeResponse.MapId!.Value);
                 Logger.LogDebug($"GetSimpleMeAsync Lock ok après {sw.Elapsed} ms");
-                if (!HasTownIdCollision(myHordeMeResponse))
+                if (!TownCreation.HasTownIdCollision(DbContext, myHordeMeResponse, Logger))
                 {
                     townSynchronized = true;
                     Logger.LogDebug($"GetSimpleMeAsync User en ville !");
@@ -380,73 +382,25 @@ namespace MyHordesOptimizerApi.Services.Impl
                     Logger.LogDebug($"GetSimpleMeAsync Génération du lastupdate {sw.Elapsed} ms");
                     var lastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.Entity.IdLastUpdateInfo);
                     Logger.LogDebug($"GetSimpleMeAsync Récupération du lastupdate {sw.Elapsed} ms");
-                    myHordeMeResponse.Map.LastUpdateInfo = lastUpdate;
-                    var town = Mapper.Map<Town>(myHordeMeResponse, opts => opts.SetDbContext(DbContext));
-                    // Garde-fou : cette ville est celle où le citoyen connecté se trouve actuellement,
-                    // elle ne peut donc pas être terminée, même si l'import global l'a marquée à tort
-                    // (le endpoint /json/towns en bulk ne remonte parfois que des citoyens déjà morts).
-                    town.IsFinished = false;
-                    var citizens = town.TownCitizens;
-                    town.TownCitizens = null!;
-                    var bankItems = town.TownBankItems;
-                    town.TownBankItems = null!;
-                    var cadavers = town.TownCadavers;
-                    town.TownCadavers = null!;
                     var existingTown = DbContext.Towns
                         .Include(town => town.TownCitizens)
                         .Include(town => town.TownCadavers)
-                        .FirstOrDefault(t => t.IdTown == town.IdTown);
+                        .FirstOrDefault(t => t.IdTown == -myHordeMeResponse.MapId!.Value);
                     Logger.LogDebug($"GetSimpleMeAsync Récupération de la town {sw.Elapsed} ms");
                     if (existingTown == null)
                     {
                         Logger.LogDebug($"GetSimpleMeAsync La Town n'existe pas !");
-                        // On Crée la ville
-                        DbContext.Add(town);
-                        // Lignes filles déjà présentes en base pour cette ville provisoire (orphelines :
-                        // la ligne Towns manque mais pas ses TownCitizen/TownCadaver). On exclut leurs clés
-                        // pour n'insérer que ce qui manque, sinon violation de la PK (IdTown, IdUser).
-                        HashSet<int> existingCitizenUserIds = DbContext.TownCitizens
-                            .Where(citizen => citizen.IdTown == town.IdTown)
-                            .Select(citizen => citizen.IdUser)
-                            .ToHashSet();
-                        HashSet<int> existingCadaverUserIds = DbContext.TownCadavers
-                            .Where(cadaver => cadaver.IdTown == town.IdTown)
-                            .Select(cadaver => cadaver.IdUser)
-                            .ToHashSet();
-                        // On crée les citoyens manquants (dédoublonnage + exclusion des existants ; PK (IdTown, IdUser))
-                        List<TownCitizen> distinctCitizens = citizens
-                            .GroupBy(citizen => citizen.IdUser)
-                            .Select(group => group.First())
-                            .Where(citizen => !existingCitizenUserIds.Contains(citizen.IdUser))
-                            .ToList();
-                        DbContext.AddRange(distinctCitizens);
-                        // On crée la banque (dédoublonnage sur (IdItem, IsBroken), IdLastUpdateInfo constant ici)
-                        List<TownBankItem> distinctBankItems = bankItems
-                            .GroupBy(bankItem => new { bankItem.IdItem, bankItem.IsBroken })
-                            .Select(group => group.First())
-                            .ToList();
-                        DbContext.AddRange(distinctBankItems);
-                        // On crée les cadavres manquants (dédoublonnage + exclusion des existants ; PK (IdTown, IdUser))
-                        List<TownCadaver> distinctCadavers = cadavers
-                            .GroupBy(cadaver => cadaver.IdUser)
-                            .Select(group => group.First())
-                            .Where(cadaver => !existingCadaverUserIds.Contains(cadaver.IdUser))
-                            .ToList();
-                        DbContext.AddRange(distinctCadavers);
-                        // On crée les cells
-                        var cells = CreateCellsForTown(xVille: myHordeMeResponse.Map.City!.X!.Value,
-                            yVille: myHordeMeResponse.Map.City.Y!.Value,
-                            mapWid: myHordeMeResponse.Map.Wid!.Value,
-                            mapHei: myHordeMeResponse.Map.Hei!.Value,
-                            townId: town.IdTown,
-                            lastUpdate);
-                        DbContext.AddRange(cells);
+                        TownCreation.Create(DbContext, Mapper, myHordeMeResponse, lastUpdate, MyHordesScrutateurConfiguration);
                         DbContext.SaveChanges();
                         Logger.LogDebug($"GetSimpleMeAsync Création de la Town après {sw.Elapsed} ms");
                     }
                     else
                     {
-                        Logger.LogDebug($"GetSimpleMeAsync La Town existe {town.IdTown} !");
+                        Logger.LogDebug($"GetSimpleMeAsync La Town existe {existingTown.IdTown} !");
+                        var town = TownCreation.MapTown(DbContext, Mapper, myHordeMeResponse, lastUpdate);
+                        var citizens = town.TownCitizens;
+                        var bankItems = town.TownBankItems;
+                        var cadavers = town.TownCadavers;
                         // On met à jour la ville (logique partagée avec les outils externes et l'import)
                         existingTown.UpdateFromMapDetails(myHordeMeResponse.Map);
                         // Appel SÉPARÉ, et réservé à /json/me : c'est la seule source qui demande les
@@ -469,8 +423,8 @@ namespace MyHordesOptimizerApi.Services.Impl
                         // TownCitizen.IdUserNavigation) à l'état Modified, ce qui écrase leurs colonnes avec
                         // les valeurs en mémoire — potentiellement obsolètes si une autre tâche (ex. l'import
                         // pictos en fond) a modifié ce User entre son chargement et ce SaveChanges (lost update).
-                        // On ajoute une nouvelle banque avec un nouveau lastupdate
-                        DbContext.AddRange(bankItems);
+                        // Nouvelle version de banque si elle a changé
+                        TownBankHistory.Record(DbContext, existingTown.IdTown, myHordeMeResponse.Map.Days ?? existingTown.Day, lastUpdate.IdLastUpdateInfo, bankItems);
                         // On maj les citoyens en place, sans jamais supprimer de ligne :
                         // le TownCitizen d'un mort est conservé (Dead = true) et le détail
                         // qui ne remonte pas de MH (maison, actions héroïques, statuts,
@@ -531,7 +485,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // Hors ville : rien d'autre à synchroniser ici, mais c'est le bon moment pour rafraîchir
                 // pictos/playedMaps (throttlé 24h dans ImportUserPictosAsync) — ce joueur vient
                 // probablement de terminer une vie, son historique a de bonnes chances d'avoir changé.
-                QueuePictosImportInBackground(myHordeMeResponse.Id.Value);
+                QueuePictosImportInBackground(myHordeMeResponse.Id.Value, 0);
             }
 
             // Pictos gagnés par les morts dans cette ville. Aucune requête MyHordes supplémentaire
@@ -545,9 +499,9 @@ namespace MyHordesOptimizerApi.Services.Impl
                 // Pareil pour pictos/playedMaps. Pas de garde "nouvelle ville pour ce citoyen" ici :
                 // map.citizens liste TOUS les citoyens de la ville, donc la ligne TownCitizen d'un
                 // joueur peut déjà exister sans qu'il ait lui-même synchronisé (créée par la synchro
-                // d'un AUTRE citoyen — voir MyHordeCitizenToUserValueResolver). Le throttle 24h déjà
-                // dans ImportUserPictosAsync (PictosHistoryImportedAt) est le seul signal fiable.
-                QueuePictosImportInBackground(myHordeMeResponse.Id.Value);
+                // d'un AUTRE citoyen — voir MyHordeCitizenToUserValueResolver). Le seul signal fiable est
+                // celui d'ImportUserPictosAsync : la ville retenue par le dernier import du joueur lui-même.
+                QueuePictosImportInBackground(myHordeMeResponse.Id.Value, myHordeMeResponse.MapId!.Value);
             }
 
             return Mapper.Map<SimpleMeDto>(myHordeMeResponse);
@@ -617,7 +571,7 @@ namespace MyHordesOptimizerApi.Services.Impl
 
             var town = citizen.IdTownNavigation;
 
-            // IdTown peut être une clé locale provisoire (-mapId, voir HasTownIdCollision) tant que
+            // IdTown peut être une clé locale provisoire (-mapId, voir TownCreation.HasTownIdCollision) tant que
             // la ville n'a pas de MapId MyHordes synchronisé. L'exposer comme TownId confondrait les
             // deux pour TOUS les consommateurs, qui le lisent comme un vrai MapId (piège
             // IdTown/MapId documenté). Repli impossible dans ce cas : null, comme "rien en BDD" —
@@ -718,7 +672,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// libéré dès la réponse envoyée. ImportUserPictosAsync gère lui-même son propre throttle
         /// (24h) et son propre verrou (villes de l'historique du joueur) : rien à dupliquer ici.
         /// </summary>
-        private void QueuePictosImportInBackground(int userId)
+        public void QueuePictosImportInBackground(int userId, int currentMapId)
         {
             // Capturé ici, dans le scope requête où JwtActionFilter/GetToken l'a déjà posé : le nouveau
             // scope de fond a son propre IUserInfoProvider vide, sinon GenerateUrl y enverrait un
@@ -732,31 +686,13 @@ namespace MyHordesOptimizerApi.Services.Impl
                     using var scope = ServiceScopeFactory.CreateScope();
                     scope.ServiceProvider.GetRequiredService<IUserInfoProvider>().UserKey = userKey;
                     var fetcherService = scope.ServiceProvider.GetRequiredService<IMyHordesFetcherService>();
-                    await fetcherService.ImportUserPictosAsync(userId);
+                    await fetcherService.ImportUserPictosAsync(userId, currentMapId);
                 }
                 catch (Exception ex)
                 {
                     Logger.LogWarning(ex, "GetSimpleMeAsync: échec de l'import automatique des pictos/playedMaps pour {UserId}", userId);
                 }
             });
-        }
-
-        // Une ligne provisoire (pas encore migrée vers son townId stable) vit sous IdTown = -mapId,
-        // un espace qui ne peut jamais entrer en collision avec un vrai townId (toujours positif).
-        // Le seul risque résiduel : un mapId recyclé d'une saison à l'autre retombant sur une ancienne
-        // ligne provisoire jamais migrée. On la détecte via la saison et on refuse de la réutiliser.
-        private bool HasTownIdCollision(MyHordesUserDetailsDto myHordeMeResponse)
-        {
-            var mapId = myHordeMeResponse.MapId;
-            var season = myHordeMeResponse.Map?.Season;
-            var existing = DbContext.Towns.FirstOrDefault(t => t.IdTown == -mapId);
-            if (existing == null) return false;
-            if (!existing.Season.HasValue || !season.HasValue || existing.Season.Value == season.Value) return false;
-
-            Logger.LogError(
-                "GetSimpleMeAsync: mapId {MapId} recyclé — ligne provisoire existante (saison={ExistingSeason}) incompatible avec la ville actuelle (saison={CurrentSeason}). Synchronisation ignorée pour ne pas écraser une ville différente.",
-                mapId, existing.Season, season);
-            return true;
         }
 
         /// <summary>
@@ -917,6 +853,20 @@ namespace MyHordesOptimizerApi.Services.Impl
         // intenable. Les pictos ne bougeant qu'en fin de ville, un jour de fraîcheur suffit.
         private static readonly TimeSpan PictosImportMinimumInterval = TimeSpan.FromHours(24);
 
+        /// <summary>
+        /// Vrai si l'import doit attendre la fin des 24 h. Le joueur qui a quitté la ville du dernier
+        /// import l'a terminée : MyHordes valide les pictos d'une vie à la confirmation de la mort,
+        /// préalable à toute sortie de ville. Ville courante inconnue (null) : 24 h strictes.
+        /// </summary>
+        public static bool IsPictosImportThrottled(DateTime? importedAt, int? importMapId, int? currentMapId, DateTime utcNow)
+        {
+            if (!importedAt.HasValue || utcNow - importedAt.Value >= PictosImportMinimumInterval)
+            {
+                return false;
+            }
+            return !(importMapId.HasValue && currentMapId.HasValue && importMapId.Value != currentMapId.Value);
+        }
+
         // Le throttle 24h ci-dessous est un check-then-act : sans verrou, deux imports démarrés à
         // quelques secondes d'intervalle (deux requêtes de connexion concurrentes du même joueur) lisent
         // tous les deux "pas encore fait" avant que le premier n'écrive PictosHistoryImportedAt à la
@@ -937,7 +887,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         /// seul appel MyHordes. Renvoie false sans rien faire si l'import est déjà récent, ou si une
         /// tentative a échoué il y a moins de <see cref="PictosImportFailureCooldown"/>.
         /// </summary>
-        public async Task<bool> ImportUserPictosAsync(int userId)
+        public async Task<bool> ImportUserPictosAsync(int userId, int? currentMapId = null)
         {
             var gate = PictosImportGates.GetOrAdd(userId, _ => new SemaphoreSlim(1, 1));
             await gate.WaitAsync();
@@ -948,8 +898,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 {
                     throw new MhoTechnicalException($"Utilisateur introuvable : {userId}");
                 }
-                if (user.PictosHistoryImportedAt.HasValue
-                    && DateTime.UtcNow - user.PictosHistoryImportedAt.Value < PictosImportMinimumInterval)
+                if (IsPictosImportThrottled(user.PictosHistoryImportedAt, user.PictosImportMapId, currentMapId, DateTime.UtcNow))
                 {
                     Logger.LogDebug("ImportUserPictos: import ignoré pour {UserId}, déjà fait le {Date}", userId, user.PictosHistoryImportedAt);
                     return false;
@@ -986,7 +935,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .ToList();
                 await using (await TownSyncLock.AcquireTownsAsync(townIds))
                 {
-                    PersistUserPictos(response, userId);
+                    PersistUserPictos(response, userId, currentMapId);
                 }
                 return true;
             }
@@ -996,7 +945,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
         }
 
-        private void PersistUserPictos(MyHordesUserDetailsDto response, int userId)
+        private void PersistUserPictos(MyHordesUserDetailsDto response, int userId, int? currentMapId)
         {
             // Les villes de l'historique doivent exister avant d'y rattacher des pictos (FK).
             // Attention : UpsertPlayedMaps se termine par un ChangeTracker.Clear(). Toute entité
@@ -1137,6 +1086,10 @@ namespace MyHordesOptimizerApi.Services.Impl
             // UpsertPlayedMaps aurait détaché l'instance chargée en amont.
             var user = DbContext.Users.First(u => u.IdUser == userId);
             user.PictosHistoryImportedAt = lastUpdate;
+            if (currentMapId.HasValue)
+            {
+                user.PictosImportMapId = currentMapId.Value;
+            }
             DbContext.SaveChanges();
             Logger.LogInformation("ImportUserPictos: {PictoCount} pictos et {TownCount} villes importés pour {UserId}",
                 rewards.Count, pictosByTown.Count, userId);
@@ -1199,7 +1152,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 if (town == null)
                 {
                     // Aucune ligne compatible. Si -mapId est déjà occupé par une ville d'une autre saison,
-                    // on ne l'écrase pas (même garde-fou que HasTownIdCollision).
+                    // on ne l'écrase pas (même garde-fou que TownCreation.HasTownIdCollision).
                     if (candidates.Any(t => t.IdTown == -mapId))
                     {
                         Logger.LogWarning("UpsertPlayedMaps: mapId {MapId} recyclé (ligne provisoire d'une autre saison) — entrée ignorée.", mapId);
@@ -1458,7 +1411,7 @@ namespace MyHordesOptimizerApi.Services.Impl
                 var newTownlastUpdate = DbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate.IdLastUpdateInfo);
                 myHordeMeResponse.Map!.LastUpdateInfo = newTownlastUpdate;
                 var town = Mapper.Map<Town>(myHordeMeResponse, opts => { opts.SetDbContext(DbContext); opts.SetAllItems(allItems); });
-                DbContext.AddRange(town.TownBankItems);
+                TownBankHistory.Record(DbContext, town.IdTown, myHordeMeResponse.Map.Days ?? town.Day, newTownlastUpdate.IdLastUpdateInfo, town.TownBankItems);
                 DbContext.SaveChanges();
                 transaction.Commit();
                 lastUpdateId = newTownlastUpdate.IdLastUpdateInfo;
@@ -1469,20 +1422,42 @@ namespace MyHordesOptimizerApi.Services.Impl
             }
             var townDetail = UserInfoProvider.TownDetail;
             var townId = DbContext.ResolveTownId(townDetail!.TownId);
-            return GetBankFromDb(townId, lastUpdateId);
+            // Toujours la plus récente : un état inchangé n'écrit pas de version pour ce lastUpdateId.
+            return GetBankFromDb(townId, -1)!;
         }
 
-        public BankLastUpdateDto GetBank(int townId)
+        public BankLastUpdateDto? GetBank(int townId, int? lastUpdateId)
         {
             var resolvedTownId = DbContext.ResolveTownId(townId);
-            return GetBankFromDb(resolvedTownId, -1);
+            return GetBankFromDb(resolvedTownId, lastUpdateId ?? -1);
         }
 
-        private BankLastUpdateDto GetBankFromDb(int townId, int lastUpdateId)
+        public List<BankVersionDto> GetBankVersions(int townId)
+        {
+            var resolvedTownId = DbContext.ResolveTownId(townId);
+            var visibleIds = TownBankHistory.VisibleVersions(DbContext, resolvedTownId).Select(v => v.IdLastUpdateInfo).ToList();
+            var headers = DbContext.TownBankSnapshots.AsNoTracking()
+                .Where(s => s.IdTown == resolvedTownId && visibleIds.Contains(s.IdLastUpdateInfo))
+                .Select(s => new BankVersionDto
+                {
+                    Day = s.Day,
+                    LastUpdateId = s.IdLastUpdateInfo,
+                    UpdateTime = s.IdLastUpdateInfoNavigation.DateUpdate,
+                    UserName = s.IdLastUpdateInfoNavigation.IdUserNavigation != null ? s.IdLastUpdateInfoNavigation.IdUserNavigation.Name : null
+                })
+                .ToList();
+            return headers.OrderBy(h => h.LastUpdateId).ToList();
+        }
+
+        private BankLastUpdateDto? GetBankFromDb(int townId, int lastUpdateId)
         {
             if (lastUpdateId == -1)
             {
-                lastUpdateId = DbContext.TownBankItems.Where(tbi => tbi.IdTown == townId).Max(tbi => (int?)tbi.IdLastUpdateInfo) ?? -1;
+                lastUpdateId = TownBankHistory.LatestSnapshotId(DbContext, townId) ?? -1;
+            }
+            else if (!TownBankHistory.VisibleVersions(DbContext, townId).Any(v => v.IdLastUpdateInfo == lastUpdateId))
+            {
+                return null;
             }
             if (lastUpdateId == -1)
             {
@@ -1532,26 +1507,19 @@ namespace MyHordesOptimizerApi.Services.Impl
                     .AsSplitQuery()
                 .First();
 
-            var group = townModel.TownBankItems.GroupBy(townBankItem => townBankItem.IdLastUpdateInfoNavigation)
-                .OrderByDescending(g => g.Key.DateUpdate)
-                .First();
-
-            var lastUpdate = group.Key;
-            var townBankItemsLastUpdated = group.ToList();
-            var dtos = Mapper.Map<List<StackableItemDto>>(townBankItemsLastUpdated);
+            // Une version de banque vide n'a aucune ligne : l'auteur se lit sur la version elle-même.
+            var lastUpdate = DbContext.LastUpdateInfos.AsNoTracking()
+                .Include(info => info.IdUserNavigation)
+                .First(info => info.IdLastUpdateInfo == lastUpdateId);
+            var dtos = Mapper.Map<List<StackableItemDto>>(townModel.TownBankItems.ToList());
             // Catalogue COMPLET en référence, pas seulement le contenu de cette banque : sinon un
             // ouvre-boîte absent de la banque ferait passer une boîte pour « sans outil requis ».
             ItemOpenerResolver.PopulateOpenerRelations(dtos.Select(dto => dto.Item).ToList(), GetItemCatalogForOpenerRelations(), GetActionsByName());
             ItemCatapultEffectResolver.PopulateCatapultEffects(dtos.Select(dto => dto.Item).ToList(), GetItemCatalogForOpenerRelations(), GetItemsCatapultByUid(), GetActionsByName(), GetMetaResultsByName());
-            LastUpdateInfoDto? lastUpdateDto = null;
-            if (townModel.TownBankItems.Any())
-            {
-                lastUpdateDto = Mapper.Map<LastUpdateInfoDto>(lastUpdate);
-            }
             return new BankLastUpdateDto()
             {
                 Bank = dtos,
-                LastUpdateInfo = lastUpdateDto
+                LastUpdateInfo = Mapper.Map<LastUpdateInfoDto>(lastUpdate)
             };
         }
 
@@ -1866,70 +1834,5 @@ namespace MyHordesOptimizerApi.Services.Impl
             var dtos = Mapper.Map<List<MyHordesOptimizerMapUpdateDto>>(models);
             return dtos;
         }
-
-        #region Private helpers
-        #region MapCells
-        private List<MapCell> CreateCellsForTown(int xVille, int yVille, int mapWid, int mapHei, int townId, LastUpdateInfo lastUpdate)
-        {
-            var cells = new List<MapCell>();
-            float averageStartingItem = (float)Math.Round((float)MyHordesScrutateurConfiguration.StartItemMin + (((float)MyHordesScrutateurConfiguration.StartItemMax - (float)MyHordesScrutateurConfiguration.StartItemMin) / 2), 3);
-            for (var x = 0; x < mapWid; x++)
-            {
-                for (var y = 0; y < mapHei; y++)
-                {
-                    var xFromTown = x - xVille;
-                    var yFromTown = yVille - y;
-                    bool isTown = x == xVille && y == yVille;
-                    float? averageStartingItemValue = averageStartingItem;
-                    int? maxPotentialStartingItemValue = MyHordesScrutateurConfiguration.StartItemMax;
-                    if (isTown)
-                    {
-                        averageStartingItemValue = null;
-                        maxPotentialStartingItemValue = null;
-                    }
-                    int? zoneRegen = null;
-                    // Toutes les cases hors ville ont un octant, celles des axes comprises (l'ancienne
-                    // condition `x != 0 && y != 0` les laissait sans octant).
-                    if (!isTown)
-                    {
-                        zoneRegen = (int)GetCellZone(xFromTown, yFromTown);
-                    }
-                    var cell = new MapCell()
-                    {
-                        IdTown = townId,
-                        IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo,
-                        X = x,
-                        Y = y,
-                        IsTown = isTown,
-                        IsVisitedToday = false,
-                        IsNeverVisited = true,
-                        DangerLevel = null,
-                        IsDryed = false,
-                        IdRuin = null,
-                        NbZombie = null,
-                        NbZombieKilled = null,
-                        NbHero = null,
-                        IsRuinCamped = null,
-                        IsRuinDryed = null,
-                        NbRuinDig = null,
-                        AveragePotentialRemainingDig = averageStartingItemValue,
-                        MaxPotentialRemainingDig = maxPotentialStartingItemValue,
-                        NbKm = GetCellDistanceInKm(xFromTown, yFromTown),
-                        NbPa = GetCellDistanceInActionPoint(xFromTown, yFromTown),
-                        ZoneRegen = zoneRegen
-                    };
-                    cells.Add(cell);
-                }
-            }
-
-            return cells;
-        }
-        private DirectionEnum GetCellZone(int x, int y) => ZoneGeometry.Direction(x, y);
-
-        private int GetCellDistanceInKm(int xRelativeToTown, int yRelativetoTown) => ZoneGeometry.DistanceKm(xRelativeToTown, yRelativetoTown);
-
-        private int GetCellDistanceInActionPoint(int xRelativeToTown, int yRelativetoTown) => ZoneGeometry.DistanceAp(xRelativeToTown, yRelativetoTown);
-        #endregion
-        #endregion
     }
 }

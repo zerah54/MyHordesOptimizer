@@ -24,6 +24,10 @@ public partial class User
     [Column("pictosHistoryImportedAt")]
     public DateTime? PictosHistoryImportedAt { get; set; }
 
+    /// <summary>Ville MyHordes (mapId) du joueur lors du dernier import de pictos : 0 hors ville, null si non retenue.</summary>
+    [Column("pictosImportMapId")]
+    public int? PictosImportMapId { get; set; }
+
     /// <summary>
     /// Dernier import de l'historique des villes jouées (playedMaps). Null = jamais importé, seul cas
     /// où la synchronisation de connexion s'en charge : l'opération est trop lourde pour tourner sous

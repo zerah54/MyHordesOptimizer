@@ -28,7 +28,7 @@ namespace MyHordesOptimizerApi.Serilog
                 logEvent.AddPropertyIfAbsent(mhoAddonVersionProperty);
                 logEvent.AddPropertyIfAbsent(mhoOriginProperty);
 
-                var query = HttpContextAccessor.HttpContext.Request.QueryString;
+                var query = new QueryString(LogRedaction.Redact(HttpContextAccessor.HttpContext.Request.QueryString.Value));
                 var queryProperty = factory.CreateProperty("Query", query);
                 logEvent.AddPropertyIfAbsent(queryProperty);
 
@@ -41,7 +41,7 @@ namespace MyHordesOptimizerApi.Serilog
                         request.Body.Position = 0;
                         var requestBody = streamReader.ReadToEndAsync().Result;
                         request.Body.Position = 0;
-                        requestBody = Regex.Replace(requestBody, @"\s+|\\n|\\r", string.Empty);
+                        requestBody = LogRedaction.Redact(Regex.Replace(requestBody, @"\s+|\\n|\\r", string.Empty));
                         var bodyProperty = factory.CreateProperty("Body", requestBody);
                         logEvent.AddPropertyIfAbsent(bodyProperty);
                     }

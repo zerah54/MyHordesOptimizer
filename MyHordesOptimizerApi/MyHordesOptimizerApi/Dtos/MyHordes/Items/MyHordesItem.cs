@@ -21,6 +21,13 @@ namespace MyHordesOptimizerApi.Dtos.MyHordes.Items
         [JsonProperty("uid")]
         public string? Uid { get; set; }
 
+        /// <summary>
+        /// Nom du prototype (= <c>Item.Uid</c>), émis avec <c>uid</c> quand ce champ est demandé.
+        /// Absent des instances du jeu antérieures à son ajout.
+        /// </summary>
+        [JsonProperty("uuid")]
+        public string? Uuid { get; set; }
+
         [JsonProperty("name")]
         public IDictionary<string, string>? Label { get; set; }
 

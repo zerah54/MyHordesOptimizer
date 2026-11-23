@@ -27,14 +27,19 @@ using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Configuration.Interfaces;
+using MyHordesOptimizerApi.Services.Impl.Bank;
+using MyHordesOptimizerApi.Services.Impl.Items;
 using MyHordesOptimizerApi.Services.Impl.Buildings;
 using MyHordesOptimizerApi.Services.Impl.Locking;
 using MyHordesOptimizerApi.Services.Impl.MapRoutes;
 using MyHordesOptimizerApi.Services.Impl.Maps;
+using MyHordesOptimizerApi.Services.Impl.Towns;
+using MyHordesOptimizerApi.Services.Impl.Users;
 using MyHordesOptimizerApi.Services.Interfaces.ExternalTools;
 using Newtonsoft.Json.Linq;
 using IAuthenticationService = MyHordesOptimizerApi.Services.Interfaces.IAuthenticationService;
 using ITownAccessService = MyHordesOptimizerApi.Services.Interfaces.ITownAccessService;
+using IMyHordesFetcherService = MyHordesOptimizerApi.Services.Interfaces.IMyHordesFetcherService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +63,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
         protected IAuthenticationService AuthenticationService { get; private set; }
         protected IMyHordesScrutateurConfiguration MyHordesScrutateurConfiguration { get; private set; }
         protected ITownAccessService TownAccessService { get; private set; }
+        protected IMyHordesFetcherService MyHordesFetcherService { get; private set; }
 
         public ExternalToolsService(ILogger<ExternalToolsService> logger,
             IBigBrothHordesRepository bigBrothHordesRepository,
@@ -71,7 +77,8 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownSyncLock townSyncLock,
             IAuthenticationService authenticationService,
             IMyHordesScrutateurConfiguration myHordesScrutateurConfiguration,
-            ITownAccessService townAccessService)
+            ITownAccessService townAccessService,
+            IMyHordesFetcherService myHordesFetcherService)
         {
             Logger = logger;
             BigBrothHordesRepository = bigBrothHordesRepository;
@@ -86,6 +93,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             AuthenticationService = authenticationService;
             MyHordesScrutateurConfiguration = myHordesScrutateurConfiguration;
             TownAccessService = townAccessService;
+            MyHordesFetcherService = myHordesFetcherService;
         }
 
         public async Task<UpdateResponseDto> UpdateExternalsTools(UpdateRequestDto updateRequestDto, IExternalToolsProgressSink? sink = null)
@@ -275,7 +283,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         using var scope = ServiceScopeFactory.CreateScope();
                         var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
-                        newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
+                        newLastUpdate = AddLastUpdateInfo(dbContext, UserInfoProvider.GenerateLastUpdateInfo(), townDetails.TownId);
                         dbContext.SaveChanges();
                     }
                 }
@@ -309,6 +317,12 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                     {
                         var me = MyHordesApiRepository.GetMapForToolsUpdate();
 
+                        // On peut rejoindre une ville sans F5 : la MAJ peut précéder le login dans cette ville.
+                        if (me.MapId.HasValue)
+                        {
+                            MyHordesFetcherService.QueuePictosImportInBackground(UserInfoProvider.UserId, me.MapId.Value);
+                        }
+
                         if (me.MapId.HasValue && me.MapId.Value != UserInfoProvider.TownDetail?.TownId)
                         {
                             var simpleMe = Mapper.Map<SimpleMeDto>(me);
@@ -336,18 +350,34 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         using var transaction = dbContext.Database.BeginTransaction();
 
                         var zones = me.Map!.Zones;
+                        var itemResolver = new MyHordesItemResolver(dbContext.Items.ToList());
                         var listCells = new List<MapCell>();
                         var listCellItems = new List<MapCellItem>();
                         // Cases dont le sol est connu à l'instant (API MyHordes ou addon) : leurs objets
                         // en base sont remplacés, y compris par un sol vide.
                         var cellsWithKnownFloor = new List<MapCell>();
 
-                        var townId = resolvedTownId;
+                        // Relu sous le verrou : le préalable a résolu la ville avant, une création ou une migration a pu passer depuis.
+                        var townId = dbContext.ResolveTownId(townDetails.TownId);
 
-                        var townEntity = dbContext.Towns
+                        // La garde ne concerne que la ligne provisoire -mapId : une ville stable n'en est jamais une.
+                        if (townId == -me.MapId && TownCreation.HasTownIdCollision(dbContext, me, Logger))
+                        {
+                            throw new InvalidOperationException($"La ville {me.MapId} recouvre une ligne provisoire d'une autre saison : MAJ ignorée.");
+                        }
+                        Town? LoadTownEntity() => dbContext.Towns
                             .Include(town => town.TownCitizens)
                             .Include(town => town.TownCadavers)
                             .FirstOrDefault(town => town.IdTown == townId);
+                        var townEntity = LoadTownEntity();
+                        if (townEntity == null)
+                        {
+                            // Le LastUpdateInfo du préalable vient d'un autre contexte : EF le réinsérerait.
+                            var lastUpdate = dbContext.LastUpdateInfos.First(x => x.IdLastUpdateInfo == newLastUpdate!.IdLastUpdateInfo);
+                            TownCreation.Create(dbContext, Mapper, me, lastUpdate, MyHordesScrutateurConfiguration);
+                            dbContext.SaveChanges();
+                            townEntity = LoadTownEntity();
+                        }
                         if (townEntity != null)
                         {
                             // Mise à jour centralisée : on exploite tout le /json/me déjà payé
@@ -404,20 +434,23 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                                     existingCadaver.UpdateAllButKeysProperties(mappedCadaver, ignoreNull: true);
                                 }
                             }
-                            // Banque : nouvelle photo à chaque MAJ, comme le login (pas de suppression
-                            // des anciennes lignes, la lecture se fait sur le dernier IdLastUpdateInfo).
+                            // Banque : version enregistrée seulement si l'état change, purge des jours écoulés au changement de jour.
                             if (me.Map.City?.Bank != null)
                             {
                                 var mappedBankItems = me.Map.City.Bank
-                                    .Select(item => Mapper.Map<TownBankItem>(item, opt => opt.SetDbContext(dbContext)))
-                                    .Where(item => item.IdItemNavigation != null)
+                                    .Select(item => (Source: item, Item: itemResolver.Resolve(item)))
+                                    .Where(pair => pair.Item != null)
+                                    .Select(pair => new TownBankItem
+                                    {
+                                        IdTown = townId,
+                                        IdItem = pair.Item!.IdItem,
+                                        IdItemNavigation = pair.Item,
+                                        IsBroken = pair.Source.Broken,
+                                        Count = pair.Source.Count,
+                                        IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo
+                                    })
                                     .ToList();
-                                foreach (var item in mappedBankItems)
-                                {
-                                    item.IdTown = townId;
-                                    item.IdLastUpdateInfo = newLastUpdate!.IdLastUpdateInfo;
-                                }
-                                dbContext.AddRange(mappedBankItems);
+                                TownBankHistory.Record(dbContext, townId, me.Map.Days ?? townEntity.Day, newLastUpdate!.IdLastUpdateInfo, mappedBankItems);
                             }
                             TownBuildingSync.Replace(dbContext, townId, newLastUpdate!.IdLastUpdateInfo, me.Map.City, Logger);
                             TownBuildingSync.ReplaceDefense(dbContext, townId, newLastUpdate.IdLastUpdateInfo, me.Map.City?.Defense);
@@ -443,8 +476,6 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                         // découplage.
                         var clesRuineParMhId = dbContext.Ruins.ToList()
                             .ToDictionary(ruin => ruin.MhId ?? ruin.IdRuin, ruin => ruin.IdRuin);
-                        var clesItemParMhId = dbContext.Items.ToList()
-                            .ToDictionary(item => item.MhId ?? item.IdItem, item => item.IdItem);
                         // X et Y sont les clés de la case. MyHordes les ajoute d'office, même non
                         // demandés, mais on ne s'appuie pas sur une chaîne `fields=` : sans
                         // coordonnées, la case n'est pas localisable.
@@ -512,20 +543,21 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                             if (zone.Items != null)
                             {
                                 cellsWithKnownFloor.Add(cellModel);
-                                // IdItem est une clé étrangère : un objet sans id n'est pas un objet.
-                                // On l'ignore plutôt que d'inventer un identifiant.
-                                foreach (var item in zone.Items.Where(item => item.Id.HasValue))
+                                // IdItem est une clé étrangère : un objet non résolu est ignoré plutôt
+                                // que rattaché à un identifiant inventé.
+                                foreach (var item in zone.Items.Where(item => item.Uuid != null || item.Id.HasValue))
                                 {
-                                    if (!clesItemParMhId.TryGetValue(item.Id!.Value, out var cleItem))
+                                    var cleItem = itemResolver.Resolve(item)?.IdItem;
+                                    if (cleItem == null)
                                     {
-                                        Logger.LogWarning("UpdateMap : objet {MhId} inconnu en {X}/{Y}, ignoré.",
-                                            item.Id.Value, zone.X, zone.Y);
+                                        Logger.LogWarning("UpdateMap : objet {Uuid}/{MhId} inconnu en {X}/{Y}, ignoré.",
+                                            item.Uuid, item.Id, zone.X, zone.Y);
                                         continue;
                                     }
                                     var cellItem = new MapCellItem()
                                     {
                                         Count = item.Count,
-                                        IdItem = cleItem,
+                                        IdItem = cleItem.Value,
                                         IsBroken = item.Broken,
                                         // IdCell à jour dès la construction : le RemoveRange ci-dessous lit cette
                                         // valeur en mémoire (LINQ-to-Objects) avant tout AddRange/SaveChanges, donc
@@ -1252,6 +1284,22 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             return known;
         }
 
+        /// <summary>
+        /// Ajoute au contexte le LastUpdateInfo de <paramref name="dto"/>, après avoir créé son joueur s'il manque (clé étrangère vers Users).
+        /// <paramref name="unlockedMapId"/> : ville dont l'appelant ne tient pas encore le verrou, pris le temps de cette création.
+        /// </summary>
+        private LastUpdateInfo AddLastUpdateInfo(MhoContext dbContext, LastUpdateInfoDto dto, int? unlockedMapId = null)
+        {
+            if (!dbContext.Users.Any(user => user.IdUser == dto.UserId))
+            {
+                // Le login et mhoTask créent le joueur en « vérifier puis ajouter » sous ce verrou : insérer
+                // entre leur vérification et leur SaveChanges les ferait échouer sur un doublon.
+                using var townLock = unlockedMapId is int mapId ? TownSyncLock.AcquireTownBlocking(-mapId) : null;
+                UserCreation.EnsureExists(dbContext, dto.UserId, dto.UserName);
+            }
+            return dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(dto, opt => opt.SetDbContext(dbContext))).Entity;
+        }
+
         private void UpdateBags(int townId, List<UpdateBagsContentsDto> bags)
         {
             if (bags != null)
@@ -1259,7 +1307,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
                 using var scope = ServiceScopeFactory.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<MhoContext>();
                 using var transaction = dbContext.Database.BeginTransaction();
-                var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(UserInfoProvider.GenerateLastUpdateInfo(), opt => opt.SetDbContext(dbContext))).Entity;
+                var newLastUpdate = AddLastUpdateInfo(dbContext, UserInfoProvider.GenerateLastUpdateInfo());
                 dbContext.SaveChanges();
                 var validItemIds = dbContext.Items.Select(i => i.IdItem).ToHashSet();
 
@@ -1306,7 +1354,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            var newLastUpdate = AddLastUpdateInfo(dbContext, lastUpdateInfoDto);
             dbContext.SaveChanges();
 
             var citizen = dbContext.TownCitizens
@@ -1390,7 +1438,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            var newLastUpdate = AddLastUpdateInfo(dbContext, lastUpdateInfoDto);
             dbContext.SaveChanges();
 
             var citizen = dbContext.TownCitizens
@@ -1414,7 +1462,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            var newLastUpdate = AddLastUpdateInfo(dbContext, lastUpdateInfoDto);
             dbContext.SaveChanges();
 
             var citizen = dbContext.TownCitizens.Single(x => x.IdTown == townId && x.IdUser == userId);
@@ -1439,7 +1487,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            var newLastUpdate = AddLastUpdateInfo(dbContext, lastUpdateInfoDto);
             dbContext.SaveChanges();
 
             var citizen = dbContext.TownCitizens.Single(x => x.IdTown == townId && x.IdUser == userId);
@@ -1569,7 +1617,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            var newLastUpdate = AddLastUpdateInfo(dbContext, lastUpdateInfoDto);
             dbContext.SaveChanges();
 
             var citizen = dbContext.TownCitizens.Single(x => x.IdTown == townId && x.IdUser == userId);
@@ -1596,7 +1644,7 @@ namespace MyHordesOptimizerApi.Services.Impl.ExternalTools
             TownAccessService.EnsureCanWriteTown(townId, mapId);
             using var transaction = dbContext.Database.BeginTransaction();
             LastUpdateInfoDto lastUpdateInfoDto = UserInfoProvider.GenerateLastUpdateInfo();
-            var newLastUpdate = dbContext.LastUpdateInfos.Update(Mapper.Map<LastUpdateInfo>(lastUpdateInfoDto, opt => opt.SetDbContext(dbContext))).Entity;
+            var newLastUpdate = AddLastUpdateInfo(dbContext, lastUpdateInfoDto);
             dbContext.SaveChanges();
 
             var citizen = dbContext.TownCitizens.Single(x => x.IdTown == townId && x.IdUser == userId);

@@ -62,7 +62,7 @@ const HAS_HEROICRETURN_DATA: HeroicActionEnumData = {
     action: 'hero_generic_return'
 };
 const HAS_BREAKTHROUGH_DATA: HeroicActionEnumData = {
-    label: $localize`Passage en Force`,
+    label: $localize`Passage en force`,
     max_lvl: 1,
     img: 'icons/small_arma.gif',
     count_in_daily: false,

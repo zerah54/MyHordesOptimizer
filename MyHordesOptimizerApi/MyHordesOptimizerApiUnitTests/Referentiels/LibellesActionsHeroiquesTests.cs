@@ -41,6 +41,8 @@ namespace MyHordesOptimizerApiUnitTests.Referentiels
         [InlineData("es", "Vencer a la muerte", ActionHeroicType.CheatDeath)]
         [InlineData("fr", "Retour du Héros", ActionHeroicType.HeroicReturn)]
         [InlineData("fr", "Camaraderie", ActionHeroicType.BrotherInArms)]
+        [InlineData("fr", "Passage en Force", ActionHeroicType.BreakThrough)]
+        [InlineData("fr", "Passage en force", ActionHeroicType.BreakThrough)]
         public void LesActionsAUnSeulLibelleRestentReconnues(string locale, string label, ActionHeroicType expected)
         {
             expected.IsEquivalentToLabel(locale, label)

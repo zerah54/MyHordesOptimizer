@@ -1,8 +1,13 @@
+import 'moment-timezone';
+
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
+import { SILENT_ERROR_STATUS } from '../../_core/services/http-context-tokens';
 import { setObservedTown, setTown } from '../../_core/utilities/localstorage.util';
+import { BankInfo } from '../types/bank-info.class';
+import { BankVersion } from '../types/bank-version.class';
 import { TownDetails } from '../types/town-details.class';
 import { TownService } from './town.service';
 
@@ -55,6 +60,43 @@ describe('TownService', (): void => {
 
             const request: TestRequest = http_mock.expectOne((candidate: { url: string }): boolean => candidate.url.endsWith(`/town/${OWN_TOWN_ID}/user/${USER_ID}`));
             request.flush({});
+        });
+    });
+
+    describe('versions de la banque', (): void => {
+        it('getBankVersions appelle la route des versions et construit les BankVersion', (): void => {
+            let versions: BankVersion[] = [];
+            service.getBankVersions(7772).subscribe((result: BankVersion[]): void => { versions = result; });
+
+            http_mock.expectOne((candidate: { url: string }): boolean => candidate.url.includes('/Fetcher/bank/versions?townId=7772'))
+                .flush([{ day: 3, lastUpdateId: 10, updateTime: '2026-11-21T15:47:00', userName: 'Zerah' }]);
+
+            expect(versions.length).toBe(1);
+            expect(versions[0].day).toBe(3);
+            expect(versions[0].last_update_id).toBe(10);
+            expect(versions[0].user_name).toBe('Zerah');
+            expect(versions[0].update_time.tz('Europe/Paris').format('HH:mm')).toBe('16:47');
+        });
+
+        it('getBankVersion demande la version et ne touche pas au cache de la banque', (): void => {
+            const set_item_spy: ReturnType<typeof vi.spyOn> = vi.spyOn(Storage.prototype, 'setItem');
+            let bank: BankInfo | undefined;
+            service.getBankVersion(7772, 10).subscribe((result: BankInfo): void => { bank = result; });
+
+            http_mock.expectOne((candidate: { url: string }): boolean => candidate.url.includes('/Fetcher/bank?townId=7772&lastUpdateId=10'))
+                .flush({ bank: {}, lastUpdateInfo: { username: 'Zerah', updateTime: '2026-11-21T15:47:00' } });
+
+            expect(bank).toBeInstanceOf(BankInfo);
+            expect(set_item_spy).not.toHaveBeenCalled();
+            set_item_spy.mockRestore();
+        });
+
+        it('getBankVersion : la 404 attendue (repli) est silencieuse', (): void => {
+            service.getBankVersion(7772, 10).subscribe({ error: (): void => undefined });
+
+            const request: TestRequest = http_mock.expectOne((candidate: { url: string }): boolean => candidate.url.includes('/Fetcher/bank?townId=7772&lastUpdateId=10'));
+            expect(request.request.context.get(SILENT_ERROR_STATUS)).toBe(404);
+            request.flush(null, { status: 404, statusText: 'Not Found' });
         });
     });
 

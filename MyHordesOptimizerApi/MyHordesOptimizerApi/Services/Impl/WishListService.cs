@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer;
+using MyHordesOptimizerApi.Services.Impl.Bank;
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.WishList;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Models;
@@ -61,9 +62,7 @@ namespace MyHordesOptimizerApi.Services.Impl
         // (cf. commentaire sur MhoContext.ResolveTownId) → wishlist vide juste après l'écriture.
         private WishListLastUpdateDto GetWishListByResolvedTownId(int townId)
         {
-            var townBankItemLastUpdateId = DbContext.TownBankItems
-                .Where(tbi => tbi.IdTown == townId)
-                .Max(tbi => (int?)tbi.IdLastUpdateInfo);
+            var townBankItemLastUpdateId = TownBankHistory.LatestSnapshotId(DbContext, townId);
 
             var wishListItems = DbContext.TownWishListItems
                 .Where(wishList => wishList.IdTown == townId)

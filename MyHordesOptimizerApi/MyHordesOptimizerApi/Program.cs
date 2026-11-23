@@ -31,6 +31,7 @@ using MyHordesOptimizerApi.Repository.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces.ExternalTools;
 using MyHordesOptimizerApi.Serilog;
 using MyHordesOptimizerApi.Services.Impl;
+using MyHordesOptimizerApi.Services.Impl.Bank;
 using MyHordesOptimizerApi.Services.Impl.Estimations;
 using MyHordesOptimizerApi.Services.Impl.ExternalTools;
 using MyHordesOptimizerApi.Services.Impl.BuildingPlans;
@@ -228,6 +229,7 @@ builder.Services.AddScoped<IMyHordesFetcherService, MyHordesFetcherService>();
 builder.Services.AddScoped<IExternalToolsService, ExternalToolsService>();
 builder.Services.AddScoped<IMyHordesImportService, MyHordesImportService>();
 builder.Services.AddScoped<ITownSnapshotService, TownSnapshotService>();
+builder.Services.AddScoped<BankHistoryBackfillService>();
 // Singleton : porte l'état de l'import global, qui survit à la requête qui l'a déclenché
 builder.Services.AddSingleton<ImportJobRunner>();
 // Singleton : porte l'état des mises à jour d'outils externes, qui survit à la requête qui les a déclenchées
@@ -318,7 +320,7 @@ builder.Services.AddDbContext<MhoContext>(ServiceLifetime.Transient);
 builder.Services.AddTransient<MyHordesOptimizerEnricher>();
 builder.Services.AddHttpLogging(logging =>
 {
-    logging.LoggingFields = HttpLoggingFields.All | HttpLoggingFields.RequestQuery;
+    logging.LoggingFields = LogRedaction.HttpLoggingFields;
 });
 
 builder.Services.AddBearerAuthentication(builder.Configuration);
@@ -390,10 +392,9 @@ app.UseRouting();
 // Après le routage : les politiques posées sur une route ([EnableRateLimiting]) lisent son endpoint.
 app.UseRateLimiter();
 
+app.UseHttpLogging();
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseHttpLogging();
 
 app.MapControllers();
 app.MapHub<ExpeditionsHub>("/hub/expeditions");

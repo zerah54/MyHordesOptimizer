@@ -8,6 +8,7 @@ namespace MyHordesOptimizerApi.Models;
 
 [Table("Town")]
 [Index("IdUserWishListUpdater", Name = "Town_fkuserwishlist")]
+[Index("MapId", Name = "Town_mapId")]
 public partial class Town
 {
     [Key]

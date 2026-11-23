@@ -86,9 +86,16 @@ function consumedDefenseItems(resources: readonly ResourceCount[], defense_item_
  * @param {number} home_raw_gain Défense de maison brute gagnée par les montées de niveau du plan.
  * @param {DefenseGainContext} context État de la ville au début de la journée.
  * @param {number} voted_item_step Hausse du multiplicateur des objets de défense par le vote du soir sur les Fixations.
+ * @param {number | null} voted_scale Échelle de la défense après le vote du soir sur l'Ajustement défensif, nulle sans.
  * @returns {DefenseGainResult} Gain et composantes au soir.
  */
-export function defenseGain(completed: readonly BuildingRef[], home_raw_gain: number, context: DefenseGainContext, voted_item_step: number = 0): DefenseGainResult {
+export function defenseGain(
+    completed: readonly BuildingRef[],
+    home_raw_gain: number,
+    context: DefenseGainContext,
+    voted_item_step: number = 0,
+    voted_scale: number | null = null
+): DefenseGainResult {
     const factors: TownDefenseFactors = context.factors;
     const completed_uids: ReadonlySet<string> = new Set<string>(completed.map((building: BuildingRef): string => building.uid));
     const is_new = (uid: string): boolean => completed_uids.has(uid) && !context.builtBefore.has(uid);
@@ -111,7 +118,7 @@ export function defenseGain(completed: readonly BuildingRef[], home_raw_gain: nu
     const coffins: number = is_new(COFFINS_UID) && built_after(CEMETERY_UID) ? COFFINS_BONUS_PER_DEAD * factors.dead : 0;
 
     const raw_gain: number = own_defense + (homes_after - homes_before) + (items_after - items_before) + cemetery + coffins;
-    const scale_after: number = is_new(DEFENSE_ADJUSTMENT_UID)
+    const scale_after: number = voted_scale !== null ? voted_scale : is_new(DEFENSE_ADJUSTMENT_UID)
         ? (upgradeEffect(context.upgrades, DEFENSE_ADJUSTMENT_UID, TOWN_DEFENSE_SCALE_EFFECT, 0) ?? factors.scale)
         : factors.scale;
     // Défense de départ ramenée hors échelle, pour appliquer une échelle qui change à toute la ville.
@@ -166,7 +173,7 @@ function cascadeAncestors(building: BuildingRef, buildings: ReadonlyMap<number, 
 export interface PlannedDefense {
     /** Gain par id de chantier. */
     buildings: Map<number, number>;
-    /** Gain du vote sur les Fixations de défenses (objets de défense en banque), 0 sans. */
+    /** Gain du vote sur les Fixations de défenses (objets de défense en banque) ou l'Ajustement défensif (échelle), 0 sans. */
     vote: number;
 }
 
@@ -179,12 +186,14 @@ const GAIN_RANKS: ReadonlyMap<string, number> = new Map<string, number>([
 ]);
 /** Le vote sur les Fixations compte juste après elles, avant les chantiers qui consomment des objets de défense. */
 const VOTE_RANK: number = 2;
+/** Le vote sur l'Ajustement défensif compte avant tout autre chantier, qui compte alors à l'échelle votée. */
+const SCALE_VOTE_RANK: number = 0;
 const DEFAULT_RANK: number = 4;
 
 /**
  * Défense affichée par chantier, dans l'état du soir (chantiers terminés dans la journée et vote) ; les chantiers du jour sont
  * ajoutés l'un après l'autre, si bien que leur somme et le vote égalent le gain de la journée :
- * - Ajustement défensif, Fixations de défenses, leur vote et Cimetière cadenassé comptent sur l'état actuel de la ville ; les
+ * - Ajustement défensif, Fixations de défenses, leurs votes et Cimetière cadenassé comptent sur l'état actuel de la ville ; les
  *   autres chantiers comptent à leur échelle, à leur multiplicateur d'objets et avec le cimetière ;
  * - Quartiers circulaires comptent en dernier, avec les maisons ajoutées dans la journée (Habitations fortifiées, montées de maison).
  * Un chantier non terminé dans la journée compte comme s'il s'ajoutait à l'état du soir, ses ancêtres à effets en cascade
@@ -195,6 +204,7 @@ const DEFAULT_RANK: number = 4;
  * @param {DefenseGainContext} context État de la ville au début de la journée.
  * @param {number} voted_item_step Hausse du multiplicateur des objets de défense par le vote du soir sur les Fixations.
  * @param {ReadonlyMap<number, BuildingRef>} buildings Chantiers par id, pour remonter les parents.
+ * @param {number | null} voted_scale Échelle de la défense après le vote du soir sur l'Ajustement défensif, nulle sans.
  * @returns {PlannedDefense} Défense par chantier et gain du vote.
  */
 export function plannedDefenseGains(
@@ -203,13 +213,16 @@ export function plannedDefenseGains(
     home_raw_gain: number,
     context: DefenseGainContext,
     voted_item_step: number,
-    buildings: ReadonlyMap<number, BuildingRef> = new Map<number, BuildingRef>()
+    buildings: ReadonlyMap<number, BuildingRef> = new Map<number, BuildingRef>(),
+    voted_scale: number | null = null
 ): PlannedDefense {
-    const total = (buildings: readonly BuildingRef[], voted: boolean): number => defenseGain(buildings, home_raw_gain, context, voted ? voted_item_step : 0).total;
+    const total = (buildings: readonly BuildingRef[], voted: boolean): number =>
+        defenseGain(buildings, home_raw_gain, context, voted ? voted_item_step : 0, voted ? voted_scale : null).total;
+    const vote_rank: number = voted_scale !== null ? SCALE_VOTE_RANK : VOTE_RANK;
     const rank = (building: BuildingRef): number => GAIN_RANKS.get(building.uid) ?? DEFAULT_RANK;
     // null : le vote.
     const steps: (BuildingRef | null)[] = [...completed].sort((a: BuildingRef, b: BuildingRef): number => rank(a) - rank(b));
-    const vote_index: number = steps.findIndex((step: BuildingRef | null): boolean => step !== null && rank(step) > VOTE_RANK);
+    const vote_index: number = steps.findIndex((step: BuildingRef | null): boolean => step !== null && rank(step) > vote_rank);
     steps.splice(vote_index === -1 ? steps.length : vote_index, 0, null);
 
     const gains: Map<number, number> = new Map<number, number>();

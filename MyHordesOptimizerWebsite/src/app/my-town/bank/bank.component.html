@@ -16,6 +16,15 @@
         </mat-button-toggle>
     </mat-button-toggle-group>
 </mat-card-header>
+@if (versions().length > 0) {
+    <div class="bank-versions">
+        <mho-day-selector [days]="days()" [value]="selected_day()" [today]="today()" (valueChange)="selectDay($event)"/>
+        @if (show_version_selector()) {
+            <mho-bank-version-selector [versions]="latest_day_versions()" [value]="selected_version_id()"
+                                       (valueChange)="selectVersion($event)"/>
+        }
+    </div>
+}
 <mat-card-content class="mho-bank">
     @if (displayed_bank_items(); as displayed_bank_items) {
         <div class="filter">

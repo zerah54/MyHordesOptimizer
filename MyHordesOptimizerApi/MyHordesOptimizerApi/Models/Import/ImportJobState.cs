@@ -11,6 +11,7 @@ namespace MyHordesOptimizerApi.Models.Import
         public const string All = "all";
         public const string Towns = "towns";
         public const string TownSnapshot = "town-snapshot";
+        public const string BankHistory = "bank-history";
     }
 
     /// <summary>

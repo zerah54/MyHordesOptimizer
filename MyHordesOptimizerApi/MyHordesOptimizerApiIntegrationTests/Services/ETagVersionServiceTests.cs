@@ -77,12 +77,34 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var (versionService, context, mapId, userId, suffix) = NewFixture();
             var idItem1 = AddItem(context, suffix);
             var idLastUpdate1 = AddLastUpdateInfo(context);
+            context.TownBankSnapshots.Add(new TownBankSnapshot { IdTown = mapId, IdLastUpdateInfo = idLastUpdate1, Day = 1, ContentHash = new string('a', 64) });
             context.TownBankItems.Add(new TownBankItem { IdTown = mapId, IdItem = idItem1, IdLastUpdateInfo = idLastUpdate1, IsBroken = false, Count = 1 });
             context.SaveChanges();
             var v1 = versionService.GetVersion(ETagResource.Bank, mapId, userId);
 
             var idItem2 = AddItem(context, suffix);
-            context.TownBankItems.Add(new TownBankItem { IdTown = mapId, IdItem = idItem2, IdLastUpdateInfo = idLastUpdate1, IsBroken = false, Count = 1 });
+            var idLastUpdate2 = AddLastUpdateInfo(context);
+            context.TownBankSnapshots.Add(new TownBankSnapshot { IdTown = mapId, IdLastUpdateInfo = idLastUpdate2, Day = 1, ContentHash = new string('b', 64) });
+            context.TownBankItems.Add(new TownBankItem { IdTown = mapId, IdItem = idItem2, IdLastUpdateInfo = idLastUpdate2, IsBroken = false, Count = 1 });
+            context.SaveChanges();
+            var v2 = versionService.GetVersion(ETagResource.Bank, mapId, userId);
+
+            v1.Should().NotBeNull();
+            v2.Should().NotBe(v1);
+        }
+
+        [Fact]
+        public void Bank_ChangementDeJourDeLaVille_ChangeLaVersion()
+        {
+            var (versionService, context, mapId, userId, suffix) = NewFixture();
+            var idItem = AddItem(context, suffix);
+            var idLastUpdate = AddLastUpdateInfo(context);
+            context.TownBankSnapshots.Add(new TownBankSnapshot { IdTown = mapId, IdLastUpdateInfo = idLastUpdate, Day = 1, ContentHash = new string('a', 64) });
+            context.TownBankItems.Add(new TownBankItem { IdTown = mapId, IdItem = idItem, IdLastUpdateInfo = idLastUpdate, IsBroken = false, Count = 1 });
+            context.SaveChanges();
+            var v1 = versionService.GetVersion(ETagResource.Bank, mapId, userId);
+
+            context.Towns.Single(t => t.IdTown == mapId).Day = 2;
             context.SaveChanges();
             var v2 = versionService.GetVersion(ETagResource.Bank, mapId, userId);
 
@@ -106,6 +128,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             context.SaveChanges();
             var idItem = AddItem(context, suffix);
             var idLastUpdate = AddLastUpdateInfo(context);
+            context.TownBankSnapshots.Add(new TownBankSnapshot { IdTown = internalTownId, IdLastUpdateInfo = idLastUpdate, Day = 1, ContentHash = new string('a', 64) });
             context.TownBankItems.Add(new TownBankItem { IdTown = internalTownId, IdItem = idItem, IdLastUpdateInfo = idLastUpdate, IsBroken = false, Count = 1 });
             context.SaveChanges();
 
@@ -210,6 +233,97 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var (versionService, _, mapId, userId, _) = NewFixture();
 
             versionService.GetVersion(ETagResource.Map, mapId, userId).Should().BeNull();
+        }
+
+        private sealed record MapSeed(IETagVersionService VersionService, MhoContext Context, int MapId, int UserId,
+            MapCell Cell, MapCellItem CellItem, TownCitizen Citizen);
+
+        /// <summary>Une case avec objet au sol, une fouille et un citoyen vivant posé dessus.</summary>
+        private MapSeed NewMapFixture()
+        {
+            var (versionService, context, mapId, userId, suffix) = NewFixture();
+            var idLastUpdate = AddLastUpdateInfo(context);
+            var cell = new MapCell { IdTown = mapId, X = 5, Y = 5, IdLastUpdateInfo = idLastUpdate, AveragePotentialRemainingDig = 1f };
+            context.MapCells.Add(cell);
+            context.SaveChanges();
+            var cellItem = new MapCellItem { IdCell = cell.IdCell, IdItem = AddItem(context, suffix), Count = 1, IsBroken = false };
+            var citizen = new TownCitizen { IdTown = mapId, IdUser = userId, IdLastUpdateInfo = idLastUpdate, PositionX = 5, PositionY = 5, Dead = false };
+            context.AddRange(cellItem, citizen,
+                new MapCellDig { IdCell = cell.IdCell, IdUser = userId, Day = 1, NbSucces = 1, IdLastUpdateInfo = idLastUpdate });
+            context.SaveChanges();
+            return new MapSeed(versionService, context, mapId, userId, cell, cellItem, citizen);
+        }
+
+        private void AssertMapVersionChanges(Action<MapSeed> mutate)
+        {
+            var seed = NewMapFixture();
+            var v1 = seed.VersionService.GetVersion(ETagResource.Map, seed.MapId, seed.UserId);
+            seed.VersionService.GetVersion(ETagResource.Map, seed.MapId, seed.UserId).Should().Be(v1);
+
+            mutate(seed);
+            seed.Context.SaveChanges();
+            var v2 = seed.VersionService.GetVersion(ETagResource.Map, seed.MapId, seed.UserId);
+
+            v1.Should().NotBeNull();
+            v2.Should().NotBe(v1);
+        }
+
+        [Fact]
+        public void Map_AveragePotentialRemainingDigModifieSansIdLastUpdateInfo_ChangeLaVersion()
+            => AssertMapVersionChanges(s => s.Cell.AveragePotentialRemainingDig = 2f);
+
+        [Fact]
+        public void Map_AjoutDUneFouille_ChangeLaVersion()
+            => AssertMapVersionChanges(s => s.Context.MapCellDigs.Add(
+                new MapCellDig { IdCell = s.Cell.IdCell, IdUser = s.UserId, Day = 2, NbSucces = 1 }));
+
+        [Fact]
+        public void Map_CountDUnObjetAuSolModifie_ChangeLaVersion()
+            => AssertMapVersionChanges(s => s.CellItem.Count = 7);
+
+        [Fact]
+        public void Map_DeplacementDUnCitoyen_ChangeLaVersion()
+            => AssertMapVersionChanges(s => s.Citizen.PositionX = 6);
+
+        [Fact]
+        public void Map_JourDeLaVilleIncremente_ChangeLaVersion()
+            => AssertMapVersionChanges(s => s.Context.Towns.Single(t => t.IdTown == s.MapId).Day++);
+
+        [Fact]
+        public void Map_PorteOuverteOuFermee_ChangeLaVersion()
+            => AssertMapVersionChanges(s => s.Context.Towns.Single(t => t.IdTown == s.MapId).IsDoorOpen = true);
+
+        [Fact]
+        public void Map_PuitsModifie_ChangeLaVersion()
+            => AssertMapVersionChanges(s => s.Context.Towns.Single(t => t.IdTown == s.MapId).WaterWell = 38);
+
+        [Fact]
+        public void Map_WishlistDateUpdateModifiee_NeChangePasLaVersion()
+        {
+            var seed = NewMapFixture();
+            var v1 = seed.VersionService.GetVersion(ETagResource.Map, seed.MapId, seed.UserId);
+
+            seed.Context.Towns.Single(t => t.IdTown == seed.MapId).WishlistDateUpdate = DateTime.UtcNow;
+            seed.Context.SaveChanges();
+
+            seed.VersionService.GetVersion(ETagResource.Map, seed.MapId, seed.UserId).Should().Be(v1);
+        }
+
+        [Fact]
+        public void Map_CampImprovementLevelModifie_ChangeLaVersion()
+            => AssertMapVersionChanges(s => s.Cell.CampImprovementLevel = 5);
+
+        [Fact]
+        public void Map_AutreVilleModifiee_NeChangePasLaVersion()
+        {
+            var seed = NewMapFixture();
+            var other = NewMapFixture();
+            var v1 = seed.VersionService.GetVersion(ETagResource.Map, seed.MapId, seed.UserId);
+
+            other.Cell.AveragePotentialRemainingDig = 9f;
+            other.Context.SaveChanges();
+
+            seed.VersionService.GetVersion(ETagResource.Map, seed.MapId, seed.UserId).Should().Be(v1);
         }
 
         #endregion

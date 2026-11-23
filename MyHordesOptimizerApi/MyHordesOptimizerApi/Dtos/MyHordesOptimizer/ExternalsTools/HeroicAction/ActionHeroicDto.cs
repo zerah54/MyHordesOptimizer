@@ -38,7 +38,7 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.ExternalsTools.HeroicActio
         HeroicReturn,
         [Fr("Appareil photo d'avant-guerre"), En("Pre-war camera"), De("Kamera aus Vorkriegs-Tagen"), Es("Cámara fotográfica de post-guerra")]
         Apag,
-        [Fr("Passage en Force"), En("Break Through"), De("Durchgang in Kraft"), Es("Pasaje en vigor")]
+        [Fr("Passage en force"), Fr("Passage en Force"), En("Break Through"), De("Durchgang in Kraft"), Es("Pasaje en vigor")]
         BreakThrough,
         [Fr("Camaraderie"), En("Brothers in Arms"), De("Freundschaft"), Es("Camaradería")]
         BrotherInArms

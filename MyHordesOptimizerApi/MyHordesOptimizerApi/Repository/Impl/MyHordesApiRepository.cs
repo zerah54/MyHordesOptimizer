@@ -33,6 +33,9 @@ namespace MyHordesOptimizerApi.Repository.Impl
             return base.Get<Dictionary<string, MyHordesItem>>(url);
         }
 
+        /// <summary>Champs demandés au login et par <c>GetBank()</c> : ce que <c>GetSimpleMeAsync</c> enregistre, plus bâtiments (id, niveaux) et gazette (vent) pour la régénération nocturne des zones.</summary>
+        public const string MeFields = "id,name,isGhost,locale,twinId,mapId,map.fields(id,date,wid,hei,conspiracy,bonusPts,days,custom,citizens.fields(id,name,isGhost,twinId,mapId,homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y),city.fields(name,type,water,x,y,door,chaos,hard,devast,buildings.fields(id,hasLevels),news.fields(regenDir),bank.fields(uid,id,count,broken)),cadavers.fields(id,name,avatar,survival,origin,score,sp,dtype,comment,msg,cleanup.fields(user,type),rewards),season,phase,language,shaman,guide,cata),homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y";
+
         // `rewards` est demandé NU dans cadavers (et non `rewards.fields(...)`) : côté MyHordes la
         // branche gérant les sous-champs est commentée et renverrait un objet vide sans erreur.
         // Il n'est volontairement PAS demandé dans playedMaps : ce champ coûte une requête SQL par
@@ -41,11 +44,9 @@ namespace MyHordesOptimizerApi.Repository.Impl
         public MyHordesUserDetailsDto GetMe()
         {
             var url = GenerateUrl(EndpointMe);
-            // `estimations`/`estimationsNext` : ignorés par TownMappingProfile (ForMember...Ignore), jamais
-            // écrits en base — le vrai système d'estimation d'attaque est alimenté ailleurs.
             // `playedMaps` : plus traité ici (voir commentaire dans GetSimpleMeAsync), l'historique des
             // villes jouées vient de GetUserPictos (import dédié, page profil).
-            url = AddParameterToQuery(url, _parameterFields, "id,name,isGhost,locale,twinId,mapId,map.fields(id,date,wid,hei,conspiracy,bonusPts,days,custom,zones.fields(x,y,nvt,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),citizens.fields(id,name,isGhost,twinId,mapId,homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y),city.fields(name,type,water,x,y,door,chaos,hard,devast,chantiers.fields(id,icon,name,pa,maxLife,votes,breakable,def,resources.fields(amount,rsc.fields(id,name)),actions,hasLevels),buildings.fields(id,name,life,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId)),bank.fields(uid,id,count,broken)),cadavers.fields(id,name,avatar,survival,origin,score,sp,dtype,comment,msg,cleanup.fields(user,type),rewards),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,phase,language,shaman,guide,cata),homeMessage,avatar,hero,job.fields(uid,name,id,desc),dead,out,baseDef,ban,x,y,rewards.fields(id,number)");
+            url = AddParameterToQuery(url, _parameterFields, MeFields);
             var response = base.Get<MyHordesUserDetailsDto>(url);
             UserKeyProvider.UserId = response.Id!.Value;
             UserKeyProvider.UserName = response.Name!;
@@ -69,7 +70,7 @@ namespace MyHordesOptimizerApi.Repository.Impl
         /// </para>
         /// </summary>
         /// <summary>Champs demandés par la mise à jour des outils externes (cf. <see cref="GetMapForToolsUpdate"/>).</summary>
-        public const string ToolsUpdateFields = "id,name,mapId,map.fields(id,wid,hei,days,zones.fields(x,y,nvt,exc,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),citizens.fields(id,name,avatar,homeMessage,baseDef,ban,job.fields(uid,name),dead,x,y),city.fields(name,type,water,x,y,door,chaos,devast,chantiers.fields(id,icon,name,pa,paCurrent,difficulty,maxLife,votes,breakable,def,resources.fields(amount,rsc.fields(id,name)),resourcesCurrent.fields(amount,rsc.fields(id,name)),actions,hasLevels),buildings.fields(id,name,life,maxLife,breakable,def,hasUpgrade,rarity,temporary,parent,paCurrent,difficulty,resourcesCurrent.fields(amount,rsc.fields(id,name)),actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId)),bank.fields(id,count,broken)),cadavers.fields(id,name,avatar,survival,dtype,comment,msg,sp),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,phase,language,shaman,guide,cata),avatar,job.fields(uid,name,id,desc)";
+        public const string ToolsUpdateFields = "id,name,mapId,map.fields(id,wid,hei,days,zones.fields(x,y,nvt,exc,tag,danger,details.fields(z,h,dried),items.fields(uid,id,count,broken),building.fields(type,dig,camped,dried)),citizens.fields(id,name,avatar,homeMessage,baseDef,ban,job.fields(uid,name),dead,x,y),city.fields(name,type,water,x,y,door,chaos,devast,chantiers.fields(id,paCurrent,difficulty,maxLife,def,resourcesCurrent.fields(amount,rsc.fields(id)),actions,hasLevels),buildings.fields(id,life,maxLife,def,paCurrent,difficulty,resourcesCurrent.fields(amount,rsc.fields(id)),actions,hasLevels),news.fields(z,def,content,regenDir,water),defense.fields(total,base,buildings,upgrades,items,itemsMul,citizenHomes,citizenGuardians,watchmen,souls,temp,cadavers,guardiansInfos.fields(gardians,def),bonus),upgrades.fields(total,list.fields(name,level,update,buildingId)),bank.fields(uid,id,count,broken)),cadavers.fields(id,name,avatar,survival,dtype,comment,msg,sp),expeditions.fields(name,author.fields(id),length,points.fields(x,y)),season,phase,language,shaman,guide,cata),avatar,job.fields(uid,name,id,desc)";
 
         public MyHordesUserDetailsDto GetMapForToolsUpdate()
         {

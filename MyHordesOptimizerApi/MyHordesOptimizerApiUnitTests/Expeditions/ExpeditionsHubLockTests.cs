@@ -125,6 +125,14 @@ namespace MyHordesOptimizerApiUnitTests.Expeditions
         }
 
         [Fact]
+        public async Task GetExpeditionLocks_SansVille_RenvoieListeVide()
+        {
+            var locks = await NewHub(9, 0, "c-sans-ville", NewRegistry()).GetExpeditionLocks();
+
+            locks.Should().BeEmpty();
+        }
+
+        [Fact]
         public async Task PostPartOrders_BlocTenuParAutre_LeveHubExceptionLockedSansAppelerLeService()
         {
             var registry = NewRegistry();

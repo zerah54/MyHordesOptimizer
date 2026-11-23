@@ -2,7 +2,7 @@ import { CitizenCapacity } from './budget.util';
 import { BuildingProgress } from './building-progress.util';
 import { RankedCandidate } from './defense.util';
 import { neutralDefenseFactors } from './defense-gain.util';
-import { CEMETERY_UID, COFFINS_UID, DEFENSE_FIXINGS_UID } from './defense-rules.const';
+import { CEMETERY_UID, COFFINS_UID, DEFENSE_ADJUSTMENT_UID, DEFENSE_FIXINGS_UID } from './defense-rules.const';
 import { REACTOR_UID } from './night-survival.util';
 import { BuildingPlanContentDTO, emptyPlanContent, PlanCitizenDTO, PlanStepDTO } from './plan.types';
 import {
@@ -533,6 +533,66 @@ describe('plan-evaluation.util', (): void => {
             expect(evaluation.vote?.defense).toBe(0);
             expect(evaluation.projectedDefense).toBe(1000);
             expect(evaluation.defenseFactorsAfter.itemFactor).toBe(1.5);
+        });
+    });
+
+    describe('vote sur l\'Ajustement défensif', (): void => {
+        const ADJUSTMENT: BuildingRef = ref({ id: 6, uid: DEFENSE_ADJUSTMENT_UID, label: 'Ajustement', pa: 10 });
+        const TOWER: BuildingRef = ref({ id: 7, uid: 'tower', label: 'Tour', pa: 10, defence: 30 });
+
+        /**
+         * Ajustement défensif construit au niveau 0 (échelle 1,1), défense de départ 1100, Tour à construire.
+         * @param {Partial<BuildingPlanContentDTO>} content Contenu du plan.
+         * @returns {DayInput} Entrée.
+         */
+        function adjustmentInput(content: Partial<BuildingPlanContentDTO>): DayInput {
+            return input({ eveningVoteBuildingId: 6, ...content }, {
+                buildings: new Map<number, BuildingRef>([[1, WALL], [2, WORKSHOP], [3, GATE], [6, ADJUSTMENT], [7, TOWER]]),
+                progress: new Map<number, BuildingProgress>([
+                    ...baseProgress(),
+                    [6, progress({ buildingId: 6, built: true })],
+                    [7, progress({ buildingId: 7, paCurrent: 10 })]
+                ]),
+                baseDefense: 1100,
+                defenseFactors: { ...neutralDefenseFactors(), scale: 1.1 },
+                upgrades: { [DEFENSE_ADJUSTMENT_UID]: { maxLevel: 2, effects: { OverallTownDefenseScale: { levels: [1.1, 1.11, 1.12], default: null, source: '' } } } },
+                buildingLevels: new Map<string, number>([[DEFENSE_ADJUSTMENT_UID, 0]])
+            });
+        }
+
+        it('relève l\'échelle de toute la défense pour la nuit même et le lendemain', (): void => {
+            const day: DayInput = adjustmentInput({});
+            const evaluation: DayEvaluation = evaluateDay(day);
+
+            expect(evaluation.vote).toEqual({ uid: DEFENSE_ADJUSTMENT_UID, level: 1, defense: 10 });
+            expect(evaluation.projectedDefense).toBe(1110);
+            expect(advanceDay(evaluation, day).defenseFactors.scale).toBe(1.11);
+        });
+
+        it('un chantier terminé le même jour compte à l\'échelle votée', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(adjustmentInput({ programs: { banned: [], regular: [step(7, 0)] } }));
+
+            expect(evaluation.vote?.defense).toBe(10);
+            expect(evaluation.realDefense.get(7)).toBe(33);
+            expect(evaluation.projectedDefense).toBe(1143);
+        });
+    });
+
+    describe('vote sur le Cimetière cadenassé', (): void => {
+        const CEMETERY: BuildingRef = ref({ id: 6, uid: CEMETERY_UID, label: 'Cimetière', pa: 10 });
+
+        it('relève la défense par mort au niveau voté, échelle comprise', (): void => {
+            const evaluation: DayEvaluation = evaluateDay(input({ eveningVoteBuildingId: 6 }, {
+                buildings: new Map<number, BuildingRef>([[1, WALL], [2, WORKSHOP], [3, GATE], [6, CEMETERY]]),
+                progress: new Map<number, BuildingProgress>([...baseProgress(), [6, progress({ buildingId: 6, built: true })]]),
+                baseDefense: 1100,
+                defenseFactors: { ...neutralDefenseFactors(), dead: 5, scale: 1.1 },
+                upgrades: { [CEMETERY_UID]: { maxLevel: 2, effects: { 'calculate_town_def.ratio': { levels: [3, 7, 14], default: 14, source: '' } } } },
+                buildingLevels: new Map<string, number>([[CEMETERY_UID, 0]])
+            }));
+
+            expect(evaluation.vote).toEqual({ uid: CEMETERY_UID, level: 1, defense: 22 });
+            expect(evaluation.projectedDefense).toBe(1122);
         });
     });
 

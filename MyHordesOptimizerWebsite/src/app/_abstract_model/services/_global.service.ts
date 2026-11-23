@@ -9,10 +9,11 @@ export class GlobalService {
     protected readonly API_URL: string = environment.api_url;
     protected readonly http: HttpClient = inject(HttpClient);
 
-    protected get<T>(url: string, bypass_loading?: boolean, params?: HttpParams, bypass_error?: boolean): Observable<HttpResponse<T>> {
+    protected get<T>(url: string, bypass_loading?: boolean, params?: HttpParams, bypass_error?: boolean, silent_status: number | readonly number[] | null = null): Observable<HttpResponse<T>> {
         const context: HttpContext = new HttpContext()
             .set(BYPASS_LOADING, bypass_loading)
-            .set(BYPASS_ERROR, !!bypass_error);
+            .set(BYPASS_ERROR, !!bypass_error)
+            .set(SILENT_ERROR_STATUS, silent_status);
         return this.http.get<T>(url, {
             responseType: 'json',
             context: context,

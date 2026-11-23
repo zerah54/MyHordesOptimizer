@@ -1,0 +1,29 @@
+<div class="version-selector">
+    <button mat-icon-button type="button" data-action="previous-version" [disabled]="previous_version() === null" (click)="select(previous_version())"
+            i18n-matTooltip matTooltip="Version précédente" i18n-aria-label aria-label="Version précédente">
+        <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button mat-button type="button" class="version" data-action="pick-version" [matMenuTriggerFor]="versions_menu" [disabled]="versions().length <= 1">
+        @if (current(); as version) {
+            {{ label(version) }}
+        }
+        <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+    </button>
+    <button mat-icon-button type="button" data-action="next-version" [disabled]="next_version() === null" (click)="select(next_version())"
+            i18n-matTooltip matTooltip="Version suivante" i18n-aria-label aria-label="Version suivante">
+        <mat-icon>chevron_right</mat-icon>
+    </button>
+</div>
+
+<mat-menu #versions_menu="matMenu">
+    <ng-template matMenuContent>
+        @for (version of versions(); track version.last_update_id) {
+            <button mat-menu-item type="button" data-action="select-version" [class.selected]="version.last_update_id === value()" (click)="select(version)">
+                {{ label(version) }}
+                @if (version.last_update_id === latest_id()) {
+                    <span class="latest" i18n>dernière</span>
+                }
+            </button>
+        }
+    </ng-template>
+</mat-menu>

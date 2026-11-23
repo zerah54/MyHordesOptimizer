@@ -10,6 +10,7 @@ using MyHordesOptimizerApi.Models.Logs;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Services.Caching;
 using MyHordesOptimizerApi.Services.Impl;
+using MyHordesOptimizerApi.Services.Impl.Bank;
 using MyHordesOptimizerApi.Services.Impl.Import;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApi.Services.Interfaces.Import;
@@ -256,6 +257,21 @@ namespace MyHordesOptimizerApi.Controllers
                 _userInfoProvider.UserName!,
                 (services, onStep) => services.GetRequiredService<ITownSnapshotService>().CaptureAsync(refresh, null, onStep));
             var state = _importJobRunner.GetState(ImportJobKeys.TownSnapshot);
+            return started ? Accepted(state) : Conflict(state);
+        }
+
+        // Reprise unique, à lancer après déploiement : date les photos de banque existantes et supprime celles que la règle ne garde pas. Relançable sans effet.
+        [HttpPost("bank-history/backfill")]
+        [Authorize]
+        [AdminOnly]
+        public ActionResult<ImportJobState> BackfillBankHistory()
+        {
+            var started = _importJobRunner.TryStartScoped(ImportJobKeys.BankHistory,
+                _userInfoProvider.UserId,
+                _userInfoProvider.UserKey!,
+                _userInfoProvider.UserName!,
+                (services, onStep) => services.GetRequiredService<BankHistoryBackfillService>().RunAsync(onStep));
+            var state = _importJobRunner.GetState(ImportJobKeys.BankHistory);
             return started ? Accepted(state) : Conflict(state);
         }
 

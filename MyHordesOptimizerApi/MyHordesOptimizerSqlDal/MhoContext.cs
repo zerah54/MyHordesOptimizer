@@ -94,6 +94,8 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownBankItem> TownBankItems { get; set; }
 
+    public virtual DbSet<TownBankSnapshot> TownBankSnapshots { get; set; }
+
     public virtual DbSet<TownCadaver> TownCadavers { get; set; }
 
     public virtual DbSet<TownCadaverCleanUp> TownCadaverCleanUps { get; set; }
@@ -659,6 +661,15 @@ public partial class MhoContext : DbContext
             entity.HasOne(d => d.IdTownNavigation).WithMany(p => p.TownBankItems)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("TownBankItem_ibfk_1");
+        });
+
+        modelBuilder.Entity<TownBankSnapshot>(entity =>
+        {
+            entity.HasKey(e => new { e.IdTown, e.IdLastUpdateInfo }).HasName("PRIMARY");
+
+            entity.HasOne(d => d.IdLastUpdateInfoNavigation).WithMany(p => p.TownBankSnapshots)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("TownBankSnapshot_ibfk_1");
         });
 
         modelBuilder.Entity<TownCadaver>(entity =>

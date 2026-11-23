@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ using MyHordesOptimizerApi.Dtos.MyHordes.Town;
 using MyHordesOptimizerApi.Models;
 using MyHordesOptimizerApi.Providers.Interfaces;
 using MyHordesOptimizerApi.Repository.Interfaces;
+using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApiIntegrationTests.ApplicationFactory;
 using Xunit;
 
@@ -165,6 +167,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
             (await WaitUntil(() => context.Users.AsNoTracking().Single(u => u.IdUser == userId).PictosHistoryImportedAt.HasValue))
                 .Should().BeTrue();
+            ImportMapId(factory, userId).Should().Be(mapId);
         }
 
         [Fact]
@@ -275,6 +278,100 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
 
             await Task.Delay(300);
             tracker.CallCount.Should().Be(callsAfterFirst, "moins de 24h depuis le premier import, le throttle doit empêcher le second appel MyHordes");
+        }
+
+        [Fact]
+        public async Task GetToken_VilleQuitteeDepuisLeDernierImport_ImporteSansAttendre24h()
+        {
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            var userId = new Random().Next(1, int.MaxValue);
+            var mapId = new Random().Next(1, MyHordesOptimizerApi.Models.PreTownIds.Offset);
+            SeedUserImportedOneHourAgo(userId, suffix, importMapId: mapId + 1);
+            var tracker = new PictosCallTracker();
+            using var factory = FactoryWith(BuildInTownResponse(userId, suffix, mapId), tracker);
+
+            var httpResponse = await factory.CreateClient().GetAsync($"/Authentication/Token?userKey=key-{suffix}");
+            httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            (await WaitUntil(() => tracker.CallCount > 0)).Should().BeTrue("le joueur a changé de ville depuis le dernier import");
+            (await WaitUntil(() => ImportMapId(factory, userId) == mapId)).Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GetToken_HorsVilleApresUneVille_ImporteSansAttendre24hEtRetientHorsVille()
+        {
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            var userId = new Random().Next(1, int.MaxValue);
+            SeedUserImportedOneHourAgo(userId, suffix, importMapId: 123);
+            var tracker = new PictosCallTracker();
+            var response = new MyHordesUserDetailsDto { Id = userId, Name = "test-user-" + suffix, Map = null };
+            using var factory = FactoryWith(response, tracker);
+
+            var httpResponse = await factory.CreateClient().GetAsync($"/Authentication/Token?userKey=key-{suffix}");
+            httpResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            (await WaitUntil(() => tracker.CallCount > 0)).Should().BeTrue("le joueur a quitté la ville du dernier import");
+            (await WaitUntil(() => ImportMapId(factory, userId) == 0)).Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task ImportUserPictos_VilleCouranteInconnue_NeModifiePasLaVilleRetenue()
+        {
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 8);
+            var userId = new Random().Next(1, int.MaxValue);
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+                context.Users.Add(new User { IdUser = userId, Name = "test-user-" + suffix, PictosImportMapId = 123 });
+                context.SaveChanges();
+            }
+            var tracker = new PictosCallTracker();
+            using var factory = FactoryWith(new MyHordesUserDetailsDto { Id = userId, Name = "test-user-" + suffix }, tracker);
+
+            using (var scope = factory.Services.CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<IUserInfoProvider>().UserKey = "key-" + suffix;
+                (await scope.ServiceProvider.GetRequiredService<IMyHordesFetcherService>().ImportUserPictosAsync(userId))
+                    .Should().BeTrue();
+            }
+
+            tracker.CallCount.Should().Be(1);
+            ImportMapId(factory, userId).Should().Be(123);
+        }
+
+        private WebApplicationFactory<Program> FactoryWith(MyHordesUserDetailsDto getMeResponse, PictosCallTracker tracker)
+        {
+            return _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddScoped<IMyHordesApiRepository>(sp =>
+                        new TrackingMyHordesApiRepository(getMeResponse, sp.GetRequiredService<IUserInfoProvider>(), tracker));
+                });
+            });
+        }
+
+        /// <summary>Joueur dont le dernier import de pictos date d'une heure, fait dans la ville <paramref name="importMapId"/>.</summary>
+        private void SeedUserImportedOneHourAgo(int userId, string suffix, int importMapId)
+        {
+            using var scope = _factory.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<MhoContext>();
+            context.Users.Add(new User
+            {
+                IdUser = userId,
+                Name = "test-user-" + suffix,
+                PictosHistoryImportedAt = DateTime.UtcNow.AddHours(-1),
+                PictosImportMapId = importMapId
+            });
+            context.SaveChanges();
+        }
+
+        /// <summary>Scope frais à chaque lecture : un DbContext réutilisé peut garder un instantané périmé.</summary>
+        private static int? ImportMapId(WebApplicationFactory<Program> factory, int userId)
+        {
+            using var scope = factory.Services.CreateScope();
+            return scope.ServiceProvider.GetRequiredService<MhoContext>().Users.AsNoTracking()
+                .Single(u => u.IdUser == userId).PictosImportMapId;
         }
     }
 }

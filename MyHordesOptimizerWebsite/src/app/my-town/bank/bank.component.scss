@@ -5,6 +5,14 @@
         justify-content: space-between;
     }
 
+    .bank-versions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1em;
+        padding: 0 16px;
+    }
+
     .mho-bank {
 
         display: flex;

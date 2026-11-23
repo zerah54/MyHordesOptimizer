@@ -54,6 +54,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var lastUpdate = new LastUpdateInfo { DateUpdate = DateTime.UtcNow };
             context.LastUpdateInfos.Add(lastUpdate);
             context.SaveChanges();
+            context.TownBankSnapshots.Add(new TownBankSnapshot { IdTown = mapId, IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo, Day = 1, ContentHash = new string('a', 64) });
             context.TownBankItems.Add(new TownBankItem { IdTown = mapId, IdItem = item.IdItem, IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo, IsBroken = false, Count = 1 });
             context.SaveChanges();
             return mapId;
@@ -78,7 +79,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         {
             var mapId = SeedTownWithBank();
             var mock = new Mock<IMyHordesFetcherService>();
-            mock.Setup(s => s.GetBank(It.IsAny<int>())).Returns(new BankLastUpdateDto());
+            mock.Setup(s => s.GetBank(It.IsAny<int>(), It.IsAny<int?>())).Returns(new BankLastUpdateDto());
             var client = CreateClientWithMockedFetcher(mock, bearerUserId: 900001);
 
             var first = await client.GetAsync($"/Fetcher/Bank?townId={mapId}");
@@ -88,7 +89,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             first.Headers.CacheControl!.Private.Should().BeTrue();
             first.Headers.CacheControl.MustRevalidate.Should().BeTrue();
             first.Headers.Vary.Should().Contain("Authorization");
-            mock.Verify(s => s.GetBank(It.IsAny<int>()), Times.Once);
+            mock.Verify(s => s.GetBank(It.IsAny<int>(), It.IsAny<int?>()), Times.Once);
 
             var revalidation = new HttpRequestMessage(HttpMethod.Get, $"/Fetcher/Bank?townId={mapId}");
             revalidation.Headers.TryAddWithoutValidation("If-None-Match", etag);
@@ -96,7 +97,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
 
             second.StatusCode.Should().Be(HttpStatusCode.NotModified);
             // Toujours Times.Once, pas Times.Exactly(2) : le 304 n'a pas rappelé GetBank.
-            mock.Verify(s => s.GetBank(It.IsAny<int>()), Times.Once);
+            mock.Verify(s => s.GetBank(It.IsAny<int>(), It.IsAny<int?>()), Times.Once);
         }
 
         [Fact]
@@ -104,7 +105,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         {
             var mapId = SeedTownWithBank();
             var mock = new Mock<IMyHordesFetcherService>();
-            mock.Setup(s => s.GetBank(It.IsAny<int>())).Returns(new BankLastUpdateDto());
+            mock.Setup(s => s.GetBank(It.IsAny<int>(), It.IsAny<int?>())).Returns(new BankLastUpdateDto());
             var client = CreateClientWithMockedFetcher(mock, bearerUserId: 900002);
 
             await client.GetAsync($"/Fetcher/Bank?townId={mapId}");
@@ -114,7 +115,7 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
             var response = await client.SendAsync(staleRequest);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-            mock.Verify(s => s.GetBank(It.IsAny<int>()), Times.Exactly(2));
+            mock.Verify(s => s.GetBank(It.IsAny<int>(), It.IsAny<int?>()), Times.Exactly(2));
         }
 
         [Fact]
@@ -122,10 +123,10 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         {
             var mapId = SeedTownWithBank();
             var mockA = new Mock<IMyHordesFetcherService>();
-            mockA.Setup(s => s.GetBank(It.IsAny<int>())).Returns(new BankLastUpdateDto());
+            mockA.Setup(s => s.GetBank(It.IsAny<int>(), It.IsAny<int?>())).Returns(new BankLastUpdateDto());
             var clientA = CreateClientWithMockedFetcher(mockA, bearerUserId: 900003);
             var mockB = new Mock<IMyHordesFetcherService>();
-            mockB.Setup(s => s.GetBank(It.IsAny<int>())).Returns(new BankLastUpdateDto());
+            mockB.Setup(s => s.GetBank(It.IsAny<int>(), It.IsAny<int?>())).Returns(new BankLastUpdateDto());
             var clientB = CreateClientWithMockedFetcher(mockB, bearerUserId: 900004);
 
             var responseA = await clientA.GetAsync($"/Fetcher/Bank?townId={mapId}");

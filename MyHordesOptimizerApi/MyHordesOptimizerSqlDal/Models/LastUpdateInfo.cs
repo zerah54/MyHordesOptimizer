@@ -46,6 +46,9 @@ public partial class LastUpdateInfo
     public virtual ICollection<TownBankItem> TownBankItems { get; set; } = new List<TownBankItem>();
 
     [InverseProperty("IdLastUpdateInfoNavigation")]
+    public virtual ICollection<TownBankSnapshot> TownBankSnapshots { get; set; } = new List<TownBankSnapshot>();
+
+    [InverseProperty("IdLastUpdateInfoNavigation")]
     public virtual ICollection<TownCadaver> TownCadavers { get; set; } = new List<TownCadaver>();
 
     [InverseProperty("IdLastUpdateInfoNavigation")]

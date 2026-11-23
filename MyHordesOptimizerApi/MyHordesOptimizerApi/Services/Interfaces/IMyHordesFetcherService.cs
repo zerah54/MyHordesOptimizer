@@ -41,8 +41,14 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         IEnumerable<CleanUpTypeDto> GetCleanUpTypes();
         IEnumerable<ItemRecipeDto> GetRecipes();
         BankLastUpdateDto GetBank();
-        BankLastUpdateDto GetBank(int townId);
-        Task<bool> ImportUserPictosAsync(int userId);
+        /// <summary>Banque d'une ville (version donnée ou la plus récente) ; null si la version n'existe pas pour cette ville.</summary>
+        BankLastUpdateDto? GetBank(int townId, int? lastUpdateId);
+        /// <summary>Versions visibles de la banque, triées par id croissant.</summary>
+        List<BankVersionDto> GetBankVersions(int townId);
+        /// <summary>Importe les pictos du joueur ; <paramref name="currentMapId"/> (0 hors ville, null si inconnue) lève la limite des 24 h s'il a quitté la ville du dernier import.</summary>
+        Task<bool> ImportUserPictosAsync(int userId, int? currentMapId = null);
+        /// <summary>Lance <see cref="ImportUserPictosAsync"/> en tâche de fond, avec la clé du joueur de la requête courante.</summary>
+        void QueuePictosImportInBackground(int userId, int currentMapId);
         CitizensLastUpdateDto GetCitizens(int townId);
         IEnumerable<MyHordesOptimizerRuinDto> GetRuins(int? townId);
         IEnumerable<BuildingDto> GetBuildings();

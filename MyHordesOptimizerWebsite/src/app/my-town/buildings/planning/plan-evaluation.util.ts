@@ -1,6 +1,6 @@
 import { BudgetLine, CitizenCapacity, citizenCapacity, detailedBasePa, PoolBudget, poolBudgets, resolveGhoul, simpleCitizenCapacity } from './budget.util';
 import { BuildingProgress, evaluateProgram, remainingAp, StepResult } from './building-progress.util';
-import { BuildingUpgradesDTO, upgradeDefenseBonus } from './building-upgrades.types';
+import { BuildingUpgradesDTO, CEMETERY_RATIO_EFFECT, TOWN_DEFENSE_SCALE_EFFECT, upgradeDefenseBonus, upgradeEffect } from './building-upgrades.types';
 import { defenseGap, projectedDefense, rankByDefPerPa, RankCandidate, RankedCandidate } from './defense.util';
 import {
     buildingDefenseGain,
@@ -12,7 +12,7 @@ import {
     plannedDefenseGains,
     TownDefenseFactors
 } from './defense-gain.util';
-import { CIRCULAR_QUARTERS_UID, DEFENSE_FIXINGS_STEP, DEFENSE_FIXINGS_UID } from './defense-rules.const';
+import { CEMETERY_UID, CIRCULAR_QUARTERS_UID, DEFENSE_ADJUSTMENT_UID, DEFENSE_FIXINGS_STEP, DEFENSE_FIXINGS_UID } from './defense-rules.const';
 import { cascadeLevels } from './home-upgrades.util';
 import { nightLifeLoss, ownNightLoss } from './night-survival.util';
 import { budgetModeOf, BuildingPlanContentDTO, PlanCitizenDTO, PlanLossDTO, PlanLossKind, PlanPool, PlanTaskDTO, PlanTownLineDTO } from './plan.types';
@@ -226,13 +226,17 @@ export function evaluateDay(input: DayInput): DayEvaluation {
     const double_vote: boolean = builtInEvening(progress_after, input.buildings, PYRE_UID);
     const vote_ids: (number | null)[] = eveningVoteIds(content, double_vote);
     const voted_item_step: number = votedItemStep(input, vote_ids);
-    const gain: DefenseGainResult = defenseGain(completed_refs, home_raw_gain, gain_context, voted_item_step);
+    const voted_scale: number | null = votedScale(input, vote_ids);
+    const gain: DefenseGainResult = defenseGain(completed_refs, home_raw_gain, gain_context, voted_item_step, voted_scale);
     const homes_gain: number = defenseGain([], home_raw_gain, gain_context).total;
-    const planned: PlannedDefense = plannedDefenseGains(completed_refs, pendingBuildings(input, completed_ids), home_raw_gain, gain_context, voted_item_step, input.buildings);
-    const [vote, second_vote]: (EveningVote | null)[] = vote_ids.map((vote_id: number | null): EveningVote | null => {
-        const item_defense: number = vote_id !== null && input.buildings.get(vote_id)?.uid === DEFENSE_FIXINGS_UID ? planned.vote : 0;
-        return eveningVote(input, vote_id, gain.factorsAfter.scale, item_defense);
-    });
+    const planned: PlannedDefense = plannedDefenseGains(
+        completed_refs, pendingBuildings(input, completed_ids), home_raw_gain, gain_context, voted_item_step, input.buildings, voted_scale
+    );
+    // Le gain indirect des votes (objets de défense, échelle) est porté une seule fois, par le premier vote concerné.
+    const indirect_vote_id: number | null | undefined = vote_ids.find((vote_id: number | null): boolean =>
+        vote_id !== null && INDIRECT_VOTE_UIDS.has(input.buildings.get(vote_id)?.uid ?? ''));
+    const [vote, second_vote]: (EveningVote | null)[] = vote_ids.map((vote_id: number | null): EveningVote | null =>
+        eveningVote(input, vote_id, gain.factorsAfter.scale, vote_id !== null && vote_id === indirect_vote_id ? planned.vote : 0));
     const losses: PlannedLoss[] = plannedLosses(input, progress_after, [vote, second_vote], gain.factorsAfter.scale);
     const projected: number = projectedDefense({
         baseDefense: input.baseDefense,
@@ -347,7 +351,8 @@ function lossTotal(losses: PlannedLoss[], kind: PlanLossKind): number {
 
 /**
  * Évolution votée le soir : le chantier passe au niveau suivant avant l'attaque (`onProcessPreAttackUpgrade` du jeu) ; son
- * bonus de défense (multiple de sa défense propre + défense ajoutée) compte donc pour la nuit même.
+ * bonus de défense (multiple de sa défense propre + défense ajoutée, défense par mort du Cimetière cadenassé) compte donc pour
+ * la nuit même.
  * @param {DayInput} input Entrée de la journée.
  * @param {number | null} vote_id Chantier voté.
  * @param {number} scale Échelle de la défense au soir.
@@ -363,8 +368,23 @@ function eveningVote(input: DayInput, vote_id: number | null, scale: number, ite
     const max_level: number = input.upgrades[building.uid]?.maxLevel ?? Number.MAX_SAFE_INTEGER;
     const level: number = Math.min(current + 1, max_level);
     const gain: number = upgradeDefenseBonus(input.upgrades, building.uid, building.defence, level)
-        - upgradeDefenseBonus(input.upgrades, building.uid, building.defence, current);
+        - upgradeDefenseBonus(input.upgrades, building.uid, building.defence, current)
+        + (building.uid === CEMETERY_UID ? cemeteryRatioGain(input.upgrades, current, level) * input.defenseFactors.dead : 0);
     return { uid: building.uid, level, defense: Math.round(gain * scale) + item_defense };
+}
+
+/**
+ * Défense par mort gagnée par le Cimetière cadenassé entre deux niveaux (`calculate_town_def`).
+ * @param {BuildingUpgradesDTO} upgrades Évolutions.
+ * @param {number} from Niveau de départ.
+ * @param {number} to Niveau atteint.
+ * @returns {number} Gain par mort, 0 sans donnée d'évolution.
+ */
+function cemeteryRatioGain(upgrades: BuildingUpgradesDTO, from: number, to: number): number {
+    const ratio = (level: number): number | null => upgradeEffect(upgrades, CEMETERY_UID, CEMETERY_RATIO_EFFECT, level);
+    const before: number | null = ratio(from);
+    const after: number | null = ratio(to);
+    return before === null || after === null ? 0 : after - before;
 }
 
 /**
@@ -378,6 +398,25 @@ function votedItemStep(input: DayInput, vote_ids: readonly (number | null)[]): n
         const vote: EveningVote | null = eveningVote(input, vote_id, 1, 0);
         return vote?.uid === DEFENSE_FIXINGS_UID && vote.level > (input.buildingLevels.get(vote.uid) ?? 0);
     }) ? DEFENSE_FIXINGS_STEP : 0;
+}
+
+/** Chantiers dont le vote change la défense par un effet indirect (objets de défense, échelle de la défense). */
+const INDIRECT_VOTE_UIDS: ReadonlySet<string> = new Set<string>([DEFENSE_FIXINGS_UID, DEFENSE_ADJUSTMENT_UID]);
+
+/**
+ * Échelle de la défense après le vote du soir sur l'Ajustement défensif : valeur de son niveau voté.
+ * @param {DayInput} input Entrée de la journée.
+ * @param {readonly (number | null)[]} vote_ids Chantiers votés.
+ * @returns {number | null} Échelle, nulle sans vote sur l'Ajustement défensif, à son niveau maximum ou sans donnée d'évolution.
+ */
+function votedScale(input: DayInput, vote_ids: readonly (number | null)[]): number | null {
+    for (const vote_id of vote_ids) {
+        const vote: EveningVote | null = eveningVote(input, vote_id, 1, 0);
+        if (vote?.uid === DEFENSE_ADJUSTMENT_UID && vote.level > (input.buildingLevels.get(vote.uid) ?? 0)) {
+            return upgradeEffect(input.upgrades, DEFENSE_ADJUSTMENT_UID, TOWN_DEFENSE_SCALE_EFFECT, vote.level);
+        }
+    }
+    return null;
 }
 
 /**

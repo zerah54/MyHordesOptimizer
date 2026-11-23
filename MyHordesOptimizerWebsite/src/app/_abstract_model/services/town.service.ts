@@ -30,6 +30,7 @@ import {
     setBankWithExpirationDate,
 } from '../../_core/utilities/localstorage.util';
 import { BankInfoDTO } from '../dto/bank-info.dto';
+import { BankVersionDTO } from '../dto/bank-version.dto';
 import { CampImprovementDTO, CampImprovementUpdateDTO } from '../dto/camping-group.dto';
 import { CellDTO } from '../dto/cell.dto';
 import { CitizenDTO, HeroSkillLevelsDTO } from '../dto/citizen.dto';
@@ -47,6 +48,7 @@ import { TownListMapper } from '../mapper/town-list-item.mapper';
 import { dtoToModelArray } from '../types/_common.class';
 import { ToolsToUpdate, TownState, TownTypeId } from '../types/_types';
 import { BankInfo } from '../types/bank-info.class';
+import { BankVersion } from '../types/bank-version.class';
 import { Cell } from '../types/cell.class';
 import { Citizen } from '../types/citizen.class';
 import { CitizenInfo } from '../types/citizen-info.class';
@@ -124,6 +126,20 @@ export class TownService extends GlobalService {
                     });
             }
         });
+    }
+
+    /** Liste les versions de la banque d'une ville, de la plus ancienne à la plus récente. */
+    public getBankVersions(town_id: number): Observable<BankVersion[]> {
+        return super.get<BankVersionDTO[]>(this.API_URL + `/Fetcher/bank/versions?townId=${town_id}`).pipe(
+            map((response: HttpResponse<BankVersionDTO[]>): BankVersion[] => (response.body ?? []).map((dto: BankVersionDTO): BankVersion => new BankVersion(dto)))
+        );
+    }
+
+    /** Lit le contenu d'une version de la banque, sans toucher au cache local de la banque. */
+    public getBankVersion(town_id: number, last_update_id: number): Observable<BankInfo> {
+        return super.get<BankInfoDTO>(this.API_URL + `/Fetcher/bank?townId=${town_id}&lastUpdateId=${last_update_id}`, undefined, undefined, false, 404).pipe(
+            map((response: HttpResponse<BankInfoDTO>): BankInfo => new BankInfo(response.body))
+        );
     }
 
     /** Intervalle d'interrogation de l'avancement d'une mise à jour des outils externes */
