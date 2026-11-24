@@ -558,6 +558,10 @@
         <source>Verrou</source>
         <target state="final">Lock</target>
       </trans-unit>
+      <trans-unit id="7353585844525196449" datatype="html">
+        <source>chantiers</source>
+        <target state="translated">constructions</target>
+      </trans-unit>
       <trans-unit id="7359182511958867754" datatype="html">
         <source>Ouvrir</source>
         <target state="translated">Open</target>
@@ -2132,6 +2136,10 @@
         <source> Meilleure survie </source>
         <target state="final"> Best survival </target>
       </trans-unit>
+      <trans-unit id="5994401295106811444" datatype="html">
+        <source>Rations d&apos;eau versées au puits une fois terminé</source>
+        <target state="translated">Water rations added to the well once completed</target>
+      </trans-unit>
       <trans-unit id="5996532318582244309" datatype="html">
         <source>Cliquez une case pour y aller</source>
         <target state="translated">Click a cell to go there</target>
@@ -2711,6 +2719,10 @@
       <trans-unit id="794846713726296087" datatype="html" approved="yes">
         <source>Alternative Technicien</source>
         <target state="final">Technician alternative</target>
+      </trans-unit>
+      <trans-unit id="79486738287577589" datatype="html">
+        <source>Gains du jour :</source>
+        <target state="translated">Today's gains:</target>
       </trans-unit>
       <trans-unit id="1653227668373898364" datatype="html">
         <source>zone</source>
@@ -4208,6 +4220,10 @@
         <source>Clic droit (ou appui long) sur une case du tracé : tout ce qui suit est retiré.</source>
         <target state="final">Right-click (or long press) on a zone of the route: everything that follows is removed.</target>
       </trans-unit>
+      <trans-unit id="4829569900134225613" datatype="html">
+        <source>réparations</source>
+        <target state="translated">repairs</target>
+      </trans-unit>
       <trans-unit id="392253742766116201" datatype="html" approved="yes">
         <source>Tout passe par le bouton MyHordes Optimizer ajouté au bandeau du jeu : les options, le Wiki, les outils et les informations sur les versions.</source>
         <target state="final">Everything goes through the MyHordes Optimizer button added to the game banner: the options, the Wiki, the tools and the version information.</target>
@@ -4223,6 +4239,10 @@
       <trans-unit id="3926113908909885977" datatype="html" approved="yes">
         <source> La dévastation force : porte ouverte depuis longtemps (+25) et tous les logements au niveau 0 (facteur de zombies actifs). La défense personnelle n&apos;est pas remise à 0 : seule sa part liée au logement l&apos;est, le reste (métier héroïque, améliorations, objets) survit. </source>
         <target state="final"> Devastation forces: door open for a long time (+25) and all homes at level 0 (active zombie factor). Personal defense is not reset to 0: only its home-related share is, the rest (hero job, improvements, items) survives. </target>
+      </trans-unit>
+      <trans-unit id="3928664129044319049" datatype="html">
+        <source>Rations d&apos;eau par PA</source>
+        <target state="translated">Water rations per AP</target>
       </trans-unit>
       <trans-unit id="2677341107476774217" datatype="html">
         <source>Attribuer</source>
@@ -4504,6 +4524,10 @@
         <source>&lt;p&gt;Les joueurs : pseudo (filtrable), nombre de villes, meilleure survie et dernière ville. Connecté, vous pouvez y écrire une note privée sur chaque joueur. Un clic ouvre son profil (villes et pictos).&lt;/p&gt;</source>
         <target state="final">&lt;p&gt;Players: username (filterable), number of towns, best survival and last town. When logged in, you can write a private note about each player there. One click opens their profile (towns and pictos).&lt;/p&gt;</target>
       </trans-unit>
+      <trans-unit id="4654392097835361595" datatype="html">
+        <source>maisons</source>
+        <target state="translated">homes</target>
+      </trans-unit>
       <trans-unit id="4660686038225270640" datatype="html">
         <source>Valeurs des objets en <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/></source>
         <target state="translated">Item values in <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/></target>
@@ -4683,6 +4707,10 @@
       <trans-unit id="669866572497610362" datatype="html" approved="yes">
         <source>Attaque J<x id="PH" equiv-text="day"/> calculée - Min</source>
         <target state="final">Calculated attack D<x id="PH" equiv-text="day"/> - Min</target>
+      </trans-unit>
+      <trans-unit id="8953953417231506966" datatype="html">
+        <source>Rations d&apos;eau versées au puits cette nuit</source>
+        <target state="translated">Water rations added to the well tonight</target>
       </trans-unit>
       <trans-unit id="8957575198110805301" datatype="html" approved="yes">
         <source>Les tracés sont réservés aux citoyens de la ville.</source>
@@ -6344,6 +6372,10 @@
         <source>Bonus en équivalent PA</source>
         <target state="final">Equivalent AP bonus</target>
       </trans-unit>
+      <trans-unit id="6489441800790477240" datatype="html">
+        <source>total</source>
+        <target state="needs-translation">total</target>
+      </trans-unit>
       <trans-unit id="4328907410933636413" datatype="html" approved="yes">
         <source>Le citoyen</source>
         <target state="final">Citizen</target>
@@ -7184,6 +7216,10 @@
         <source>Se doucher</source>
         <target state="final">Take a shower</target>
       </trans-unit>
+      <trans-unit id="5587775504680006376" datatype="html">
+        <source>évolutions</source>
+        <target state="translated">upgrades</target>
+      </trans-unit>
       <trans-unit id="6500925437908105799" datatype="html" approved="yes">
         <source>Distribution réaliste</source>
         <target state="final">Realistic distribution</target>
@@ -7948,6 +7984,10 @@
         <source>Options de la catégorie « Informations complémentaires » : elles ajoutent aux pages du jeu des données que MyHordes n&apos;affiche pas.</source>
         <target state="final">Options in the "Further information" category: they add to the game pages data that MyHordes does not display.</target>
       </trans-unit>
+      <trans-unit id="192700802535731981" datatype="html">
+        <source>sources</source>
+        <target state="needs-translation">sources</target>
+      </trans-unit>
       <trans-unit id="444601773189456419" datatype="html" approved="yes">
         <source>Jours précédents</source>
         <target state="final">Previous days</target>
@@ -8003,6 +8043,10 @@
       <trans-unit id="3835013333520355539" datatype="html" approved="yes">
         <source>Indisponible</source>
         <target state="final">Unavailable</target>
+      </trans-unit>
+      <trans-unit id="3835878766747597330" datatype="html">
+        <source>pertes</source>
+        <target state="translated">losses</target>
       </trans-unit>
       <trans-unit id="4379904882658374793" datatype="html" approved="yes">
         <source>RE</source>
