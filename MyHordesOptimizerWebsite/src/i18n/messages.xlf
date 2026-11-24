@@ -338,8 +338,8 @@
             <trans-unit id="3493022559900788436" datatype="html">
                 <source>Bleu canard</source>
             </trans-unit>
-            <trans-unit id="349574492903631397" datatype="html">
-                <source>Passage en Force</source>
+            <trans-unit id="3750153803525026360" datatype="html">
+                <source>Passage en force</source>
             </trans-unit>
             <trans-unit id="3495827345194332174" datatype="html">
                 <source>Consigne : <x id="upgrade" equiv-text="upgrade"/> niv. <x id="level" equiv-text="level"/></source>
@@ -389,9 +389,6 @@
             <trans-unit id="1260504455353929494" datatype="html">
                 <source>À faire</source>
             </trans-unit>
-            <trans-unit id="1262634552784987007" datatype="html">
-                <source><x id="needed" equiv-text="check.needed"/> PA nécessaires, <x id="available" equiv-text="check.available"/> PA disponibles</source>
-            </trans-unit>
             <trans-unit id="1269215144979610420" datatype="html">
                 <source>Aucun programme effectif pour ce jour.</source>
             </trans-unit>
@@ -421,6 +418,9 @@
             </trans-unit>
             <trans-unit id="7352105174300788792" datatype="html">
                 <source>Verrou</source>
+            </trans-unit>
+            <trans-unit id="7353585844525196449" datatype="html">
+                <source>chantiers</source>
             </trans-unit>
             <trans-unit id="7359182511958867754" datatype="html">
                 <source>Ouvrir</source>
@@ -778,6 +778,9 @@
             </trans-unit>
             <trans-unit id="3802614335560711985" datatype="html">
                 <source>Dans MyHordes uniquement</source>
+            </trans-unit>
+            <trans-unit id="3803584960843438129" datatype="html">
+                <source>Version suivante</source>
             </trans-unit>
             <trans-unit id="8648912876673109537" datatype="html">
                 <source>Ne pas ramener</source>
@@ -1598,6 +1601,9 @@
             <trans-unit id="5987572317992662165" datatype="html">
                 <source> Meilleure survie </source>
             </trans-unit>
+            <trans-unit id="5994401295106811444" datatype="html">
+                <source>Rations d&apos;eau versées au puits une fois terminé</source>
+            </trans-unit>
             <trans-unit id="5996532318582244309" datatype="html">
                 <source>Cliquez une case pour y aller</source>
             </trans-unit>
@@ -2032,6 +2038,9 @@
             </trans-unit>
             <trans-unit id="794846713726296087" datatype="html">
                 <source>Alternative Technicien</source>
+            </trans-unit>
+            <trans-unit id="79486738287577589" datatype="html">
+                <source>Gains du jour :</source>
             </trans-unit>
             <trans-unit id="1653227668373898364" datatype="html">
                 <source>zone</source>
@@ -2996,6 +3005,9 @@
             <trans-unit id="7969447827855107408" datatype="html">
                 <source>Plans inhabituels sortis</source>
             </trans-unit>
+            <trans-unit id="797617825509474791" datatype="html">
+                <source>Version précédente</source>
+            </trans-unit>
             <trans-unit id="7980053000569541434" datatype="html">
                 <source>Saisies modifiées depuis le dernier affinage : relance nécessaire</source>
             </trans-unit>
@@ -3152,6 +3164,9 @@
             <trans-unit id="4826063216370463411" datatype="html">
                 <source>Clic droit (ou appui long) sur une case du tracé : tout ce qui suit est retiré.</source>
             </trans-unit>
+            <trans-unit id="4829569900134225613" datatype="html">
+                <source>réparations</source>
+            </trans-unit>
             <trans-unit id="392253742766116201" datatype="html">
                 <source>Tout passe par le bouton MyHordes Optimizer ajouté au bandeau du jeu : les options, le Wiki, les outils et les informations sur les versions.</source>
             </trans-unit>
@@ -3163,6 +3178,9 @@
             </trans-unit>
             <trans-unit id="3926113908909885977" datatype="html">
                 <source> La dévastation force : porte ouverte depuis longtemps (+25) et tous les logements au niveau 0 (facteur de zombies actifs). La défense personnelle n&apos;est pas remise à 0 : seule sa part liée au logement l&apos;est, le reste (métier héroïque, améliorations, objets) survit. </source>
+            </trans-unit>
+            <trans-unit id="3928664129044319049" datatype="html">
+                <source>Rations d&apos;eau par PA</source>
             </trans-unit>
             <trans-unit id="2677341107476774217" datatype="html">
                 <source>Attribuer</source>
@@ -3374,6 +3392,9 @@
             <trans-unit id="439882987204429274" datatype="html">
                 <source>&lt;p&gt;Les joueurs : pseudo (filtrable), nombre de villes, meilleure survie et dernière ville. Connecté, vous pouvez y écrire une note privée sur chaque joueur. Un clic ouvre son profil (villes et pictos).&lt;/p&gt;</source>
             </trans-unit>
+            <trans-unit id="4654392097835361595" datatype="html">
+                <source>maisons</source>
+            </trans-unit>
             <trans-unit id="4660686038225270640" datatype="html">
                 <source>Valeurs des objets en <x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/></source>
             </trans-unit>
@@ -3509,6 +3530,9 @@
             <trans-unit id="669866572497610362" datatype="html">
                 <source>Attaque J<x id="PH" equiv-text="day"/> calculée - Min</source>
             </trans-unit>
+            <trans-unit id="8953953417231506966" datatype="html">
+                <source>Rations d&apos;eau versées au puits cette nuit</source>
+            </trans-unit>
             <trans-unit id="8957575198110805301" datatype="html">
                 <source>Les tracés sont réservés aux citoyens de la ville.</source>
             </trans-unit>
@@ -3577,6 +3601,9 @@
             </trans-unit>
             <trans-unit id="3518677477781469053" datatype="html">
                 <source>Enregistrer la mienne</source>
+            </trans-unit>
+            <trans-unit id="3519043400185913657" datatype="html">
+                <source>dernière</source>
             </trans-unit>
             <trans-unit id="3520759538347525799" datatype="html">
                 <source>{VAR_PLURAL, plural, =1 {1 consigne :} other {<x id="INTERPOLATION"/> consignes :}}</source>
@@ -4751,6 +4778,9 @@
             <trans-unit id="6487260431971357562" datatype="html">
                 <source>Bonus en équivalent PA</source>
             </trans-unit>
+            <trans-unit id="6489441800790477240" datatype="html">
+                <source>total</source>
+            </trans-unit>
             <trans-unit id="4328907410933636413" datatype="html">
                 <source>Le citoyen</source>
             </trans-unit>
@@ -5381,6 +5411,9 @@
             <trans-unit id="5586616947241141559" datatype="html">
                 <source>Se doucher</source>
             </trans-unit>
+            <trans-unit id="5587775504680006376" datatype="html">
+                <source>évolutions</source>
+            </trans-unit>
             <trans-unit id="6500925437908105799" datatype="html">
                 <source>Distribution réaliste</source>
             </trans-unit>
@@ -5954,6 +5987,9 @@
             <trans-unit id="1925851199600823942" datatype="html">
                 <source>Options de la catégorie « Informations complémentaires » : elles ajoutent aux pages du jeu des données que MyHordes n&apos;affiche pas.</source>
             </trans-unit>
+            <trans-unit id="192700802535731981" datatype="html">
+                <source>sources</source>
+            </trans-unit>
             <trans-unit id="444601773189456419" datatype="html">
                 <source>Jours précédents</source>
             </trans-unit>
@@ -5995,6 +6031,9 @@
             </trans-unit>
             <trans-unit id="3835013333520355539" datatype="html">
                 <source>Indisponible</source>
+            </trans-unit>
+            <trans-unit id="3835878766747597330" datatype="html">
+                <source>pertes</source>
             </trans-unit>
             <trans-unit id="4379904882658374793" datatype="html">
                 <source>RE</source>
@@ -6061,6 +6100,9 @@
             </trans-unit>
             <trans-unit id="7788061501151326787" datatype="html">
                 <source>Atelier, Chaman uniquement</source>
+            </trans-unit>
+            <trans-unit id="8923758037319060801" datatype="html">
+                <source>Tracé : <x id="route_ap" equiv-text="check.route_ap"/> PA + <x id="route_sp" equiv-text="check.route_sp"/> PE, disponibles : <x id="available" equiv-text="check.available"/> PA + <x id="sp" equiv-text="check.sp"/> PE</source>
             </trans-unit>
             <trans-unit id="8924763758161915362" datatype="html">
                 <source>Type de recette</source>
