@@ -1,4 +1,18 @@
 export const changelogs: Record<string, string> = {
+    '1.1.68': `
+        [Nouveauté] Consignes d'expédition : la case est désormais cliquable pour cocher ou décocher une consigne directement depuis le désert ou la fenêtre des expéditions
+
+        [Amélioration] Paramètres : les options parentes ont une case tri-état (cochée, partielle, décochée) qui reflète leurs sous-options, et leurs sous-options restent consultables même décochées
+        [Amélioration] Mise à jour : après une mise à jour Fata Morgana, le bouton de rafraîchissement est utilisé quand il existe au lieu de recharger la page
+        [Amélioration] Chargements : la carte, les ruines et les estimations ne sont plus demandées plusieurs fois en parallèle ; les requêtes de mise à jour attendent le jeton d'authentification
+
+        [Correction] Désert : l'avertissement avant de quitter sans escorte et les options d'escorte par défaut ne s'empilent plus au fil de la navigation
+        [Correction] Messages : le pré-remplissage au clic sur un objet envoyable fonctionne à chaque clic et ne se duplique plus
+        [Correction] Forum : l'import de blocs médias ne provoque plus d'erreur sur certains navigateurs
+        [Correction] Notes : un échec de chargement ne relance plus la requête en boucle
+        [Correction] Infobulles : correction de l'affichage des objets de type boîte de nourriture
+        [Correction] Libellé « Passage en force » corrigé
+        `,
     '1.1.67': `
         [Amélioration] Désert : les informations de la case, l'expédition et les autres outils MHO sont regroupés dans un bloc unique « MHO Addon » sous la carte, avec des icônes du jeu à la place des titres
         [Amélioration] En-tête : les boutons MHO sont regroupés dans un encadré avec le logo ; l'outil de traduction devient un bouton qui ouvre un panneau

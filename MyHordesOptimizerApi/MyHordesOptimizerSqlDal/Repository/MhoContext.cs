@@ -76,7 +76,9 @@ namespace MyHordesOptimizerApi
                 .Include(townCitizen => townCitizen.IdTownNavigation)
                     .ThenInclude(town => town.TownCitizenDailyActions)
                         .ThenInclude(townCitizenDailyAction => townCitizenDailyAction.IdLastUpdateInfoNavigation)
-                            .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation);
+                            .ThenInclude(lastUpdate => lastUpdate.IdUserNavigation)
+                // Requête unique = produit cartésien sac × coffre × actions quotidiennes de toute la ville (20 s+ sur une grosse ville).
+                .AsSplitQuery();
         }
     }
 }

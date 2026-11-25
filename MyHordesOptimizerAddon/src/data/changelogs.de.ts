@@ -1,4 +1,18 @@
 export const changelogs: Record<string, string> = {
+    '1.1.68': `
+        [Neu] Expeditionsaufträge: Das Kästchen ist jetzt anklickbar, um einen Auftrag direkt in der Wüste oder im Expeditionsfenster abzuhaken oder zurückzunehmen
+
+        [Verbesserung] Einstellungen: Übergeordnete Optionen haben ein Drei-Zustands-Kästchen (aktiviert, teilweise, deaktiviert), das ihre Unteroptionen widerspiegelt; Unteroptionen bleiben auch deaktiviert einsehbar
+        [Verbesserung] Aktualisierung: Nach einer Fata-Morgana-Aktualisierung wird die Aktualisieren-Schaltfläche genutzt, sofern vorhanden, statt die Seite neu zu laden
+        [Verbesserung] Laden: Karte, Ruinen und Schätzungen werden nicht mehr mehrfach parallel angefordert; Aktualisierungsanfragen warten auf das Authentifizierungs-Token
+
+        [Korrektur] Wüste: Die Warnung vor dem Verlassen ohne Eskorte und die Standard-Eskortenoptionen häufen sich beim Navigieren nicht mehr an
+        [Korrektur] Nachrichten: Das automatische Ausfüllen beim Klick auf einen versendbaren Gegenstand funktioniert bei jedem Klick und wird nicht mehr dupliziert
+        [Korrektur] Forum: Der Import von Medienblöcken verursacht in einigen Browsern keinen Fehler mehr
+        [Korrektur] Notizen: Ein Ladefehler wiederholt die Anfrage nicht mehr in einer Schleife
+        [Korrektur] Tooltips: Anzeige von Nahrungsbox-Gegenständen korrigiert
+        [Korrektur] Bezeichnung « Passage en force » (französischer Text) korrigiert
+        `,
     '1.1.67': `
         [Verbesserung] Wüste: Feldinfos, Expedition und weitere MHO-Werkzeuge sind in einem einzigen Block „MHO Addon“ unter der Karte gebündelt, mit Spielsymbolen statt Titeln
         [Verbesserung] Kopfzeile: Die MHO-Schaltflächen sind mit dem Logo in einem Rahmen gebündelt; das Übersetzungswerkzeug ist jetzt eine Schaltfläche, die ein Panel öffnet

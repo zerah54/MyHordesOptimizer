@@ -136,7 +136,7 @@ export function displayTranslateTool() {
                 });
             }
         });
-        const button: HTMLDivElement = createHeaderButton(mho_translate_button_id, `${repo_img_hordes_url}/lang/${lang}.png`);
+        const button: HTMLDivElement = createHeaderButton(mho_translate_button_id, `${repo_img_hordes_url}/lang/${lang}.png`, getI18N(texts.translate_bar));
         // Garde le focus dans le panneau : le clic sur le bouton ne déclenche pas le focusout qui le refermerait.
         button.addEventListener('mousedown', (event: MouseEvent) => event.preventDefault());
         button.addEventListener('click', () => {

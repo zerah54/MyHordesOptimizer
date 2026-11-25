@@ -947,6 +947,24 @@ export const texts = {
         de: 'Ältere Changelogs anzeigen',
         es: 'Ver las notas de versiones anteriores'
     },
+    stored_notifications: {
+        en: 'Stored notifications',
+        fr: 'Notifications conservées',
+        de: 'Gespeicherte Benachrichtigungen',
+        es: 'Notificaciones guardadas'
+    },
+    external_map: {
+        en: 'Map from external tools',
+        fr: 'Carte des outils externes',
+        de: 'Karte der externen Tools',
+        es: 'Mapa de las aplicaciones externas'
+    },
+    translate_bar: {
+        en: 'MyHordes\' item translation',
+        fr: 'Traduction des éléments de MyHordes',
+        de: 'Übersetzung von MyHordes Elementen',
+        es: 'Traducción de elementos de MyHordes'
+    },
     hero_find: {
         en: 'Seeker',
         fr: 'Trouvaille',

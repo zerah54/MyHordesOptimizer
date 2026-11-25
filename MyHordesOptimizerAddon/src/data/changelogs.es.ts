@@ -1,4 +1,18 @@
 export const changelogs: Record<string, string> = {
+    '1.1.68': `
+        [Novedad] Consignas de expedición: la casilla ahora es clicable para marcar o desmarcar una consigna directamente desde el desierto o la ventana de expediciones
+
+        [Mejora] Parámetros: las opciones padre tienen una casilla de tres estados (marcada, parcial, desmarcada) que refleja sus subopciones, y las subopciones siguen siendo accesibles aunque estén desmarcadas
+        [Mejora] Actualización: tras una actualización de Fata Morgana, se usa el botón de actualizar cuando existe en lugar de recargar la página
+        [Mejora] Cargas: el mapa, las ruinas y las estimaciones ya no se piden varias veces en paralelo; las peticiones de actualización esperan al token de autenticación
+
+        [Corrección] Desierto: el aviso antes de salir sin escolta y las opciones de escolta por defecto ya no se acumulan al navegar
+        [Corrección] Mensajes: el rellenado al hacer clic en un objeto enviable funciona en cada clic y ya no se duplica
+        [Corrección] Foro: la importación de bloques multimedia ya no provoca un error en algunos navegadores
+        [Corrección] Notas: un fallo de carga ya no repite la petición en bucle
+        [Corrección] Tooltips: corregida la visualización de los objetos de tipo caja de comida
+        [Corrección] Corregida la etiqueta « Passage en force » (texto en francés)
+        `,
     '1.1.67': `
         [Mejora] Desierto: la información de la casilla, la expedición y otras herramientas MHO se agrupan en un único bloque «MHO Addon» bajo el mapa, con iconos del juego en lugar de títulos
         [Mejora] Cabecera: los botones MHO se agrupan en un marco con el logo; la herramienta de traducción pasa a ser un botón que abre un panel

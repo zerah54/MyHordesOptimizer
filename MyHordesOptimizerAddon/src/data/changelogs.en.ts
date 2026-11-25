@@ -1,4 +1,18 @@
 export const changelogs: Record<string, string> = {
+    '1.1.68': `
+        [New] Expedition orders: the checkbox is now clickable to tick or untick an order directly from the desert or the expeditions window
+
+        [Improvement] Settings: parent options have a tri-state checkbox (checked, partial, unchecked) reflecting their sub-options, and sub-options stay accessible even when unchecked
+        [Improvement] Update: after a Fata Morgana update, the refresh button is used when available instead of reloading the page
+        [Improvement] Loading: the map, ruins and estimations are no longer requested several times in parallel; update requests now wait for the authentication token
+
+        [Fix] Desert: the warning before leaving without an escort and the default escort options no longer pile up while navigating
+        [Fix] Messages: the pre-filling when clicking a sendable item works on every click and is no longer duplicated
+        [Fix] Forum: importing media blocks no longer causes an error on some browsers
+        [Fix] Notes: a loading failure no longer retries the request in a loop
+        [Fix] Tooltips: fixed the display of food box items
+        [Fix] Fixed the « Break Through » label (French text)
+        `,
     '1.1.67': `
         [Improvement] Desert: cell information, expedition and other MHO tools are grouped in a single "MHO Addon" block under the map, with game icons instead of titles
         [Improvement] Header: MHO buttons are grouped in a frame with the logo; the translation tool is now a button opening a panel

@@ -1,5 +1,7 @@
 import { mho_expeditions_window_id, mho_store_notifications_id, mho_store_notifications_window_id, repo_img_hordes_url } from '../config/constants';
+import { texts } from '../i18n/texts';
 import { state } from '../state';
+import { getI18N } from '../utils/i18n';
 import { createHeaderButton, getHeaderButtonsContainer } from './header-space';
 import { createWindow } from './window';
 
@@ -29,7 +31,7 @@ export function createStoreNotificationsBtn() {
         // Commencez à observer l'élément cible pour les modifications configurées
         observer.observe(notifications_space, config);
 
-        const btn_container = createHeaderButton(mho_store_notifications_id, repo_img_hordes_url + '/icons/news.gif');
+        const btn_container = createHeaderButton(mho_store_notifications_id, repo_img_hordes_url + '/icons/news.gif', getI18N(texts.stored_notifications));
 
         btn_container.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -53,6 +55,10 @@ export function createNotificationsWindowContent() {
     const window = window_content.parentElement;
     window.style.minWidth = '500px';
     window.style.maxWidth = '100dvw';
+
+    const title: HTMLHeadingElement = document.createElement('h3');
+    title.textContent = getI18N(texts.stored_notifications);
+    window_content.appendChild(title);
 
     const tabs_div = document.createElement('div');
     tabs_div.id = 'tabs';

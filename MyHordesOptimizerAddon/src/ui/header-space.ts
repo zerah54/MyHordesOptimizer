@@ -9,10 +9,11 @@ export function getHeaderButtonsContainer(): HTMLElement | null {
     return document.querySelector(`#${mho_header_space_id} .${mho_header_inner_class}`);
 }
 
-/** Crée un bouton de l'encadré MHO : un conteneur d'`id` avec un unique pictogramme. */
-export function createHeaderButton(id: string, pictogram_src: string): HTMLDivElement {
+/** Crée un bouton de l'encadré MHO : un conteneur d'`id` avec un unique pictogramme, `title` au survol. */
+export function createHeaderButton(id: string, pictogram_src: string, title: string): HTMLDivElement {
     const btn_container: HTMLDivElement = document.createElement('div');
     btn_container.id = id;
+    btn_container.title = title;
 
     const btn_img: HTMLImageElement = document.createElement('img');
     btn_img.src = pictogram_src;

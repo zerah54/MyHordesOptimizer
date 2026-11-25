@@ -2,7 +2,9 @@ import { mh_optimizer_map_window_id, mho_display_map_id, mho_map_key, repo_img_h
 import { getBBHMap, getBBHRuin } from '../external/bbh';
 import { getFMMap, getFMRuin } from '../external/fata-morgana';
 import { getGHMap, getGHRuin } from '../external/gest-hordes';
+import { texts } from '../i18n/texts';
 import { state } from '../state';
+import { getI18N } from '../utils/i18n';
 import { getStorageItem } from '../utils/storage';
 import { createHeaderButton, getHeaderButtonsContainer } from './header-space';
 import { createMapWindow } from './window';
@@ -14,7 +16,7 @@ export function createDisplayMapButton() {
         const mho_header_space = getHeaderButtonsContainer();
         if (display_map_btn || !mho_header_space) return;
 
-        const btn_container = createHeaderButton(mho_display_map_id, repo_img_hordes_url + 'emotes/explo.gif');
+        const btn_container = createHeaderButton(mho_display_map_id, repo_img_hordes_url + 'emotes/explo.gif', getI18N(texts.external_map));
 
         btn_container.addEventListener('click', (event) => {
             event.stopPropagation();

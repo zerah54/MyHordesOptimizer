@@ -37,7 +37,7 @@ describe('header-space', () => {
     });
 
     it('createHeaderButton crée un bouton avec un seul img, sans taille en ligne (laissée au CSS desktop/mobile)', () => {
-        const btn = createHeaderButton('x', 'p.gif');
+        const btn = createHeaderButton('x', 'p.gif', '');
         expect(btn.id).toBe('x');
         expect(btn.classList.contains('header-icon')).toBe(false);
         expect(btn.querySelector('img').style.cursor).toBe('pointer');
@@ -45,6 +45,10 @@ describe('header-space', () => {
         expect(imgs.length).toBe(1);
         expect(imgs[0].src).toContain('p.gif');
         expect(imgs[0].style.height).toBe('');
+    });
+
+    it('createHeaderButton affiche le titre au survol', () => {
+        expect(createHeaderButton('x', 'p.gif', 'Mon programme').title).toBe('Mon programme');
     });
 
     it('le logo n\'a pas de taille en ligne', () => {
