@@ -22,7 +22,7 @@ import { createStyles } from './ui/styles';
 import { waitForElement } from './utils/dom-wait';
 import { isDoubleInstall } from './utils/double-install-guard';
 import { initOptionsWithLoginNeeded, initOptionsWithoutLoginNeeded } from './utils/fetch';
-import { getTownClockSignature, isMhoWebsite, shouldRefreshMe } from './utils/page';
+import { clickIfPresent, getTownClockSignature, isMhoWebsite, shouldRefreshMe } from './utils/page';
 import { getStorageItem, setStorageItem } from './utils/storage';
 import { notifyJustUpdated } from './utils/update-notifications';
 import { isNewVersion, toggleNewChangelog } from './utils/version';
@@ -93,14 +93,9 @@ import { isNewVersion, toggleNewChangelog } from './utils/version';
                     if (current_key === gm_bbh_updated_key && state.mho_parameters.refresh_bbh_after_update) {
                         location.reload();
                     } else if (current_key === gm_gh_updated_key && state.mho_parameters.refresh_gh_after_update) {
-                        const refresh_btn = document.querySelector('#zoneRefresh');
-                        if (refresh_btn) {
-                            refresh_btn.click();
-                        } else {
-                            location.reload();
-                        }
+                        if (!clickIfPresent('#zoneRefresh')) location.reload();
                     } else if (current_key === gm_fata_updated_key && state.mho_parameters.refresh_fm_after_update) {
-                        location.reload();
+                        if (!clickIfPresent('#topbar-refresh-btn')) location.reload();
                     } else if (current_key === gm_mho_updated_key && state.mho_parameters.refresh_mho_after_update) {
                         location.reload();
                     }

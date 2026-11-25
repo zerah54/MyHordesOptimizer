@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { state } from '../state';
 import { fetcher } from '../utils/fetch';
-import { getRefinedAttack } from './estimations';
+import { getEstimations, getRefinedAttack } from './estimations';
 
 vi.mock('../utils/fetch', () => ({ fetcher: vi.fn() }));
 /** `getScriptInfo()` est appelée au chargement de modules importés ; jsdom n'a ni `GM_info` ni `browser`/`chrome`. */
@@ -12,6 +12,7 @@ vi.mock('../utils/version', async (importOriginal: () => Promise<object>) => ({
     isScript: (): boolean => true,
     getScriptInfo: (): { name: string; version: string; updateURL: string } => ({ name: 'MHO', version: '0.0.0', updateURL: 'about:blank' })
 }));
+vi.mock('../utils/notifications', () => ({ addError: vi.fn() }));
 const fetcherMock: ReturnType<typeof vi.fn> = fetcher as unknown as ReturnType<typeof vi.fn>;
 
 function jsonResponse(status: number, body: unknown): Response {
@@ -39,5 +40,22 @@ describe('getRefinedAttack', () => {
         expect(await getRefinedAttack(16)).toBeNull();
         fetcherMock.mockRejectedValueOnce(new Error('réseau'));
         expect(await getRefinedAttack(16)).toBeNull();
+    });
+});
+
+describe('getEstimations', () => {
+    beforeEach(() => {
+        fetcherMock.mockReset();
+        state.api_url = 'https://api.test';
+        state.mh_user = { townDetails: { townId: 42, day: 5 } } as unknown as typeof state.mh_user;
+    });
+
+    it('rejette si un calcul d\'attaque est rejeté', async (): Promise<void> => {
+        fetcherMock
+            .mockResolvedValueOnce(jsonResponse(200, { day: 5 }))
+            .mockResolvedValueOnce(jsonResponse(200, { result: { min: 1, max: 2 } }))
+            .mockRejectedValueOnce(new Error('calcul'));
+
+        await expect(getEstimations()).rejects.toThrow('calcul');
     });
 });

@@ -89,6 +89,19 @@ describe('displayTownNote', () => {
         expect((document.querySelector('.mho-note-text') as HTMLElement)?.innerText).toBe('ville sympa');
     });
 
+    it('does not refetch right after a failed load, but retries on the next call', async () => {
+        getMyTownNotesMock.mockRejectedValue(new Error('401'));
+        document.body.innerHTML = '<div class="view-town" data-town-id="789"><div class="row"><button></button></div></div>';
+
+        displayTownNote();
+        await flush();
+        expect(getMyTownNotesMock).toHaveBeenCalledTimes(1);
+
+        displayTownNote();
+        await flush();
+        expect(getMyTownNotesMock).toHaveBeenCalledTimes(2);
+    });
+
     it('shows the empty placeholder when no note exists for this town', () => {
         state.town_notes = {};
         document.body.innerHTML = '<div class="view-town" data-town-id="789"><div class="row"><button></button></div></div>';
@@ -203,6 +216,19 @@ describe('displayCitizenNoteIcons', () => {
         expect(icons[1].title).toBe(getI18N(texts.note_empty));
     });
 
+    it('does not refetch right after a failed load, but retries on the next call', async () => {
+        getMyCitizenNotesMock.mockRejectedValue(new Error('401'));
+        setCitizensListDom();
+
+        displayCitizenNoteIcons();
+        await flush();
+        expect(getMyCitizenNotesMock).toHaveBeenCalledTimes(1);
+
+        displayCitizenNoteIcons();
+        await flush();
+        expect(getMyCitizenNotesMock).toHaveBeenCalledTimes(2);
+    });
+
     it('does not insert duplicate icons on repeated calls', () => {
         setCitizensListDom();
         state.citizen_notes = {};
@@ -276,6 +302,19 @@ describe('displayUserGlobalNote', () => {
         displayUserGlobalNote();
 
         expect((document.querySelector('.mho-user-note-block .mho-note-text') as HTMLElement)?.innerText).toBe('payeur fiable');
+    });
+
+    it('does not refetch right after a failed load, but retries on the next call', async () => {
+        getMyUserNotesMock.mockRejectedValue(new Error('401'));
+        document.body.innerHTML = '<div id="user-tooltip"><a class="link" x-ajax-href="/soul/456"></a><hr class="dashed"></div>';
+
+        displayUserGlobalNote();
+        await flush();
+        expect(getMyUserNotesMock).toHaveBeenCalledTimes(1);
+
+        displayUserGlobalNote();
+        await flush();
+        expect(getMyUserNotesMock).toHaveBeenCalledTimes(2);
     });
 
     it('extracts the user id from the profile link, not from the home-visit link that can precede it in the same town', () => {

@@ -117,12 +117,16 @@ export function displayTownNote(): void {
     if (!state.town_notes) {
         if (!is_loading_town_notes) {
             is_loading_town_notes = true;
-            getMyTownNotes()
-                .catch(() => undefined)
-                .finally(() => {
+            /** Rappel uniquement en cas de succès : un échec attend le prochain rejeu des inits */
+            getMyTownNotes().then(
+                () => {
                     is_loading_town_notes = false;
                     displayTownNote();
-                });
+                },
+                () => {
+                    is_loading_town_notes = false;
+                }
+            );
         }
         return;
     }
@@ -164,12 +168,16 @@ export function displayCitizenNoteIcons(): void {
     if (!state.citizen_notes || state.citizen_notes_map_id !== map_id) {
         if (!is_loading_citizen_notes) {
             is_loading_citizen_notes = true;
-            getMyCitizenNotes(map_id)
-                .catch(() => undefined)
-                .finally(() => {
+            /** Rappel uniquement en cas de succès : un échec attend le prochain rejeu des inits */
+            getMyCitizenNotes(map_id).then(
+                () => {
                     is_loading_citizen_notes = false;
                     displayCitizenNoteIcons();
-                });
+                },
+                () => {
+                    is_loading_citizen_notes = false;
+                }
+            );
         }
         return;
     }
@@ -220,12 +228,16 @@ export function displayUserGlobalNote(): void {
     if (!state.user_notes) {
         if (!is_loading_user_notes) {
             is_loading_user_notes = true;
-            getMyUserNotes()
-                .catch(() => undefined)
-                .finally(() => {
+            /** Rappel uniquement en cas de succès : un échec attend le prochain rejeu des inits */
+            getMyUserNotes().then(
+                () => {
                     is_loading_user_notes = false;
                     displayUserGlobalNote();
-                });
+                },
+                () => {
+                    is_loading_user_notes = false;
+                }
+            );
         }
         return;
     }

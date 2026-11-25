@@ -402,6 +402,8 @@ export interface ParamDefinition {
     options?: ParamOption[];
     help?: string | I18nLabel;
     short_label?: I18nLabel;
+    /** Parent qui a un effet propre : sa valeur est stockée au lieu d'être déduite de ses enfants. */
+    active_without_children?: boolean;
 
     [key: string]: any;
 }

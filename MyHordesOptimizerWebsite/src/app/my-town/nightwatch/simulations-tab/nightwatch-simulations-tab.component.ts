@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, LOCALE_ID, Signal
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -12,9 +13,9 @@ import { Imports, ListForAddRemove } from '../../../_abstract_model/types/_types
 import { Item } from '../../../_abstract_model/types/item.class';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../_shared/confirm-dialog/confirm-dialog.component';
 import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
-import { bagItems } from '../nightwatch-bag.util';
 import { NightwatchStore, SimulationDayView, SimulationWatcherView } from '../nightwatch.store';
 import { NightwatchCitizenStateDTO, NightwatchSimulationDTO } from '../nightwatch.types';
+import { bagItems } from '../nightwatch-bag.util';
 import { NightwatchSimulationDayComponent } from './day/nightwatch-simulation-day.component';
 import {
     NightwatchSimulationDialogComponent,
@@ -22,16 +23,16 @@ import {
     NightwatchSimulationDialogResult
 } from './nightwatch-simulation-dialog.component';
 
-const material_modules: Imports = [MatButtonModule, MatDialogModule, MatIconModule, MatMenuModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatDialogModule, MatExpansionModule, MatIconModule, MatMenuModule, MatTooltipModule];
 
-/** Ligne du tableau multi-jours : un citoyen et son risque par jour (nul s'il ne veille pas). */
+/** Ligne du tableau « Veilleurs par jour » : un citoyen et son risque par jour (nul s'il ne veille pas). */
 interface SimulationCitizenRow {
     user_id: number;
     name: string;
     risks: (number | null)[];
 }
 
-/** Onglet Simulations : simulations en puces (menu par simulation) et tableau citoyens × jours de la simulation ouverte. */
+/** Onglet Simulations : simulations en puces, stock de départ replié, frise des jours, détail du jour et veilleurs par jour. */
 @Component({
     selector: 'mho-nightwatch-simulations-tab',
     templateUrl: './nightwatch-simulations-tab.component.html',
@@ -54,6 +55,10 @@ export class NightwatchSimulationsTabComponent {
     /** Stock de départ de la simulation ouverte. */
     private readonly stock: Signal<Record<number, number>> = computed((): Record<number, number> => this.selected()?.stock ?? {});
 
+    /** Nombre d'objets du stock de départ. */
+    protected readonly stock_count: Signal<number> = computed((): number =>
+        Object.values(this.stock()).reduce((sum: number, quantity: number): number => sum + quantity, 0));
+
     /** Stock de départ pour le composant de sac : un objet par exemplaire, objets hors catalogue omis. */
     protected readonly stock_bag: Signal<Item[]> = computed((): Item[] => bagItems(this.stock(), this.items(), false));
 
@@ -68,7 +73,7 @@ export class NightwatchSimulationsTabComponent {
         ];
     });
 
-    /** Citoyens par ordre alphabétique avec leur risque pour chaque jour de la simulation. */
+    /** Citoyens qui veillent au moins un jour, par ordre alphabétique, avec leur risque pour chaque jour de la simulation. */
     protected readonly rows: Signal<SimulationCitizenRow[]> = computed((): SimulationCitizenRow[] => {
         const days: SimulationDayView[] = this.store.simulation_days();
         return (this.store.state()?.citizens ?? [])
@@ -78,6 +83,7 @@ export class NightwatchSimulationsTabComponent {
                 risks: days.map((day: SimulationDayView): number | null =>
                     day.watchers.find((watcher: SimulationWatcherView): boolean => watcher.user_id === citizen.userId)?.risk ?? null)
             }))
+            .filter((row: SimulationCitizenRow): boolean => row.risks.some((risk: number | null): boolean => risk !== null))
             .sort((a: SimulationCitizenRow, b: SimulationCitizenRow): number => a.name.localeCompare(b.name, this.locale, { sensitivity: 'base' }));
     });
 

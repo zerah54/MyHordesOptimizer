@@ -20,66 +20,93 @@
 </div>
 
 @if (selected() !== null) {
-    <mho-list-element-add-remove withQuantity data-bag="stock" label="Stock de départ" i18n-label [currentList]="stock_bag()" [lists]="stock_lists()"
-                                 addLabel="Ajouter" i18n-addLabel (add)="changeStock(+$event, 1)"
-                                 removeLabel="Retirer" i18n-removeLabel (remove)="changeStock(+$event, -1)"
-                                 emptyLabel="Vider" i18n-emptyLabel (empty)="store.clearSimulationStock()" [readonly]="!store.can_edit_simulations()"/>
+    <mat-expansion-panel data-panel="stock">
+        <mat-expansion-panel-header>
+            <mat-panel-title i18n>Stock de départ</mat-panel-title>
+            <mat-panel-description data-field="stock-count">
+                {{ stock_count() }}
+                <ng-container i18n>{stock_count(), plural, =1 {objet} other {objets}}</ng-container>
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+            <mho-list-element-add-remove withQuantity data-bag="stock" label="Stock de départ" i18n-label [currentList]="stock_bag()" [lists]="stock_lists()"
+                                         addLabel="Ajouter" i18n-addLabel (add)="changeStock(+$event, 1)"
+                                         removeLabel="Retirer" i18n-removeLabel (remove)="changeStock(+$event, -1)"
+                                         emptyLabel="Vider" i18n-emptyLabel (empty)="store.clearSimulationStock()" [readonly]="!store.can_edit_simulations()"/>
+        </ng-template>
+    </mat-expansion-panel>
 }
 
 @if (selected() !== null && store.simulation_days().length > 0) {
-    <div class="table-scroll">
-        <table class="days">
-            <thead>
-            <tr>
-                <th scope="col"></th>
-                @for (day of store.simulation_days(); track day.day) {
-                    <th scope="col" [class.selected]="day.day === store.selected_day()">
-                        <button mat-button type="button" data-action="select-day" [attr.aria-pressed]="day.day === store.selected_day()"
-                                (click)="selectDay(day.day)">
-                            <ng-container i18n>J</ng-container>
-                            {{ day.day }}
-                        </button>
-                    </th>
-                }
-            </tr>
-            </thead>
-            <tbody>
-                @for (row of rows(); track row.user_id) {
-                    <tr>
-                        <th scope="row">{{ row.name }}</th>
-                        @for (risk of row.risks; track $index) {
-                            <td>
-                                @if (risk !== null) {
-                                    {{ percent(risk) }} %
-                                }
-                            </td>
+    <div class="days" role="group" i18n-aria-label aria-label="Jours de la simulation">
+        @for (day of store.simulation_days(); track day.day) {
+            <button type="button" class="day" data-action="select-day" [class.selected]="day.day === store.selected_day()"
+                    [class.covered]="day.verdict?.covered === true" [class.missing]="day.verdict?.covered === false"
+                    [attr.aria-pressed]="day.day === store.selected_day()" (click)="selectDay(day.day)">
+                <strong class="number">
+                    <ng-container i18n>J</ng-container>
+                    {{ day.day }}</strong>
+                <span class="verdict">
+                    @if (day.verdict; as verdict) {
+                        @if (verdict.covered) {
+                            <ng-container i18n>Couvert</ng-container>
+                        } @else if (verdict.missing_watchers !== null) {
+                            <ng-container i18n>Manque</ng-container> {{ verdict.missing_watchers }}
+                            <ng-container i18n>{verdict.missing_watchers, plural, =1 {veilleur} other {veilleurs}}</ng-container>
+                        } @else {
+                            <ng-container i18n>Non couvert</ng-container>
                         }
-                    </tr>
-                }
-            </tbody>
-            <tfoot>
-            <tr>
-                <th scope="row" i18n>Verdict</th>
-                @for (day of store.simulation_days(); track day.day) {
-                    <td [class.covered]="day.verdict?.covered === true" [class.missing]="day.verdict?.covered === false">
-                        @if (day.verdict; as verdict) {
-                            @if (verdict.covered) {
-                                <ng-container i18n>Couvert</ng-container>
-                            } @else if (verdict.missing_watchers !== null) {
-                                <ng-container i18n>Manque</ng-container> {{ verdict.missing_watchers }}
-                                <ng-container i18n>{verdict.missing_watchers, plural, =1 {veilleur} other {veilleurs}}</ng-container>
-                            } @else {
-                                <ng-container i18n>Non couvert</ng-container>
-                            }
-                        }
-                    </td>
-                }
-            </tr>
-            </tfoot>
-        </table>
+                    } @else {
+                        ?
+                    }
+                </span>
+                <span class="count">
+                    {{ day.watchers.length }}
+                    <ng-container i18n>{day.watchers.length, plural, =1 {veilleur} other {veilleurs}}</ng-container>
+                </span>
+            </button>
+        }
     </div>
+
     @if (selected_day_view(); as day) {
         <mho-nightwatch-simulation-day [day]="day"/>
+    }
+
+    @if (rows().length > 0) {
+        <mat-expansion-panel data-panel="by-day">
+            <mat-expansion-panel-header>
+                <mat-panel-title i18n>Veilleurs par jour</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="table-scroll">
+                <table class="by-day">
+                    <thead>
+                    <tr>
+                        <th scope="col"></th>
+                        @for (day of store.simulation_days(); track day.day) {
+                            <th scope="col" [class.selected]="day.day === store.selected_day()">
+                                <ng-container i18n>J</ng-container>
+                                {{ day.day }}
+                            </th>
+                        }
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of rows(); track row.user_id) {
+                            <tr>
+                                <th scope="row">{{ row.name }}</th>
+                                @for (risk of row.risks; track $index) {
+                                    <td>
+                                        @if (risk !== null) {
+                                            {{ percent(risk) }} %
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </mat-expansion-panel>
     }
 }
 

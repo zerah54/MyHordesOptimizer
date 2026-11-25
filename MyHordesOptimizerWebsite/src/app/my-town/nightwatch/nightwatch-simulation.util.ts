@@ -59,20 +59,38 @@ function isPrefillList(prefill: CityDefenseValues | readonly CityDefenseValues[]
 }
 
 /**
- * Défense restant à couvrir par les veilleurs : objectif hors AD (arrondi au supérieur) moins les postes.
+ * Objectif hors AD : attaque ajustée (réduction, débordement, réacteur) divisée par le bonus de l'AD, arrondie au supérieur.
+ * @param {number} attack Attaque estimée.
+ * @param {number} ad_level Niveau de l'AD (-1 = non construit).
+ * @param {NightwatchPlanContentDTO} content Contenu de la proposition (débordement, réduction, réacteur).
+ * @returns {number} Objectif hors AD.
+ */
+export function attackGoal(attack: number, ad_level: number, content: NightwatchPlanContentDTO): number {
+    const to_cover: number = attack * (100 - (content.attackReductionPercent ?? 0)) / 100
+        - (content.allowedOverflow ?? 0) + (content.reactorDamage ?? 0);
+    return Math.ceil(to_cover / (1 + (AD_COEFFICIENTS[ad_level] ?? 0)));
+}
+
+/**
+ * Défense de la ville hors veille : somme des postes, objets de défense multipliés par le coefficient FDD.
+ * @param {CityDefenseValues} defense Défense de la ville du jour.
+ * @returns {number} Total des postes.
+ */
+export function cityDefenseTotal(defense: CityDefenseValues): number {
+    return defense.wall + defense.bankDefenseItems * defense.fddCoefficient + defense.buildings
+        + defense.upgrades + defense.cemetery + defense.eveningVote + defense.guardians + defense.homes
+        + defense.guardTowerPa + defense.souls + defense.dumpContribution;
+}
+
+/**
+ * Défense restant à couvrir par les veilleurs : objectif hors AD moins les postes.
  * @param {number} attack Attaque estimée.
  * @param {CityDefenseValues} defense Défense de la ville du jour.
  * @param {NightwatchPlanContentDTO} content Contenu de la proposition (débordement, réduction, réacteur).
  * @returns {number} Reste à couvrir, négatif si la ville est déjà couverte.
  */
 export function remainingToCover(attack: number, defense: CityDefenseValues, content: NightwatchPlanContentDTO): number {
-    const to_cover: number = attack * (100 - (content.attackReductionPercent ?? 0)) / 100
-        - (content.allowedOverflow ?? 0) + (content.reactorDamage ?? 0);
-    const goal: number = Math.ceil(to_cover / (1 + (AD_COEFFICIENTS[defense.adLevel] ?? 0)));
-    const posts: number = defense.wall + defense.bankDefenseItems * defense.fddCoefficient + defense.buildings
-        + defense.upgrades + defense.cemetery + defense.eveningVote + defense.guardians + defense.homes
-        + defense.guardTowerPa + defense.souls + defense.dumpContribution;
-    return Math.ceil(goal - posts);
+    return Math.ceil(attackGoal(attack, defense.adLevel, content) - cityDefenseTotal(defense));
 }
 
 /**

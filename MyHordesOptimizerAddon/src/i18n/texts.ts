@@ -49,7 +49,7 @@ export const texts = {
     homes_col_lucky_find: { en: 'Seeker', fr: 'Trouvaille', de: 'Fund', es: 'Hallazgo' },
     homes_col_cheat_death: { en: 'Cheat Death', fr: 'Vaincre la Mort', de: 'Den Tod besiegen', es: 'Vencer a la muerte' },
     homes_col_heroic_return: { en: 'Heroic Return', fr: 'Retour du Héro', de: 'Die Rückkehr des Helden', es: 'El retorno del Héroe' },
-    homes_col_break_through: { en: 'Break Through', fr: 'Passage en Force', de: 'Durchgang in Kraft', es: 'Pasaje en vigor' },
+    homes_col_break_through: { en: 'Break Through', fr: 'Passage en force', de: 'Durchgang in Kraft', es: 'Pasaje en vigor' },
     homes_col_brother_in_arms: { en: 'Brothers in Arms', fr: 'Camaraderie', de: 'Freundschaft', es: 'Camaradería' },
     homes_col_apag: { en: 'Pre-war camera', fr: 'Appareil Photo d\'Avant-Guerre', de: 'Kamera aus Vorkriegs-Tagen', es: 'Cámara fotográfica de post-guerra' },
     website: {

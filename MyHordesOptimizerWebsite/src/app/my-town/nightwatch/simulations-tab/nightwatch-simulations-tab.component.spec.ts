@@ -27,7 +27,7 @@ function simulation(id: number, name: string, stock: Record<number, number> = {}
 /** Jour de simulation réduit aux champs affichés. */
 function simDay(day: number, watchers: SimulationWatcherView[], verdict: SimulationVerdict | null): SimulationDayView {
     return {
-        day, plan_id: 100 + day, attack: null, remaining: null, watch_defense: 0, stock: {}, verdict, watchers,
+        day, plan_id: 100 + day, attack: null, goal: null, remaining: null, watch_defense: 0, stock: {}, verdict, watchers,
         defense: {
             buildings: 0, upgrades: 0, wall: 0, bankDefenseItems: 0, homes: 0, guardians: 0, guardTowerPa: 0, souls: 0,
             cemetery: 0, eveningVote: 0, dumpContribution: 0, fddCoefficient: 1, adLevel: -1
@@ -108,6 +108,14 @@ describe('NightwatchSimulationsTabComponent', (): void => {
         fixture.detectChanges();
     }
 
+    /** Déplie le panneau du stock de départ. */
+    async function openStock(): Promise<void> {
+        root().querySelector<HTMLElement>('mat-expansion-panel[data-panel="stock"] mat-expansion-panel-header')?.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+    }
+
     afterEach((): void => {
         TestBed.resetTestingModule();
     });
@@ -181,7 +189,7 @@ describe('NightwatchSimulationsTabComponent', (): void => {
         expect(fake.actions.deleteSimulation).toHaveBeenCalled();
     });
 
-    it('tableau : citoyens × jours, risque du veilleur, verdict en pied (singulier compris) ; clic sur un jour', async (): Promise<void> => {
+    it('frise : une carte par jour (verdict, veilleurs) ; clic sur un jour ; tableau limité aux citoyens qui veillent', async (): Promise<void> => {
         await render();
         fake.state.set({ ...FAKE_NIGHTWATCH_STATE, citizens: [FAKE_NIGHTWATCH_STATE.citizens[2], FAKE_NIGHTWATCH_STATE.citizens[0]] });
         fake.simulations.set([simulation(1, 'J36')]);
@@ -194,12 +202,12 @@ describe('NightwatchSimulationsTabComponent', (): void => {
         ]);
         fixture.detectChanges();
 
+        const cards: string[] = Array.from(root().querySelectorAll('button[data-action="select-day"]')).map((card: Element): string =>
+            Array.from(card.children).map((part: Element): string => text(part)).join(' '));
+        expect(cards).toEqual(['J 10 Couvert 1 veilleur', 'J 11 Manque 2 veilleurs 0 veilleurs', 'J 12 ? 0 veilleurs', 'J 13 Manque 1 veilleur 0 veilleurs']);
         const rows: HTMLTableRowElement[] = Array.from(root().querySelectorAll<HTMLTableRowElement>('tbody tr'));
-        expect(rows.map((row: HTMLTableRowElement): string => text(row.querySelector('th')))).toEqual(['Alice', 'Chloé']);
+        expect(rows.map((row: HTMLTableRowElement): string => text(row.querySelector('th')))).toEqual(['Alice']);
         expect(Array.from(rows[0].querySelectorAll('td')).map((cell: Element): string => text(cell))).toEqual(['12.34 %', '', '', '']);
-        expect(Array.from(rows[1].querySelectorAll('td')).map((cell: Element): string => text(cell))).toEqual(['', '', '', '']);
-        const verdicts: string[] = Array.from(root().querySelectorAll('tfoot td')).map((cell: Element): string => text(cell));
-        expect(verdicts).toEqual(['Couvert', 'Manque 2 veilleurs', '', 'Manque 1 veilleur']);
 
         root().querySelectorAll<HTMLButtonElement>('button[data-action="select-day"]')[1].click();
 
@@ -256,9 +264,18 @@ describe('NightwatchSimulationsTabComponent', (): void => {
         expect(fake.actions.setSimulationLastDay).toHaveBeenCalledWith(15);
     });
 
+    it('stock de départ replié : nombre d\'objets en résumé, contenu rendu à l\'ouverture seulement', async (): Promise<void> => {
+        await render();
+        selectSimulation({ 22: 2, 23: 3 });
+
+        expect(text(root().querySelector('[data-field="stock-count"]'))).toContain('5');
+        expect(bag('stock')).toBeUndefined();
+    });
+
     it('stock de départ : un objet par exemplaire, objets inconnus ignorés ; ajout, retrait → setSimulationStock ; vider → clearSimulationStock', async (): Promise<void> => {
         await render();
         selectSimulation({ 22: 2, 999: 1 });
+        await openStock();
 
         const stock: ListElementAddRemoveComponent | undefined = bag('stock');
         expect(stock?.label()).toBe('Stock de départ');
@@ -278,6 +295,7 @@ describe('NightwatchSimulationsTabComponent', (): void => {
         await render();
         fake.state.set({ ...FAKE_NIGHTWATCH_STATE, bank: { 23: 4 } });
         selectSimulation();
+        await openStock();
 
         const lists: ListForAddRemove[] = bag('stock')?.lists() ?? [];
         expect(lists.map((list: ListForAddRemove): string => list.label)).toEqual(['Banque', 'Tous']);

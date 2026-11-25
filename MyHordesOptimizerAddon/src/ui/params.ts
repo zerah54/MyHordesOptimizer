@@ -2,7 +2,7 @@ import { mho_parameters_key } from '../config/constants';
 import { params_categories } from '../data/params';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
-import type { I18nLabel } from '../types';
+import type { I18nLabel, MhoParameters, ParamCategory, ParamDefinition } from '../types';
 import { initOptionsWithLoginNeeded, initOptionsWithoutLoginNeeded } from '../utils/fetch';
 import { getI18N } from '../utils/i18n';
 import { isTouchScreen } from '../utils/misc';
@@ -70,6 +70,8 @@ export function createParams(content) {
             createParamItem(param, category_content, 0);
         });
     });
+
+    refreshAllParentParams();
 }
 
 
@@ -116,14 +118,13 @@ export function createParamItem(param, parent, depth) {
     param_label.style.flex = '1';
     param_input_div.appendChild(param_label);
 
-    // Flèche indicateur enfants (mobile uniquement)
+    // Flèche indicateur enfants (mobile uniquement, la version bureau passe par .param-has-children)
     let arrow_indicator = null;
     if (has_children && is_touch) {
         arrow_indicator = document.createElement('span');
         arrow_indicator.classList.add('mho-param-arrow');
         arrow_indicator.style.marginLeft = '0.5em';
         arrow_indicator.style.transition = 'transform 0.2s';
-        arrow_indicator.style.display = param_input.checked ? 'inline' : 'none';
         arrow_indicator.innerText = '▶';
         param_input_div.appendChild(arrow_indicator);
     }
@@ -139,6 +140,7 @@ export function createParamItem(param, parent, depth) {
     if (!has_children) {
         param_input.addEventListener('change', (event) => {
             updateParam(param.id, event.target.checked);
+            refreshAllParentParams();
             initOptionsWithLoginNeeded();
             initOptionsWithoutLoginNeeded();
         });
@@ -178,44 +180,24 @@ export function createParamItem(param, parent, depth) {
             }
         };
 
-        // Clic sur le label : toggle expand (seulement si coché)
+        // Clic sur le label : toggle expand
         param_label.style.cursor = 'pointer';
         param_label.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
-            if (!param_input.checked) {
-                // Cocher l'input
-                param_input.checked = true;
-                updateParam(param.id, true);
-                setParamChildrenChecked(param, true);
-                syncChildInputs(param, true);
-                if (arrow_indicator) arrow_indicator.style.display = 'inline';
-                // Ne pas expand ici, juste cocher
-                initOptionsWithLoginNeeded();
-                initOptionsWithoutLoginNeeded();
+            if (is_expanded) {
+                collapse();
             } else {
-                // Toggle expand/collapse
-                if (is_expanded) {
-                    collapse();
-                } else {
-                    expand();
-                }
+                expand();
             }
         });
 
-        // Changement direct de l'input (clic sur la checkbox elle-même)
         param_input.addEventListener('change', (event) => {
             const checked = event.target.checked;
             updateParam(param.id, checked);
             setParamChildrenChecked(param, checked);
             syncChildInputs(param, checked);
-
-            if (!checked) {
-                collapse();
-                if (arrow_indicator) arrow_indicator.style.display = 'none';
-            } else {
-                if (arrow_indicator) arrow_indicator.style.display = 'inline';
-            }
+            refreshAllParentParams();
 
             initOptionsWithLoginNeeded();
             initOptionsWithoutLoginNeeded();
@@ -230,9 +212,7 @@ export function createParamItem(param, parent, depth) {
         children_container.style.border = '1px solid #f0d79e';
         children_container.style.outline = '1px solid #000';
 
-        if (param_input.checked) {
-            param_container.classList.add('param-has-children');
-        }
+        param_container.classList.add('param-has-children');
 
         const showTooltip = () => {
             positionTooltip();
@@ -271,9 +251,7 @@ export function createParamItem(param, parent, depth) {
 
         const onMouseEnter = () => {
             mousein = true;
-            if (param_input.checked) {
-                showTooltip();
-            }
+            showTooltip();
         };
 
         const onMouseLeave = () => {
@@ -293,13 +271,7 @@ export function createParamItem(param, parent, depth) {
             updateParam(param.id, checked);
             setParamChildrenChecked(param, checked);
             syncChildInputs(param, checked);
-
-            if (checked) {
-                param_container.classList.add('param-has-children');
-            } else {
-                param_container.classList.remove('param-has-children');
-                hideTooltip();
-            }
+            refreshAllParentParams();
 
             initOptionsWithLoginNeeded();
             initOptionsWithoutLoginNeeded();
@@ -347,6 +319,43 @@ export function setParamChildrenChecked(param, checked) {
         if (child_input) child_input.checked = checked;
         setParamChildrenChecked(child, checked);
     });
+}
+
+export type ParamState = 'checked' | 'indeterminate' | 'unchecked';
+
+/** État d'un paramètre : valeur stockée pour une feuille, dérivé des enfants pour un parent. */
+export function getParamState(param: ParamDefinition, values: MhoParameters): ParamState {
+    if (!param.children?.length) return values[param.id] ? 'checked' : 'unchecked';
+    if (param.active_without_children && !values[param.id]) return 'unchecked';
+    const states: ParamState[] = param.children.map((child: ParamDefinition) => getParamState(child, values));
+    if (states.every((child_state: ParamState) => child_state === 'checked')) return 'checked';
+    if (states.every((child_state: ParamState) => child_state === 'unchecked') && !param.active_without_children) return 'unchecked';
+    return 'indeterminate';
+}
+
+/** Recalcule la case tri-état des parents ; un parent est actif dès qu'un de ses enfants l'est. */
+export function refreshParentInputs(params: ParamDefinition[], values: MhoParameters): void {
+    params.forEach((param: ParamDefinition) => {
+        if (!param.children?.length) return;
+        refreshParentInputs(param.children, values);
+        if (param.active_without_children && param.children.some((child: ParamDefinition) => getParamState(child, values) !== 'unchecked')) {
+            values[param.id] = true;
+        }
+        const param_state: ParamState = getParamState(param, values);
+        values[param.id] = param_state !== 'unchecked';
+        const input: HTMLInputElement | null = document.getElementById(`${param.id}_input`) as HTMLInputElement | null;
+        if (input) {
+            input.checked = param_state === 'checked';
+            input.indeterminate = param_state === 'indeterminate';
+        }
+    });
+}
+
+/** Recalcule tous les parents de l'écran des paramètres et enregistre le résultat. */
+function refreshAllParentParams(): void {
+    if (!state.mho_parameters) state.mho_parameters = {};
+    refreshParentInputs(params_categories.flatMap((category: ParamCategory) => category.params), state.mho_parameters);
+    setStorageItem(mho_parameters_key, state.mho_parameters);
 }
 
 

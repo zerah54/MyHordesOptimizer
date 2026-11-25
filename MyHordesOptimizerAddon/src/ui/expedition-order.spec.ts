@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { repo_img_hordes_url } from '../config/constants';
 import { state } from '../state';
@@ -11,6 +11,10 @@ vi.mock('../utils/version', () => ({
     getErrorFromApi: (error: unknown): unknown => error,
     getScriptInfo: (): { version: string; updateURL: string } => ({ version: '0.0.0', updateURL: 'about:blank' })
 }));
+
+const mocks: { setOrderDone: Mock; addError: Mock } = vi.hoisted((): { setOrderDone: Mock; addError: Mock } => ({ setOrderDone: vi.fn(), addError: vi.fn() }));
+vi.mock('../api/expeditions', () => ({ setOrderDone: mocks.setOrderDone }));
+vi.mock('../utils/notifications', () => ({ addError: mocks.addError }));
 
 /** Langue de la page en jsdom : `lang` vaut `en` (navigator.language) */
 const PLANK: MhoItem = { id: 3, img: 'item/item_wood_bad.gif', label: { fr: 'Planche tordue', en: 'Twisted Plank', de: 'Verbogenes Brett', es: 'Tabla torcida' } };
@@ -90,5 +94,41 @@ describe('createOrderElement', (): void => {
         const element: HTMLDivElement = createOrderElement(order({ type: 'text', text: '<p>Passer <b>vite</b><script>alert(1)</script></p>' }));
         expect(element.querySelector('.mho-order-mark')?.textContent).toBe('•');
         expect(element.querySelector('.mho-order-text')?.innerHTML).toBe('<p>Passer <b>vite</b></p>');
+    });
+
+    it('clic sur la case : envoie la coche au site puis coche la consigne', async (): Promise<void> => {
+        mocks.setOrderDone.mockResolvedValue(undefined);
+        const consigne: ApiExpeditionOrder = order({ id: 12, kind: 'camp' });
+        const element: HTMLDivElement = createOrderElement(consigne);
+        const mark: HTMLButtonElement = element.querySelector('button.mho-order-mark') as HTMLButtonElement;
+
+        mark.click();
+        expect(mark.disabled).toBe(true);
+        await vi.waitFor((): void => expect(mark.disabled).toBe(false));
+
+        expect(mocks.setOrderDone).toHaveBeenCalledWith(12, true);
+        expect(consigne.isDone).toBe(true);
+        expect(element.classList).toContain('mho-order-done');
+        expect(mark.textContent).toBe('☑');
+        expect(mark.getAttribute('aria-checked')).toBe('true');
+    });
+
+    it('échec de l\'envoi : la consigne reste décochée et l\'erreur est signalée', async (): Promise<void> => {
+        mocks.setOrderDone.mockRejectedValue(new Error('423'));
+        const consigne: ApiExpeditionOrder = order({ id: 12, kind: 'camp' });
+        const element: HTMLDivElement = createOrderElement(consigne);
+        const mark: HTMLButtonElement = element.querySelector('button.mho-order-mark') as HTMLButtonElement;
+
+        mark.click();
+        await vi.waitFor((): void => expect(mocks.addError).toHaveBeenCalled());
+
+        expect(consigne.isDone).toBe(false);
+        expect(element.classList).not.toContain('mho-order-done');
+        expect(mark.textContent).toBe('☐');
+    });
+
+    it('consigne sans identifiant : case non cliquable', (): void => {
+        const element: HTMLDivElement = createOrderElement(order({ kind: 'camp' }));
+        expect(element.querySelector('button.mho-order-mark')).toBeNull();
     });
 });

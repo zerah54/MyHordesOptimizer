@@ -33,10 +33,11 @@ export function getCitizens(fresh: boolean = false) {
 
 /**
  * Citoyens de la ville du joueur, lus dans la base MHO (`GET Fetcher/citizens`, aucun appel à MyHordes),
- * réduits à l'identifiant, au pseudo et au métier. Ne touche pas à `state.citizens`.
+ * réduits à l'identifiant, au pseudo et au métier. Ne touche pas à `state.citizens`. Attend le jeton :
+ * la mise à jour l'appelle, parfois pendant un renouvellement.
  */
 export async function fetchTownCitizenRefs(): Promise<TownCitizenRef[]> {
-    const response: Response = await fetcher(`${state.api_url}/Fetcher/citizens?userId=${state.mh_user?.id}&townId=${state.mh_user?.townDetails?.townId}`);
+    const response: Response = await fetcher(`${state.api_url}/Fetcher/citizens?userId=${state.mh_user?.id}&townId=${state.mh_user?.townDetails?.townId}`, undefined, { wait_for_token: true });
     if (response.status !== 200) {
         return convertResponsePromiseToError(response);
     }

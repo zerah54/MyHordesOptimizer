@@ -3,7 +3,7 @@ import { fetcher } from '../utils/fetch';
 import { addError } from '../utils/notifications';
 import { convertResponsePromiseToError } from '../utils/version';
 
-/** Déclare à l'API si le joueur a ses chaussures équipées ; rien n'est envoyé sans état détecté ni ville connue. */
+/** Déclare à l'API si le joueur a ses chaussures équipées (en attendant le jeton) ; rien n'est envoyé sans état détecté ni ville connue. */
 export function saveShoesEquipped(equipped: boolean | undefined): Promise<void> | undefined {
     const town_id: number | undefined = state.mh_user.townDetails?.townId;
     if (equipped === undefined || town_id === undefined || town_id === null) return undefined;
@@ -12,7 +12,7 @@ export function saveShoesEquipped(equipped: boolean | undefined): Promise<void> 
         method: 'POST',
         body: JSON.stringify({ shoesEquipped: equipped }),
         headers: { 'Content-Type': 'application/json' }
-    })
+    }, { wait_for_token: true })
         .then((response: Response): Promise<void> | undefined => response.status >= 200 && response.status < 300 ? undefined : convertResponsePromiseToError(response))
         .catch((error: unknown): never => {
             addError(error);

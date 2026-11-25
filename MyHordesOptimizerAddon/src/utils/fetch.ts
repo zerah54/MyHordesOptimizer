@@ -183,7 +183,20 @@ export interface FetcherOptions {
     wait_for_token?: boolean;
 }
 
+/**
+ * Envoie la requête ; sur 401 de l'API MHO, renouvelle le jeton (forcé) et rejoue une seule fois, sauf si un
+ * renouvellement était déjà en cours à l'envoi (`tokenReceived()` s'attendrait lui-même).
+ */
 export async function fetcher(url: string, options?: any, fetcher_options?: FetcherOptions): Promise<Response> {
+    const renewal_in_flight: boolean = isTokenRequestInFlight();
+    const response: Response = await fetchWithTimeout(url, await updateFetchRequestOptions(options, fetcher_options));
+    if (response.status !== 401 || renewal_in_flight || !url.startsWith(state.api_url)) {
+        return response;
+    }
+    await getToken(true);
+    if (!isValidToken()) {
+        return response;
+    }
     return fetchWithTimeout(url, await updateFetchRequestOptions(options, fetcher_options));
 }
 

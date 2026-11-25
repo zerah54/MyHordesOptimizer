@@ -3,58 +3,102 @@
 :host {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 0.75em;
 
     @include shared.alert;
     @include shared.compact-field;
     @include shared.kpis;
 
-    .attack,
-    .posts {
+    mat-panel-description {
+        justify-content: flex-end;
+        gap: 0.25em;
+
+        .warning {
+            color: var(--mho-danger);
+        }
+    }
+
+    // Une ligne par valeur : libellé à gauche, saisie à droite ; tient sur un téléphone.
+    .lines {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25em;
+        max-width: 32rem;
+    }
+
+    .line {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+        grid-template-columns: 1fr 8rem 2.5rem;
+        align-items: center;
         gap: 0.5em;
+        padding-left: 0.4em;
+        border-left: 3px solid transparent;
+
+        &.edited {
+            border-left-color: var(--mho-accent);
+        }
+
+        .number {
+            width: 100%;
+        }
     }
 
     .watchers {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+        align-items: start;
+        gap: 0.75em;
+        margin-bottom: 0.75em;
+    }
+
+    .watcher {
         display: flex;
         flex-direction: column;
         gap: 0.5em;
+        padding: 0.5em 0.75em;
     }
 
-    .citizen {
+    .head {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 0.25em 1em;
+        gap: 0.25em 0.75em;
+
+        .name {
+            flex: 1 1 auto;
+        }
+
+        .stat {
+            white-space: nowrap;
+        }
     }
 
+    .job,
     .status-icon {
         vertical-align: middle;
     }
 
-    .global {
-        display: flex;
-        flex-direction: column;
-        gap: 0.4em;
+    .add-watcher {
+        width: min(100%, 20rem);
     }
 
     .stock {
-        h3 {
-            margin: 0 0 0.25em;
-        }
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25em 1em;
 
-        ul {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25em 1em;
-            margin: 0;
-            padding: 0;
-            list-style: none;
+        .item {
+            white-space: nowrap;
         }
 
         img {
             vertical-align: middle;
         }
     }
+}
+
+// Options du sélecteur rendues dans l'overlay, mais issues de ce gabarit : la portée du composant s'applique.
+mat-option .job {
+    margin-right: 0.4em;
+    vertical-align: middle;
 }

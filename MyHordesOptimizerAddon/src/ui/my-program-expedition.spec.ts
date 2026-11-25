@@ -9,6 +9,7 @@ vi.mock('../utils/version', () => ({
     getErrorFromApi: (error: unknown): unknown => error,
     getScriptInfo: (): { version: string; updateURL: string } => ({ version: '0.0.0', updateURL: 'about:blank' })
 }));
+vi.mock('../api/expeditions', () => ({ setOrderDone: vi.fn() }));
 
 vi.mock('./expedition-route', () => ({
     formatCell: (point: { x: number; y: number }): string => `[${point.x} / ${point.y}]`,

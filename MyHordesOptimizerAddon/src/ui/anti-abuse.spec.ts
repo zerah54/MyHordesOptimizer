@@ -5,10 +5,12 @@ import type { MhoItem } from '../types';
 import { getStorageItem, setStorageItem } from '../utils/storage';
 import { displayAntiAbuseCounter } from './anti-abuse';
 
-/** `pageIsBank()`/`pageIsWell()` lisent `document.URL` : mockées pour piloter le scénario banque */
+const page: { is_well: boolean } = vi.hoisted((): { is_well: boolean } => ({ is_well: false }));
+
+/** `pageIsBank()`/`pageIsWell()` lisent `document.URL` : mockées pour piloter le scénario banque (défaut) ou puits */
 vi.mock('../utils/page', () => ({
-    pageIsBank: (): boolean => true,
-    pageIsWell: (): boolean => false
+    pageIsBank: (): boolean => !page.is_well,
+    pageIsWell: (): boolean => page.is_well
 }));
 
 vi.mock('../utils/storage', () => ({
@@ -680,5 +682,34 @@ describe('displayAntiAbuseCounter — comptage des prises en banque (signal sig-
         const stored_values: StoredCounterValue[] = last_call![1] as StoredCounterValue[];
         expect(stored_values).toHaveLength(1);
         expect(stored_values[0].item.item.id).toBe(normal_item.id);
+    });
+});
+
+describe('displayAntiAbuseCounter : puits, rejeux', () => {
+    afterEach(() => {
+        page.is_well = false;
+        document.body.innerHTML = '';
+    });
+
+    it('ne traite la prise de ration qu\'une fois après plusieurs rejeux puis un clic', async () => {
+        page.is_well = true;
+        state.items = [];
+        state.mho_parameters = { display_anti_abuse: true };
+        document.body.innerHTML = '<div><div class="actions-box"></div></div><button data-fetch-method="get" data-fetch-confirm></button>';
+        const button: HTMLButtonElement = document.querySelector('button') as HTMLButtonElement;
+        setStorageItemMock.mockClear();
+
+        for (let i: number = 0; i < 3; i++) {
+            document.getElementById('mho-anti-abuse-counter')?.remove();
+            displayAntiAbuseCounter();
+            await Promise.resolve();
+            await Promise.resolve();
+        }
+        button.click();
+        document.dispatchEvent(new Event('mh-navigation-complete'));
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(setStorageItemMock).toHaveBeenCalledTimes(1);
     });
 });

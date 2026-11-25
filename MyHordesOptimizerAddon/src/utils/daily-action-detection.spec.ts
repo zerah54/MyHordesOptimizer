@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { dailyActionReport, detectDailyActionDone, HOME_DAILY_ACTIONS, reportHomeDailyActions } from './daily-action-detection';
 
@@ -99,5 +99,21 @@ describe('reportHomeDailyActions', () => {
 
         await expect(reportHomeDailyActions(save, 'vest')).resolves.toBeUndefined();
         expect(sent).toEqual(['home_pool:true', 'home_crows:false']);
+    });
+
+    it('lance les 9 envois avant qu\'aucun ne soit résolu, et se résout quand tous ont abouti', async () => {
+        document.body.innerHTML = HOME_DAILY_ACTIONS.map((a) => `<li class="heroic_action"><img src="/build/images/actions/${a.icon}.gif"></li>`).join('');
+        const resolvers: (() => void)[] = [];
+        const save = vi.fn((): Promise<void> => new Promise<void>((resolve) => { resolvers.push(resolve); }));
+        let finished: boolean = false;
+
+        const promise: Promise<void> = reportHomeDailyActions(save, 'vest').then(() => { finished = true; });
+        await Promise.resolve();
+
+        expect(save).toHaveBeenCalledTimes(9);
+        expect(finished).toBe(false);
+        resolvers.forEach((resolve) => resolve());
+        await promise;
+        expect(finished).toBe(true);
     });
 });

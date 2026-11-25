@@ -9,6 +9,7 @@ vi.mock('../utils/version', () => ({
     getErrorFromApi: (error: unknown): unknown => error,
     getScriptInfo: (): { version: string; updateURL: string } => ({ version: '0.0.0', updateURL: 'about:blank' })
 }));
+vi.mock('../api/expeditions', () => ({ setOrderDone: vi.fn() }));
 
 function order(overrides: Partial<ApiExpeditionOrder>): ApiExpeditionOrder {
     return { type: 'checkbox', text: '', isDone: false, position: 0, kind: null, ...overrides };

@@ -1865,11 +1865,25 @@ $mho-route-arrow-stroke: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org
     }
 }
 
-/* Une consigne en lecture seule (ui/expedition-order.ts) : bloc du désert et fenêtre des expéditions */
+/* Une consigne (ui/expedition-order.ts) : bloc du désert et fenêtre des expéditions */
 .mho-order {
     display: flex;
     align-items: baseline;
     gap: 0.35em;
+
+    button.mho-order-mark {
+        padding: 0;
+        border: none;
+        background: none;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+
+        &:disabled {
+            cursor: wait;
+            opacity: 0.5;
+        }
+    }
 
     &.mho-order-done .mho-order-content {
         text-decoration: line-through;

@@ -1,9 +1,11 @@
+import { setOrderDone } from '../api/expeditions';
 import { repo_img_hordes_url } from '../config/constants';
 import { hero_actions, type HeroActionInfo } from '../data/hero-actions';
 import { expedition_texts } from '../i18n/texts';
 import { state } from '../state';
 import type { ApiExpeditionOrder, ApiExpeditionOrderKind, I18nLabel, MhoItem } from '../types';
 import { getI18N } from '../utils/i18n';
+import { addError } from '../utils/notifications';
 import { appendRichText } from '../utils/rich-text';
 
 /** Verbe de chaque type de consigne */
@@ -105,7 +107,37 @@ export function describeOrder(order: ApiExpeditionOrder, citizen_names?: Readonl
     return { verb: getI18N(KIND_VERBS[kind]) ?? '', rest, img, glyph: KIND_GLYPHS[kind], note: order.note?.trim() || null };
 }
 
-/** Consigne en lecture seule : case à cocher ou puce, case éventuelle, image ou pictogramme, puis verbe et paramètres (typée) ou texte libre réduit aux balises de mise en forme. */
+/** Affiche l'état coché ou non de la consigne sur sa ligne et sa case. */
+function renderDone(element: HTMLElement, mark: HTMLButtonElement, done: boolean): void {
+    element.classList.toggle('mho-order-done', done);
+    mark.textContent = done ? '☑' : '☐';
+    mark.setAttribute('aria-checked', String(done));
+}
+
+/** Case cliquable : envoie la coche au site, et ne change l'affichage (et la consigne en mémoire) qu'une fois acceptée. */
+function createCheckButton(element: HTMLElement, order: ApiExpeditionOrder, order_id: number): HTMLButtonElement {
+    const mark: HTMLButtonElement = document.createElement('button');
+    mark.type = 'button';
+    mark.classList.add('mho-order-mark');
+    mark.setAttribute('role', 'checkbox');
+    renderDone(element, mark, order.isDone === true);
+    mark.addEventListener('click', (): void => {
+        const next: boolean = order.isDone !== true;
+        mark.disabled = true;
+        setOrderDone(order_id, next)
+            .then((): void => {
+                order.isDone = next;
+                renderDone(element, mark, next);
+            })
+            .catch((error: unknown): void => addError(error))
+            .finally((): void => {
+                mark.disabled = false;
+            });
+    });
+    return mark;
+}
+
+/** Consigne : case à cocher (cliquable si la consigne a un identifiant) ou puce, case éventuelle, image ou pictogramme, puis verbe et paramètres (typée) ou texte libre réduit aux balises de mise en forme. */
 export function createOrderElement(order: ApiExpeditionOrder, options: OrderRenderOptions = {}): HTMLDivElement {
     const element: HTMLDivElement = document.createElement('div');
     element.classList.add('mho-order');
@@ -116,10 +148,15 @@ export function createOrderElement(order: ApiExpeditionOrder, options: OrderRend
     const done: boolean = checkable && order.isDone === true;
     if (done) element.classList.add('mho-order-done');
 
-    const mark: HTMLSpanElement = document.createElement('span');
-    mark.classList.add('mho-order-mark');
-    mark.textContent = checkable ? (done ? '☑' : '☐') : '•';
-    element.appendChild(mark);
+    const order_id: number | null | undefined = order.id;
+    if (checkable && typeof order_id === 'number') {
+        element.appendChild(createCheckButton(element, order, order_id));
+    } else {
+        const mark: HTMLSpanElement = document.createElement('span');
+        mark.classList.add('mho-order-mark');
+        mark.textContent = checkable ? (done ? '☑' : '☐') : '•';
+        element.appendChild(mark);
+    }
 
     if (options.cell_label) {
         const cell: HTMLSpanElement = document.createElement('span');

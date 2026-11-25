@@ -66,6 +66,19 @@ describe('updateExternalTools', () => {
         expect(setStorageItemMock).toHaveBeenCalledWith(mho_token_key, renewed_token);
     });
 
+    it('attend le jeton pour le lancement et le suivi : un renouvellement peut être en cours', async () => {
+        fetcherMock
+            .mockResolvedValueOnce(jsonResponse(200, { jobId: 'job-1', isRunning: true, tools: [] }))
+            .mockResolvedValueOnce(jsonResponse(200, { jobId: 'job-1', isRunning: false, tools: [] }));
+
+        await updateExternalTools();
+
+        const start_call: unknown[] | undefined = fetcherMock.mock.calls.find((call: unknown[]): boolean => String(call[0]).includes('/externaltools/update/start'));
+        const status_call: unknown[] | undefined = fetcherMock.mock.calls.find((call: unknown[]): boolean => String(call[0]).includes('/externaltools/update/status'));
+        expect(start_call?.[2]).toEqual({ wait_for_token: true });
+        expect(status_call?.[2]).toEqual({ wait_for_token: true });
+    });
+
     /**
      * C1 (revue finale du chantier cycle de vie de session) : ExternalTools/Update/Start refuse
      * (403) tout appel sans Bearer valide. L'attente d'un jeton frais quand isValidToken() est faux

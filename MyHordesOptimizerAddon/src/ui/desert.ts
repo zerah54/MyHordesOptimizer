@@ -4,49 +4,54 @@ import { getI18N } from '../utils/i18n';
 import { createNotification } from '../utils/notifications';
 import { pageIsDesert } from '../utils/page';
 
+/** L'écouteur `beforeunload` est posé une seule fois pour la vie de la page */
+let prevent_from_leaving_bound: boolean = false;
+
+/** Pose (une seule fois, quand l'option est active dans le désert) l'écouteur qui avertit avant de quitter le désert sans escorte ; option et page sont relues à chaque déclenchement. */
 export function preventFromLeaving() {
-    if (state.mho_parameters.alert_if_no_escort && state.mho_parameters.prevent_from_leaving && pageIsDesert()) {
-        const prevent_function = (event) => {
-            const e = event || window.event;
+    if (prevent_from_leaving_bound || !(state.mho_parameters.alert_if_no_escort && state.mho_parameters.prevent_from_leaving && pageIsDesert())) return;
+    prevent_from_leaving_bound = true;
+    const prevent_function = (event) => {
+        if (!(state.mho_parameters.alert_if_no_escort && state.mho_parameters.prevent_from_leaving && pageIsDesert())) return;
+        const e = event || window.event;
 
-            const ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
-            if (ae_button) {
-                let mho_leaving_info = document.getElementById('mho-leaving-info');
-                if (!mho_leaving_info) {
-                    mho_leaving_info = document.createElement('div');
-                    mho_leaving_info.id = 'mho-leaving-info';
-                    mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                    mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
-                    ae_button.parentNode.insertBefore(mho_leaving_info, ae_button.nextSibling);
-                }
+        const ae_button = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
+        if (ae_button) {
+            let mho_leaving_info = document.getElementById('mho-leaving-info');
+            if (!mho_leaving_info) {
+                mho_leaving_info = document.createElement('div');
+                mho_leaving_info.id = 'mho-leaving-info';
+                mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
+                mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.prevent_not_in_ae);
+                ae_button.parentNode.insertBefore(mho_leaving_info, ae_button.nextSibling);
+            }
+        }
+
+        const is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+
+        if (is_escorting) {
+            let mho_leaving_info = document.getElementById('mho-leaving-info');
+            if (!mho_leaving_info) {
+                mho_leaving_info = document.createElement('div');
+                mho_leaving_info.id = 'mho-leaving-info';
+                mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
+                mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.escort_not_released);
+                is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
+            }
+        }
+
+        /** Si est en AE ou qu'on n'a pas reposé l'escorte */
+        if (ae_button || is_escorting) {
+            if (e) {
+                e.returnValue = '';
+                e.preventDefault();
             }
 
-            const is_escorting = document.getElementsByClassName('beyond-escort-on')[0];
+            return '';
+        }
+    };
 
-            if (is_escorting) {
-                let mho_leaving_info = document.getElementById('mho-leaving-info');
-                if (!mho_leaving_info) {
-                    mho_leaving_info = document.createElement('div');
-                    mho_leaving_info.id = 'mho-leaving-info';
-                    mho_leaving_info.setAttribute('style', 'background-color: red; padding: 0.5em; margin-top: 0.5em; border: 1px solid;');
-                    mho_leaving_info.innerText = getI18N(texts.prevent_from_leaving_information) + getI18N(texts.escort_not_released);
-                    is_escorting.parentNode.insertBefore(mho_leaving_info, is_escorting.nextSibling);
-                }
-            }
-
-            /** Si est en AE ou qu'on n'a pas reposé l'escorte */
-            if (ae_button || is_escorting) {
-                if (e) {
-                    e.returnValue = '';
-                    e.preventDefault();
-                }
-
-                return '';
-            }
-        };
-
-        window.addEventListener('beforeunload', prevent_function, false);
-    }
+    window.addEventListener('beforeunload', prevent_function, false);
 }
 
 /** Bouton « Attendre une escorte » : sa présence signifie que l'attente d'escorte n'est pas activée */
@@ -162,12 +167,15 @@ export function alertIfInactiveAndNoEscort(): void {
     }
 }
 
-/** Affiche une notification 5 secondes avant la fin de la fouille en cours */
+/** Boutons d'escorte déjà équipés de l'écouteur de clic */
+const escort_buttons_bound: WeakSet<Element> = new WeakSet<Element>();
 
+/** Applique les options d'escorte par défaut quand le joueur active l'attente d'escorte. */
 export function changeDefaultEscortOptions() {
     if (state.mho_parameters.default_escort_options && pageIsDesert()) {
         const btn_activate_escort = document.querySelector('button[x-toggle-escort="1"]:not([x-escort-control-endpoint])');
-        if (!btn_activate_escort) return;
+        if (!btn_activate_escort || escort_buttons_bound.has(btn_activate_escort)) return;
+        escort_buttons_bound.add(btn_activate_escort);
 
         btn_activate_escort.addEventListener('click', () => {
             document.addEventListener('mh-navigation-complete', () => {

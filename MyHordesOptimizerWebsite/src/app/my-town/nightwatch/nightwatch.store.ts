@@ -57,6 +57,7 @@ import {
 } from './nightwatch-model.util';
 import { PlannedBuildings, plannedBuildings, RealBuildings } from './nightwatch-planned-buildings.util';
 import {
+    attackGoal,
     CityDefenseValues,
     offeredCapacity,
     remainingStock,
@@ -179,6 +180,7 @@ export interface SimulationDayView {
     day: number;
     plan_id: number;
     attack: number | null;
+    goal: number | null;
     defense: CityDefenseValues;
     remaining: number | null;
     watch_defense: number;
@@ -417,6 +419,7 @@ export class NightwatchStore {
                 day: plan.day,
                 plan_id: plan.id,
                 attack,
+                goal: attack === null ? null : attackGoal(attack, defenses[index].adLevel, plan.content),
                 defense: defenses[index],
                 remaining,
                 watch_defense,

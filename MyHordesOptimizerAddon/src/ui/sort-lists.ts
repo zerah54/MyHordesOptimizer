@@ -37,6 +37,9 @@ export interface SortableTableOptions {
     header_cell_class?: string;
 }
 
+/** Contrôleur portant les écouteurs de tri d'un tableau, abandonné au nettoyage */
+const sort_controllers: WeakMap<Element, AbortController> = new WeakMap<Element, AbortController>();
+
 export function mhoInitSortableTable(table, columns, rowSelector, options: SortableTableOptions = {}) {
     if (!table || table.dataset.sortEnabled) return;
     table.dataset.sortEnabled = 'true';
@@ -51,6 +54,9 @@ export function mhoInitSortableTable(table, columns, rowSelector, options: Sorta
 
     const header = table.querySelector(header_selector);
     if (!header) return;
+
+    const controller: AbortController = new AbortController();
+    sort_controllers.set(table, controller);
 
     const cells = arrFrom(header.children).filter((el) => el.classList.contains('cell'));
     let activeCol = -1;
@@ -80,7 +86,7 @@ export function mhoInitSortableTable(table, columns, rowSelector, options: Sorta
         if (!cell) return undefined;
 
         cell.querySelector('.help-button')
-            ?.addEventListener('click', (e) => e.stopPropagation());
+            ?.addEventListener('click', (e) => e.stopPropagation(), { signal: controller.signal });
 
         /**
          * Les cellules d'en-tête que l'on garnit peuvent avoir besoin d'une classe de mise en
@@ -138,7 +144,7 @@ export function mhoInitSortableTable(table, columns, rowSelector, options: Sorta
             });
 
             doSort(activeCol < 0 ? 0 : activeCol, direction);
-        });
+        }, { signal: controller.signal });
 
         return arrow;
     });
@@ -149,6 +155,9 @@ export function mhoCleanupSortableTable(table, rowSelector, options: SortableTab
     if (!table?.dataset.sortEnabled) return;
 
     const header_selector: string = options.header_selector ?? '.row-flex.header';
+
+    sort_controllers.get(table)?.abort();
+    sort_controllers.delete(table);
 
     /** Les étiquettes cliquables contiennent leur propre flèche : elles partent en premier */
     table.querySelectorAll('.mho-sort-control').forEach((control) => control.remove());

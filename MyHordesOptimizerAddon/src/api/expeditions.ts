@@ -36,6 +36,18 @@ export async function loadMyExpeditions(): Promise<ApiExpedition[]> {
     return expeditions;
 }
 
+/** Coche ou décoche une consigne sur le site ; rejeté (sans notification) si elle est verrouillée ou non modifiable. */
+export async function setOrderDone(order_id: number, done: boolean): Promise<void> {
+    const response: Response = await fetcher(`${state.api_url}/expeditions/orders/${order_id}/done`, {
+        method: 'PUT',
+        body: JSON.stringify(done),
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (response.status !== 200) {
+        return convertResponsePromiseToError(response);
+    }
+}
+
 /** Comme `loadMyExpeditions`, avec notification d'erreur (ouverture de la fenêtre des expéditions). */
 export function getMyExpeditions(): Promise<ApiExpedition[]> {
     return loadMyExpeditions().catch((error: unknown): Promise<never> => {

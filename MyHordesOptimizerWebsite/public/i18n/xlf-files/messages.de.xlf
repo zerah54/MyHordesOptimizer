@@ -78,9 +78,9 @@
                 <source>Aucun chantier ne correspond.</source>
                 <target state="translated">Keine Konstruktion entspricht der Suche.</target>
             </trans-unit>
-            <trans-unit id="73974147979864893" datatype="html">
-                <source>Retirer l&apos;objet</source>
-                <target state="translated">Gegenstand entfernen</target>
+            <trans-unit id="5262644031154009862" datatype="html">
+                <source>Niveau Endurant inconnu</source>
+                <target state="translated">Unbekannte Eifer-Stufe</target>
             </trans-unit>
             <trans-unit id="5265009546543742591" datatype="html">
                 <source><x id="START_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/><x id="CLOSE_TAG_MHO_ICON_AP" ctype="x-mho_icon_ap" equiv-text="&lt;mho-icon-ap/&gt;"/> restants</source>
@@ -398,10 +398,6 @@
                 <source>Nom du thème</source>
                 <target state="translated">Name des Themas</target>
             </trans-unit>
-            <trans-unit id="3399210006531496130" datatype="html">
-                <source>Attribuer un objet…</source>
-                <target state="translated">Gegenstand zuweisen…</target>
-            </trans-unit>
             <trans-unit id="8780270810415322734" datatype="html" approved="yes">
                 <source>Second Souffle</source>
                 <target state="final">Zweite Lunge</target>
@@ -634,6 +630,10 @@
                 <source>Mort</source>
                 <target state="final">Tot</target>
             </trans-unit>
+            <trans-unit id="6214403350284597669" datatype="html">
+                <source>Vote du soir</source>
+                <target state="translated">Abendabstimmung</target>
+            </trans-unit>
             <trans-unit id="6216056219276546927" datatype="html" approved="yes">
                 <source>&lt;p&gt;Cherche les recettes d&apos;assemblage (à la main) qui produisent un objet, puis celles qui produisent ses composants. Options : &lt;strong&gt;text&lt;/strong&gt; (nom de l&apos;objet, même partiel), &lt;strong&gt;language&lt;/strong&gt; (langue du nom, obligatoire), private-msg. Si les recettes sont trop nombreuses pour un message, la fin est tronquée et le bot l&apos;indique.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Sucht die Zusammensetzungsrezepte (von Hand), die einen Gegenstand herstellen, dann diejenigen, die seine Komponenten herstellen. Optionen: &lt;strong&gt;text&lt;/strong&gt; (Name des Gegenstands, auch teilweise), &lt;strong&gt;language&lt;/strong&gt; (Sprache des Namens, Pflichtangabe), private-msg. Wenn die Rezepte für eine Nachricht zu zahlreich sind, wird das Ende abgeschnitten und der Bot weist darauf hin.&lt;/p&gt;</target>
@@ -753,6 +753,10 @@
             <trans-unit id="447877790312840617" datatype="html" approved="yes">
                 <source>Coffre</source>
                 <target state="final">Truhe</target>
+            </trans-unit>
+            <trans-unit id="4481523652427771172" datatype="html">
+                <source>Rétablir la valeur calculée</source>
+                <target state="translated">Berechneten Wert wiederherstellen</target>
             </trans-unit>
             <trans-unit id="4483221505481206961" datatype="html" approved="yes">
                 <source>Script</source>
@@ -1034,6 +1038,10 @@
                 <source>{VAR_PLURAL, plural, =0 {consigne faite} =1 {consigne faite} other {consignes faites}}</source>
                 <target state="translated">{VAR_PLURAL, plural, =0 {erledigte Anweisung} =1 {erledigte Anweisung} other {erledigte Anweisungen}}</target>
             </trans-unit>
+            <trans-unit id="4613338085351943838" datatype="html">
+                <source>Stock</source>
+                <target state="translated">Bestand</target>
+            </trans-unit>
             <trans-unit id="3802614335560711985" datatype="html" approved="yes">
                 <source>Dans MyHordes uniquement</source>
                 <target state="final">Nur in MyHordes</target>
@@ -1098,6 +1106,10 @@
                 <source>La cible est déjà atteinte : rien à investir</source>
                 <target state="translated">Das Ziel ist bereits erreicht: nichts zu investieren</target>
             </trans-unit>
+            <trans-unit id="4372691840356944613" datatype="html">
+                <source>La simulation a été modifiée entre-temps : elle a été rechargée.</source>
+                <target state="translated">Die Simulation wurde zwischenzeitlich geändert: Sie wurde neu geladen.</target>
+            </trans-unit>
             <trans-unit id="4375735510566828155" datatype="html" approved="yes">
                 <source>Aucune</source>
                 <target state="final">Keine</target>
@@ -1161,6 +1173,10 @@
             <trans-unit id="5127852869390190101" datatype="html">
                 <source>PA manquants pour réparer les chantiers</source>
                 <target state="translated">Fehlende AP zum Reparieren der Baustellen</target>
+            </trans-unit>
+            <trans-unit id="5129057750239082787" datatype="html">
+                <source>Maisons citoyens</source>
+                <target state="translated">Bürgerhäuser</target>
             </trans-unit>
             <trans-unit id="370917987951639261" datatype="html">
                 <source>Dupliquer les consignes générales </source>
@@ -1386,6 +1402,10 @@
                 <source>zombies qui franchissent</source>
                 <target state="final">Zombies, die durchkommen</target>
             </trans-unit>
+            <trans-unit id="1736989209396076586" datatype="html">
+                <source>Apport des décharges</source>
+                <target state="translated">Beitrag der Müllhalden</target>
+            </trans-unit>
             <trans-unit id="1737276409111424339" datatype="html" approved="yes">
                 <source>Total utilisateur : non importé</source>
                 <target state="final">Benutzer gesamt: nicht importiert</target>
@@ -1466,6 +1486,10 @@
                 <source>La liste est vide</source>
                 <target state="final">Die Liste ist leer</target>
             </trans-unit>
+            <trans-unit id="828319980835070339" datatype="html">
+                <source>Objets de veille</source>
+                <target state="translated">Wacht-Gegenstände</target>
+            </trans-unit>
             <trans-unit id="8283686607360852750" datatype="html">
                 <source>Passages (éclaireur)</source>
                 <target state="translated">Durchgänge (Kundschafter)</target>
@@ -1505,6 +1529,10 @@
             <trans-unit id="4359053901144852078" datatype="html" approved="yes">
                 <source>Réinitialiser</source>
                 <target state="final">Zurücksetzen</target>
+            </trans-unit>
+            <trans-unit id="8276159670708083309" datatype="html">
+                <source>Couvert</source>
+                <target state="translated">Abgedeckt</target>
             </trans-unit>
             <trans-unit id="8276190381931049875" datatype="html" approved="yes">
                 <source>Objets au sol</source>
@@ -2154,6 +2182,10 @@
                 <source>Couleur de surlignage</source>
                 <target state="final">Hervorhebungsfarbe</target>
             </trans-unit>
+            <trans-unit id="5367905287012372629" datatype="html">
+                <source>Verdict</source>
+                <target state="translated">Fazit</target>
+            </trans-unit>
             <trans-unit id="5369300264539350682" datatype="html" approved="yes">
                 <source>Haut droite</source>
                 <target state="final">Oben rechts</target>
@@ -2298,9 +2330,17 @@
                 <source>Temps :</source>
                 <target state="final">Zeit:</target>
             </trans-unit>
+            <trans-unit id="1346958904798542767" datatype="html">
+                <source>Changer le dernier jour</source>
+                <target state="translated">Letzten Tag ändern</target>
+            </trans-unit>
             <trans-unit id="846577519378449063" datatype="html" approved="yes">
                 <source>Nouvelle partie</source>
                 <target state="final">Neue Partie</target>
+            </trans-unit>
+            <trans-unit id="8475126231398954368" datatype="html">
+                <source>Voir les chantiers du jour</source>
+                <target state="translated">Konstruktionen des Tages ansehen</target>
             </trans-unit>
             <trans-unit id="4165705760001583442" datatype="html">
                 <source>La comparaison porte sur la proposition effective du jour : affichez-la pour voir l&apos;écart entre le prévu et le réel. </source>
@@ -2538,10 +2578,6 @@
                 <source>Mode âmes</source>
                 <target state="final">Seelenmodus</target>
             </trans-unit>
-            <trans-unit id="3857906544777437569" datatype="html">
-                <source>Quantité à attribuer</source>
-                <target state="translated">Zuzuweisende Menge</target>
-            </trans-unit>
             <trans-unit id="3860715110536742352" datatype="html">
                 <source>restants</source>
                 <target state="translated">übrig</target>
@@ -2601,6 +2637,10 @@
             <trans-unit id="6399909283709832302" datatype="html" approved="yes">
                 <source>Action héroïque</source>
                 <target state="final">Heldentat</target>
+            </trans-unit>
+            <trans-unit id="920007309694935643" datatype="html">
+                <source>Stuff à répartir</source>
+                <target state="translated">Auszuteilende Ausrüstung</target>
             </trans-unit>
             <trans-unit id="9201198932056179343" datatype="html" approved="yes">
                 <source>Consignes perso</source>
@@ -2850,6 +2890,10 @@
                 <source>Ajouter un veilleur…</source>
                 <target state="translated">Nachtwächter hinzufügen…</target>
             </trans-unit>
+            <trans-unit id="3031364999103667158" datatype="html">
+                <source>Sac prévu / réel</source>
+                <target state="translated">Geplante / tatsächliche Tasche</target>
+            </trans-unit>
             <trans-unit id="4692406295845779700" datatype="html" approved="yes">
                 <source>Estimation :</source>
                 <target state="final">Schätzung:</target>
@@ -2869,6 +2913,10 @@
             <trans-unit id="4698435772707122452" datatype="html" approved="yes">
                 <source>Privé · vous seul</source>
                 <target state="final">Privat · nur du</target>
+            </trans-unit>
+            <trans-unit id="4698710885251116272" datatype="html">
+                <source>Défense de la veille</source>
+                <target state="translated">Verteidigung der Wacht</target>
             </trans-unit>
             <trans-unit id="4923971453013298091" datatype="html" approved="yes">
                 <source>Exploration :</source>
@@ -2974,6 +3022,10 @@
                 <source>Mode de budget</source>
                 <target state="translated">Budgetmodus</target>
             </trans-unit>
+            <trans-unit id="4749376599875504635" datatype="html">
+                <source>Prévu</source>
+                <target state="translated">Geplant</target>
+            </trans-unit>
             <trans-unit id="4752880524312751918" datatype="html">
                 <source>Aucune connue</source>
                 <target state="translated">Keine bekannt</target>
@@ -2997,6 +3049,10 @@
             <trans-unit id="477013734318888828" datatype="html" approved="yes">
                 <source>&lt;p&gt;L&apos;extension se met à jour par la boutique de votre navigateur, le script par votre gestionnaire de scripts. Quand une nouvelle version existe, le panneau affiche « Mise à jour disponible » et une pastille apparaît sur le bouton MyHordes Optimizer.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Die Erweiterung wird über den Store deines Browsers aktualisiert, das Skript über deinen Skript-Manager. Wenn eine neue Version existiert, zeigt das Panel „Update verfügbar“ an und auf der MyHordes-Optimizer-Schaltfläche erscheint ein Hinweispunkt.&lt;/p&gt;</target>
+            </trans-unit>
+            <trans-unit id="4775457159140691206" datatype="html">
+                <source>Dégâts du réacteur</source>
+                <target state="translated">Reaktorschaden</target>
             </trans-unit>
             <trans-unit id="4254054450644204728" datatype="html">
                 <source>Choisir des chantiers</source>
@@ -3154,6 +3210,10 @@
                 <source>Zoomer (Ctrl + molette)</source>
                 <target state="final">Vergrößern (Strg + Mausrad)</target>
             </trans-unit>
+            <trans-unit id="1430790112714083303" datatype="html">
+                <source>Gardiens</source>
+                <target state="translated">Wächter</target>
+            </trans-unit>
             <trans-unit id="1434854699604569130" datatype="html" approved="yes">
                 <source>Ajouter un citoyen</source>
                 <target state="final">Bürger hinzufügen</target>
@@ -3217,6 +3277,14 @@
             <trans-unit id="7980053000569541434" datatype="html" approved="yes">
                 <source>Saisies modifiées depuis le dernier affinage : relance nécessaire</source>
                 <target state="final">Seit der letzten Verfeinerung geänderte Eingaben: Neustart erforderlich</target>
+            </trans-unit>
+            <trans-unit id="798713550699857317" datatype="html">
+                <source>Réel</source>
+                <target state="translated">Tatsächlich</target>
+            </trans-unit>
+            <trans-unit id="7988848009767275711" datatype="html">
+                <source>Anomalie dans l&apos;équipement : Trop d&apos;encombrants</source>
+                <target state="translated">Ausrüstungsanomalie: Zu viele sperrige Gegenstände</target>
             </trans-unit>
             <trans-unit id="7988871351422822307" datatype="html">
                 <source>Ajouter un veilleur</source>
@@ -3301,6 +3369,10 @@
             <trans-unit id="4582059789370791766" datatype="html">
                 <source>Utiliser : Ballon de foot</source>
                 <target state="translated">Benutzen: Fußball</target>
+            </trans-unit>
+            <trans-unit id="458636699647047268" datatype="html">
+                <source>Les propositions de la simulation après le jour <x id="day" equiv-text="last_day"/> seront supprimées.</source>
+                <target state="translated">Die Vorschläge der Simulation nach Tag <x id="day" equiv-text="last_day"/> werden gelöscht.</target>
             </trans-unit>
             <trans-unit id="458640201868278392" datatype="html">
                 <source>Niveau actuel dans ta ville</source>
@@ -3429,10 +3501,6 @@
             <trans-unit id="3928664129044319049" datatype="html">
                 <source>Rations d&apos;eau par PA</source>
                 <target state="translated">Wasserrationen pro AP</target>
-            </trans-unit>
-            <trans-unit id="2677341107476774217" datatype="html">
-                <source>Attribuer</source>
-                <target state="translated">Zuweisen</target>
             </trans-unit>
             <trans-unit id="267812886893458943" datatype="html" approved="yes">
                 <source>C&apos;est prêt</source>
@@ -3677,6 +3745,10 @@
             <trans-unit id="3696553302854150474" datatype="html" approved="yes">
                 <source>serveur Discord de MyHordes Optimizer</source>
                 <target state="final">Discord-Server von MyHordes Optimizer</target>
+            </trans-unit>
+            <trans-unit id="3697542730533983950" datatype="html">
+                <source>Changer le dernier jour…</source>
+                <target state="translated">Letzten Tag ändern…</target>
             </trans-unit>
             <trans-unit id="5177031640736248755" datatype="html">
                 <source>Dans le sac, +1 point de contrôle de zone</source>
@@ -3958,6 +4030,10 @@
                 <source>Estimation enregistrée - Min</source>
                 <target state="final">Gespeicherte Schätzung - Min</target>
             </trans-unit>
+            <trans-unit id="6382553251415302924" datatype="html">
+                <source>Renommer la simulation</source>
+                <target state="translated">Simulation umbenennen</target>
+            </trans-unit>
             <trans-unit id="6388052032876059142" datatype="html" approved="yes">
                 <source>Liste a puces</source>
                 <target state="final">Aufzählungsliste</target>
@@ -4182,6 +4258,10 @@
                 <source>N&apos;ont pas pris le drapeau</source>
                 <target state="final">Haben die Flagge nicht genommen</target>
             </trans-unit>
+            <trans-unit id="8255844058334930991" datatype="html">
+                <source>Actions sur la simulation</source>
+                <target state="translated">Aktionen für die Simulation</target>
+            </trans-unit>
             <trans-unit id="8255850283848708847" datatype="html" approved="yes">
                 <source>Voir sur la carte</source>
                 <target state="final">Auf der Karte ansehen</target>
@@ -4297,6 +4377,10 @@
             <trans-unit id="6806022574374286744" datatype="html" approved="yes">
                 <source>Vider le champ</source>
                 <target state="final">Feld leeren</target>
+            </trans-unit>
+            <trans-unit id="6810607870908387098" datatype="html">
+                <source>Anomalie dans l&apos;équipement : Pas assez de place dans le sac</source>
+                <target state="translated">Ausrüstungsanomalie: Nicht genug Platz in der Tasche</target>
             </trans-unit>
             <trans-unit id="5557579667181288319" datatype="html" approved="yes">
                 <source>Différenciel de la banque</source>
@@ -4626,6 +4710,10 @@
                 <source>Tout replier</source>
                 <target state="translated">Alle einklappen</target>
             </trans-unit>
+            <trans-unit id="655568924805273637" datatype="html">
+                <source>Raccourcir la simulation</source>
+                <target state="translated">Simulation verkürzen</target>
+            </trans-unit>
             <trans-unit id="6566416674718528586" datatype="html" approved="yes">
                 <source>Nouvelle consigne sur <x id="INTERPOLATION" equiv-text="{{ data.cell_label }}"/></source>
                 <target state="final">Neue Anweisung auf <x id="INTERPOLATION" equiv-text="{{ data.cell_label }}"/></target>
@@ -4758,6 +4846,10 @@
                 <source>Risque prévu / réel</source>
                 <target state="translated">Geplantes / tatsächliches Risiko</target>
             </trans-unit>
+            <trans-unit id="4298022949483528697" datatype="html">
+                <source>Âmes purifiées</source>
+                <target state="translated">Gereinigte Seelen</target>
+            </trans-unit>
             <trans-unit id="8141956022659606503" datatype="html" approved="yes">
                 <source>Sacs</source>
                 <target state="final">Rucksäcke</target>
@@ -4874,6 +4966,10 @@
                 <source>&lt;p&gt;Mort, ou passé à une autre ville, vous gardez la main sur votre ancienne ville tant qu&apos;elle n&apos;est pas terminée : ouverte depuis l&apos;annuaire des villes, elle s&apos;affiche en observation, mais ses expéditions, leurs consignes (page Expéditions et détail des zones) et ses tracés restent modifiables, en temps réel avec ses citoyens. Le bandeau d&apos;observation le rappelle. Le reste de la ville (citoyens, zones, souhaits…) reste en lecture seule.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Wenn du tot bist oder zu einer anderen Stadt gewechselt hast, behältst du die Kontrolle über deine frühere Stadt, solange sie nicht beendet ist: Über das Städteverzeichnis geöffnet, wird sie im Beobachtungsmodus angezeigt, aber ihre Expeditionen, deren Anweisungen (Seite Expeditionen und Zonendetails) und ihre Routen bleiben änderbar, in Echtzeit mit ihren Bürgern. Das Beobachtungsbanner weist darauf hin. Der Rest der Stadt (Bürger, Zonen, Wünsche…) bleibt schreibgeschützt.&lt;/p&gt;</target>
             </trans-unit>
+            <trans-unit id="7133135164254902755" datatype="html">
+                <source>Proposition de chantiers retenue</source>
+                <target state="translated">Gewählter Konstruktionsvorschlag</target>
+            </trans-unit>
             <trans-unit id="713428125328247599" datatype="html" approved="yes">
                 <source>Dernière mise à jour</source>
                 <target state="final">Letzte Aktualisierung</target>
@@ -4989,6 +5085,10 @@
             <trans-unit id="2339882358691154794" datatype="html" approved="yes">
                 <source>Niveau inconnu</source>
                 <target state="final">Unbekannte Stufe</target>
+            </trans-unit>
+            <trans-unit id="2341000007372892583" datatype="html">
+                <source>Bonus cadavres</source>
+                <target state="translated">Leichenbonus</target>
             </trans-unit>
             <trans-unit id="2341443282179648415" datatype="html" approved="yes">
                 <source>fermer</source>
@@ -5182,6 +5282,10 @@
                 <source>Valider</source>
                 <target state="final">Übernehmen</target>
             </trans-unit>
+            <trans-unit id="4003726225688362850" datatype="html">
+                <source>Jours de la simulation</source>
+                <target state="translated">Tage der Simulation</target>
+            </trans-unit>
             <trans-unit id="4019970245844189228" datatype="html">
                 <source>Épuisée</source>
                 <target state="translated">Leergesucht</target>
@@ -5262,6 +5366,10 @@
                 <source>Vous n&apos;êtes pas citoyen de cette ville.</source>
                 <target state="translated">Du bist kein Bürger dieser Stadt.</target>
             </trans-unit>
+            <trans-unit id="6935576082619300710" datatype="html">
+                <source>Stuff global</source>
+                <target state="translated">Gesamtausrüstung</target>
+            </trans-unit>
             <trans-unit id="4890819708659716129" datatype="html">
                 <source>Actions sur l&apos;expédition</source>
                 <target state="translated">Expeditionsaktionen</target>
@@ -5321,6 +5429,10 @@
             <trans-unit id="4090316153063202728" datatype="html" approved="yes">
                 <source>Mis à jour par <x id="INTERPOLATION" equiv-text="{{_lastUpdateInfo?.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{_lastUpdateInfo?.update_time?.fromNow()}}"/> (<x id="INTERPOLATION_2" equiv-text="{{$safeNavigationMigration(_lastUpdateInfo?.update_time?.toDate()) | date:&apos;medium&apos;}}"/>)</source>
                 <target state="translated">Aktualisiert von <x id="INTERPOLATION" equiv-text="{{_lastUpdateInfo?.username}}"/> <x id="INTERPOLATION_1" equiv-text="{{_lastUpdateInfo?.update_time?.fromNow()}}"/> (<x id="INTERPOLATION_2" equiv-text="{{$safeNavigationMigration(_lastUpdateInfo?.update_time?.toDate()) | date:&apos;medium&apos;}}"/>)</target>
+            </trans-unit>
+            <trans-unit id="409044656642796347" datatype="html">
+                <source>Objectif</source>
+                <target state="translated">Ziel</target>
             </trans-unit>
             <trans-unit id="4097260909045543703" datatype="html">
                 <source>terminer</source>
@@ -5418,6 +5530,10 @@
                 <source>Utilisateur inconnu</source>
                 <target state="final">Unbekannter User</target>
             </trans-unit>
+            <trans-unit id="4304232948816896349" datatype="html">
+                <source>Stock restant</source>
+                <target state="translated">Verbleibender Bestand</target>
+            </trans-unit>
             <trans-unit id="4314784038589905764" datatype="html">
                 <source>Modifié</source>
                 <target state="translated">Geändert</target>
@@ -5441,6 +5557,10 @@
             <trans-unit id="1555492596982404976" datatype="html">
                 <source>Mon programme</source>
                 <target state="translated">Mein Programm</target>
+            </trans-unit>
+            <trans-unit id="1559976634111563867" datatype="html">
+                <source>Vider</source>
+                <target state="translated">Leeren</target>
             </trans-unit>
             <trans-unit id="6421128448674403015" datatype="html">
                 <source>Reste à trouver</source>
@@ -5498,6 +5618,10 @@
                 <source>Tableau</source>
                 <target state="final">Tabelle</target>
             </trans-unit>
+            <trans-unit id="5784963353701634003" datatype="html">
+                <source>Coefficient FDD</source>
+                <target state="translated">FDD-Koeffizient</target>
+            </trans-unit>
             <trans-unit id="5786363460327756403" datatype="html" approved="yes">
                 <source>Rose</source>
                 <target state="final">Pink</target>
@@ -5542,6 +5666,10 @@
                 <source>sur la zone visée et les cases adjacentes</source>
                 <target state="final">auf der anvisierten Zone und den angrenzenden Feldern</target>
             </trans-unit>
+            <trans-unit id="3613040985427859219" datatype="html">
+                <source>Simulations</source>
+                <target state="translated">Simulationen</target>
+            </trans-unit>
             <trans-unit id="3620517551192762944" datatype="html" approved="yes">
                 <source>, à qui appartiennent certains éléments graphiques.</source>
                 <target state="final">, denen einige Grafikelemente gehören.</target>
@@ -5570,6 +5698,10 @@
                 <source>Autorisez MyHordes Optimizer</source>
                 <target state="final">Erlaube MyHordes Optimizer</target>
             </trans-unit>
+            <trans-unit id="3635699962385901211" datatype="html">
+                <source>Niveau de l&apos;Ajustement défensif</source>
+                <target state="translated">Stufe der Defensivanpassung</target>
+            </trans-unit>
             <trans-unit id="6032118487199649794" datatype="html">
                 <source>Plein</source>
                 <target state="translated">Durchgezogen</target>
@@ -5594,13 +5726,13 @@
                 <source>Commencer</source>
                 <target state="final">Starten</target>
             </trans-unit>
+            <trans-unit id="5014256543056130727" datatype="html">
+                <source>La simulation « <x id="name" equiv-text="simulation.name"/> » sera supprimée pour toute la ville.</source>
+                <target state="translated">Die Simulation „<x id="name" equiv-text="simulation.name"/>“ wird für die ganze Stadt gelöscht.</target>
+            </trans-unit>
             <trans-unit id="5014730264289450708" datatype="html" approved="yes">
                 <source>Tout importer</source>
                 <target state="final">Alles importieren</target>
-            </trans-unit>
-            <trans-unit id="5036204813296103236" datatype="html">
-                <source>Objet à attribuer</source>
-                <target state="translated">Zuzuweisender Gegenstand</target>
             </trans-unit>
             <trans-unit id="5036795245990193353" datatype="html">
                 <source>Coût</source>
@@ -5701,6 +5833,10 @@
             <trans-unit id="2729991459022467855" datatype="html" approved="yes">
                 <source>&lt;p&gt;Complète les bulles d&apos;aide du jeu. Chaque partie a sa sous-option :&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Objets &amp;gt; Quantité en banque &amp; liste de courses&lt;/strong&gt; : quantités en banque, sur la carte, dans les sacs et dans les coffres ; la quantité souhaitée et le dépôt si l&apos;objet est dans la liste de courses de la zone ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Objets &amp;gt; Propriétés&lt;/strong&gt; : propriétés de l&apos;objet, effet réel à la catapulte, objets qui l&apos;ouvrent (avec l&apos;alternative du technicien) et objets qu&apos;il ouvre ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Objets &amp;gt; Actions&lt;/strong&gt; : ce que fait l&apos;objet quand on l&apos;utilise (points d&apos;action rendus, drogue, alcool, trouvaille…) ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Objets &amp;gt; Recettes&lt;/strong&gt; : les recettes où l&apos;objet apparaît ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Objets &amp;gt; Traductions&lt;/strong&gt; : le nom de l&apos;objet dans les trois autres langues du jeu ;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;États&lt;/strong&gt; : dans la bulle d&apos;un état, ses effets (zombies tués en veille, chances de survie en veille, chances de réussite des fouilles, terreur, infection, blessures).&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;La valeur de décoration d&apos;un objet est ajoutée à l&apos;étiquette du jeu. Appuyez sur Maj (⇧) pour figer la bulle affichée et la lire tranquillement ; la croix la libère.&lt;/p&gt; &lt;p&gt;Le détail des objets dans le Wiki et l&apos;outil Banque de MyHordes Optimizer suit les mêmes sous-options.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Ergänzt die Hilfeblasen des Spiels. Jeder Teil hat seine Unteroption:&lt;/p&gt; &lt;ul&gt; &lt;li&gt;&lt;strong&gt;Gegenstände &amp;gt; Bankbestand &amp; Wunschzettel&lt;/strong&gt;: Mengen in der Bank, auf der Karte, in den Rucksäcken und in den Truhen; die gewünschte Menge und die Ablage, wenn der Gegenstand auf der Wunschliste der Zone steht;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Gegenstände &amp;gt; Eigenschaften&lt;/strong&gt;: Eigenschaften des Gegenstands, tatsächliche Wirkung beim Katapult, Gegenstände, die ihn öffnen (mit der Alternative des Technikers), und Gegenstände, die er öffnet;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Gegenstände &amp;gt; Aktionen&lt;/strong&gt;: was der Gegenstand bei Benutzung bewirkt (zurückgegebene Aktionspunkte, Droge, Alkohol, Fundstück…);&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Gegenstände &amp;gt; Rezepte&lt;/strong&gt;: die Rezepte, in denen der Gegenstand vorkommt;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Gegenstände &amp;gt; Übersetzungen&lt;/strong&gt;: der Name des Gegenstands in den drei anderen Sprachen des Spiels;&lt;/li&gt; &lt;li&gt;&lt;strong&gt;Zustände&lt;/strong&gt;: in der Blase eines Zustands seine Effekte (getötete Zombies bei der Wache, Überlebenschancen bei der Wache, Erfolgschancen der Ausgrabungen, Angst, Infektion, Verletzungen).&lt;/li&gt; &lt;/ul&gt; &lt;p&gt;Der Dekorationswert eines Gegenstands wird dem Etikett des Spiels hinzugefügt. Drücke die Umschalttaste (⇧), um die angezeigte Blase einzufrieren und in Ruhe zu lesen; das Kreuz gibt sie wieder frei.&lt;/p&gt; &lt;p&gt;Die Details der Gegenstände im Wiki und im Bank-Tool von MyHordes Optimizer folgen denselben Unteroptionen.&lt;/p&gt;</target>
+            </trans-unit>
+            <trans-unit id="2732598678079560274" datatype="html">
+                <source>Stock de départ</source>
+                <target state="translated">Anfangsbestand</target>
             </trans-unit>
             <trans-unit id="2735775440803933212" datatype="html" approved="yes">
                 <source>Saison</source>
@@ -5866,6 +6002,10 @@
                 <source>Jobs</source>
                 <target state="final">Berufe</target>
             </trans-unit>
+            <trans-unit id="3229598705422852782" datatype="html">
+                <source>{VAR_PLURAL, plural, =1 {objet} other {objets}}</source>
+                <target state="translated">{VAR_PLURAL, plural, =1 {Gegenstand} other {Gegenstände}}</target>
+            </trans-unit>
             <trans-unit id="205544949501424084" datatype="html" approved="yes">
                 <source>Compétences héros</source>
                 <target state="final">Heldenfähigkeiten</target>
@@ -5901,6 +6041,10 @@
             <trans-unit id="2293338065538649958" datatype="html" approved="yes">
                 <source>Tris et filtres</source>
                 <target state="final">Sortierung und Filter</target>
+            </trans-unit>
+            <trans-unit id="2295536928947234996" datatype="html">
+                <source>J</source>
+                <target state="translated">T</target>
             </trans-unit>
             <trans-unit id="8624567640321872397" datatype="html" approved="yes">
                 <source>Déplacer ou modifier la consigne</source>
@@ -6070,6 +6214,10 @@
                 <source>liée</source>
                 <target state="translated">verknüpft</target>
             </trans-unit>
+            <trans-unit id="3041348240128666981" datatype="html">
+                <source>Muraille de base</source>
+                <target state="translated">Basismauer</target>
+            </trans-unit>
             <trans-unit id="3041728042542305057" datatype="html">
                 <source>il manque :</source>
                 <target state="translated">es fehlt:</target>
@@ -6138,6 +6286,10 @@
                 <source>Installation</source>
                 <target state="final">Installation</target>
             </trans-unit>
+            <trans-unit id="7422910484782964023" datatype="html">
+                <source>Stuff de la nuit</source>
+                <target state="translated">Ausrüstung der Nacht</target>
+            </trans-unit>
             <trans-unit id="7427530606342815304" datatype="html">
                 <source>Nom de la proposition</source>
                 <target state="translated">Name des Vorschlags</target>
@@ -6173,6 +6325,10 @@
             <trans-unit id="585281428036254522" datatype="html">
                 <source>Propositions du jour</source>
                 <target state="translated">Vorschläge des Tages</target>
+            </trans-unit>
+            <trans-unit id="3793098118530753303" datatype="html">
+                <source>Objets de survie</source>
+                <target state="translated">Überlebensgegenstände</target>
             </trans-unit>
             <trans-unit id="3793819955692174765" datatype="html" approved="yes">
                 <source>Site</source>
@@ -6278,6 +6434,10 @@
                 <source>Normal</source>
                 <target state="final">Normal</target>
             </trans-unit>
+            <trans-unit id="3084598934941552518" datatype="html">
+                <source>Veilleurs par jour</source>
+                <target state="translated">Wächter pro Tag</target>
+            </trans-unit>
             <trans-unit id="3086550859257174909" datatype="html">
                 <source>Investissez vos PA par paires de PA pour ne rien perdre.</source>
                 <target state="translated">Investiere deine AP paarweise, damit nichts verloren geht.</target>
@@ -6381,6 +6541,10 @@
             <trans-unit id="4527053987641321834" datatype="html" approved="yes">
                 <source>Afficher le détail</source>
                 <target state="final">Details anzeigen</target>
+            </trans-unit>
+            <trans-unit id="4538319275882718293" datatype="html">
+                <source>Non construit</source>
+                <target state="translated">Nicht gebaut</target>
             </trans-unit>
             <trans-unit id="4540401638459620535" datatype="html" approved="yes">
                 <source>/timer (/minuteur)</source>
@@ -6726,10 +6890,6 @@
                 <source>Attaque</source>
                 <target state="final">Angriff</target>
             </trans-unit>
-            <trans-unit id="6333181403622236642" datatype="html">
-                <source>Copier le message forum</source>
-                <target state="translated">Forum-Nachricht kopieren</target>
-            </trans-unit>
             <trans-unit id="633718324030532963" datatype="html">
                 <source>Réafficher</source>
                 <target state="translated">Wieder anzeigen</target>
@@ -7034,6 +7194,10 @@
                 <source>Ajouter une simulation</source>
                 <target state="final">Simulation hinzufügen</target>
             </trans-unit>
+            <trans-unit id="9014136660724271241" datatype="html">
+                <source>Nouvelle simulation</source>
+                <target state="translated">Neue Simulation</target>
+            </trans-unit>
             <trans-unit id="467171963687435897" datatype="html" approved="yes">
                 <source>Citoyen <x id="id" equiv-text="user_id"/></source>
                 <target state="final">Bürger <x id="id" equiv-text="user_id"/></target>
@@ -7174,6 +7338,10 @@
                 <source>Emoticone</source>
                 <target state="final">Emoticon</target>
             </trans-unit>
+            <trans-unit id="8857404145432361736" datatype="html">
+                <source>Dupliquer la simulation</source>
+                <target state="translated">Simulation duplizieren</target>
+            </trans-unit>
             <trans-unit id="8857495921747113608" datatype="html" approved="yes">
                 <source>Forme de la consigne</source>
                 <target state="final">Form der Anweisung</target>
@@ -7185,6 +7353,10 @@
             <trans-unit id="8863580991943078303" datatype="html" approved="yes">
                 <source>Afficher</source>
                 <target state="final">Anzeigen</target>
+            </trans-unit>
+            <trans-unit id="8869100643990966351" datatype="html">
+                <source>PA de la Tour des Gardiens</source>
+                <target state="translated">AP des Wächter-Turms</target>
             </trans-unit>
             <trans-unit id="4945794230367496950" datatype="html" approved="yes">
                 <source>Avertissement en cas d&apos;inactivité</source>
@@ -7297,6 +7469,10 @@
             <trans-unit id="7276189993046999018" datatype="html" approved="yes">
                 <source>Ordres de consommation possibles (du meilleur au pire)</source>
                 <target state="final">Mögliche Verbrauchsreihenfolgen (von der besten zur schlechtesten)</target>
+            </trans-unit>
+            <trans-unit id="7278011859664716160" datatype="html">
+                <source>Non couvert</source>
+                <target state="translated">Nicht abgedeckt</target>
             </trans-unit>
             <trans-unit id="7278756996848536082" datatype="html" approved="yes">
                 <source>&lt;p&gt;Un onglet par jour, jusqu&apos;au lendemain ; les jours passés ne se modifient plus. Les modifications des autres s&apos;affichent en direct, et les avatars en haut montrent qui consulte la page. Chaque expédition indique si elle est « Prête » ou « En préparation ».&lt;/p&gt; &lt;p&gt;Sur une expédition prête, « M&apos;inscrire ici » vous inscrit sur une place libre (si son métier est libre ou est le vôtre). Votre soif et vos points de contrôle restent modifiables. Les consignes à cocher se cochent directement. Le bouton de partage copie les expéditions au format forum.&lt;/p&gt;</source>
@@ -7590,6 +7766,10 @@
                 <source><x id="INTERPOLATION" equiv-text="{{ element.points_needed }}"/> points pour débloquer</source>
                 <target state="final"><x id="INTERPOLATION" equiv-text="{{ element.points_needed }}"/> Punkte zum Freischalten</target>
             </trans-unit>
+            <trans-unit id="8144773788371094224" datatype="html">
+                <source>Coller le stuff</source>
+                <target state="translated">Ausrüstung einfügen</target>
+            </trans-unit>
             <trans-unit id="814524093468498547" datatype="html" approved="yes">
                 <source>Pouvoir</source>
                 <target state="final">Fähigkeit</target>
@@ -7850,6 +8030,10 @@
                 <source>de défense</source>
                 <target state="final">Verteidigung</target>
             </trans-unit>
+            <trans-unit id="4140876440867280547" datatype="html">
+                <source>Copier le stuff</source>
+                <target state="translated">Ausrüstung kopieren</target>
+            </trans-unit>
             <trans-unit id="4146951745721996995" datatype="html">
                 <source>Rab d&apos;expé</source>
                 <target state="translated">Expeditions-Extra-AP</target>
@@ -8026,6 +8210,10 @@
                 <source>RE</source>
                 <target state="final">Entfernte Region</target>
             </trans-unit>
+            <trans-unit id="1203928412304923586" datatype="html">
+                <source>% retranché à l&apos;attaque</source>
+                <target state="translated">% vom Angriff abgezogen</target>
+            </trans-unit>
             <trans-unit id="1210526375101082699" datatype="html" approved="yes">
                 <source>Mises à jour</source>
                 <target state="final">Aktualisierungen</target>
@@ -8045,6 +8233,10 @@
             <trans-unit id="1219737932941833062" datatype="html" approved="yes">
                 <source>Mode tracé : clic = destination · clic droit sur le tracé = couper · Échap : annuler · glisser : se déplacer</source>
                 <target state="final">Routenmodus: Klick = Ziel · Rechtsklick auf die Route = abschneiden · Esc: abbrechen · Ziehen: verschieben</target>
+            </trans-unit>
+            <trans-unit id="3433811943516561949" datatype="html">
+                <source>Dernier jour à défendre</source>
+                <target state="translated">Letzter zu verteidigender Tag</target>
             </trans-unit>
             <trans-unit id="3434960607050400834" datatype="html" approved="yes">
                 <source>Tas</source>
@@ -8169,6 +8361,10 @@
             <trans-unit id="3656199934377633082" datatype="html" approved="yes">
                 <source>Distance maximum</source>
                 <target state="final">Maximalentfernung</target>
+            </trans-unit>
+            <trans-unit id="3659016982129055885" datatype="html">
+                <source>{VAR_PLURAL, plural, =1 {veilleur} other {veilleurs}}</source>
+                <target state="translated">{VAR_PLURAL, plural, =1 {Wächter} other {Wächter}}</target>
             </trans-unit>
             <trans-unit id="7965672989392672913" datatype="html" approved="yes">
                 <source>Capacité</source>

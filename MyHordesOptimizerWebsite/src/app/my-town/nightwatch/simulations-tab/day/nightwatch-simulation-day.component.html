@@ -1,113 +1,3 @@
-<section class="attack">
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label i18n>Attaque</mat-label>
-        <input matInput type="number" min="0" step="1" data-field="attack" [value]="store.draft()?.attackOverride ?? ''"
-               [placeholder]="day().attack === null ? '' : '' + day().attack" [disabled]="!editable()"
-               #attack (change)="store.setAttackOverride(toNumber(attack.value))">
-    </mat-form-field>
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label i18n>Débordement autorisé</mat-label>
-        <input matInput type="number" min="0" step="1" data-field="overflow" [value]="store.draft()?.allowedOverflow ?? ''" placeholder="0"
-               [disabled]="!editable()" #overflow (change)="store.setAllowedOverflow(toNumber(overflow.value))">
-    </mat-form-field>
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label i18n>% retranché</mat-label>
-        <input matInput type="number" min="0" max="100" step="1" data-field="reduction" [value]="store.draft()?.attackReductionPercent ?? ''" placeholder="0"
-               [disabled]="!editable()" #reduction (change)="store.setAttackReduction(toNumber(reduction.value))">
-    </mat-form-field>
-    <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label i18n>Dégâts du réacteur</mat-label>
-        <input matInput type="number" min="0" step="1" data-field="reactor" [value]="store.draft()?.reactorDamage ?? ''" placeholder="0"
-               [disabled]="!editable()" #reactor (change)="store.setReactorDamage(toNumber(reactor.value))">
-    </mat-form-field>
-    <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
-        <mat-label i18n>Niveau AD</mat-label>
-        <mat-select data-field="adLevel" [value]="entered('adLevel')" [placeholder]="adLabel(day().defense.adLevel)" [disabled]="!editable()"
-                    (selectionChange)="store.setCityDefense('adLevel', $event.value ?? null)">
-            <mat-option data-ad="prefill" [value]="null"></mat-option>
-            <mat-option [value]="-1">
-                <ng-container i18n>Non construit</ng-container>
-            </mat-option>
-            @for (level of ad_levels; track level) {
-                <mat-option [value]="level">{{ level }}</mat-option>
-            }
-        </mat-select>
-    </mat-form-field>
-</section>
-
-<section class="posts">
-    @for (post of posts; track post.key) {
-        <mat-form-field appearance="outline" subscriptSizing="dynamic">
-            <mat-label>{{ post.label }}</mat-label>
-            <input matInput type="number" min="0" step="any" [attr.data-field]="post.key" [value]="entered(post.key) ?? ''"
-                   [placeholder]="'' + day().defense[post.key]"
-                   [disabled]="!editable()" #field (change)="store.setCityDefense(post.key, toNumber(field.value))">
-        </mat-form-field>
-    }
-</section>
-
-<section class="watchers">
-    @for (citizen of citizens(); track citizen.userId) {
-        <div class="citizen">
-            <mat-checkbox [attr.data-citizen]="citizen.userId" [checked]="watcher(citizen.userId) !== null" [disabled]="!editable()"
-                          (change)="toggleWatcher(citizen.userId, $event.checked)">{{ citizen.name }}
-            </mat-checkbox>
-            @if (watcher(citizen.userId) !== null) {
-                <mat-chip-listbox class="statuses" multiple [disabled]="!editable()" i18n-aria-label aria-label="Statuts prévus">
-                    @for (status of status_options; track status.key) {
-                        <mat-chip-option [attr.data-status]="status.key" [selected]="hasStatus(citizen.userId, status.key)" [disabled]="!editable()"
-                                         (selectionChange)="onStatusChange(citizen.userId, status.key, $event.isUserInput)">
-                            <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
-                            {{ status.label }}
-                        </mat-chip-option>
-                    }
-                </mat-chip-listbox>
-                <mho-list-element-add-remove withQuantity [attr.data-bag]="'survival-' + citizen.userId" label="Objets de survie" i18n-label
-                                             [currentList]="survival_bags().get(citizen.userId) ?? []" [lists]="survival_lists()"
-                                             addLabel="Ajouter" i18n-addLabel (add)="changeSurvival(citizen.userId, +$event, 1)"
-                                             removeLabel="Retirer" i18n-removeLabel (remove)="changeSurvival(citizen.userId, +$event, -1)"
-                                             emptyLabel="Vider" i18n-emptyLabel (empty)="emptySurvival(citizen.userId)" [readonly]="!editable()"/>
-            }
-        </div>
-    }
-</section>
-
-<section class="global">
-    <mho-list-element-add-remove withQuantity data-bag="global" label="Stuff global" i18n-label [currentList]="global_bag()" [lists]="global_lists()"
-                                 addLabel="Ajouter" i18n-addLabel (add)="changeGlobal(+$event, 1)"
-                                 removeLabel="Retirer" i18n-removeLabel (remove)="changeGlobal(+$event, -1)"
-                                 emptyLabel="Vider" i18n-emptyLabel (empty)="emptyGlobal()"
-                                 [capacity]="day().offered.slots" [capacityUncertain]="!day().offered.slots_known" [readonly]="!editable()"/>
-    @if (slots_overflow()) {
-        <p class="alert" data-alert="slots">
-            <mat-icon aria-hidden="true">warning</mat-icon>
-            <ng-container i18n>Anomalie dans l'équipement : Pas assez de place dans le sac</ng-container>
-        </p>
-    }
-    @if (heavy_overflow()) {
-        <p class="alert" data-alert="heavy">
-            <mat-icon aria-hidden="true">warning</mat-icon>
-            <ng-container i18n>Anomalie dans l'équipement : Trop d'encombrants</ng-container>
-        </p>
-    }
-</section>
-
-@if (stock_rows().length > 0) {
-    <section class="stock">
-        <h3 i18n>Stock restant</h3>
-        <ul>
-            @for (row of stock_rows(); track row.item_id) {
-                <li [attr.data-stock]="row.item_id">
-                    @if (row.icon !== '') {
-                        <img [src]="row.icon" [alt]="row.label">
-                    }
-                    {{ row.label }} : {{ row.quantity }}
-                </li>
-            }
-        </ul>
-    </section>
-}
-
 <section class="kpis">
     <div class="kpi" data-field="remaining">
         <span class="title" i18n>Reste à couvrir</span>
@@ -135,3 +25,198 @@
         </strong>
     </div>
 </section>
+
+@if (slots_overflow()) {
+    <p class="alert" data-alert="slots">
+        <mat-icon aria-hidden="true">warning</mat-icon>
+        <ng-container i18n>Anomalie dans l'équipement : Pas assez de place dans le sac</ng-container>
+    </p>
+}
+@if (heavy_overflow()) {
+    <p class="alert" data-alert="heavy">
+        <mat-icon aria-hidden="true">warning</mat-icon>
+        <ng-container i18n>Anomalie dans l'équipement : Trop d'encombrants</ng-container>
+    </p>
+}
+
+<mat-accordion multi>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title i18n>Attaque</mat-panel-title>
+            <mat-panel-description data-field="attack-goal">
+                @if (day().goal !== null) {
+                    <ng-container i18n>Objectif</ng-container> {{ day().goal }}
+                } @else {
+                    ?
+                }
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="lines">
+            <div class="line" [class.edited]="store.draft()?.attackOverride !== null && store.draft()?.attackOverride !== undefined">
+                <label for="sim-attack" i18n>Attaque estimée</label>
+                <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                    <input id="sim-attack" matInput type="number" min="0" step="1" data-field="attack" [value]="day().attack ?? ''" [disabled]="!editable()"
+                           #attack (change)="store.setAttackOverride(toNumber(attack.value))">
+                </mat-form-field>
+                @if (store.draft()?.attackOverride !== null && store.draft()?.attackOverride !== undefined && editable()) {
+                    <button mat-icon-button type="button" data-action="reset-attack" i18n-matTooltip matTooltip="Rétablir la valeur calculée"
+                            i18n-aria-label aria-label="Rétablir la valeur calculée" (click)="store.setAttackOverride(null)">
+                        <mat-icon>undo</mat-icon>
+                    </button>
+                }
+            </div>
+            <div class="line">
+                <label for="sim-overflow" i18n>Débordement autorisé</label>
+                <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                    <input id="sim-overflow" matInput type="number" min="0" step="1" data-field="overflow" [value]="store.draft()?.allowedOverflow ?? 0"
+                           [disabled]="!editable()" #overflow (change)="store.setAllowedOverflow(toNumber(overflow.value))">
+                </mat-form-field>
+            </div>
+            <div class="line">
+                <label for="sim-reduction" i18n>% retranché à l'attaque</label>
+                <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                    <input id="sim-reduction" matInput type="number" min="0" max="100" step="1" data-field="reduction"
+                           [value]="store.draft()?.attackReductionPercent ?? 0" [disabled]="!editable()" #reduction
+                           (change)="store.setAttackReduction(toNumber(reduction.value))">
+                </mat-form-field>
+            </div>
+            <div class="line">
+                <label for="sim-reactor" i18n>Dégâts du réacteur</label>
+                <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                    <input id="sim-reactor" matInput type="number" min="0" step="1" data-field="reactor" [value]="store.draft()?.reactorDamage ?? 0"
+                           [disabled]="!editable()" #reactor (change)="store.setReactorDamage(toNumber(reactor.value))">
+                </mat-form-field>
+            </div>
+            <div class="line" [class.edited]="entered('adLevel') !== null">
+                <span class="label" id="sim-ad-label" i18n>Niveau de l'Ajustement défensif</span>
+                <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                    <mat-select id="sim-ad" data-field="adLevel" aria-labelledby="sim-ad-label" [value]="day().defense.adLevel" [disabled]="!editable()"
+                                (selectionChange)="store.setCityDefense('adLevel', $event.value)">
+                        @for (level of ad_levels; track level) {
+                            <mat-option [value]="level">{{ adLabel(level) }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                @if (entered('adLevel') !== null && editable()) {
+                    <button mat-icon-button type="button" data-action="reset-adLevel" i18n-matTooltip matTooltip="Rétablir la valeur calculée"
+                            i18n-aria-label aria-label="Rétablir la valeur calculée" (click)="store.setCityDefense('adLevel', null)">
+                        <mat-icon>undo</mat-icon>
+                    </button>
+                }
+            </div>
+        </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title i18n>Défense de la ville</mat-panel-title>
+            <mat-panel-description data-field="city-defense-total">{{ city_defense_total() }}</mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="lines">
+            @for (post of posts; track post.key) {
+                <div class="line" [class.edited]="entered(post.key) !== null">
+                    <label [for]="'sim-' + post.key">{{ post.label }}</label>
+                    <mat-form-field class="number" appearance="outline" subscriptSizing="dynamic">
+                        <input [id]="'sim-' + post.key" matInput type="number" min="0" step="any" [attr.data-field]="post.key" [value]="day().defense[post.key]"
+                               [disabled]="!editable()" #field (change)="store.setCityDefense(post.key, toNumber(field.value))">
+                    </mat-form-field>
+                    @if (entered(post.key) !== null && editable()) {
+                        <button mat-icon-button type="button" [attr.data-action]="'reset-' + post.key" i18n-matTooltip matTooltip="Rétablir la valeur calculée"
+                                i18n-aria-label aria-label="Rétablir la valeur calculée" (click)="store.setCityDefense(post.key, null)">
+                            <mat-icon>undo</mat-icon>
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+            <mat-panel-title i18n>Veilleurs</mat-panel-title>
+            <mat-panel-description>{{ watcher_cards().length }}</mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="watchers">
+            @for (card of watcher_cards(); track card.user_id) {
+                <mat-card class="watcher" appearance="outlined" [attr.data-watcher]="card.user_id">
+                    <div class="head">
+                        @if (card.job; as job) {
+                            <img class="job" [src]="HORDES_IMG_REPO + job.value.img" [alt]="job.value.label">
+                        }
+                        <strong class="name">{{ card.name }}</strong>
+                        <span class="stat" data-field="defense"><ng-container i18n>Défense</ng-container> <strong>{{ card.defense }}</strong></span>
+                        <span class="stat" data-field="risk"><ng-container i18n>Risque</ng-container> <strong>{{ percent(card.risk) }} %</strong></span>
+                        <button mat-icon-button type="button" data-action="remove-watcher" [disabled]="!editable()" i18n-aria-label
+                                aria-label="Retirer le veilleur"
+                                (click)="store.removeWatcher(card.user_id)">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </div>
+                    <mat-chip-listbox class="statuses" multiple [disabled]="!editable()" i18n-aria-label aria-label="Statuts prévus">
+                        @for (status of status_options; track status.key) {
+                            <mat-chip-option [attr.data-status]="status.key" [selected]="hasStatus(card.user_id, status.key)" [disabled]="!editable()"
+                                             (selectionChange)="onStatusChange(card.user_id, status.key, $event.isUserInput)">
+                                <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
+                                {{ status.label }}
+                            </mat-chip-option>
+                        }
+                    </mat-chip-listbox>
+                    <mho-list-element-add-remove withQuantity [attr.data-bag]="'survival-' + card.user_id" label="Objets de survie" i18n-label
+                                                 [currentList]="survival_bags().get(card.user_id) ?? []" [lists]="survival_lists()"
+                                                 addLabel="Ajouter" i18n-addLabel (add)="changeSurvival(card.user_id, +$event, 1)"
+                                                 removeLabel="Retirer" i18n-removeLabel (remove)="changeSurvival(card.user_id, +$event, -1)"
+                                                 emptyLabel="Vider" i18n-emptyLabel (empty)="emptySurvival(card.user_id)" [readonly]="!editable()"/>
+                </mat-card>
+            }
+        </div>
+        <mat-form-field class="add-watcher" appearance="outline" subscriptSizing="dynamic">
+            <mat-select data-field="add-watcher" [disabled]="!editable()" i18n-aria-label aria-label="Ajouter un veilleur" #picked
+                        i18n-placeholder placeholder="Ajouter un veilleur…" (selectionChange)="addWatcher(picked, $event.value)">
+                @for (citizen of addable_citizens(); track citizen.user_id) {
+                    <mat-option [value]="citizen.user_id">
+                        @if (citizen.job; as job) {
+                            <img class="job" [src]="HORDES_IMG_REPO + job.value.img" [alt]="job.value.label">
+                        }
+                        {{ citizen.name }}
+                    </mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title i18n>Stuff de la nuit</mat-panel-title>
+            <mat-panel-description>
+                {{ global_bag().length }} / {{ day().offered.slots }}{{ day().offered.slots_known ? '' : '+?' }}
+                @if (slots_overflow() || heavy_overflow()) {
+                    <mat-icon class="warning" aria-hidden="true">warning</mat-icon>
+                }
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+        <mho-list-element-add-remove withQuantity data-bag="global" label="Stuff global" i18n-label [currentList]="global_bag()" [lists]="global_lists()"
+                                     addLabel="Ajouter" i18n-addLabel (add)="changeGlobal(+$event, 1)"
+                                     removeLabel="Retirer" i18n-removeLabel (remove)="changeGlobal(+$event, -1)"
+                                     emptyLabel="Vider" i18n-emptyLabel (empty)="emptyGlobal()"
+                                     [capacity]="day().offered.slots" [capacityUncertain]="!day().offered.slots_known" [readonly]="!editable()"/>
+    </mat-expansion-panel>
+
+    @if (stock_rows().length > 0) {
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title i18n>Stock restant</mat-panel-title>
+                <mat-panel-description>{{ stock_rows().length }}</mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="stock">
+                @for (row of stock_rows(); track row.item_id) {
+                    <span class="item" [attr.data-stock]="row.item_id" [title]="row.label">
+                        @if (row.icon !== '') {
+                            <img [src]="row.icon" [alt]="row.label">
+                        }
+                        {{ row.quantity }}
+                    </span>
+                }
+            </div>
+        </mat-expansion-panel>
+    }
+</mat-accordion>

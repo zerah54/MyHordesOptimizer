@@ -10,16 +10,16 @@ import moment from 'moment';
 import { catchError, Observable, of } from 'rxjs';
 
 import { HORDES_IMG_REPO } from '../../../_abstract_model/const';
-import { JobEnum } from '../../../_abstract_model/enum/job.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { Imports } from '../../../_abstract_model/types/_types';
 import { Item } from '../../../_abstract_model/types/item.class';
 import { DEEP_LINK_PARAMS } from '../../../_core/utilities/deep-link.util';
 import { itemIcon, itemLabel } from '../../buildings/planning/planning-labels.util';
+import { NightwatchStore } from '../nightwatch.store';
+import { NightwatchPlanContentDTO } from '../nightwatch.types';
+import { AddableCitizen, addableCitizens } from '../nightwatch-addable-citizens.util';
 import { defaultPlanName } from '../nightwatch-plan-name';
 import { StockLine } from '../nightwatch-stock.util';
-import { NightwatchStore } from '../nightwatch.store';
-import { NightwatchCitizenStateDTO, NightwatchPlanContentDTO, NightwatchWatcherDTO } from '../nightwatch.types';
 import { NightwatchWatcherComponent } from './watcher/nightwatch-watcher.component';
 
 const components: Imports = [NightwatchWatcherComponent];
@@ -41,13 +41,6 @@ interface UnassignedItem {
     quantity: number;
 }
 
-/** Citoyen proposé à l'inscription, avec son métier (nul s'il est inconnu). */
-interface AddableCitizen {
-    user_id: number;
-    name: string;
-    job: JobEnum | null;
-}
-
 /** Onglet Plan : veilleurs de la proposition affichée, valeurs calculées en direct, totaux et consignes. Lit le store de la page. */
 @Component({
     selector: 'mho-nightwatch-plan-tab',
@@ -63,17 +56,8 @@ export class NightwatchPlanTabComponent {
     protected readonly items: Signal<readonly Item[]> = toSignal(inject(ApiService).getItems().pipe(catchError((): Observable<Item[]> => of([]))), { initialValue: [] as Item[] });
 
     /** Citoyens vivants pas encore inscrits comme veilleurs, par ordre alphabétique. */
-    protected readonly addable_citizens: Signal<AddableCitizen[]> = computed((): AddableCitizen[] => {
-        const enrolled: Set<number> = new Set<number>((this.store.draft()?.watchers ?? []).map((watcher: NightwatchWatcherDTO): number => watcher.userId));
-        return (this.store.state()?.citizens ?? [])
-            .filter((citizen: NightwatchCitizenStateDTO): boolean => !enrolled.has(citizen.userId))
-            .map((citizen: NightwatchCitizenStateDTO): AddableCitizen => ({
-                user_id: citizen.userId,
-                name: citizen.name,
-                job: citizen.jobUid === null || citizen.jobUid === undefined ? null : (JobEnum.getByKey<JobEnum>(citizen.jobUid) ?? null)
-            }))
-            .sort((a: AddableCitizen, b: AddableCitizen): number => a.name.localeCompare(b.name, this.locale, { sensitivity: 'base' }));
-    });
+    protected readonly addable_citizens: Signal<AddableCitizen[]> = computed((): AddableCitizen[] =>
+        addableCitizens(this.store.state()?.citizens ?? [], this.store.draft()?.watchers ?? [], this.locale));
 
     /** Lien vers la page Chantiers, sur le jour affiché et la proposition retenue par la veille. */
     protected readonly buildings_link: Signal<Params> = computed((): Params => {

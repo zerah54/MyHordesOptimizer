@@ -3,11 +3,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { state } from '../state';
 import { isValidToken } from '../utils/misc';
 import { authenticateOnScriptLoad, getToken, isTokenRequestInFlight } from './token';
+import { getWishlist } from './wishlist';
 
 // `getWishlist` mocké : seul `getItems()` (non mocké) doit passer par le vrai `fetcher()`, pour
 // prouver que l'attente de `getToken()` dans `fetcher()` (src/utils/fetch.ts) ne bloque pas un
 // appel imbriqué déclenché par `tokenReceived()` lui-même (`getItems`/`getWishlist`).
 vi.mock('./wishlist', () => ({ getWishlist: vi.fn().mockResolvedValue(undefined) }));
+const getWishlistMock: ReturnType<typeof vi.fn> = getWishlist as unknown as ReturnType<typeof vi.fn>;
 vi.mock('../utils/storage', () => ({ setStorageItem: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('../utils/notifications', () => ({ addError: vi.fn() }));
 
@@ -166,6 +168,17 @@ describe('getToken(true) : cooldown après un 429 (incident prod 2026-09-09)', (
         } finally {
             vi.useRealTimers();
         }
+    });
+});
+
+describe('tokenReceived hors désert', () => {
+    it('ne charge la liste de courses qu\'une seule fois', async () => {
+        getWishlistMock.mockClear();
+        stubAuthenticationFetch();
+
+        await getToken(true);
+
+        expect(getWishlistMock).toHaveBeenCalledTimes(1);
     });
 });
 

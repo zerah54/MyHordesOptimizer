@@ -32,7 +32,7 @@ const REFERENTIAL: NightwatchReferentialDTO = {
  */
 function simDay(overrides: Partial<SimulationDayView> = {}): SimulationDayView {
     return {
-        day: 10, plan_id: 7, attack: 500,
+        day: 10, plan_id: 7, attack: 500, goal: 500,
         defense: {
             buildings: 100, upgrades: 20, wall: 40, bankDefenseItems: 2, homes: 30, guardians: 5, guardTowerPa: 0, souls: 1,
             cemetery: 2, eveningVote: 0, dumpContribution: 0, fddCoefficient: 1.5, adLevel: -1
@@ -113,16 +113,32 @@ describe('NightwatchSimulationDayComponent', (): void => {
 
     afterEach((): void => {
         TestBed.resetTestingModule();
+        document.querySelectorAll('.cdk-overlay-container').forEach((overlay: Element): void => { overlay.innerHTML = ''; });
     });
 
-    it('saisie de la muraille → setCityDefense, vidage → null ; la valeur pré-remplie est en indication', async (): Promise<void> => {
+    it('saisie de la muraille → setCityDefense, vidage → null ; la valeur pré-remplie est affichée comme valeur', async (): Promise<void> => {
         await render();
 
-        expect(root().querySelector<HTMLInputElement>('input[data-field="wall"]')?.placeholder).toBe('40');
+        expect(root().querySelector<HTMLInputElement>('input[data-field="wall"]')?.value).toBe('40');
+        expect(root().querySelector('button[data-action="reset-wall"]')).toBeNull();
         type('wall', '20');
         expect(fake.actions.setCityDefense).toHaveBeenCalledWith('wall', 20);
         type('wall', '');
         expect(fake.actions.setCityDefense).toHaveBeenLastCalledWith('wall', null);
+    });
+
+    it('poste modifié : marqué, et « rétablir » revient à la valeur pré-remplie', async (): Promise<void> => {
+        await render({ cityDefense: { wall: 20 } });
+
+        root().querySelector<HTMLButtonElement>('button[data-action="reset-wall"]')?.click();
+        expect(fake.actions.setCityDefense).toHaveBeenCalledWith('wall', null);
+    });
+
+    it('en-têtes repliables : objectif hors AD de l\'attaque et total de la défense de la ville', async (): Promise<void> => {
+        await render({}, { goal: 480 });
+
+        expect(text(root().querySelector('[data-field="attack-goal"]'))).toContain('480');
+        expect(text(root().querySelector('[data-field="city-defense-total"]'))).toContain(`${40 + 2 * 1.5 + 100 + 20 + 30 + 5 + 1 + 2}`);
     });
 
     it('affiche « Apport des décharges » et transmet sa saisie', async (): Promise<void> => {
@@ -136,7 +152,7 @@ describe('NightwatchSimulationDayComponent', (): void => {
     it('attaque, débordement, % retranché et dégâts du réacteur', async (): Promise<void> => {
         await render();
 
-        expect(root().querySelector<HTMLInputElement>('input[data-field="attack"]')?.placeholder).toBe('500');
+        expect(root().querySelector<HTMLInputElement>('input[data-field="attack"]')?.value).toBe('500');
         type('attack', '600');
         type('overflow', '10');
         type('reduction', '');
@@ -147,13 +163,23 @@ describe('NightwatchSimulationDayComponent', (): void => {
         expect(fake.actions.setReactorDamage).toHaveBeenCalledWith(50);
     });
 
-    it('cocher un citoyen → addWatcher, décocher → removeWatcher', async (): Promise<void> => {
-        await render({ watchers: [{ userId: 3, statuses: [], items: {}, hasDiscourse: false }] });
+    it('veilleurs : une fiche par veilleur (défense, risque), retrait ; ajout par la liste des autres citoyens', async (): Promise<void> => {
+        await render({ watchers: [{ userId: 3, statuses: [], items: {}, hasDiscourse: false }] }, { watchers: [{ user_id: 3, risk: 0.125, defense: 42 }] });
 
-        root().querySelector<HTMLInputElement>('[data-citizen="1"] input[type="checkbox"]')?.click();
-        expect(fake.actions.addWatcher).toHaveBeenCalledWith(1);
-        root().querySelector<HTMLInputElement>('[data-citizen="3"] input[type="checkbox"]')?.click();
+        const card: HTMLElement | null = root().querySelector('[data-watcher="3"]');
+        expect(text(card)).toContain('Chloé');
+        expect(text(card?.querySelector('[data-field="defense"]') ?? null)).toContain('42');
+        expect(text(card?.querySelector('[data-field="risk"]') ?? null)).toContain('12.5 %');
+        card?.querySelector<HTMLButtonElement>('button[data-action="remove-watcher"]')?.click();
         expect(fake.actions.removeWatcher).toHaveBeenCalledWith(3);
+
+        root().querySelector<HTMLElement>('mat-select[data-field="add-watcher"] .mat-mdc-select-trigger')?.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        const options: HTMLElement[] = Array.from(document.querySelectorAll<HTMLElement>('mat-option'));
+        expect(options.map((option: HTMLElement): string => text(option))).toEqual(['Alice', 'Bob']);
+        options[0].click();
+        expect(fake.actions.addWatcher).toHaveBeenCalledWith(1);
     });
 
     it('objets de survie d\'un veilleur : seuls ceux à watchImpact non nul, ajout → setItem', async (): Promise<void> => {
@@ -185,13 +211,10 @@ describe('NightwatchSimulationDayComponent', (): void => {
         expect(stock.counts?.get(22)).toBe(3);
     });
 
-    it('niveau AD : indication = niveau pré-rempli, option vide → setCityDefense(adLevel, null)', async (): Promise<void> => {
+    it('niveau AD : affiche le niveau retenu ; « rétablir » → setCityDefense(adLevel, null)', async (): Promise<void> => {
         await render({ cityDefense: { adLevel: 2 } });
 
-        root().querySelector<HTMLElement>('mat-select[data-field="adLevel"] .mat-mdc-select-trigger')?.click();
-        fixture.detectChanges();
-        await fixture.whenStable();
-        document.querySelector<HTMLElement>('mat-option[data-ad="prefill"]')?.click();
+        root().querySelector<HTMLButtonElement>('button[data-action="reset-adLevel"]')?.click();
 
         expect(fake.actions.setCityDefense).toHaveBeenCalledWith('adLevel', null);
     });

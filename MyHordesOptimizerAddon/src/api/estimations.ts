@@ -29,7 +29,8 @@ export function getRefinedAttack(day: number): Promise<RefinedAttack | null> {
         .catch((): null => null);
 }
 
-export function getEstimations() {
+/** Estimations sauvegardées de la ville et attaques calculées du jour et du lendemain. */
+export function getEstimations(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
         fetcher(state.api_url + `/AttaqueEstimation/Estimations/${state.mh_user.townDetails?.day}?townId=${state.mh_user.townDetails?.townId}`)
             .then((response) => {
@@ -45,13 +46,16 @@ export function getEstimations() {
                     today_attack: undefined,
                     tomorrow_attack: undefined
                 };
-                getAttackCalculation(state.mh_user.townDetails?.day, false).then((today_result) => {
-                    estimations.today_attack = today_result;
-                    getAttackCalculation(state.mh_user.townDetails?.day + 1, false).then((tomorrow_result) => {
+                const day: number = state.mh_user.townDetails?.day;
+                return getAttackCalculation(day, false)
+                    .then((today_result) => {
+                        estimations.today_attack = today_result;
+                        return getAttackCalculation(day + 1, false);
+                    })
+                    .then((tomorrow_result) => {
                         estimations.tomorrow_attack = tomorrow_result;
                         resolve(estimations);
                     });
-                });
             })
             .catch((error) => {
                 addError(error);

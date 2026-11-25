@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vite
 import { state } from '../state';
 import type { MhoState } from '../types';
 import { fetcher } from '../utils/fetch';
-import { fetchCitizenHomeRows, getCitizens, readTownCitizenRefs } from './citizens';
+import { fetchCitizenHomeRows, fetchTownCitizenRefs, getCitizens, readTownCitizenRefs } from './citizens';
 
 vi.mock('../utils/fetch', () => ({ fetcher: vi.fn() }));
 vi.mock('../utils/notifications', () => ({ addError: vi.fn() }));
@@ -64,6 +64,28 @@ describe('fetchCitizenHomeRows', () => {
         (fetcher as unknown as Mock).mockResolvedValue({ status: 500, text: (): Promise<string> => Promise.resolve('boom'), json: (): Promise<unknown> => Promise.resolve({}) });
 
         await expect(fetchCitizenHomeRows()).rejects.toBeDefined();
+    });
+});
+
+describe('fetchTownCitizenRefs', () => {
+    let saved: Pick<MhoState, 'api_url' | 'mh_user'>;
+
+    beforeEach(() => {
+        saved = { api_url: state.api_url, mh_user: state.mh_user };
+        state.api_url = 'https://api';
+        state.mh_user = { id: 1, townDetails: { townId: 2 } };
+        (fetcher as unknown as Mock).mockReset();
+        (fetcher as unknown as Mock).mockResolvedValue({ status: 200, json: (): Promise<unknown> => Promise.resolve({ citizens: [] }) });
+    });
+
+    afterEach(() => {
+        Object.assign(state, saved);
+    });
+
+    it('attend le jeton : appelée pendant la mise à jour, qui peut tomber sur un renouvellement', async () => {
+        await fetchTownCitizenRefs();
+
+        expect(fetcher).toHaveBeenCalledWith('https://api/Fetcher/citizens?userId=1&townId=2', undefined, { wait_for_token: true });
     });
 });
 

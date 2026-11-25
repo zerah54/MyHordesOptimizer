@@ -11,10 +11,18 @@ import {
 } from '../utils/forum-link-insertion';
 import { getForumImageUrl, getImgurEmbedUrl } from '../utils/image-links';
 import { pageIsDesert, pageIsForum, pageIsMsgReceived } from '../utils/page';
+import { toPageWorld } from '../utils/page-world';
 import { unwatchRendered, watchRendered } from '../utils/render-watch';
 import { getStorageItem, setStorageItem } from '../utils/storage';
 import { isDirectVideoLink, type MatchedVideo, matchVideoLink } from '../utils/video-providers';
 
+/** Objets envoyables déjà équipés de l'écouteur de clic */
+const filled_items_bound: WeakSet<Element> = new WeakSet<Element>();
+
+/** Délai de mise en place des écouteurs en attente : un seul à la fois */
+let fill_items_timeout: ReturnType<typeof setTimeout> | undefined;
+
+/** Pré-remplit titre et contenu du message avec un texte aléatoire au clic sur un objet envoyable. */
 export function fillItemsMessages() {
     if (state.mho_parameters.fill_items_messages && pageIsMsgReceived()) {
         const row_send = document.querySelector('#rows-send');
@@ -26,14 +34,17 @@ export function fillItemsMessages() {
         const editor_block = document.querySelector('#pm-forum-editor');
         if (!editor_block) return;
 
-        setTimeout(() => {
-
-            const editor = editor_block.querySelector('hordes-twino-editor');
-            if (!editor) return;
+        if (fill_items_timeout !== undefined) clearTimeout(fill_items_timeout);
+        fill_items_timeout = setTimeout(() => {
+            fill_items_timeout = undefined;
 
             const sendable_items_item = sendable_items.querySelectorAll('li.item');
             Array.from(sendable_items_item).forEach((item) => {
+                if (filled_items_bound.has(item)) return;
+                filled_items_bound.add(item);
                 item.addEventListener('click', () => {
+                    const editor = document.querySelector('#pm-forum-editor hordes-twino-editor');
+                    if (!editor) return;
                     const message_title = editor.querySelector('input');
                     const message_content = editor.querySelector('textarea');
                     if ((message_title.value === undefined || message_title.value === null || message_title.value === '')
@@ -47,7 +58,7 @@ export function fillItemsMessages() {
                         message_content.value = random_filler.content;
                         message_content.dispatchEvent(new Event('input', { bubbles: true }));
                     }
-                }, { once: true });
+                });
             });
         }, 250);
     }
@@ -457,7 +468,7 @@ function installMediaBlocksCopyGuard(): void {
         event.stopImmediatePropagation();
         is_reemitting_import = true;
         try {
-            event.target?.dispatchEvent(new CustomEvent('import', { bubbles: false, cancelable: false, detail: { ...detail, html: cleaned_html } }));
+            event.target?.dispatchEvent(new CustomEvent('import', { bubbles: false, cancelable: false, detail: toPageWorld({ ...detail, html: cleaned_html }) }));
         } finally {
             is_reemitting_import = false;
         }

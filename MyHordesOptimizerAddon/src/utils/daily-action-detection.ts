@@ -28,13 +28,9 @@ export function dailyActionReport(key: string, detected: boolean | undefined, jo
     return detected;
 }
 
-/** Envoie l'état de chaque action de la page maison (`save` : envoi d'une action, undefined si rien à envoyer) ; un échec, déjà signalé par l'envoi, n'empêche ni les autres actions ni la suite de la mise à jour. */
+/** Envoie en parallèle l'état de chaque action de la page maison (`save` : envoi d'une action, undefined si rien à envoyer) ; un échec, déjà signalé par l'envoi, n'empêche ni les autres actions ni la suite de la mise à jour. */
 export async function reportHomeDailyActions(save: (key: string, done: boolean | undefined) => Promise<void> | undefined, job_uid: string | undefined): Promise<void> {
-    for (const action of HOME_DAILY_ACTIONS) {
-        try {
-            await save(action.key, dailyActionReport(action.key, detectDailyActionDone(action.icon), job_uid));
-        } catch {
-            // Erreur déjà notifiée par l'envoi.
-        }
-    }
+    await Promise.allSettled(HOME_DAILY_ACTIONS.map(async (action: { key: string; icon: string }): Promise<void> => {
+        await save(action.key, dailyActionReport(action.key, detectDailyActionDone(action.icon), job_uid));
+    }));
 }

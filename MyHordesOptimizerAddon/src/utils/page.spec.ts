@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { state } from '../state';
-import { isMhoWebsite, shouldRefreshMe } from './page';
+import { clickIfPresent, isMhoWebsite, shouldRefreshMe } from './page';
 
 beforeEach(() => {
     document.body.innerHTML = '';
@@ -48,5 +48,19 @@ describe('isMhoWebsite()', () => {
     it('ignore les autres sites et un website vide', () => {
         expect(isMhoWebsite('https://myhordes.eu/jx/town/dashboard', prod_website)).toBe(false);
         expect(isMhoWebsite('https://gesthordes.fr/', '')).toBe(false);
+    });
+});
+
+describe('clickIfPresent()', () => {
+    it('clique sur l\'élément trouvé et renvoie true', () => {
+        document.body.innerHTML = '<button id="topbar-refresh-btn"></button>';
+        let clicked: boolean = false;
+        document.querySelector('#topbar-refresh-btn')?.addEventListener('click', (): void => { clicked = true; });
+        expect(clickIfPresent('#topbar-refresh-btn')).toBe(true);
+        expect(clicked).toBe(true);
+    });
+
+    it('renvoie false quand l\'élément est absent', () => {
+        expect(clickIfPresent('#topbar-refresh-btn')).toBe(false);
     });
 });

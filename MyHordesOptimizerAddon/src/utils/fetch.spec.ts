@@ -166,3 +166,97 @@ describe('fetcherWithoutBearer', () => {
         await assertion;
     });
 });
+
+describe('fetcher : relance après une 401', () => {
+    const api_url: string = 'https://api.test';
+    const fetchMock = (): ReturnType<typeof vi.fn> => fetch as unknown as ReturnType<typeof vi.fn>;
+
+    beforeEach((): void => {
+        state.api_url = api_url;
+    });
+
+    it('rejoue une fois avec un jeton renouvelé', async (): Promise<void> => {
+        state.token = validToken('ancien');
+        fetchMock().mockResolvedValueOnce(jsonResponse(401, {})).mockResolvedValueOnce(jsonResponse(200, {}));
+        getTokenMock.mockImplementation(async (): Promise<void> => {
+            state.token = validToken('neuf');
+        });
+
+        const response: Response = await fetcher(`${api_url}/x`, { method: 'POST', body: '{"a":1}' });
+
+        expect(getTokenMock).toHaveBeenCalledWith(true);
+        expect(fetchMock()).toHaveBeenCalledTimes(2);
+        const second = fetchMock().mock.calls[1][1];
+        expect(second.headers.Authorization).toBe('Bearer neuf');
+        expect(second.body).toBe(fetchMock().mock.calls[0][1].body);
+        expect(second.body).toBe('{"a":1}');
+        expect(second.method).toBe('POST');
+        expect(response.status).toBe(200);
+    });
+
+    it('ne rejoue qu\'une fois', async (): Promise<void> => {
+        state.token = validToken('ancien');
+        fetchMock().mockResolvedValue(jsonResponse(401, {}));
+        getTokenMock.mockImplementation(async (): Promise<void> => {
+            state.token = validToken('neuf');
+        });
+
+        const response: Response = await fetcher(`${api_url}/x`);
+
+        expect(fetchMock()).toHaveBeenCalledTimes(2);
+        expect(response.status).toBe(401);
+    });
+
+    it('ne rejoue pas une requête partie pendant un renouvellement', async (): Promise<void> => {
+        isTokenRequestInFlightMock.mockReturnValue(true);
+        fetchMock().mockResolvedValue(jsonResponse(401, {}));
+
+        const response: Response = await fetcher(`${api_url}/x`);
+
+        expect(fetchMock()).toHaveBeenCalledTimes(1);
+        expect(getTokenMock).not.toHaveBeenCalledWith(true);
+        expect(response.status).toBe(401);
+    });
+
+    it('rend la 401 quand le renouvellement ne donne pas de jeton valide', async (): Promise<void> => {
+        state.token = validToken('ancien');
+        fetchMock().mockResolvedValue(jsonResponse(401, {}));
+        getTokenMock.mockImplementation(async (): Promise<void> => {
+            state.token = undefined;
+        });
+
+        const response: Response = await fetcher(`${api_url}/x`);
+
+        expect(fetchMock()).toHaveBeenCalledTimes(1);
+        expect(response.status).toBe(401);
+    });
+
+    it('ne relance pas pour un autre site que l\'API', async (): Promise<void> => {
+        state.token = validToken('ancien');
+        fetchMock().mockResolvedValue(jsonResponse(401, {}));
+
+        await fetcher('https://bbh.test/x');
+
+        expect(fetchMock()).toHaveBeenCalledTimes(1);
+    });
+
+    it('rejoue chacune des requêtes refusées en même temps', async (): Promise<void> => {
+        state.token = validToken('ancien');
+        const seen: Set<string> = new Set<string>();
+        fetchMock().mockImplementation(async (url: string): Promise<Response> => {
+            if (seen.has(url)) {
+                return jsonResponse(200, {});
+            }
+            seen.add(url);
+            return jsonResponse(401, {});
+        });
+        getTokenMock.mockImplementation(async (): Promise<void> => {
+            state.token = validToken('neuf');
+        });
+
+        const responses: Response[] = await Promise.all([fetcher(`${api_url}/a`), fetcher(`${api_url}/b`)]);
+
+        expect(fetchMock()).toHaveBeenCalledTimes(4);
+        expect(responses.map((r: Response): number => r.status)).toEqual([200, 200]);
+    });
+});

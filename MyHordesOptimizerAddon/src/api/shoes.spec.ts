@@ -55,6 +55,14 @@ describe('saveShoesEquipped', () => {
         expect(options.headers).toEqual({ 'Content-Type': 'application/json' });
     });
 
+    it('attend le jeton : premier appel de la mise à jour, souvent celui qui lance le renouvellement', async () => {
+        fetcherMock.mockResolvedValue(noContentResponse());
+
+        await saveShoesEquipped(true);
+
+        expect(fetcherMock.mock.calls[0][2]).toEqual({ wait_for_token: true });
+    });
+
     it('envoie aussi l\'absence de chaussures équipées', async () => {
         fetcherMock.mockResolvedValue(noContentResponse());
 

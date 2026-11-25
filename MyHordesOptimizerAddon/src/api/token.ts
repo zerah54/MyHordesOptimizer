@@ -115,7 +115,6 @@ function requestToken(force?: boolean, stop?: boolean): Promise<void> {
                             const get_map_promise = getMap();
                             await Promise.all([get_items_promise, get_ruins_promise, get_wishlist_promise, get_map_promise]);
                         } else {
-                            const get_wishlist_promise = getWishlist();
                             await Promise.all([get_items_promise, get_wishlist_promise]);
                         }
                     } else {

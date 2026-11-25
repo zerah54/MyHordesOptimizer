@@ -24,6 +24,13 @@ export function buttonOptimizerElement(): HTMLElement {
  * @param {string} website      site MHO de l'environnement courant (`state.website`)
  * @return {boolean}            true si la page est une page du site MyHordes Optimizer
  */
+/** Simule un clic sur l'élément ciblé ; renvoie false s'il est absent de la page */
+export function clickIfPresent(selector: string): boolean {
+    const element: HTMLElement | null = document.querySelector<HTMLElement>(selector);
+    element?.click();
+    return element !== null;
+}
+
 export function isMhoWebsite(url: string, website: string): boolean {
     const origin: string = new URL(url).origin;
     return [mh_optimizer_site_url, mh_optimizer_beta_site_url, website]

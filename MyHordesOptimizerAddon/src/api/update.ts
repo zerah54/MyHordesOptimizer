@@ -80,6 +80,7 @@ const polling_interval_ms: number = 800;
 /** Au-delà, on cesse de suivre ; le traitement, lui, continue côté serveur */
 const polling_timeout_ms: number = 120000;
 
+/** Envoie la mise à jour aux outils externes et en suit l'avancement ; ses appels à l'API attendent le jeton. */
 export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJobState) => void): Promise<ExternalToolsUpdateJobState> {
     const { mh_user, mho_parameters, api_url, external_app_id } = state as any;
     return new Promise<ExternalToolsUpdateJobState>(async (resolve, reject) => {
@@ -512,7 +513,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
             headers: {
                 'Content-Type': 'application/json'
             }
-        })
+        }, { wait_for_token: true })
             .then((response: Response) => {
                 if (response.status === 200 || response.status === 202) {
                     return response.json();
@@ -538,7 +539,7 @@ export function updateExternalTools(on_progress?: (state: ExternalToolsUpdateJob
  * Interroge l'avancement jusqu'à la fin du lancement suivi. Les rafraîchissements de la liste de
  * courses et de la carte sont déclenchés dès que MyHordes Optimizer est à jour : les rattacher à
  * la fin du traitement les supprimerait quand le garde-fou de deux minutes arrête le suivi, et un
- * Gest'Hordes lent n'a aucune raison de les retarder.
+ * Gest'Hordes lent n'a aucune raison de les retarder. Chaque interrogation attend le jeton.
  */
 async function followUpdateJob(initial_state: ExternalToolsUpdateJobState, on_progress?: (state: ExternalToolsUpdateJobState) => void): Promise<ExternalToolsUpdateJobState> {
     const started_at: number = Date.now();
@@ -567,7 +568,7 @@ async function followUpdateJob(initial_state: ExternalToolsUpdateJobState, on_pr
 
         let next_state: ExternalToolsUpdateJobState;
         try {
-            const response: Response = await fetcher(state.api_url + '/externaltools/update/status?userKey=' + state.external_app_id + '&userId=' + state.mh_user.id + '&jobId=' + current_state.jobId);
+            const response: Response = await fetcher(state.api_url + '/externaltools/update/status?userKey=' + state.external_app_id + '&userId=' + state.mh_user.id + '&jobId=' + current_state.jobId, undefined, { wait_for_token: true });
             if (response.status !== 200) {
                 continue;
             }

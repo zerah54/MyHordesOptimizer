@@ -1,8 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { RefinedAttack } from '../api/estimations';
-import { getRefinedAttack } from '../api/estimations';
-import { appendRefinedAttacks, refinedAttackRowHtml } from './watchtower';
+import { getEstimations, getRefinedAttack } from '../api/estimations';
+import { mho_watchtower_estim_id } from '../config/constants';
+import { state } from '../state';
+import { pageIsWatchtower } from '../utils/page';
+import { appendRefinedAttacks, displayEstimationsOnWatchtower, refinedAttackRowHtml } from './watchtower';
 
 /** `getScriptInfo()` est appelée au chargement de modules importés ; jsdom n'a ni `GM_info` ni `browser`/`chrome`. */
 vi.mock('../utils/version', async (importOriginal: () => Promise<object>) => ({
@@ -12,7 +16,13 @@ vi.mock('../utils/version', async (importOriginal: () => Promise<object>) => ({
     getScriptInfo: (): { name: string; version: string; updateURL: string } => ({ name: 'MHO', version: '0.0.0', updateURL: 'about:blank' })
 }));
 vi.mock('../api/estimations', () => ({ getEstimations: vi.fn(), saveEstimations: vi.fn(), getRefinedAttack: vi.fn() }));
+vi.mock('../utils/page', async (importOriginal: () => Promise<object>) => ({ ...await importOriginal(), pageIsWatchtower: vi.fn() }));
+const getEstimationsMock: ReturnType<typeof vi.fn> = getEstimations as unknown as ReturnType<typeof vi.fn>;
+const pageIsWatchtowerMock: ReturnType<typeof vi.fn> = pageIsWatchtower as unknown as ReturnType<typeof vi.fn>;
 const getRefinedAttackMock: ReturnType<typeof vi.fn> = getRefinedAttack as unknown as ReturnType<typeof vi.fn>;
+/** Sous-ensemble de `process` (Node) utilisé ici, sans `@types/node` qui typerait `setTimeout` en Node dans tout le programme du build. */
+type NodeProcess = { on(event: string, listener: (reason: unknown) => void): void; off(event: string, listener: (reason: unknown) => void): void };
+const node_process: NodeProcess = (globalThis as unknown as { process: NodeProcess }).process;
 
 describe('refinedAttackRowHtml', () => {
     it('affiche la plage affinée', () => {
@@ -49,5 +59,96 @@ describe('appendRefinedAttacks', () => {
 
         expect(container.querySelectorAll('.refined-attack').length).toBe(1);
         expect(container.textContent).toContain('3740');
+    });
+});
+
+describe('displayEstimationsOnWatchtower', () => {
+    const estimationsResult: object = {
+        estimations: { day: 5, estim: {}, planif: {} },
+        today_attack: { result: { min: 1, max: 2 } },
+        tomorrow_attack: { result: { min: 3, max: 4 } }
+    };
+
+    /** Résout la promesse de getEstimations() en attente. */
+    function pendingEstimations(): () => void {
+        let resolveEstimations: (value: object) => void = (): undefined => undefined;
+        getEstimationsMock.mockReturnValue(new Promise<object>((resolve: (value: object) => void): void => {
+            resolveEstimations = resolve;
+        }));
+        return (): void => resolveEstimations(estimationsResult);
+    }
+
+    beforeEach((): void => {
+        document.body.innerHTML = '<div id="root"><div class="block watchtower"></div><div class="block"></div><div class="small-note"></div></div>';
+        getEstimationsMock.mockReset();
+        getRefinedAttackMock.mockReset();
+        getRefinedAttackMock.mockResolvedValue(null);
+        pageIsWatchtowerMock.mockReset();
+        pageIsWatchtowerMock.mockReturnValue(true);
+        state.mho_parameters = { display_estimations_on_watchtower: true } as unknown as typeof state.mho_parameters;
+        state.mh_user = { townDetails: { townId: 42, day: 5 } } as unknown as typeof state.mh_user;
+    });
+
+    it('ne lance qu\'une chaîne de requêtes pour deux appels avant résolution', async (): Promise<void> => {
+        const resolve: () => void = pendingEstimations();
+
+        displayEstimationsOnWatchtower();
+        displayEstimationsOnWatchtower();
+        resolve();
+        await new Promise<void>((r: () => void): void => { setTimeout(r, 0); });
+
+        expect(getEstimationsMock).toHaveBeenCalledTimes(1);
+        expect(document.querySelectorAll(`#${mho_watchtower_estim_id}`).length).toBe(1);
+    });
+
+    it('n\'insère aucun bloc si la page est quittée avant la résolution', async (): Promise<void> => {
+        const resolve: () => void = pendingEstimations();
+
+        displayEstimationsOnWatchtower();
+        pageIsWatchtowerMock.mockReturnValue(false);
+        resolve();
+        await new Promise<void>((r: () => void): void => { setTimeout(r, 0); });
+
+        expect(document.querySelector(`#${mho_watchtower_estim_id}`)).toBeNull();
+    });
+
+    it('n\'insère rien dans une note détachée puis insère au rejeu suivant', async (): Promise<void> => {
+        const resolve: () => void = pendingEstimations();
+
+        displayEstimationsOnWatchtower();
+        const old_note: Element = document.querySelector('.small-note') as Element;
+        const old_parent: Element = old_note.parentElement as Element;
+        old_parent.remove();
+        resolve();
+        await new Promise<void>((r: () => void): void => { setTimeout(r, 0); });
+
+        expect(old_parent.querySelector(`#${mho_watchtower_estim_id}`)).toBeNull();
+
+        document.body.innerHTML = '<div id="root"><div class="block watchtower"></div><div class="block"></div><div class="small-note"></div></div>';
+        const resolve_again: () => void = pendingEstimations();
+        displayEstimationsOnWatchtower();
+        resolve_again();
+        await new Promise<void>((r: () => void): void => { setTimeout(r, 0); });
+
+        expect(document.querySelectorAll(`#${mho_watchtower_estim_id}`).length).toBe(1);
+    });
+
+    it('n\'émet aucun rejet non intercepté quand getEstimations échoue', async (): Promise<void> => {
+        const unhandled: Mock<(reason: unknown) => void> = vi.fn<(reason: unknown) => void>();
+        node_process.on('unhandledRejection', unhandled);
+        getEstimationsMock.mockReturnValue(Promise.reject(new Error('boom')));
+
+        displayEstimationsOnWatchtower();
+        await new Promise<void>((r: () => void): void => { setTimeout(r, 10); });
+        node_process.off('unhandledRejection', unhandled);
+
+        expect(unhandled).not.toHaveBeenCalled();
+    });
+
+    it('ne lève rien si .block.watchtower est absent', () => {
+        document.body.innerHTML = '<div><div class="small-note"></div></div>';
+
+        expect(() => displayEstimationsOnWatchtower()).not.toThrow();
+        expect(getEstimationsMock).not.toHaveBeenCalled();
     });
 });

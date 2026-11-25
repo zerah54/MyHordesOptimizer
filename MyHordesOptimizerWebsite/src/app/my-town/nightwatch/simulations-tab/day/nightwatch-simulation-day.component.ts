@@ -1,11 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, InputSignal, LOCALE_ID, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelect, MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import moment from 'moment';
 import { catchError, Observable, of } from 'rxjs';
 
@@ -16,14 +19,17 @@ import { Item } from '../../../../_abstract_model/types/item.class';
 import { BAG_SPACE_UIDS, maxBagCapacity } from '../../../../_shared/bag/bag-capacity.util';
 import { ListElementAddRemoveComponent } from '../../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { itemIcon, itemLabel } from '../../../buildings/planning/planning-labels.util';
-import { NightwatchStore, SimulationDayView } from '../../nightwatch.store';
+import { NightwatchStore, SimulationDayView, SimulationWatcherView } from '../../nightwatch.store';
 import { NightwatchCitizenStateDTO, NightwatchItemDefDTO, NightwatchWatcherDTO } from '../../nightwatch.types';
+import { AddableCitizen, addableCitizens } from '../../nightwatch-addable-citizens.util';
 import { bagItems, bagItemUids, bagUsed } from '../../nightwatch-bag.util';
 import { isHeavy } from '../../nightwatch-heavy.util';
-import { CityDefenseValues } from '../../nightwatch-simulation.util';
+import { cityDefenseTotal, CityDefenseValues } from '../../nightwatch-simulation.util';
 import { StatusOption, statusOptions } from '../../nightwatch-status-labels';
 
-const material_modules: Imports = [MatCheckboxModule, MatChipsModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule];
+const material_modules: Imports = [
+    MatButtonModule, MatCardModule, MatChipsModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatTooltipModule
+];
 
 /** Poste de défense saisi par un champ numérique. */
 type DefenseField = Exclude<keyof CityDefenseValues, 'adLevel'>;
@@ -32,6 +38,12 @@ type DefenseField = Exclude<keyof CityDefenseValues, 'adLevel'>;
 interface DefensePost {
     key: DefenseField;
     label: string;
+}
+
+/** Fiche d'un veilleur du jour : citoyen inscrit avec sa défense et son risque calculés. */
+interface WatcherCard extends AddableCitizen {
+    defense: number;
+    risk: number;
 }
 
 /** Ligne du stock restant. */
@@ -57,7 +69,7 @@ export class NightwatchSimulationDayComponent {
     protected readonly store: NightwatchStore = inject(NightwatchStore);
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     protected readonly status_options: readonly StatusOption[] = statusOptions();
-    protected readonly ad_levels: readonly number[] = [0, 1, 2, 3];
+    protected readonly ad_levels: readonly number[] = [-1, 0, 1, 2, 3];
     protected readonly posts: readonly DefensePost[] = [
         { key: 'buildings', label: $localize`Chantiers` },
         { key: 'upgrades', label: $localize`Évolutions` },
@@ -90,10 +102,22 @@ export class NightwatchSimulationDayComponent {
     private readonly watchers: Signal<ReadonlyMap<number, NightwatchWatcherDTO>> = computed((): ReadonlyMap<number, NightwatchWatcherDTO> =>
         new Map<number, NightwatchWatcherDTO>((this.store.draft()?.watchers ?? []).map((watcher: NightwatchWatcherDTO): [number, NightwatchWatcherDTO] => [watcher.userId, watcher])));
 
-    /** Citoyens par ordre alphabétique. */
-    protected readonly citizens: Signal<NightwatchCitizenStateDTO[]> = computed((): NightwatchCitizenStateDTO[] =>
-        [...(this.store.state()?.citizens ?? [])]
-            .sort((a: NightwatchCitizenStateDTO, b: NightwatchCitizenStateDTO): number => a.name.localeCompare(b.name, this.site_locale, { sensitivity: 'base' })));
+    /** Citoyens pas encore inscrits, avec leur métier, par ordre alphabétique. */
+    protected readonly addable_citizens: Signal<AddableCitizen[]> = computed((): AddableCitizen[] =>
+        addableCitizens(this.store.state()?.citizens ?? [], [...this.watchers().values()], this.site_locale));
+
+    /** Veilleurs inscrits, par ordre alphabétique, avec la défense et le risque du jour. */
+    protected readonly watcher_cards: Signal<WatcherCard[]> = computed((): WatcherCard[] => {
+        const enrolled: NightwatchCitizenStateDTO[] = (this.store.state()?.citizens ?? [])
+            .filter((citizen: NightwatchCitizenStateDTO): boolean => this.watchers().has(citizen.userId));
+        return addableCitizens(enrolled, [], this.site_locale).map((citizen: AddableCitizen): WatcherCard => {
+            const view: SimulationWatcherView | undefined = this.day().watchers.find((watcher: SimulationWatcherView): boolean => watcher.user_id === citizen.user_id);
+            return { ...citizen, defense: view?.defense ?? 0, risk: view?.risk ?? 0 };
+        });
+    });
+
+    /** Défense de la ville hors veille. */
+    protected readonly city_defense_total: Signal<number> = computed((): number => Math.round(cityDefenseTotal(this.day().defense) * 100) / 100);
 
     /** Objets de survie : ceux du référentiel à `watchImpact` non nul. */
     private readonly survival_items: Signal<Item[]> = computed((): Item[] => {
@@ -188,16 +212,24 @@ export class NightwatchSimulationDayComponent {
     }
 
     /**
-     * Inscrit ou retire un veilleur.
-     * @param {number} user_id Citoyen.
-     * @param {boolean} checked Coché.
+     * Inscrit le citoyen choisi comme veilleur et remet la liste à vide.
+     * @param {MatSelect} select Liste de choix.
+     * @param {number | null} user_id Citoyen choisi.
      */
-    protected toggleWatcher(user_id: number, checked: boolean): void {
-        if (checked) {
+    protected addWatcher(select: MatSelect, user_id: number | null): void {
+        if (user_id !== null && user_id !== undefined) {
             this.store.addWatcher(user_id);
-        } else {
-            this.store.removeWatcher(user_id);
+            select.value = null;
         }
+    }
+
+    /**
+     * Risque en pourcentage, au centième.
+     * @param {number} risk Risque entre 0 et 1.
+     * @returns {number} Pourcentage arrondi.
+     */
+    protected percent(risk: number): number {
+        return Math.round(risk * 10000) / 100;
     }
 
     /**

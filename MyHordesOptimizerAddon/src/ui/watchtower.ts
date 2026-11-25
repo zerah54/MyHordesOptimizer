@@ -41,8 +41,12 @@ export function appendRefinedAttacks(slots: { container: Element; day: number }[
     });
 }
 
+/** Vrai tant qu'un chargement des estimations est en vol. */
+let watchtower_loading: boolean = false;
+
+/** Affiche le bloc d'estimations de la tour de guet, un seul chargement à la fois. */
 export function displayEstimationsOnWatchtower() {
-    if (state.mho_parameters.display_estimations_on_watchtower && pageIsWatchtower()) {
+    if (!watchtower_loading && state.mho_parameters.display_estimations_on_watchtower && pageIsWatchtower()) {
         let estim_block = document.querySelector(`#${mho_watchtower_estim_id}`);
         const small_note = document.querySelector('.small-note');
         if (estim_block || !small_note) return;
@@ -52,9 +56,9 @@ export function displayEstimationsOnWatchtower() {
         const PLANIF_VALUES = [0, 4, 8, 13, 17, 21, 25, 29, 33, 38, 42, 46, 50, 54, 58, 63, 67, 71, 75, 79, 83, 88, 92, 96, 100];
 
         const watchtower_estim_block = document.querySelector('.block.watchtower');
-        const watchtower_estim_block_prediction = watchtower_estim_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
 
         if (watchtower_estim_block) {
+            const watchtower_estim_block_prediction = watchtower_estim_block.querySelector('.x-copy-prediction')?.querySelector('[x-contain-prediction]')?.innerText;
             const current_estimation_percent_read = watchtower_estim_block.querySelector('.watchtower-prediction-text')?.innerText?.replace('%', '');
             const current_estimation_percent = current_estimation_percent_read !== undefined && current_estimation_percent_read !== null ? +current_estimation_percent_read : (watchtower_estim_block_prediction ? 100 : undefined);
 
@@ -121,7 +125,9 @@ export function displayEstimationsOnWatchtower() {
                 }
             };
 
+            watchtower_loading = true;
             getEstimations().then((estimations) => {
+                if (!pageIsWatchtower() || !small_note.isConnected || document.querySelector(`#${mho_watchtower_estim_id}`)) return;
                 estimations = { ...estimations };
                 estim_block = document.createElement('div');
                 estim_block.style.marginTop = '1em';
@@ -358,6 +364,8 @@ export function displayEstimationsOnWatchtower() {
                     appendRefinedAttacks([{ container: planif_values_block_title_calculated, day: state.mh_user.townDetails?.day + 1 }]);
                 }
                 appendRefinedAttacks([{ container: estim_values_block_title_calculated, day: state.mh_user.townDetails?.day }]);
+            }).catch((): undefined => undefined).finally(() => {
+                watchtower_loading = false;
             });
         }
     }

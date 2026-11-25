@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { texts } from '../i18n/texts';
 import { state } from '../state';
 import { getI18N } from '../utils/i18n';
-import { alertIfInactiveAndNoEscort } from './desert';
+import { alertIfInactiveAndNoEscort, changeDefaultEscortOptions, preventFromLeaving } from './desert';
 
 interface DesertTestContext {
     create_notification: Mock;
@@ -172,5 +172,80 @@ describe('alertIfInactiveAndNoEscort', () => {
         elapse(10);
 
         expect(context.create_notification).not.toHaveBeenCalled();
+    });
+});
+
+describe('changeDefaultEscortOptions : rejeux', () => {
+    it('applique les options par défaut une seule fois après plusieurs rejeux puis un clic', () => {
+        state.mho_parameters = { default_escort_options: true, default_escort_force_return: true, default_escort_allow_rucksack: false };
+        const button: HTMLButtonElement = addEscortWaitingButton();
+        const force_return: HTMLInputElement = document.createElement('input');
+        force_return.type = 'checkbox';
+        force_return.id = 'escort_force_return';
+        const allow_rucksack: HTMLInputElement = document.createElement('input');
+        allow_rucksack.type = 'checkbox';
+        allow_rucksack.id = 'escort_allow_rucksack';
+        document.body.append(force_return, allow_rucksack);
+        const clicks: { count: number } = { count: 0 };
+        force_return.addEventListener('click', (): void => { clicks.count++; });
+
+        const add_spy = vi.spyOn(document, 'addEventListener');
+
+        changeDefaultEscortOptions();
+        changeDefaultEscortOptions();
+        changeDefaultEscortOptions();
+        button.click();
+        const navigation_listeners: number = add_spy.mock.calls.filter((call: unknown[]): boolean => call[0] === 'mh-navigation-complete').length;
+        add_spy.mockRestore();
+        document.dispatchEvent(new Event('mh-navigation-complete'));
+        document.dispatchEvent(new Event('mh-navigation-complete'));
+
+        expect(navigation_listeners).toBe(1);
+        expect(clicks.count).toBe(1);
+    });
+});
+
+describe('preventFromLeaving : rejeux', () => {
+    it('ne pose aucun écouteur tant que l\'option est inactive ou hors du désert', () => {
+        const add_spy = vi.spyOn(window, 'addEventListener');
+        state.mho_parameters = { alert_if_no_escort: true, prevent_from_leaving: false };
+        preventFromLeaving();
+        state.mho_parameters = { alert_if_no_escort: true, prevent_from_leaving: true };
+        context.page.is_desert = false;
+        preventFromLeaving();
+        const bound: number = add_spy.mock.calls.filter((call: unknown[]): boolean => call[0] === 'beforeunload').length;
+        add_spy.mockRestore();
+        context.page.is_desert = true;
+
+        expect(bound).toBe(0);
+    });
+
+    it('ne pose qu\'un écouteur beforeunload et relit l\'option à chaque déclenchement', () => {
+        state.mho_parameters = { alert_if_no_escort: true, prevent_from_leaving: true };
+        addEscortWaitingButton();
+        const add_spy = vi.spyOn(window, 'addEventListener');
+
+        preventFromLeaving();
+        preventFromLeaving();
+        preventFromLeaving();
+
+        const bound: number = add_spy.mock.calls.filter((call: unknown[]): boolean => call[0] === 'beforeunload').length;
+        add_spy.mockRestore();
+        expect(bound).toBe(1);
+
+        const active: Event = new Event('beforeunload', { cancelable: true });
+        window.dispatchEvent(active);
+        expect(active.defaultPrevented).toBe(true);
+
+        state.mho_parameters = { alert_if_no_escort: true, prevent_from_leaving: false };
+        const inactive: Event = new Event('beforeunload', { cancelable: true });
+        window.dispatchEvent(inactive);
+        expect(inactive.defaultPrevented).toBe(false);
+
+        context.page.is_desert = false;
+        state.mho_parameters = { alert_if_no_escort: true, prevent_from_leaving: true };
+        const elsewhere: Event = new Event('beforeunload', { cancelable: true });
+        window.dispatchEvent(elsewhere);
+        expect(elsewhere.defaultPrevented).toBe(false);
     });
 });

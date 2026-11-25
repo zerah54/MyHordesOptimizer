@@ -10,7 +10,7 @@ export function saveDailyAction(actionKey: string, done: boolean | undefined) {
         fetcher(state.api_url + `/town/${state.mh_user.townDetails?.townId}/user/${state.mh_user.id}/dailyAction/${actionKey}?day=${state.mh_user.townDetails?.day}`,
                 {
                     method: done ? 'POST' : 'DELETE',
-                })
+                }, { wait_for_token: true })
             .then((response) => {
                 if (response.status === 200) {
                     return response.json();

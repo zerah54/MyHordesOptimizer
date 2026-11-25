@@ -24,6 +24,7 @@ export const params_categories: ParamCategory[] = [
                 children: [
                     {
                         id: 'update_mho',
+                        active_without_children: true,
                         label: {
                             en: 'Update MyHordes Optimiser',
                             fr: 'Mettre à jour MyHordes Optimiser',
@@ -196,6 +197,7 @@ export const params_categories: ParamCategory[] = [
                     // },
                     {
                         id: 'update_gh',
+                        active_without_children: true,
                         label: {
                             en: 'Update Gest’Hordes',
                             fr: 'Mettre à jour Gest\'Hordes',
@@ -282,6 +284,7 @@ export const params_categories: ParamCategory[] = [
                     },
                     {
                         id: 'update_fata',
+                        active_without_children: true,
                         label: {
                             en: 'Update Fata Morgana',
                             fr: 'Mettre à jour Fata Morgana',
@@ -335,6 +338,7 @@ export const params_categories: ParamCategory[] = [
                     },
                     {
                         id: 'update_zen',
+                        active_without_children: true,
                         label: {
                             en: 'Update Zen Hordes',
                             fr: 'Mettre à jour Zen Hordes',

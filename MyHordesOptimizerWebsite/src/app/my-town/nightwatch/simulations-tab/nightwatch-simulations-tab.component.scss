@@ -1,7 +1,7 @@
 :host {
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 0.75em;
     padding-top: 1em;
 
     .simulations {
@@ -30,11 +30,59 @@
         gap: 0.4em;
     }
 
+    mat-panel-description {
+        justify-content: flex-end;
+    }
+
+    // Frise des jours : une carte par jour, défilement horizontal.
+    .days {
+        display: flex;
+        gap: 0.5em;
+        overflow-x: auto;
+        padding-bottom: 0.25em;
+    }
+
+    .day {
+        display: flex;
+        flex: 0 0 auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.15em;
+        min-width: 7rem;
+        padding: 0.4em 0.6em;
+        border: 1px solid var(--mho-line-strong);
+        border-radius: var(--mho-radius-m);
+        background: var(--mho-surface);
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+
+        &.selected {
+            border-color: var(--mho-accent);
+            background: var(--mho-accent-soft);
+        }
+
+        &.covered .verdict {
+            color: var(--mho-accent);
+        }
+
+        &.missing .verdict {
+            color: var(--mho-danger);
+            font-weight: 600;
+        }
+
+        .count {
+            font-size: 0.85em;
+            opacity: 0.75;
+        }
+    }
+
     .table-scroll {
         overflow-x: auto;
     }
 
-    .days {
+    .by-day {
         border-collapse: collapse;
 
         th,
@@ -51,15 +99,6 @@
 
         th.selected {
             background: var(--mho-accent-soft);
-        }
-
-        td.covered {
-            color: var(--mho-accent);
-        }
-
-        td.missing {
-            color: var(--mho-danger);
-            font-weight: 600;
         }
     }
 }

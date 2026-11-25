@@ -4,7 +4,21 @@ import { getI18N } from '../utils/i18n';
 import { addError } from '../utils/notifications';
 import { convertResponsePromiseToError } from '../utils/version';
 
-export function getRuins() {
+/** Requête en vol, partagée tant qu'elle n'est pas terminée (le cache reste `state.ruins`). */
+let in_flight_ruins_promise: Promise<any> | undefined;
+
+/** Récupère les ruines ; les appels simultanés partagent une seule requête. */
+export function getRuins(): Promise<any> {
+    if (in_flight_ruins_promise) return in_flight_ruins_promise;
+    if (state.ruins) return Promise.resolve(state.ruins);
+    in_flight_ruins_promise = requestRuins().finally(() => {
+        in_flight_ruins_promise = undefined;
+    });
+    return in_flight_ruins_promise;
+}
+
+/** Exécute la requête de ruines, ou renvoie le cache. */
+function requestRuins(): Promise<any> {
     return new Promise<any>((resolve, reject) => {
         if (!state.ruins) {
             fetcher(state.api_url + '/Fetcher/ruins?userKey=' + state.external_app_id)

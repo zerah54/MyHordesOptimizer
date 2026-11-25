@@ -956,12 +956,9 @@ export function displayPropertiesOrActions(property_or_action, hovered_item) {
         case 'drug_april_2':
         case 'eat_meat_1':
         case 'eat_meat_2':
-        case 'open_foodbox_in':
-        case 'open_foodbox_out':
-        case 'open_foodbox_in_t1':
-        case 'open_foodbox_out_t1':
-        case 'open_foodbox_in_t2':
-        case 'open_foodbox_out_t2':
+        case 'open_foodbox':
+        case 'open_foodbox_t1':
+        case 'open_foodbox_t2':
         case 'eat_bone_1':
         case 'eat_bone_2':
         case 'fill_watercan1':

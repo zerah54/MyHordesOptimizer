@@ -1,5 +1,7 @@
 import { NightwatchPlanContentDTO, NightwatchPlanDTO } from './nightwatch.types';
 import {
+    attackGoal,
+    cityDefenseTotal,
     CityDefenseValues,
     offeredCapacity,
     remainingStock,
@@ -41,6 +43,14 @@ describe('nightwatch-simulation.util', (): void => {
                                              guardians: 0, guardTowerPa: 0, eveningVote: 0, cemetery: 0, souls: 0, dumpContribution: 0, adLevel: -1 };
         const content: NightwatchPlanContentDTO = { watchers: [], manualStock: {}, attackReductionPercent: 10, reactorDamage: 50 };
         expect(remainingToCover(1000, defense, content)).toBe(950);
+    });
+
+    it('objectif hors AD et total des postes : les deux termes du reste à couvrir', (): void => {
+        const defense: CityDefenseValues = { ...PREFILL, adLevel: 3 };
+        const content: NightwatchPlanContentDTO = { watchers: [], manualStock: {}, attackReductionPercent: 10, allowedOverflow: 25, reactorDamage: 50 };
+        expect(attackGoal(1000, defense.adLevel, content)).toBe(Math.ceil(925 / 1.13));
+        expect(cityDefenseTotal(PREFILL)).toBe(1 + 2 * 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11 + 12);
+        expect(remainingToCover(1000, defense, content)).toBe(attackGoal(1000, 3, content) - cityDefenseTotal(defense));
     });
 
     it('chaîne jour par jour, prefill si tout est nul', (): void => {
