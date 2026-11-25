@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.69': `
+        [Corrección] Actualización de herramientas externas: la opción «Actualiza la información de los marcadores de trabajo» vuelve a estar disponible para MyHordes Optimiser (hay que marcarla)
+        `,
     '1.1.68': `
         [Novedad] Consignas de expedición: la casilla ahora es clicable para marcar o desmarcar una consigna directamente desde el desierto o la ventana de expediciones
 

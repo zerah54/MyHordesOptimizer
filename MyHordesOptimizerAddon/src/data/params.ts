@@ -41,15 +41,15 @@ export const params_categories: ParamCategory[] = [
                                     es: 'Registrar el número de zombis asesinados'
                                 },
                             },
-                            // {
-                            //     id: `update_mho_job_markers`,
-                            //     label: {
-                            //         en: `Updates information from job markers`,
-                            //         fr: `Met à jour les informations issues des marqueurs de métiers`,
-                            //         de: `Aktualisiert Informationen von Jobmarkierungen`,
-                            //         es: `Actualiza la información de los marcadores de trabajo.`
-                            //     },
-                            // },
+                            {
+                                id: 'update_mho_job_markers',
+                                label: {
+                                    en: 'Updates information from job markers',
+                                    fr: 'Met à jour les informations issues des marqueurs de métiers',
+                                    de: 'Aktualisiert Informationen von Jobmarkierungen',
+                                    es: 'Actualiza la información de los marcadores de trabajo.'
+                                },
+                            },
                             {
                                 id: 'update_mho_devastated',
                                 label: {

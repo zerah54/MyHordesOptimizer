@@ -78,6 +78,16 @@ describe('params — Mon programme et expédition dans l\'Outre-Monde', (): void
     });
 });
 
+describe('params — MyHordes Optimizer options', (): void => {
+    it('expose les marqueurs de métiers parmi les options MHO, traduits dans les quatre langues', (): void => {
+        const mho = find(params_categories.flatMap((category) => category.params ?? []), 'update_mho');
+        const job_markers = mho.children.find((child: any) => child.id === 'update_mho_job_markers');
+
+        expect(job_markers).toBeDefined();
+        ['en', 'fr', 'de', 'es'].forEach((lang: string) => expect(job_markers.label[lang], lang).toBeTruthy());
+    });
+});
+
 describe('params — Gest\'Hordes options', (): void => {
     it('expose les marqueurs de métiers parmi les options Gest\'Hordes, traduits dans les quatre langues', (): void => {
         const gh = find(params_categories.flatMap((category) => category.params ?? []), 'update_gh');

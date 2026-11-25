@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.69': `
+        [Fix] External tools update: the "Updates information from job markers" option is available again for MyHordes Optimiser (tick it)
+        `,
     '1.1.68': `
         [New] Expedition orders: the checkbox is now clickable to tick or untick an order directly from the desert or the expeditions window
 

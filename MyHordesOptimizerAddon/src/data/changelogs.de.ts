@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.69': `
+        [Korrektur] Aktualisierung externer Tools: Die Option „Aktualisiert Informationen von Jobmarkierungen“ ist für MyHordes Optimiser wieder verfügbar (bitte aktivieren)
+        `,
     '1.1.68': `
         [Neu] Expeditionsaufträge: Das Kästchen ist jetzt anklickbar, um einen Auftrag direkt in der Wüste oder im Expeditionsfenster abzuhaken oder zurückzunehmen
 

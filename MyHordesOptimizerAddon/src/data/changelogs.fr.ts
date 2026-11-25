@@ -1,4 +1,7 @@
 export const changelogs: Record<string, string> = {
+    '1.1.69': `
+        [Correction] Mise à jour des outils externes : l'option « Met à jour les informations issues des marqueurs de métiers » est de nouveau proposée pour MyHordes Optimiser (à cocher)
+        `,
     '1.1.68': `
         [Nouveauté] Consignes d'expédition : la case est désormais cliquable pour cocher ou décocher une consigne directement depuis le désert ou la fenêtre des expéditions
 
