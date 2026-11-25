@@ -1,0 +1,103 @@
+<div class="simulations" role="group" i18n-aria-label aria-label="Simulations">
+    @for (simulation of store.simulations(); track simulation.id) {
+        <span class="simulation-chip" [class.selected]="simulation.id === store.selected_simulation_id()">
+            <button mat-button type="button" data-action="select-simulation" [attr.aria-pressed]="simulation.id === store.selected_simulation_id()"
+                    (click)="toggle(simulation.id)">{{ simulation.name }}</button>
+            @if (simulation.id === store.selected_simulation_id() && store.can_edit_simulations()) {
+                <button mat-icon-button type="button" data-action="simulation-menu" [matMenuTriggerFor]="simulation_menu" i18n-matTooltip
+                        matTooltip="Actions sur la simulation">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            }
+        </span>
+    }
+    <button mat-stroked-button type="button" data-action="new-simulation" [disabled]="!store.can_edit_simulations()" (click)="newSimulation()">
+        <span class="label">
+            <mat-icon>add</mat-icon>
+            <ng-container i18n>Simulation</ng-container>
+        </span>
+    </button>
+</div>
+
+@if (selected() !== null) {
+    <mho-list-element-add-remove withQuantity data-bag="stock" label="Stock de départ" i18n-label [currentList]="stock_bag()" [lists]="stock_lists()"
+                                 addLabel="Ajouter" i18n-addLabel (add)="changeStock(+$event, 1)"
+                                 removeLabel="Retirer" i18n-removeLabel (remove)="changeStock(+$event, -1)"
+                                 emptyLabel="Vider" i18n-emptyLabel (empty)="store.clearSimulationStock()" [readonly]="!store.can_edit_simulations()"/>
+}
+
+@if (selected() !== null && store.simulation_days().length > 0) {
+    <div class="table-scroll">
+        <table class="days">
+            <thead>
+            <tr>
+                <th scope="col"></th>
+                @for (day of store.simulation_days(); track day.day) {
+                    <th scope="col" [class.selected]="day.day === store.selected_day()">
+                        <button mat-button type="button" data-action="select-day" [attr.aria-pressed]="day.day === store.selected_day()"
+                                (click)="selectDay(day.day)">
+                            <ng-container i18n>J</ng-container>
+                            {{ day.day }}
+                        </button>
+                    </th>
+                }
+            </tr>
+            </thead>
+            <tbody>
+                @for (row of rows(); track row.user_id) {
+                    <tr>
+                        <th scope="row">{{ row.name }}</th>
+                        @for (risk of row.risks; track $index) {
+                            <td>
+                                @if (risk !== null) {
+                                    {{ percent(risk) }} %
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+            <tr>
+                <th scope="row" i18n>Verdict</th>
+                @for (day of store.simulation_days(); track day.day) {
+                    <td [class.covered]="day.verdict?.covered === true" [class.missing]="day.verdict?.covered === false">
+                        @if (day.verdict; as verdict) {
+                            @if (verdict.covered) {
+                                <ng-container i18n>Couvert</ng-container>
+                            } @else if (verdict.missing_watchers !== null) {
+                                <ng-container i18n>Manque</ng-container> {{ verdict.missing_watchers }}
+                                <ng-container i18n>{verdict.missing_watchers, plural, =1 {veilleur} other {veilleurs}}</ng-container>
+                            } @else {
+                                <ng-container i18n>Non couvert</ng-container>
+                            }
+                        }
+                    </td>
+                }
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+    @if (selected_day_view(); as day) {
+        <mho-nightwatch-simulation-day [day]="day"/>
+    }
+}
+
+<mat-menu #simulation_menu="matMenu">
+    <button mat-menu-item type="button" data-action="rename" (click)="rename()">
+        <mat-icon>edit</mat-icon>
+        <span i18n>Renommer</span>
+    </button>
+    <button mat-menu-item type="button" data-action="last-day" (click)="changeLastDay()">
+        <mat-icon>event</mat-icon>
+        <span i18n>Changer le dernier jour…</span>
+    </button>
+    <button mat-menu-item type="button" data-action="duplicate" (click)="duplicate()">
+        <mat-icon>content_copy</mat-icon>
+        <span i18n>Dupliquer</span>
+    </button>
+    <button mat-menu-item type="button" data-action="delete" (click)="remove()">
+        <mat-icon>delete</mat-icon>
+        <span i18n>Supprimer</span>
+    </button>
+</mat-menu>

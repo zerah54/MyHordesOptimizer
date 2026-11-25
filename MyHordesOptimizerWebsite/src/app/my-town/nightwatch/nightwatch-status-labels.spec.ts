@@ -1,4 +1,4 @@
-import { statusLabel, statusOptions } from './nightwatch-status-labels';
+import { statusLabel, StatusOption, statusOptions } from './nightwatch-status-labels';
 
 describe('nightwatch-status-labels', (): void => {
     const scope: { $localize: typeof $localize } = globalThis as unknown as { $localize: typeof $localize };
@@ -25,5 +25,13 @@ describe('nightwatch-status-labels', (): void => {
 
     it('statuts du jeu et clés du référentiel de veille', (): void => {
         expect(statusOptions().map((option: { key: string }): string => option.key)).toEqual(['drugged', 'drunk', 'thirsty', 'immune', 'dog', 'dogSteak', 'ghoul']);
+    });
+
+    it('chaque statut a une icône du jeu (chien : statuts de garde de l\'apprivoiseur)', (): void => {
+        const icons: Record<string, string> = Object.fromEntries(statusOptions().map((option: StatusOption): [string, string] => [option.key, option.img]));
+
+        expect(icons['dog']).toBe('status/status_tamer_watch_1.gif');
+        expect(icons['dogSteak']).toBe('status/status_tamer_watch_2.gif');
+        expect(icons['ghoul']).toBe('roles/ghoul.gif');
     });
 });

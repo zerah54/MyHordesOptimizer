@@ -80,7 +80,7 @@
                                 }
                             </ul>
                         }
-                        <a mat-stroked-button routerLink="../expeditions" i18n>Voir les expéditions</a>
+                        <a mat-stroked-button routerLink="../expeditions" [queryParams]="{ day: store.selected_day() }" i18n>Voir les expéditions</a>
                     }
                 } @else if (day_store.status() === 'error') {
                     <p class="expeditions-failed" i18n>Impossible de charger les expéditions.</p>

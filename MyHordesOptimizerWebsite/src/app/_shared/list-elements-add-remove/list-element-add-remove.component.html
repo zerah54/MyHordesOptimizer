@@ -18,17 +18,21 @@
         </div>
     }
     <div class="editable-container">
-        <div class="list">
+        <div class="list" [class.slotted]="capacity() !== null">
             @for (item of currentList(); track $index) {
                 @let element_label = $any(item.label && item.label[$any(locale)] ? item.label[$any(locale)] : item.label);
+                @let overflow = !capacityUncertain() && capacity() !== null && $index >= capacity()!;
                 @if (readonly()) {
-                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="element_label" width="16" height="16">
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="element_label" [class.overflow]="overflow" width="16" height="16">
                 } @else {
                     <!-- Clic : sélecteur de quantité dans une liste à quantités, retrait sinon. -->
-                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="element_label" role="button" tabindex="0"
+                    <img [ngSrc]="HORDES_IMG_REPO + item.img" [title]="element_label" role="button" tabindex="0" [class.overflow]="overflow"
                          (click)="onElementClick(item, $event)" (keydown.enter)="onElementClick(item, $event)"
                          style="cursor: pointer" width="16" height="16">
                 }
+            }
+            @for (slot of empty_slots(); track slot) {
+                <img class="empty-slot" [src]="empty_slot_img" alt="">
             }
         </div>
         @if (!label() && !readonly()) {

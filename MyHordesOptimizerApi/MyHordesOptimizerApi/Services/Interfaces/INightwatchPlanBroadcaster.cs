@@ -10,6 +10,8 @@ namespace MyHordesOptimizerApi.Services.Interfaces
         Task PlanSavedAsync(int mapId, NightwatchPlanDto plan, string? exceptConnectionId);
         Task PlanDeletedAsync(int mapId, int planId, string? exceptConnectionId);
         Task PlanEffectiveChangedAsync(int mapId, NightwatchPlanDto plan, string? exceptConnectionId);
+        /// <summary>Sans contenu : les clients rechargent simulations et propositions.</summary>
+        Task SimulationsChangedAsync(int mapId, string? exceptConnectionId);
         /// <summary>Toujours à tout le groupe : l'auteur du changement doit aussi le recevoir.</summary>
         Task PlanLockChangedAsync(int mapId, PlanLockDto lockDto);
     }

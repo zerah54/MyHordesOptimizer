@@ -104,6 +104,36 @@ namespace MyHordesOptimizerApi.Controllers
             return result;
         }
 
+        [HttpPut("{mapId}/simulations")]
+        public async Task<ActionResult<NightwatchSimulationDto>> SaveSimulation([FromRoute] int mapId, [FromBody] NightwatchSimulationRequestDto request, [FromHeader(Name = HubConnectionHeader)] string? connectionId)
+        {
+            var result = await BadRequestOnInvalid(() => NightwatchPlanService.SaveSimulationAsync(mapId, request));
+            if (result.Result is OkObjectResult)
+            {
+                await Broadcaster.SimulationsChangedAsync(mapId, connectionId);
+            }
+            return result;
+        }
+
+        [HttpPost("{mapId}/simulations/{simulationId:int}/duplicate")]
+        public async Task<ActionResult<NightwatchSimulationDto>> DuplicateSimulation([FromRoute] int mapId, [FromRoute] int simulationId, [FromQuery] string name, [FromHeader(Name = HubConnectionHeader)] string? connectionId)
+        {
+            var result = await BadRequestOnInvalid(() => NightwatchPlanService.DuplicateSimulationAsync(mapId, simulationId, name));
+            if (result.Result is OkObjectResult)
+            {
+                await Broadcaster.SimulationsChangedAsync(mapId, connectionId);
+            }
+            return result;
+        }
+
+        [HttpDelete("{mapId}/simulations/{simulationId:int}")]
+        public async Task<IActionResult> DeleteSimulation([FromRoute] int mapId, [FromRoute] int simulationId, [FromHeader(Name = HubConnectionHeader)] string? connectionId)
+        {
+            await NightwatchPlanService.DeleteSimulationAsync(mapId, simulationId);
+            await Broadcaster.SimulationsChangedAsync(mapId, connectionId);
+            return NoContent();
+        }
+
         /// <summary>
         /// Lève 423 si une autre connexion détient la proposition ; sans en-tête, refuse aussi quand <paramref name="requireHolder"/> impose d'être le détenteur.
         /// Dans ce cas, une main libre (jamais prise, ou expirée avant le balayage) est prise pour l'appelant et diffusée.

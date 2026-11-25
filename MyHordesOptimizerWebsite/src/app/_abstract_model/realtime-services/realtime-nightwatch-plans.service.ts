@@ -24,6 +24,10 @@ export class RealtimeNightwatchPlansService extends RealtimeGlobalService {
     private plan_effective_changed_subject: Subject<NightwatchPlanDTO> = new Subject<NightwatchPlanDTO>();
     public plan_effective_changed$: Observable<NightwatchPlanDTO> = this.plan_effective_changed_subject.asObservable();
 
+    /** Simulations de stock modifiées par un autre client : la liste est à relire. */
+    private simulations_changed_subject: Subject<void> = new Subject<void>();
+    public simulations_changed$: Observable<void> = this.simulations_changed_subject.asObservable();
+
     private plan_lock_changed_subject: Subject<PlanLockDTO> = new Subject<PlanLockDTO>();
     public plan_lock_changed$: Observable<PlanLockDTO> = this.plan_lock_changed_subject.asObservable();
 
@@ -56,6 +60,10 @@ export class RealtimeNightwatchPlansService extends RealtimeGlobalService {
 
             this.hubConnection.on('PlanEffectiveChanged', (plan: NightwatchPlanDTO) => {
                 this.plan_effective_changed_subject.next(plan);
+            });
+
+            this.hubConnection.on('SimulationsChanged', () => {
+                this.simulations_changed_subject.next();
             });
 
             this.hubConnection.on('PlanLockChanged', (lock: PlanLockDTO) => {

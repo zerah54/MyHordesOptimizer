@@ -10,6 +10,8 @@ import {
     NightwatchPlanDTO,
     NightwatchPlansDTO,
     NightwatchReferentialDTO,
+    NightwatchSimulationDTO,
+    NightwatchSimulationRequestDTO,
     NightwatchStateDTO
 } from '../../my-town/nightwatch/nightwatch.types';
 import { TownDetailsDTO } from '../dto/town-details.dto';
@@ -92,6 +94,35 @@ describe('NightwatchPlanService', (): void => {
         expect(effectives.map((r: TestRequest): string | null => r.request.headers.get('Mho-Hub-Connection'))).toEqual(['abc', null]);
         deletion.flush(null);
         effectives.forEach((r: TestRequest): void => r.flush(plan));
+    });
+
+    it('saveSimulation PUT /simulations avec le corps et l\'en-tête de connexion', (): void => {
+        const body: NightwatchSimulationRequestDTO = { name: 'Sim', lastDay: 6, stock: { 1: 2 } };
+        service.saveSimulation(body, 'abc').subscribe();
+
+        const request: TestRequest = http_mock.expectOne(`${base}/simulations`);
+        expect(request.request.method).toBe('PUT');
+        expect(request.request.body).toEqual(body);
+        expect(request.request.headers.get('Mho-Hub-Connection')).toBe('abc');
+        request.flush(<NightwatchSimulationDTO>{ id: 7, name: 'Sim', lastDay: 6, stock: { 1: 2 }, version: 1, lastUpdateInfo: null });
+    });
+
+    it('duplicateSimulation POST /simulations/7/duplicate?name= avec l\'en-tête de connexion', (): void => {
+        service.duplicateSimulation(7, 'Copie', 'abc').subscribe();
+
+        const request: TestRequest = http_mock.expectOne(`${base}/simulations/7/duplicate?name=Copie`);
+        expect(request.request.method).toBe('POST');
+        expect(request.request.headers.get('Mho-Hub-Connection')).toBe('abc');
+        request.flush(<NightwatchSimulationDTO>{ id: 8, name: 'Copie', lastDay: 6, stock: {}, version: 1, lastUpdateInfo: null });
+    });
+
+    it('deleteSimulation DELETE /simulations/7 avec l\'en-tête de connexion', (): void => {
+        service.deleteSimulation(7, 'abc').subscribe();
+
+        const request: TestRequest = http_mock.expectOne(`${base}/simulations/7`);
+        expect(request.request.method).toBe('DELETE');
+        expect(request.request.headers.get('Mho-Hub-Connection')).toBe('abc');
+        request.flush(null);
     });
 
     describe('ville explicite (contexte changé entre-temps)', (): void => {

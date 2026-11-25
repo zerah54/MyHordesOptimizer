@@ -59,9 +59,33 @@ export interface NightwatchWatcherDTO {
     note?: string | null;
 }
 
+/** Défense de la ville saisie ou dérivée pour une proposition ; `adLevel` : -1 = non construit, 0 à 3. */
+export interface NightwatchCityDefenseDTO {
+    buildings?: number | null;
+    upgrades?: number | null;
+    wall?: number | null;
+    bankDefenseItems?: number | null;
+    homes?: number | null;
+    guardians?: number | null;
+    guardTowerPa?: number | null;
+    souls?: number | null;
+    cemetery?: number | null;
+    eveningVote?: number | null;
+    dumpContribution?: number | null;
+    fddCoefficient?: number | null;
+    adLevel?: number | null;
+}
+
 /** Contenu JSON d'une proposition de plan de veille. */
 export interface NightwatchPlanContentDTO {
+    globalItems?: Record<number, number> | null;
+    cityDefense?: NightwatchCityDefenseDTO | null;
+    allowedOverflow?: number | null;
+    attackReductionPercent?: number | null;
+    reactorDamage?: number | null;
     attackOverride?: number | null;
+    /** Proposition de Chantiers retenue pour le jour de la veille ; absente ou nulle = l'effective. */
+    buildingPlanId?: number | null;
     instructions?: string | null;
     watchers: NightwatchWatcherDTO[];
     manualStock: Record<number, number>;
@@ -83,8 +107,28 @@ export interface NightwatchPlanDTO {
     version: number;
     authorId: number;
     authorName?: string | null;
+    simulationId?: number | null;
     content: NightwatchPlanContentDTO;
     lastUpdateInfo?: NightwatchLastUpdateInfoDTO | null;
+}
+
+/** Simulation de stock d'une ville : stock hypothétique rattaché à des propositions. */
+export interface NightwatchSimulationDTO {
+    id: number;
+    name: string;
+    lastDay: number;
+    stock: Record<number, number>;
+    version: number;
+    lastUpdateInfo: NightwatchLastUpdateInfoDTO | null;
+}
+
+/** Requête de création (sans `id`) ou de modification (`id` + `version`) d'une simulation. */
+export interface NightwatchSimulationRequestDTO {
+    id?: number | null;
+    name: string;
+    lastDay: number;
+    stock: Record<number, number>;
+    version?: number | null;
 }
 
 /** Droits de l'utilisateur sur les plans de veille de la ville. */
@@ -97,6 +141,7 @@ export interface NightwatchPlanAccessDTO {
 export interface NightwatchPlansDTO {
     access: NightwatchPlanAccessDTO;
     plans: NightwatchPlanDTO[];
+    simulations?: NightwatchSimulationDTO[];
 }
 
 /** État réel d'un citoyen vivant. Les dictionnaires sont indexés par `Item.IdItem`. */
@@ -139,6 +184,7 @@ export interface NightwatchPlanRequestDTO {
     version?: number | null;
     day: number;
     name: string;
+    simulationId?: number | null;
     content: NightwatchPlanContentDTO;
 }
 

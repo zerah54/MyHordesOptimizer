@@ -3,7 +3,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ANIMATION_MODULE_TYPE, Signal, signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { provideRouter } from '@angular/router';
+import { DefaultUrlSerializer, provideRouter, Router, UrlTree } from '@angular/router';
 import moment from 'moment';
 import { NEVER, Observable, of, Subject, throwError } from 'rxjs';
 import type { Mock, MockInstance } from 'vitest';
@@ -65,6 +65,7 @@ interface ComponentInternals {
     updateEditableForDay(day: number): void;
     expedition_service: { getExpeditions: Mock<(day: number) => Observable<Expedition[]>> };
     selected_day: WritableSignal<number>;
+    router: { url: string; parseUrl: (url: string) => UrlTree; navigateByUrl: Mock };
     changeDay(day: number): Promise<void>;
     isDirectionLocked(expedition_part: ExpeditionPart): boolean;
     me: Signal<Me | null>;
@@ -218,6 +219,7 @@ describe('ExpeditionsComponent', () => {
             internals.editable = signal(true);
             internals.expeditions = signal([]);
             internals.selected_day = signal(5);
+            internals.router = { url: '/my-town/expeditions', parseUrl: (url: string): UrlTree => new DefaultUrlSerializer().parse(url), navigateByUrl: vi.fn() };
         });
 
         afterEach(() => {
@@ -233,6 +235,7 @@ describe('ExpeditionsComponent', () => {
             expect(internals.expedition_service.getExpeditions).toHaveBeenCalledWith(4);
             expect(internals.selected_day()).toBe(4);
             expect(internals.expeditions()).toEqual([past_day]);
+            expect(internals.router.navigateByUrl.mock.lastCall?.[0].toString()).toBe('/my-town/expeditions?day=4');
             expect(internals.editable()).toBe(false);
         });
 
@@ -921,6 +924,14 @@ describe('ExpeditionsComponent — rendu de l\'avertissement de PA', () => {
         TestBed.inject(TownContextService).clear();
         localStorage.removeItem(EXPEDITIONS_EDITION_MODE_KEY);
         setUser(null);
+    });
+
+    it('opens the day of the page link (?day=)', async () => {
+        await TestBed.inject(Router).navigateByUrl('/?day=3');
+
+        await render(5);
+
+        expect(TestBed.inject(ExpeditionService).getExpeditions).toHaveBeenCalledWith(3);
     });
 
     it('cycles the SP operator from its button in edition mode', async () => {

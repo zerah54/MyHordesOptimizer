@@ -30,6 +30,21 @@
         }
     }
 
+    .unassigned {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.25em 1em;
+
+        .title {
+            font-weight: 500;
+        }
+
+        img {
+            vertical-align: middle;
+        }
+    }
+
     .watchers {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
@@ -45,4 +60,10 @@
     .no-plan {
         opacity: 0.85;
     }
+}
+
+// Options du sélecteur rendues dans l'overlay, mais issues de ce gabarit : la portée du composant s'applique.
+mat-option .job {
+    margin-right: 0.4em;
+    vertical-align: middle;
 }

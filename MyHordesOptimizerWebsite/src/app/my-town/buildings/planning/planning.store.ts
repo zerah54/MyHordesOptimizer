@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { computed, DestroyRef, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { computed, DestroyRef, effect, inject, Injectable, Signal, signal, untracked, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { filter, Observable } from 'rxjs';
 
@@ -17,7 +18,9 @@ import { Item } from '../../../_abstract_model/types/item.class';
 import { SnackbarService } from '../../../_core/services/snackbar.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { availabilityIn } from '../../../_core/utilities/building-tree.util';
+import { currentDeepLinkId, DEEP_LINK_PARAMS, replaceDeepLinkParams } from '../../../_core/utilities/deep-link.util';
 import { getTown, getUserId } from '../../../_core/utilities/localstorage.util';
+import { plannableDays } from '../../../_shared/day-selector/plannable-days';
 import { bannedPoolForced, bannedPoolShown } from './budget.util';
 import { BudgetDiff, budgetDiff, snapshotBudget } from './budget-diff.util';
 import { BuildingProgress } from './building-progress.util';
@@ -46,9 +49,6 @@ import { sanitizeContent, ToggleContext } from './program-edit.util';
 import { TaskCheckService } from './task-check.service';
 import { withTaskIds } from './task-id.util';
 import { taskLockKey } from './task-status.util';
-
-/** Nombre de jours futurs proposés en plus d'aujourd'hui. */
-const FUTURE_DAYS: number = 7;
 
 /** Délai d'enregistrement automatique après la dernière modification de la copie de travail. */
 export const AUTOSAVE_DELAY_MS: number = 2000;
@@ -112,6 +112,7 @@ function withPlanTaskIds(dto: BuildingPlansDTO): BuildingPlansDTO {
 export class PlanningStore {
 
     private readonly data_service: PlanningDataService = inject(PlanningDataService);
+    private readonly router: Router = inject(Router);
     private readonly plan_service: BuildingPlanService = inject(BuildingPlanService);
     private readonly town_context: TownContextService = inject(TownContextService);
 
@@ -169,6 +170,14 @@ export class PlanningStore {
     public readonly lock: Signal<PlanLockState> = computed((): PlanLockState => this.lockOf(this.selected_plan_id()));
 
     public constructor() {
+        // L'URL suit le jour et la proposition affichés (lien partageable), une fois les propositions chargées.
+        effect((): void => {
+            const day: number = this._selected_day();
+            const plan_id: number | null = this.selected_plan_id();
+            if (this.plans_dto() !== null) {
+                untracked((): void => replaceDeepLinkParams(this.router, { [DEEP_LINK_PARAMS.day]: day, [DEEP_LINK_PARAMS.plan]: plan_id }));
+            }
+        });
         this.destroy_ref.onDestroy((): void => {
             void this.leavePlan(true);
         });
@@ -201,18 +210,9 @@ export class PlanningStore {
     /** Le joueur est citoyen de la ville (droit de lecture des propositions). */
     public readonly is_citizen: Signal<boolean> = computed((): boolean => this.plans_dto()?.access.isCitizen === true);
 
-    /** Jours proposés : d'aujourd'hui à aujourd'hui + 7 ou au lendemain du jour affiché s'il est plus loin, plus les jours passés qui ont une proposition. */
-    public readonly days: Signal<number[]> = computed((): number[] => {
-        const days: Set<number> = new Set<number>();
-        const last_day: number = Math.max(this.current_day + FUTURE_DAYS, this._selected_day() + 1);
-        for (let day: number = this.current_day; day <= last_day; day++) {
-            days.add(day);
-        }
-        for (const plan of this.plans_dto()?.plans ?? []) {
-            days.add(plan.day);
-        }
-        return Array.from(days).sort((a: number, b: number): number => a - b);
-    });
+    /** Jours proposés : voir `plannableDays`. */
+    public readonly days: Signal<number[]> = computed((): number[] =>
+        plannableDays(this.current_day, (this.plans_dto()?.plans ?? []).map((plan: BuildingPlanDTO): number => plan.day)));
 
     public readonly plans_of_day: Signal<BuildingPlanDTO[]> = computed((): BuildingPlanDTO[] =>
         (this.plans_dto()?.plans ?? []).filter((plan: BuildingPlanDTO): boolean => plan.day === this._selected_day()));
@@ -413,6 +413,7 @@ export class PlanningStore {
                 this._selected_day.set(this.current_day);
                 this.selectPlanForDay(this.current_day);
                 this.ensureDaysLoaded(this.current_day);
+                this.openDeepLink();
                 this._loading.set(false);
                 // Le hub suit la ville du jeton reçu à l'ouverture de la connexion : la remettre à jour avant de relire les mains.
                 void this.realtime.ensureTown().then((): Promise<void> => this.refreshLocks());
@@ -677,6 +678,18 @@ export class PlanningStore {
      */
     public isPending(user_id: number, task: PlanTaskDTO): boolean {
         return this._pending_checks().has(taskLockKey(user_id, task));
+    }
+
+    /** Ouvre le jour et la proposition demandés par le lien de la page (`?day=&plan=`), s'ils existent. */
+    private openDeepLink(): void {
+        const day: number | null = currentDeepLinkId(this.router, DEEP_LINK_PARAMS.day);
+        if (day !== null && day !== this._selected_day() && this.days().includes(day)) {
+            this.selectDay(day);
+        }
+        const plan_id: number | null = currentDeepLinkId(this.router, DEEP_LINK_PARAMS.plan);
+        if (plan_id !== null && plan_id !== this.selected_plan_id() && this.plans_of_day().some((plan: BuildingPlanDTO): boolean => plan.id === plan_id)) {
+            this.selectPlan(plan_id);
+        }
     }
 
     private hardMode(): boolean {

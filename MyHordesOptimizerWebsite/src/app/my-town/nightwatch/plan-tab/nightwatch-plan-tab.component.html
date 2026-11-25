@@ -25,6 +25,26 @@
                        #attack
                        [placeholder]="store.estimated_attack() === null ? '' : '' + store.estimated_attack()" (change)="setAttack(attack.value)">
             </mat-form-field>
+            @if (store.building_plans_of_day().length > 0) {
+                <mat-form-field class="building-plan" appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Proposition de chantiers retenue</mat-label>
+                    <mat-select data-field="building-plan" [value]="store.planned_buildings()?.plan_id ?? null" [disabled]="!store.can_edit()"
+                                (selectionChange)="store.setBuildingPlan($event.value)">
+                        @for (building_plan of store.building_plans_of_day(); track building_plan.id) {
+                            <mat-option [value]="building_plan.id">
+                                @if (building_plan.isEffective) {
+                                    <mat-icon class="effective" i18n-aria-label aria-label="Proposition effective du jour">star</mat-icon>
+                                }
+                                {{ building_plan.name }}
+                            </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            }
+            <a mat-stroked-button data-action="open-buildings" routerLink="../buildings" [queryParams]="buildings_link()">
+                <mat-icon>construction</mat-icon>
+                <ng-container i18n>Voir les chantiers du jour</ng-container>
+            </a>
         </section>
 
         @if (store.over_cap()) {
@@ -42,6 +62,20 @@
             </p>
         }
 
+        @if (unassigned_items().length > 0) {
+            <section class="unassigned" data-field="stuff-to-split">
+                <span class="title" i18n>Stuff à répartir</span>
+                @for (item of unassigned_items(); track item.item_id) {
+                    <span class="item">
+                        @if (item.icon !== '') {
+                            <img [src]="item.icon" [alt]="item.label">
+                        }
+                        {{ item.quantity }}
+                    </span>
+                }
+            </section>
+        }
+
         <div class="watchers">
             @for (row of store.watcher_rows(); track row.user_id) {
                 <mho-nightwatch-watcher [row]="row" [items]="items()"/>
@@ -51,8 +85,13 @@
         <mat-form-field class="add-watcher" appearance="outline" subscriptSizing="dynamic">
             <mat-select data-field="add-watcher" [disabled]="!store.can_edit()" i18n-aria-label aria-label="Ajouter un veilleur" #picked
                         i18n-placeholder placeholder="Ajouter un veilleur…" (selectionChange)="addWatcher(picked, $event.value)">
-                @for (citizen of addable_citizens(); track citizen.userId) {
-                    <mat-option [value]="citizen.userId">{{ citizen.name }}</mat-option>
+                @for (citizen of addable_citizens(); track citizen.user_id) {
+                    <mat-option [value]="citizen.user_id">
+                        @if (citizen.job; as job) {
+                            <img class="job" [src]="HORDES_IMG_REPO + job.value.img" [alt]="job.value.label">
+                        }
+                        {{ citizen.name }}
+                    </mat-option>
                 }
             </mat-select>
         </mat-form-field>

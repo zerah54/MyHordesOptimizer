@@ -22,8 +22,8 @@ export class GlobalService {
         });
     }
 
-    protected post<T>(url: string, params?: string, bypass_error?: boolean): Observable<T> {
-        const headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/json; charset=utf-8');
+    protected post<T>(url: string, params?: string, bypass_error?: boolean, extra_headers: Record<string, string> = {}): Observable<T> {
+        const headers: HttpHeaders = new HttpHeaders({ ...extra_headers, 'Content-Type': 'application/json; charset=utf-8' });
         const context: HttpContext = new HttpContext().set(BYPASS_ERROR, !!bypass_error);
         return this.http.post<T>(url, params, { responseType: 'json', headers: headers, context: context });
     }

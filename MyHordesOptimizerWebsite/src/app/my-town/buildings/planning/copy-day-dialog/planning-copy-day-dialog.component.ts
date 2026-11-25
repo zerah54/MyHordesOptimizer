@@ -14,7 +14,10 @@ const angular_common: Imports = [FormsModule];
 const components: Imports = [DaySelectorComponent];
 const material_modules: Imports = [MatButtonModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatInputModule];
 
-/** Paramètres de la boîte : titre, nom proposé, jour proposé, jours accessibles, jour courant ; `askParts` : parties à cocher au lieu du nom. */
+/**
+ * Paramètres de la boîte : titre, nom proposé, jour proposé, jours accessibles, jour courant ; `askParts` : parties à cocher au lieu du nom ;
+ * `askName` à faux : seulement le jour.
+ */
 export interface PlanningCopyDayDialogData {
     title: string;
     name: string;
@@ -22,6 +25,7 @@ export interface PlanningCopyDayDialogData {
     days: number[];
     today: number;
     askParts: boolean;
+    askName?: boolean;
 }
 
 /** Choix validé : jour, nom rogné et parties cochées. */
@@ -50,7 +54,7 @@ export class PlanningCopyDayDialogComponent {
     protected readonly budget: WritableSignal<boolean> = signal(true);
     protected readonly programs: WritableSignal<boolean> = signal(true);
     protected readonly invalid: Signal<boolean> = computed((): boolean =>
-        this.data.askParts ? !this.budget() && !this.programs() : this.name().trim() === '');
+        this.data.askParts ? !this.budget() && !this.programs() : this.data.askName !== false && this.name().trim() === '');
 
     private readonly dialog_ref: MatDialogRef<PlanningCopyDayDialogComponent, PlanningCopyDayDialogResult> = inject(MatDialogRef);
 

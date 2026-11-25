@@ -7,7 +7,7 @@ import type { Mock } from 'vitest';
 import { PlanningNameDialogResult } from '../../buildings/planning/name-dialog/planning-name-dialog.component';
 import { NightwatchStore } from '../nightwatch.store';
 import { createFakeNightwatchStore, FakeNightwatchStore } from '../nightwatch.store.fake';
-import { NightwatchPlanDTO } from '../nightwatch.types';
+import { NightwatchPlanDTO, NightwatchSimulationDTO } from '../nightwatch.types';
 import { NightwatchHeaderComponent } from './nightwatch-header.component';
 
 describe('NightwatchHeaderComponent', (): void => {
@@ -102,6 +102,26 @@ describe('NightwatchHeaderComponent', (): void => {
         expect(fake.actions.duplicatePlan).toHaveBeenCalledWith('Copie');
     });
 
+    it('copie depuis le jour choisi (seulement le jour demandé)', async (): Promise<void> => {
+        await render({ day: 9, name: '', parts: { budget: true, programs: true } } as unknown as boolean);
+        await openMenu();
+
+        menuItem('copy-from-day')?.click();
+
+        expect(open.mock.calls[0][1].data).toEqual(expect.objectContaining({ askName: false, askParts: false }));
+        expect(fake.actions.copyPlanFromDay).toHaveBeenCalledWith(9);
+    });
+
+    it('copie vers le jour choisi sous le nom saisi, jours futurs seulement', async (): Promise<void> => {
+        await render({ day: 12, name: 'Copie', parts: { budget: true, programs: true } } as unknown as boolean);
+        await openMenu();
+
+        menuItem('copy-to-day')?.click();
+
+        expect(open.mock.calls[0][1].data.days.every((day: number): boolean => day >= 10)).toBe(true);
+        expect(fake.actions.copyPlanBetweenDays).toHaveBeenCalledWith(10, 12, 'Copie');
+    });
+
     it('supprime après confirmation seulement', async (): Promise<void> => {
         await render(true);
         await openMenu();
@@ -151,5 +171,27 @@ describe('NightwatchHeaderComponent', (): void => {
         fixture.detectChanges();
 
         expect(root().querySelector('[data-field="save-state"]')?.textContent).toContain('Enregistré');
+    });
+
+    it("suffixe la puce d'une proposition de simulation du nom de la simulation", async (): Promise<void> => {
+        await render();
+        const base: NightwatchPlanDTO = fake.selected_plan() as NightwatchPlanDTO;
+        fake.simulations.set([{ id: 4, name: 'J36' } as NightwatchSimulationDTO]);
+        fake.plans_of_day.set([{ ...base, id: 7, name: 'Plan', simulationId: 4 }, { ...base, id: 8, name: 'Autre', simulationId: null }]);
+        fixture.detectChanges();
+
+        const labels: string[] = Array.from(root().querySelectorAll('button[data-action="select-plan"] .label')).map((el: Element): string => (el.textContent ?? '').replace('star', '').trim());
+        expect(labels).toEqual(['Plan (J36)', 'Autre']);
+    });
+
+    it('pas de suffixe quand la proposition porte déjà le nom de sa simulation', async (): Promise<void> => {
+        await render();
+        const base: NightwatchPlanDTO = fake.selected_plan() as NightwatchPlanDTO;
+        fake.simulations.set([{ id: 4, name: 'J36' } as NightwatchSimulationDTO]);
+        fake.plans_of_day.set([{ ...base, id: 7, name: 'J36', simulationId: 4 }]);
+        fixture.detectChanges();
+
+        const labels: string[] = Array.from(root().querySelectorAll('button[data-action="select-plan"] .label')).map((el: Element): string => (el.textContent ?? '').replace('star', '').trim());
+        expect(labels).toEqual(['J36']);
     });
 });

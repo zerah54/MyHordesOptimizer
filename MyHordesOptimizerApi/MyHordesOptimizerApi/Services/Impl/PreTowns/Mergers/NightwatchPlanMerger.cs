@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 
 namespace MyHordesOptimizerApi.Services.Impl.PreTowns.Mergers
 {
-    /// <summary>Ajoute une copie de chaque proposition ; non effective si la ville cible a déjà une effective ce jour-là.</summary>
+    /// <summary>Ajoute une copie détachée de chaque proposition (hors propositions de simulation non effectives) ; non effective si la ville cible a déjà une effective ce jour-là.</summary>
     public class NightwatchPlanMerger : IPreTownMerger
     {
         public string TableName => "TownNightwatchPlan";
 
         public async Task<MergeReport> MergeAsync(MhoContext db, int fromIdTown, int toIdTown)
         {
-            var sources = await db.TownNightwatchPlans.AsNoTracking().Where(p => p.IdTown == fromIdTown).OrderBy(p => p.Day).ThenBy(p => p.IdTownNightwatchPlan).ToListAsync();
+            // Une proposition de simulation non effective deviendrait une proposition ordinaire parasite une fois détachée.
+            var sources = await db.TownNightwatchPlans.AsNoTracking()
+                .Where(p => p.IdTown == fromIdTown && (p.IdTownNightwatchSimulation == null || p.IsEffective)).OrderBy(p => p.Day).ThenBy(p => p.IdTownNightwatchPlan).ToListAsync();
             var effectiveDays = (await db.TownNightwatchPlans.Where(p => p.IdTown == toIdTown && p.IsEffective).Select(p => p.Day).ToListAsync()).ToHashSet();
             var copies = new List<TownNightwatchPlan>();
             foreach (var source in sources)
@@ -26,6 +28,7 @@ namespace MyHordesOptimizerApi.Services.Impl.PreTowns.Mergers
                     Name = source.Name,
                     Content = PreTownMergers.ContentFor(source.Content, toIdTown, "Watchers")!,
                     IdAuthor = source.IdAuthor,
+                    IdTownNightwatchSimulation = null,
                     IsEffective = source.IsEffective && effectiveDays.Add(source.Day)
                 };
                 copies.Add(copy);

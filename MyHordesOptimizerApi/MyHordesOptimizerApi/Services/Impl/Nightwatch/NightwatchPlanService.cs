@@ -38,7 +38,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
             Mapper = mapper;
         }
 
-        private sealed record TownInfo(int IdTown, bool IsFinished);
+        private sealed record TownInfo(int IdTown, bool IsFinished, int Day);
 
         public async Task<NightwatchPlansDto> GetPlansAsync(int mapId)
         {
@@ -59,6 +59,11 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
                 .ToListAsync();
             var authorNames = await LoadUserNamesAsync(plans.Select(plan => plan.IdAuthor));
             result.Plans = plans.Select(plan => ToDto(plan, authorNames)).ToList();
+            var simulations = await SimulationsQuery()
+                .Where(simulation => simulation.IdTown == town.IdTown)
+                .OrderBy(simulation => simulation.IdTownNightwatchSimulation)
+                .ToListAsync();
+            result.Simulations = simulations.Select(ToDto).ToList();
             return result;
         }
 
@@ -183,8 +188,29 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
             }
             else
             {
-                var hasEffective = await DbContext.TownNightwatchPlans.AnyAsync(row => row.IdTown == town.IdTown && row.Day == request.Day && row.IsEffective);
-                plan = new TownNightwatchPlan { IdTown = town.IdTown, Day = request.Day, IdAuthor = UserInfoProvider.UserId, IsEffective = !hasEffective };
+                bool isEffective;
+                if (request.SimulationId.HasValue)
+                {
+                    var simulation = await FindSimulationOrThrowAsync(town, mapId, request.SimulationId.Value);
+                    if (request.Day < town.Day || request.Day > simulation.LastDay)
+                    {
+                        throw new MhoTechnicalException($"Le jour {request.Day} est hors de la simulation {request.SimulationId} (jour {town.Day} à {simulation.LastDay}).");
+                    }
+                    if (await DbContext.TownNightwatchPlans.AnyAsync(row => row.IdTownNightwatchSimulation == request.SimulationId.Value && row.Day == request.Day))
+                    {
+                        throw new MhoTechnicalException($"La simulation {request.SimulationId} a déjà une proposition le jour {request.Day}.");
+                    }
+                    isEffective = false;
+                }
+                else
+                {
+                    isEffective = !await DbContext.TownNightwatchPlans.AnyAsync(row => row.IdTown == town.IdTown && row.Day == request.Day && row.IsEffective);
+                }
+                plan = new TownNightwatchPlan
+                {
+                    IdTown = town.IdTown, Day = request.Day, IdAuthor = UserInfoProvider.UserId, IsEffective = isEffective,
+                    IdTownNightwatchSimulation = request.SimulationId
+                };
                 DbContext.TownNightwatchPlans.Add(plan);
             }
             plan.Name = name;
@@ -228,6 +254,160 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
             return await LoadPlanDtoAsync(planId);
         }
 
+        public async Task<NightwatchSimulationDto> SaveSimulationAsync(int mapId, NightwatchSimulationRequestDto request)
+        {
+            if (request is null)
+            {
+                throw new MhoTechnicalException("Simulation absente.");
+            }
+            await using var townLock = await TownSyncLock.AcquireTownAsync(-mapId);
+            var town = await LoadTownOrThrowAsync(mapId);
+            await EnsureCanEditAsync(town, mapId);
+            var name = NightwatchPlanValidator.ValidateSimulation(request, town.Day);
+
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            var newLastUpdate = await NewLastUpdateAsync();
+            TownNightwatchSimulation simulation;
+            var firstNewDay = town.Day;
+            if (request.Id.HasValue)
+            {
+                simulation = await FindSimulationOrThrowAsync(town, mapId, request.Id.Value);
+                if (!request.Version.HasValue)
+                {
+                    throw new MhoTechnicalException("Version de la simulation absente.");
+                }
+                if (request.Version.Value != simulation.Version)
+                {
+                    throw new MhoConflictException($"La simulation {simulation.IdTownNightwatchSimulation} a été modifiée entre-temps (version {simulation.Version}).");
+                }
+                if (request.LastDay < simulation.LastDay)
+                {
+                    var beyond = await DbContext.TownNightwatchPlans
+                        .Where(plan => plan.IdTownNightwatchSimulation == simulation.IdTownNightwatchSimulation && plan.Day > request.LastDay)
+                        .ToListAsync();
+                    DetachEffectiveRemoveOthers(beyond, newLastUpdate);
+                }
+                // Allonger : seuls les jours au-delà de l'ancien dernier jour sont créés, une proposition supprimée à la main n'est pas recréée.
+                firstNewDay = Math.Max(town.Day, simulation.LastDay + 1);
+                simulation.Version++;
+            }
+            else
+            {
+                simulation = new TownNightwatchSimulation { IdTown = town.IdTown, IdAuthor = UserInfoProvider.UserId };
+                DbContext.TownNightwatchSimulations.Add(simulation);
+            }
+            simulation.Name = name;
+            simulation.LastDay = request.LastDay;
+            simulation.Stock = request.Stock.ToJson();
+            simulation.IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo;
+            await SaveOrConflictAsync($"La simulation {request.Id} a été modifiée entre-temps.");
+
+            var emptyContent = NightwatchPlanValidator.SerializeContent(new NightwatchPlanContentDto());
+            for (var day = firstNewDay; day <= simulation.LastDay; day++)
+            {
+                DbContext.TownNightwatchPlans.Add(NewSimulationPlan(simulation, day, emptyContent, newLastUpdate));
+            }
+            await DbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return await LoadSimulationDtoAsync(simulation.IdTownNightwatchSimulation);
+        }
+
+        public async Task<NightwatchSimulationDto> DuplicateSimulationAsync(int mapId, int simulationId, string name)
+        {
+            var normalizedName = NightwatchPlanValidator.NormalizeName(name);
+            await using var townLock = await TownSyncLock.AcquireTownAsync(-mapId);
+            var town = await LoadTownOrThrowAsync(mapId);
+            await EnsureCanEditAsync(town, mapId);
+
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            var source = await FindSimulationOrThrowAsync(town, mapId, simulationId);
+            var sourcePlans = await DbContext.TownNightwatchPlans.AsNoTracking()
+                .Where(plan => plan.IdTownNightwatchSimulation == simulationId && plan.Day >= town.Day)
+                .ToListAsync();
+            var newLastUpdate = await NewLastUpdateAsync();
+            var copy = new TownNightwatchSimulation
+            {
+                IdTown = town.IdTown, IdAuthor = UserInfoProvider.UserId, Name = normalizedName, LastDay = source.LastDay,
+                Stock = source.Stock, IdLastUpdateInfo = newLastUpdate.IdLastUpdateInfo
+            };
+            DbContext.TownNightwatchSimulations.Add(copy);
+            await DbContext.SaveChangesAsync();
+            foreach (var plan in sourcePlans)
+            {
+                DbContext.TownNightwatchPlans.Add(NewSimulationPlan(copy, plan.Day, plan.Content, newLastUpdate));
+            }
+            await DbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return await LoadSimulationDtoAsync(copy.IdTownNightwatchSimulation);
+        }
+
+        public async Task DeleteSimulationAsync(int mapId, int simulationId)
+        {
+            await using var townLock = await TownSyncLock.AcquireTownAsync(-mapId);
+            var town = await LoadTownOrThrowAsync(mapId);
+            await EnsureCanEditAsync(town, mapId);
+
+            await using var transaction = await DbContext.Database.BeginTransactionAsync();
+            var simulation = await FindSimulationOrThrowAsync(town, mapId, simulationId);
+            var plans = await DbContext.TownNightwatchPlans.Where(plan => plan.IdTownNightwatchSimulation == simulationId).ToListAsync();
+            DetachEffectiveRemoveOthers(plans, await NewLastUpdateAsync());
+            DbContext.TownNightwatchSimulations.Remove(simulation);
+            await SaveOrConflictAsync($"La simulation {simulationId} a été modifiée entre-temps.");
+            await transaction.CommitAsync();
+        }
+
+        /// <summary>Propositions effectives détachées de leur simulation (historique conservé), les autres supprimées.</summary>
+        private void DetachEffectiveRemoveOthers(IEnumerable<TownNightwatchPlan> plans, LastUpdateInfo lastUpdate)
+        {
+            foreach (var plan in plans)
+            {
+                if (plan.IsEffective)
+                {
+                    plan.IdTownNightwatchSimulation = null;
+                    plan.IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo;
+                }
+                else
+                {
+                    DbContext.TownNightwatchPlans.Remove(plan);
+                }
+            }
+        }
+
+        private TownNightwatchPlan NewSimulationPlan(TownNightwatchSimulation simulation, int day, string content, LastUpdateInfo lastUpdate) => new()
+        {
+            IdTown = simulation.IdTown, Day = day, Name = simulation.Name, Content = content, IsEffective = false,
+            IdTownNightwatchSimulation = simulation.IdTownNightwatchSimulation, IdAuthor = UserInfoProvider.UserId,
+            IdLastUpdateInfo = lastUpdate.IdLastUpdateInfo
+        };
+
+        private async Task<TownNightwatchSimulation> FindSimulationOrThrowAsync(TownInfo town, int mapId, int simulationId)
+        {
+            return await DbContext.TownNightwatchSimulations.SingleOrDefaultAsync(row => row.IdTownNightwatchSimulation == simulationId && row.IdTown == town.IdTown)
+                ?? throw new MhoForbiddenException($"La simulation {simulationId} n'appartient pas à la ville {mapId}.");
+        }
+
+        private IQueryable<TownNightwatchSimulation> SimulationsQuery()
+        {
+            return DbContext.TownNightwatchSimulations.AsNoTracking()
+                .Include(simulation => simulation.IdLastUpdateInfoNavigation)
+                    .ThenInclude(lastUpdateInfo => lastUpdateInfo!.IdUserNavigation);
+        }
+
+        private async Task<NightwatchSimulationDto> LoadSimulationDtoAsync(int simulationId)
+        {
+            return ToDto(await SimulationsQuery().SingleAsync(row => row.IdTownNightwatchSimulation == simulationId));
+        }
+
+        private NightwatchSimulationDto ToDto(TownNightwatchSimulation simulation) => new()
+        {
+            Id = simulation.IdTownNightwatchSimulation,
+            Name = simulation.Name,
+            LastDay = simulation.LastDay,
+            Stock = simulation.Stock.FromJson<Dictionary<int, int>>() ?? new Dictionary<int, int>(),
+            Version = simulation.Version,
+            LastUpdateInfo = simulation.IdLastUpdateInfoNavigation is null ? null : Mapper.Map<LastUpdateInfoDto>(simulation.IdLastUpdateInfoNavigation)
+        };
+
         private IQueryable<TownNightwatchPlan> PlansQuery()
         {
             return DbContext.TownNightwatchPlans.AsNoTracking()
@@ -240,7 +420,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
             var idTown = DbContext.ResolveTownId(mapId);
             return await DbContext.Towns.AsNoTracking()
                 .Where(town => town.IdTown == idTown)
-                .Select(town => new TownInfo(town.IdTown, town.IsFinished))
+                .Select(town => new TownInfo(town.IdTown, town.IsFinished, town.Day))
                 .SingleOrDefaultAsync();
         }
 
@@ -302,6 +482,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
             Day = plan.Day,
             Name = plan.Name,
             IsEffective = plan.IsEffective,
+            SimulationId = plan.IdTownNightwatchSimulation,
             Version = plan.Version,
             AuthorId = plan.IdAuthor,
             AuthorName = authorNames.TryGetValue(plan.IdAuthor, out var name) ? name : null,

@@ -65,6 +65,15 @@ describe('PlanningCopyDayDialogComponent', (): void => {
         expect(root().querySelector('mho-day-selector')?.getAttribute('aria-label')).toBeTruthy();
     });
 
+    it('sans nom ni parties : seulement le jour', async (): Promise<void> => {
+        await render({ ...data, name: '', askName: false });
+
+        expect(input()).toBeNull();
+        expect(submit().disabled).toBe(false);
+        submit().click();
+        expect(close).toHaveBeenCalledWith(expect.objectContaining({ day: 10 }));
+    });
+
     it('un nom vide désactive la validation', async (): Promise<void> => {
         await render({ ...data, name: '' });
 

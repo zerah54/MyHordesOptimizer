@@ -50,10 +50,11 @@
                     font-weight: 600;
                 }
 
-                /* Grille plutôt que flex-wrap : des tuiles de largeur égale, alignées en colonnes. */
+                /* Grille plutôt que flex-wrap : des tuiles de largeur égale, alignées en colonnes.
+                   Minimum aligné sur le `min-width` de la tuile `.simple`, sinon elle déborde sur la voisine. */
                 > .items {
                     display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+                    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
                     gap: 0.5em;
                 }
             }

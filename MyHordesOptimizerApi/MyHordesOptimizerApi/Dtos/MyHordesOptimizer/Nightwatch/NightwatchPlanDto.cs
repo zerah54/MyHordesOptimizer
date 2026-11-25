@@ -9,6 +9,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch
         public string Name { get; set; } = "";
         public bool IsEffective { get; set; }
         public int Version { get; set; }
+        /// <summary>Simulation rattachée ; null = aucune.</summary>
+        public int? SimulationId { get; set; }
         public int AuthorId { get; set; }
         public string? AuthorName { get; set; }
         public NightwatchPlanContentDto Content { get; set; } = new();
@@ -26,5 +28,6 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch
     {
         public NightwatchPlanAccessDto Access { get; set; } = new();
         public List<NightwatchPlanDto> Plans { get; set; } = new();
+        public List<NightwatchSimulationDto> Simulations { get; set; } = new();
     }
 }

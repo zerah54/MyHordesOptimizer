@@ -73,6 +73,47 @@ describe('ListElementAddRemoveComponent', (): void => {
         expect(img.title).toBe('Bois');
     });
 
+    it('with a capacity, draws the empty slots up to it and marks the elements beyond it', (): void => {
+        setInputs({ currentList: [createItem(1, 'Bois')] });
+        fixture.componentRef.setInput('capacity', 3);
+        fixture.detectChanges();
+        const root: HTMLElement = fixture.nativeElement as HTMLElement;
+
+        expect(root.querySelectorAll('.list .empty-slot').length).toBe(2);
+        expect(root.querySelector<HTMLImageElement>('.list .empty-slot')?.src).toContain(HORDES_IMG_REPO + 'inventory/large_empty_inv.png');
+
+        fixture.componentRef.setInput('currentList', [createItem(1, 'Bois'), createItem(2, 'Pierre')]);
+        fixture.componentRef.setInput('capacity', 1);
+        fixture.detectChanges();
+        expect(root.querySelectorAll('.list .empty-slot').length).toBe(0);
+        expect(root.querySelectorAll('.list img.overflow').length).toBe(1);
+    });
+
+    it('with an uncertain capacity (a minimum), draws the empty slots but marks nothing beyond it', (): void => {
+        setInputs({ currentList: [createItem(1, 'Bois'), createItem(2, 'Pierre')] });
+        fixture.componentRef.setInput('capacity', 1);
+        fixture.componentRef.setInput('capacityUncertain', true);
+        fixture.detectChanges();
+
+        expect((fixture.nativeElement as HTMLElement).querySelectorAll('.list img.overflow').length).toBe(0);
+    });
+
+    it('with a capacity, lays the slots out six per line (largest bag: two lines)', (): void => {
+        setInputs({ currentList: [createItem(1, 'Bois')] });
+        fixture.componentRef.setInput('capacity', 12);
+        fixture.detectChanges();
+
+        expect((fixture.nativeElement as HTMLElement).querySelector('.list')?.classList.contains('slotted')).toBe(true);
+    });
+
+    it('without a capacity, draws no slot', (): void => {
+        setInputs({ currentList: [createItem(1, 'Bois')] });
+        fixture.detectChanges();
+
+        expect((fixture.nativeElement as HTMLElement).querySelector('.list')?.classList.contains('slotted')).toBe(false);
+        expect((fixture.nativeElement as HTMLElement).querySelectorAll('.list .empty-slot, .list .overflow').length).toBe(0);
+    });
+
     it('renders no label block when label is empty', (): void => {
         setInputs({ label: '' });
         fixture.detectChanges();

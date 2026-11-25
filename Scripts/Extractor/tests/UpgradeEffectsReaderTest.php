@@ -33,7 +33,8 @@ final class UpgradeEffectsReaderTest extends TestCase
                     $x = new Foo()->bar();
                 }
             }
-            PHP);
+            PHP
+        );
 
         self::ecrire($racine, UpgradeEffectsReader::LISTENER_VALEURS, <<<'PHP'
             <?php
@@ -58,7 +59,23 @@ final class UpgradeEffectsReaderTest extends TestCase
                     };
                 }
             }
-            PHP);
+            PHP
+        );
+
+        self::ecrire($racine, UpgradeEffectsReader::LISTENER_CONSTRUCTION, <<<'PHP'
+            <?php
+            class BuildingConstructionListener {
+                public function onConfigureWellEffect($event): void {
+                    $event->spawn_well_water = match ($event->building->getPrototype()->getName()) {
+                        'small_derrick_#00' => 75,
+                        'small_water_#00' => 15,
+                        'odd_well_#00' => $this->calcul(),
+                        default => $event->spawn_well_water
+                    };
+                }
+            }
+            PHP
+        );
 
         self::ecrire($racine, UpgradeEffectsReader::TOWN_HANDLER, <<<'PHP'
             <?php
@@ -78,7 +95,8 @@ final class UpgradeEffectsReaderTest extends TestCase
                     return 0;
                 }
             }
-            PHP);
+            PHP
+        );
 
         return $racine;
     }
@@ -121,6 +139,17 @@ final class UpgradeEffectsReaderTest extends TestCase
         self::assertArrayNotHasKey('item_meca_parts_#00', $effets);
     }
 
+    public function testLitLEauDonneeALaConstruction(): void
+    {
+        $effets = (new UpgradeEffectsReader(self::source()))->lire();
+
+        self::assertSame([], $effets['small_derrick_#00']['spawn_well_water']['valeurs']);
+        self::assertSame(75, $effets['small_derrick_#00']['spawn_well_water']['defaut']);
+        self::assertSame(15, $effets['small_water_#00']['spawn_well_water']['defaut']);
+        self::assertSame('BuildingConstructionListener', $effets['small_water_#00']['spawn_well_water']['source']);
+        self::assertArrayNotHasKey('odd_well_#00', $effets);
+    }
+
     public function testSignaleLesFormesNonReconnuesSansLesInterpreter(): void
     {
         $lecteur = new UpgradeEffectsReader(self::source());
@@ -129,7 +158,7 @@ final class UpgradeEffectsReaderTest extends TestCase
         self::assertArrayNotHasKey('oddity_#00', $effets);
         self::assertNull($effets['small_refine_#00']['ConstructionAPRatio']['defaut']);
         self::assertSame([4 => 0.75], $effets['small_refine_#00']['ConstructionAPRatio']['valeurs']);
-        self::assertCount(2, $lecteur->ignores());
+        self::assertCount(3, $lecteur->ignores());
     }
 
     public function testUnFichierDisparuArreteLExtraction(): void

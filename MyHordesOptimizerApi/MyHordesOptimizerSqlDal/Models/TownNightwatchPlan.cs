@@ -37,6 +37,10 @@ public partial class TownNightwatchPlan
     [ConcurrencyCheck]
     public int Version { get; set; }
 
+    /// <summary>Simulation rattachée (TownNightwatchSimulation.IdTownNightwatchSimulation) ; null = aucune — pas de FK.</summary>
+    [Column("idTownNightwatchSimulation", TypeName = "int(11)")]
+    public int? IdTownNightwatchSimulation { get; set; }
+
     [Column("idAuthor", TypeName = "int(11)")]
     public int IdAuthor { get; set; }
 

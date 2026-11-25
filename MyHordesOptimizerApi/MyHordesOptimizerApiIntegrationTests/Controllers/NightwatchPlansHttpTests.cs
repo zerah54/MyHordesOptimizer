@@ -112,6 +112,53 @@ namespace MyHordesOptimizerApiIntegrationTests.Controllers
         }
 
         [Fact]
+        public async Task PutSimulation_ReturnsDtoAndCreatesPlans()
+        {
+            using var factory = _factory.WithWebHostBuilder(UseRealTownAccess);
+            var context = factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            var (townId, aliveUserId, _, _) = AttackTestSupport.SeedTown(context, Day);
+            var citizen = CreateClient(factory, aliveUserId);
+
+            var response = await citizen.PutAsJsonAsync($"/NightwatchPlans/{townId}/simulations",
+                new NightwatchSimulationRequestDto { Name = "Sim A", LastDay = Day + 2 });
+            var dto = await response.Content.ReadFromJsonAsync<NightwatchSimulationDto>();
+            var listed = await citizen.GetFromJsonAsync<NightwatchPlansDto>($"/NightwatchPlans/{townId}");
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            dto!.Name.Should().Be("Sim A");
+            listed!.Plans.Should().NotBeEmpty();
+        }
+
+        [Fact]
+        public async Task DeleteSimulation_Returns204()
+        {
+            using var factory = _factory.WithWebHostBuilder(UseRealTownAccess);
+            var context = factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            var (townId, aliveUserId, _, _) = AttackTestSupport.SeedTown(context, Day);
+            var citizen = CreateClient(factory, aliveUserId);
+            var created = (await (await citizen.PutAsJsonAsync($"/NightwatchPlans/{townId}/simulations",
+                new NightwatchSimulationRequestDto { Name = "Sim B", LastDay = Day + 1 })).Content.ReadFromJsonAsync<NightwatchSimulationDto>())!;
+
+            var response = await citizen.DeleteAsync($"/NightwatchPlans/{townId}/simulations/{created.Id}");
+
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        }
+
+        [Fact]
+        public async Task PutSimulation_NonCitizen_Forbidden()
+        {
+            using var factory = _factory.WithWebHostBuilder(UseRealTownAccess);
+            var context = factory.Services.CreateScope().ServiceProvider.GetRequiredService<MhoContext>();
+            var (townId, _, _, outsiderUserId) = AttackTestSupport.SeedTown(context, Day);
+            var outsider = CreateClient(factory, outsiderUserId);
+
+            var response = await outsider.PutAsJsonAsync($"/NightwatchPlans/{townId}/simulations",
+                new NightwatchSimulationRequestDto { Name = "Sim C", LastDay = Day + 1 });
+
+            response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+        }
+
+        [Fact]
         public async Task WithoutTokenTheRoutesAreUnauthorized()
         {
             using var factory = _factory.WithWebHostBuilder(UseRealTownAccess);

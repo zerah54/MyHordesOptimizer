@@ -2,6 +2,7 @@ import { HttpErrorResponse, provideHttpClient, withXhr } from '@angular/common/h
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { of, Subject, throwError } from 'rxjs';
 import type { MockedObject } from 'vitest';
 
@@ -11,8 +12,8 @@ import { MinMax } from '../../../_abstract_model/interfaces';
 import { AdminService } from '../../../_abstract_model/services/admin.service';
 import { TownStatisticsService } from '../../../_abstract_model/services/town-statistics.service';
 import { Dictionary } from '../../../_abstract_model/types/_types';
-import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { EstimationsResult } from '../../../_abstract_model/types/estimations-result.class';
+import { Estimations } from '../../../_abstract_model/types/estimations.class';
 import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
@@ -82,7 +83,7 @@ describe('EstimationsComponent', (): void => {
         await TestBed.configureTestingModule({
             imports: [EstimationsComponent],
             providers: [
-                provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
+                provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([]), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: TownStatisticsService, useValue: townStatisticsService },
                 { provide: AttackRefinerService, useValue: refinerService },
                 { provide: ClipboardService, useValue: clipboardService }
@@ -210,6 +211,17 @@ describe('EstimationsComponent', (): void => {
 
         expect(townStatisticsService.getEstimations).toHaveBeenLastCalledWith(9);
         expect(plainText('.header .day')).toBe('J9');
+    });
+
+    it('opens the day of the page link (?day=), never after the current day, and writes the picked day into the URL', async (): Promise<void> => {
+        const router: Router = TestBed.inject(Router);
+        await router.navigateByUrl('/?day=8');
+        const navigate: ReturnType<typeof vi.spyOn> = vi.spyOn(router, 'navigateByUrl');
+        await loadEstimations(makeEstimations(), makeAttackResult(5, 15), makeAttackResult(6, 16));
+
+        expect(townStatisticsService.getEstimations).toHaveBeenCalledWith(8);
+        fixture.nativeElement.querySelector('.header button[data-action="next-day"]')?.click();
+        expect(navigate.mock.lastCall?.[0].toString()).toBe('/?day=9');
     });
 
     it('switches the KPI and the chart to the next day, and back', async (): Promise<void> => {

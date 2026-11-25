@@ -1,19 +1,34 @@
 import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import type { Mock } from 'vitest';
 
+import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
+import { ListForAddRemove } from '../../../_abstract_model/types/_types';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { SnackbarService } from '../../../_core/services/snackbar.service';
+import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
+import { BuildingPlanDTO } from '../../buildings/planning/plan.types';
 import { NightwatchStore } from '../nightwatch.store';
 import { createFakeNightwatchStore, FakeNightwatchStore } from '../nightwatch.store.fake';
-import { NightwatchPlanContentDTO, NightwatchReferentialDTO } from '../nightwatch.types';
+import {
+    NightwatchCitizenStateDTO,
+    NightwatchPlanContentDTO,
+    NightwatchPlanDTO,
+    NightwatchReferentialDTO,
+    NightwatchStateDTO,
+    NightwatchWatcherDTO
+} from '../nightwatch.types';
 import { NightwatchPlanTabComponent } from './nightwatch-plan-tab.component';
 
 describe('NightwatchPlanTabComponent', (): void => {
     let fake: FakeNightwatchStore;
     let fixture: ComponentFixture<NightwatchPlanTabComponent>;
     let get_items: Mock;
+    const warning: Mock = vi.fn();
 
     async function render(setup: (fake: FakeNightwatchStore) => void = (): void => undefined, items$: Observable<Item[]> | null = null): Promise<void> {
         fake = createFakeNightwatchStore({
@@ -32,7 +47,9 @@ describe('NightwatchPlanTabComponent', (): void => {
             providers: [
                 { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: NightwatchStore, useValue: fake.store },
-                { provide: ApiService, useValue: { getItems: get_items } }
+                { provide: ApiService, useValue: { getItems: get_items } },
+                { provide: SnackbarService, useValue: { warningSnackbar: warning } },
+                provideRouter([])
             ]
         }).compileComponents();
         fixture = TestBed.createComponent(NightwatchPlanTabComponent);
@@ -99,17 +116,70 @@ describe('NightwatchPlanTabComponent', (): void => {
         expect(statusButton('drugged').getAttribute('aria-selected')).toBe('false');
     });
 
-    it('propose les citoyens non bannis et non inscrits, puis ajoute le veilleur choisi', async (): Promise<void> => {
-        await render();
+    it('propose les citoyens non inscrits, bannis compris, par ordre alphabétique, puis ajoute le veilleur choisi', async (): Promise<void> => {
+        await render((f: FakeNightwatchStore): void => {
+            const citizens: NightwatchCitizenStateDTO[] = f.state()?.citizens ?? [];
+            f.state.update((state: NightwatchStateDTO | null): NightwatchStateDTO | null => state === null ? null : { ...state, citizens: [...citizens].reverse() });
+        });
         const select: HTMLElement = control<HTMLElement>('mat-select[data-field="add-watcher"]');
 
         const options: string = (await openSelect(select)).map((option: HTMLElement): string => option.textContent?.trim() ?? '').join('|');
         await pick(select, /Chloé/);
 
-        expect(options).toContain('Chloé');
-        expect(options).not.toContain('Bob');
-        expect(options).not.toContain('Alice');
+        expect(options).toBe('Bob|Chloé');
         expect(fake.actions.addWatcher).toHaveBeenCalledWith(3);
+    });
+
+    it('affiche le métier des citoyens proposés', async (): Promise<void> => {
+        await render();
+
+        const options: HTMLElement[] = await openSelect(control<HTMLElement>('mat-select[data-field="add-watcher"]'));
+        const chloe: HTMLElement | undefined = options.find((option: HTMLElement): boolean => (option.textContent ?? '').includes('Chloé'));
+        const bob: HTMLElement | undefined = options.find((option: HTMLElement): boolean => (option.textContent ?? '').includes('Bob'));
+
+        expect(chloe?.querySelector('img.job')?.getAttribute('src')).toContain('professions/vest.gif');
+        expect(bob?.querySelector('img.job')).toBeNull();
+    });
+
+    it('copie le stuff d\'un veilleur ; coller est indisponible tant que rien n\'est copié', async (): Promise<void> => {
+        await render();
+        const paste: HTMLButtonElement = control<HTMLButtonElement>('[data-watcher="1"] button[data-action="paste-items"]');
+        expect(paste.disabled).toBe(true);
+
+        control<HTMLButtonElement>('[data-watcher="1"] button[data-action="copy-items"]').click();
+        expect(fake.actions.copyItems).toHaveBeenCalledWith(1);
+
+        fake.copied_items.set({ 5: 1 });
+        fixture.detectChanges();
+        paste.click();
+        expect(fake.actions.pasteItems).toHaveBeenCalledWith(1);
+    });
+
+    it('choisit la proposition de Chantiers du jour, celle retenue étant affichée', async (): Promise<void> => {
+        await render((f: FakeNightwatchStore): void => {
+            f.building_plans_of_day.set([{ id: 70, name: 'Chantiers A', isEffective: true } as BuildingPlanDTO, { id: 71, name: 'Chantiers B', isEffective: false } as BuildingPlanDTO]);
+            f.planned_buildings.set({ built_uids: new Set<string>(), round_path_level: 0, plan_id: 70 });
+        });
+        const select: HTMLElement = control<HTMLElement>('mat-select[data-field="building-plan"]');
+        expect(select.textContent).toContain('Chantiers A');
+
+        await pick(select, /Chantiers B/);
+
+        expect(fake.actions.setBuildingPlan).toHaveBeenCalledWith(71);
+    });
+
+    it('lien vers les Chantiers du jour affiché, sur la proposition retenue', async (): Promise<void> => {
+        await render((f: FakeNightwatchStore): void => {
+            f.planned_buildings.set({ built_uids: new Set<string>(), round_path_level: 0, plan_id: 70 });
+        });
+
+        expect(control<HTMLAnchorElement>('a[data-action="open-buildings"]').getAttribute('href')).toBe('/buildings?day=10&plan=70');
+    });
+
+    it('sans proposition de Chantiers ce jour : pas de choix', async (): Promise<void> => {
+        await render();
+
+        expect(root().querySelector('mat-select[data-field="building-plan"]')).toBeNull();
     });
 
     it('retire un veilleur', async (): Promise<void> => {
@@ -120,24 +190,169 @@ describe('NightwatchPlanTabComponent', (): void => {
         expect(fake.actions.removeWatcher).toHaveBeenCalledWith(1);
     });
 
-    it('attribue un objet avec sa quantité, modifie ou retire une attribution', async (): Promise<void> => {
-        await render();
-        const select: HTMLElement = control<HTMLElement>('[data-watcher="1"] mat-select[data-field="add-item"]');
-        const quantity: HTMLInputElement = control<HTMLInputElement>('[data-watcher="1"] input[data-field="add-item-quantity"]');
+    /** Texte d'un élément, espaces réduits. */
+    function text(selector: string): string {
+        return (root().querySelector(selector)?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    }
 
-        await pick(select, /Bois|Wood/);
-        quantity.value = '3';
-        quantity.dispatchEvent(new Event('input'));
-        fixture.detectChanges();
-        control<HTMLButtonElement>('[data-watcher="1"] button[data-action="add-item"]').click();
-        const existing: HTMLInputElement = control<HTMLInputElement>('[data-watcher="1"] input[data-item="5"]');
-        existing.value = '4';
-        existing.dispatchEvent(new Event('change'));
-        control<HTMLButtonElement>('[data-watcher="1"] button[data-action="remove-item-5"]').click();
+    /** Composant de sac habituel de la carte du veilleur 1. */
+    function bag(): ListElementAddRemoveComponent {
+        return fixture.debugElement.query(By.css('[data-watcher="1"] mho-list-element-add-remove')).componentInstance as ListElementAddRemoveComponent;
+    }
+
+    /** Remplace le stuff prévu du veilleur 1. */
+    function withItems(f: FakeNightwatchStore, items: Record<number, number>, discourse: boolean = false): void {
+        f.draft.update((draft: NightwatchPlanContentDTO | null): NightwatchPlanContentDTO | null =>
+            draft === null ? null : { ...draft, watchers: draft.watchers.map((watcher: NightwatchWatcherDTO): NightwatchWatcherDTO => ({ ...watcher, items, hasDiscourse: discourse })) });
+    }
+
+    /** Objets d'un onglet du menu d'ajout. */
+    function tab(label: RegExp): Item[] {
+        return (bag().lists().find((list: ListForAddRemove): boolean => label.test(list.label))?.list ?? []) as Item[];
+    }
+
+    it('sac : composant habituel, une icône par exemplaire ; ajout, retrait et vidage passent par setItem', async (): Promise<void> => {
+        await render();
+
+        expect(bag().currentList().map((item: Item | StatusEnum): number | string => item.id)).toEqual([5, 5]);
+        bag().add.emit(5);
+        bag().remove.emit(5);
+        bag().empty.emit();
 
         expect(fake.actions.setItem).toHaveBeenCalledWith(1, 5, 3);
-        expect(fake.actions.setItem).toHaveBeenCalledWith(1, 5, 4);
+        expect(fake.actions.setItem).toHaveBeenCalledWith(1, 5, 1);
         expect(fake.actions.setItem).toHaveBeenCalledWith(1, 5, 0);
+    });
+
+    it('sac : onglets « Objets de veille » (filtrés, quantité en banque, même absents), « Banque » et « Tous » sans filtre', async (): Promise<void> => {
+        const label: Record<string, string> = { fr: 'Bois', en: 'Wood', de: 'Holz', es: 'Madera' };
+        const wood: Item = Object.assign(new Item(), { id: 5, uid: 'wood', label, img: 'item/item_wood.gif' });
+        const spoon: Item = Object.assign(new Item(), { id: 6, uid: 'spoon_#00', label: { fr: 'Cuillère', en: 'Spoon' }, img: 'item/item_spoon.gif' });
+        await render((f: FakeNightwatchStore): void => {
+            f.state.update((state: NightwatchStateDTO | null): NightwatchStateDTO | null => state === null ? null : { ...state, bank: { 6: 3 } });
+        }, of([wood, spoon]));
+
+        expect(bag().lists().map((list: ListForAddRemove): string => list.label)).toEqual(['Objets de veille', 'Banque', 'Tous']);
+        expect(tab(/veille/).map((item: Item): number => item.id)).toEqual([5]);
+        expect(bag().lists()[0].counts?.get(6)).toBe(3);
+        expect(tab(/Banque/).map((item: Item): number => item.id)).toEqual([6]);
+        expect(tab(/Tous/).map((item: Item): number => item.id).sort()).toEqual([5, 6]);
+    });
+
+    it('sac : emplacements vides selon le SUPER (Endurant), objets en trop marqués seulement si le niveau est connu', async (): Promise<void> => {
+        await render((f: FakeNightwatchStore): void => {
+            f.actions.enduranceLevel.mockReturnValue(2);
+            withItems(f, { 5: 2 });
+        });
+
+        expect(root().querySelectorAll('[data-watcher="1"] mho-list-element-add-remove .empty-slot').length).toBe(4);
+        expect(bag().capacityUncertain()).toBe(false);
+    });
+
+    it('sac : niveau inconnu, emplacements jusqu\'au minimum d\'un habitant, rien de marqué en trop', async (): Promise<void> => {
+        await render((f: FakeNightwatchStore): void => {
+            withItems(f, { 5: 5 });
+        });
+
+        expect(bag().capacity()).toBe(4);
+        expect(bag().capacityUncertain()).toBe(true);
+        expect(root().querySelectorAll('[data-watcher="1"] mho-list-element-add-remove .overflow').length).toBe(0);
+    });
+
+    it('sac : lecture seule sans droit de modification', async (): Promise<void> => {
+        await render((f: FakeNightwatchStore): void => {
+            f.can_edit.set(false);
+        });
+
+        expect(bag().readonly()).toBe(true);
+    });
+
+    it('sac : places occupées / capacité, alerte d\'anomalie au dépassement, « +? » si le niveau Endurant est inconnu', async (): Promise<void> => {
+        await render((f: FakeNightwatchStore): void => {
+            f.actions.enduranceLevel.mockReturnValue(0);
+            withItems(f, { 5: 5 });
+        });
+
+        expect(text('[data-watcher="1"] .bag-capacity')).toBe('5 / 4');
+        expect(text('[data-watcher="1"] [data-alert="bag_overflow"]')).toContain('Anomalie dans l\'équipement : Pas assez de place dans le sac');
+
+        withItems(fake, { 5: 2 });
+        fixture.detectChanges();
+        expect(root().querySelector('[data-watcher="1"] [data-alert="bag_overflow"]')).toBeNull();
+    });
+
+    it('sac : niveau Endurant inconnu, minimum d\'un habitant affiché « +? », pas d\'alerte tant que le stuff tient à +3', async (): Promise<void> => {
+        await render((f: FakeNightwatchStore): void => {
+            withItems(f, { 5: 7 });
+        });
+
+        expect(text('[data-watcher="1"] .bag-capacity')).toBe('7 / 4+?');
+        expect(root().querySelector('[data-watcher="1"] .bag-capacity')?.getAttribute('title')).toBe('Niveau Endurant inconnu');
+        expect(root().querySelector('[data-watcher="1"] [data-alert="bag_overflow"]')).toBeNull();
+    });
+
+    it('sac : le Discours rassurant porté occupe une place ; le retirer du sac décoche le Discours', async (): Promise<void> => {
+        const label: Record<string, string> = { fr: 'Bois', en: 'Wood', de: 'Holz', es: 'Madera' };
+        const wood: Item = Object.assign(new Item(), { id: 5, uid: 'wood', label, img: 'item/item_wood.gif' });
+        const discourse: Item = Object.assign(new Item(), { id: 8, uid: 'chkspk_#00', label: { fr: 'Discours rassurant multicoloré', en: 'Discourse' }, img: 'item/item_chkspk.gif' });
+        await render((f: FakeNightwatchStore): void => {
+            f.actions.enduranceLevel.mockReturnValue(0);
+            withItems(f, { 5: 1 }, true);
+        }, of([wood, discourse]));
+
+        expect(bag().currentList().map((item: Item | StatusEnum): number | string => item.id)).toEqual([5, 8]);
+        expect(text('[data-watcher="1"] .bag-capacity')).toBe('2 / 4');
+        bag().remove.emit(8);
+        expect(fake.actions.setDiscourse).toHaveBeenCalledWith(1, false);
+        expect(fake.actions.setItem).not.toHaveBeenCalled();
+    });
+
+    it('sac : le sac, le grand sac et la ceinture sont attribuables sans alerte « objet absent »', async (): Promise<void> => {
+        const label: Record<string, string> = { fr: 'Bois', en: 'Wood', de: 'Holz', es: 'Madera' };
+        const wood: Item = Object.assign(new Item(), { id: 5, uid: 'wood', label, img: 'item/item_wood.gif' });
+        const extra_bag: Item = Object.assign(new Item(), { id: 9, uid: 'bag_#00', label: { fr: 'Sac supplémentaire', en: 'Extra bag' }, img: 'item/item_bag.gif' });
+        await render((f: FakeNightwatchStore): void => {
+            f.watcher_rows.set([{ user_id: 1, name: 'Alice', past_watches: 3, defense: 25, risk: 0.12, tier: 't15', alerts: [{ kind: 'unknown_item', item_id: 9 }] }]);
+        }, of([wood, extra_bag]));
+
+        expect(tab(/veille/).map((item: Item): number => item.id)).toContain(9);
+        expect(root().querySelector('[data-watcher="1"] [data-alert="unknown_item"]')).toBeNull();
+    });
+
+    it('encombrants : un de plus que la normale toléré avec alerte ; au-delà, objet retiré du menu et ajout refusé avec avertissement', async (): Promise<void> => {
+        const label: Record<string, string> = { fr: 'Bois', en: 'Wood', de: 'Holz', es: 'Madera' };
+        const heavy_wood: Item = Object.assign(new Item(), { id: 5, uid: 'wood', label, img: 'item/item_wood.gif', is_heaver: true });
+        await render((f: FakeNightwatchStore): void => {
+            withItems(f, { 5: 3 });
+        }, of([heavy_wood]));
+        warning.mockClear();
+
+        bag().add.emit(5);
+
+        expect(tab(/veille/)).toEqual([]);
+        expect(tab(/Tous/).map((item: Item): number => item.id)).toEqual([5]);
+        expect(fake.actions.setItem).not.toHaveBeenCalled();
+        expect(warning).toHaveBeenCalledWith('Anomalie dans l\'équipement : Trop d\'encombrants');
+        expect(root().querySelector('[data-watcher="1"] [data-alert="too_many_heavy"]')).not.toBeNull();
+    });
+
+    it('avertit quand le stuff collé dépasse les encombrants acceptés', async (): Promise<void> => {
+        const label: Record<string, string> = { fr: 'Bois', en: 'Wood', de: 'Holz', es: 'Madera' };
+        const heavy_wood: Item = Object.assign(new Item(), { id: 5, uid: 'wood', label, img: 'item/item_wood.gif', is_heaver: true });
+        await render((f: FakeNightwatchStore): void => {
+            f.copied_items.set({ 5: 2 });
+        }, of([heavy_wood]));
+        const paste: HTMLButtonElement = control<HTMLButtonElement>('[data-watcher="1"] button[data-action="paste-items"]');
+        warning.mockClear();
+
+        paste.click();
+        expect(fake.actions.pasteItems).toHaveBeenCalledWith(1);
+        expect(warning).not.toHaveBeenCalled();
+
+        fake.copied_items.set({ 5: 3 });
+        fixture.detectChanges();
+        paste.click();
+        expect(warning).toHaveBeenCalledTimes(1);
     });
 
     it('modifie veilles passées, Discours rassurant, consignes et attaque estimée', async (): Promise<void> => {
@@ -212,7 +427,7 @@ describe('NightwatchPlanTabComponent', (): void => {
     it('quantité attribuée supérieure au disponible : alerte unique nommant l\'objet', async (): Promise<void> => {
         await render((f: FakeNightwatchStore): void => {
             f.stock_lines.set([{ item_id: 5, need: 4, in_bag: 1, in_chests: 0, in_bank: 0, in_desert: 0, manual: 0, broken_in_town: 0, available_in_town: 1, remaining: 3, stale_chest: false, unknown_age: false, oldest_chest_update: null },
-                { item_id: 6, need: 1, in_bag: 1, in_chests: 0, in_bank: 0, in_desert: 0, manual: 0, broken_in_town: 0, available_in_town: 1, remaining: 0, stale_chest: false, unknown_age: false, oldest_chest_update: null }]);
+                               { item_id: 6, need: 1, in_bag: 1, in_chests: 0, in_bank: 0, in_desert: 0, manual: 0, broken_in_town: 0, available_in_town: 1, remaining: 0, stale_chest: false, unknown_age: false, oldest_chest_update: null }]);
         });
 
         const alerts: NodeListOf<Element> = root().querySelectorAll('[data-alert="insufficient-stock"]');
@@ -253,12 +468,12 @@ describe('NightwatchPlanTabComponent', (): void => {
         expect(root().querySelector('[data-watcher="1"] [data-alert="risk_above_zero"]')).not.toBeNull();
     });
 
-    it('désactive tous les champs sans droit de modification (jour passé ou main d\'un autre)', async (): Promise<void> => {
+    it('désactive tous les champs sans droit de modification (jour passé ou main d\'un autre), sauf la copie du stuff', async (): Promise<void> => {
         await render((f: FakeNightwatchStore): void => {
             f.can_edit.set(false);
         });
 
-        const controls: HTMLElement[] = Array.from(root().querySelectorAll<HTMLElement>('input, textarea, button'));
+        const controls: HTMLElement[] = Array.from(root().querySelectorAll<HTMLElement>('input, textarea, button:not([data-action="copy-items"])'));
         const selects: HTMLElement[] = Array.from(root().querySelectorAll<HTMLElement>('mat-select'));
         expect(controls.length).toBeGreaterThan(0);
         expect(selects.length).toBeGreaterThan(0);
@@ -287,5 +502,38 @@ describe('NightwatchPlanTabComponent', (): void => {
         });
 
         expect(root().querySelector('button[data-action="create-plan"]')).toBeNull();
+    });
+    describe('stuff à répartir', (): void => {
+        const withGlobals: (simulation_id: number | null) => (f: FakeNightwatchStore) => void = (simulation_id: number | null): ((f: FakeNightwatchStore) => void) => (f: FakeNightwatchStore): void => {
+            f.selected_plan.set({ ...(f.selected_plan() as NightwatchPlanDTO), simulationId: simulation_id });
+            f.draft.set({
+                attackOverride: null, instructions: null, manualStock: {}, globalItems: { 5: 3 },
+                watchers: [{ userId: 1, statuses: [], items: { 5: 1 }, pastWatches: 3, hasDiscourse: false, note: null }]
+            });
+        };
+
+        it('affiche le reste des objets globaux non attribués pour une proposition de simulation', async (): Promise<void> => {
+            await render(withGlobals(4));
+
+            const box: HTMLElement | null = root().querySelector<HTMLElement>('[data-field="stuff-to-split"]');
+            expect(box).not.toBeNull();
+            expect(box?.textContent).toContain('2');
+            expect(box?.querySelector('img')?.getAttribute('alt')).toBe('Wood');
+        });
+
+        it('masque l\'encart quand tout est réparti', async (): Promise<void> => {
+            await render((f: FakeNightwatchStore): void => {
+                withGlobals(4)(f);
+                f.draft.set({ ...(f.draft() as NightwatchPlanContentDTO), globalItems: { 5: 1 } });
+            });
+
+            expect(root().querySelector('[data-field="stuff-to-split"]')).toBeNull();
+        });
+
+        it('n\'affiche rien pour une proposition hors simulation', async (): Promise<void> => {
+            await render(withGlobals(null));
+
+            expect(root().querySelector('[data-field="stuff-to-split"]')).toBeNull();
+        });
     });
 });

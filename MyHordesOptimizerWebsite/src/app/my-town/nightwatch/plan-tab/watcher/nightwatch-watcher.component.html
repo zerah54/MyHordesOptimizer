@@ -6,64 +6,45 @@
             }
             <strong class="name">{{ row().name }}</strong>
         </mat-card-title>
-        <button mat-icon-button type="button" data-action="remove-watcher" [disabled]="!store.can_edit()" i18n-aria-label aria-label="Retirer le veilleur"
-                (click)="store.removeWatcher(row().user_id)">
-            <mat-icon>close</mat-icon>
-        </button>
+        <span class="head-actions">
+            <button mat-icon-button type="button" data-action="copy-items" i18n-matTooltip matTooltip="Copier le stuff" i18n-aria-label
+                    aria-label="Copier le stuff"
+                    (click)="store.copyItems(row().user_id)">
+                <mat-icon>content_copy</mat-icon>
+            </button>
+            <button mat-icon-button type="button" data-action="paste-items" [disabled]="!store.can_edit() || store.copied_items() === null"
+                    i18n-matTooltip matTooltip="Coller le stuff" i18n-aria-label aria-label="Coller le stuff" (click)="pasteItems()">
+                <mat-icon>content_paste</mat-icon>
+            </button>
+            <button mat-icon-button type="button" data-action="remove-watcher" [disabled]="!store.can_edit()" i18n-aria-label aria-label="Retirer le veilleur"
+                    (click)="store.removeWatcher(row().user_id)">
+                <mat-icon>close</mat-icon>
+            </button>
+        </span>
     </mat-card-header>
 
-    <mat-card-content class="body">
+    <div class="body">
         <mat-chip-listbox class="statuses" multiple [disabled]="!store.can_edit()" i18n-aria-label aria-label="Statuts prévus">
             @for (status of status_options; track status.key) {
                 <mat-chip-option class="status" [attr.data-status]="status.key" [selected]="hasStatus(status.key)" [disabled]="!store.can_edit()"
                                  (selectionChange)="onStatusChange(status.key, $event.isUserInput)">
-                    @if (status.img !== null) {
-                        <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
-                    }
+                    <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
                     {{ status.label }}
                 </mat-chip-option>
             }
         </mat-chip-listbox>
 
-        <div class="items">
-            @for (assigned_item of assigned(); track assigned_item.item_id) {
-                <div class="assigned">
-                    <span class="item-label">
-                        @if (assigned_item.icon !== '') {
-                            <img class="item-icon" [src]="assigned_item.icon" alt="">
-                        }
-                        {{ assigned_item.label }}
-                    </span>
-                    <mat-form-field class="quantity" appearance="outline" subscriptSizing="dynamic">
-                        <input matInput type="number" min="0" step="1" [attr.data-item]="assigned_item.item_id" [value]="assigned_item.quantity"
-                               [disabled]="!store.can_edit()"
-                               i18n-aria-label aria-label="Quantité" #quantity (change)="setQuantity(assigned_item.item_id, quantity.value)">
-                    </mat-form-field>
-                    <button mat-icon-button type="button" [attr.data-action]="'remove-item-' + assigned_item.item_id" [disabled]="!store.can_edit()"
-                            i18n-aria-label aria-label="Retirer l'objet" (click)="store.setItem(row().user_id, assigned_item.item_id, 0)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </div>
+        <div class="bag">
+            <mho-list-element-add-remove withQuantity label="Sac" i18n-label [currentList]="bag_items()" [lists]="bag_lists()"
+                                         addLabel="Ajouter au sac" i18n-addLabel (add)="addToBag(+$event)"
+                                         removeLabel="Retirer du sac" i18n-removeLabel (remove)="removeFromBag(+$event)"
+                                         emptyLabel="Vider le sac" i18n-emptyLabel (empty)="emptyBag()"
+                                         [capacity]="bag_capacity()" [capacityUncertain]="!bag_known()" [readonly]="!store.can_edit()"/>
+            @if (bag_known()) {
+                <span class="bag-capacity">{{ bag_used() }} / {{ bag_capacity() }}</span>
+            } @else {
+                <span class="bag-capacity" i18n-title title="Niveau Endurant inconnu">{{ bag_used() }} / {{ bag_capacity() }}+?</span>
             }
-            <div class="add-item">
-                <mat-form-field class="picker" appearance="outline" subscriptSizing="dynamic">
-                    <mat-select data-field="add-item" [value]="chosen_item()" [disabled]="!store.can_edit()" i18n-aria-label aria-label="Objet à attribuer"
-                                i18n-placeholder placeholder="Attribuer un objet…" (selectionChange)="chooseItem($event.value)">
-                        <mat-option [value]="null" i18n>Attribuer un objet…</mat-option>
-                        @for (item of assignable(); track item.id) {
-                            <mat-option [value]="item.id">{{ itemLabel(item.id) }}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="quantity" appearance="outline" subscriptSizing="dynamic">
-                    <input matInput type="number" min="1" step="1" data-field="add-item-quantity" [value]="chosen_quantity()" [disabled]="!store.can_edit()"
-                           i18n-aria-label aria-label="Quantité à attribuer" #amount (input)="chooseQuantity(amount.value)">
-                </mat-form-field>
-                <button mat-stroked-button type="button" data-action="add-item" [disabled]="!store.can_edit() || chosen_item() === null" (click)="addItem()">
-                    <mat-icon>add</mat-icon>
-                    <ng-container i18n>Attribuer</ng-container>
-                </button>
-            </div>
         </div>
 
         <div class="options">
@@ -132,9 +113,21 @@
             </p>
         </div>
 
-        @if (row().alerts.length > 0) {
+        @if (bag_overflow()) {
+            <p class="alert" data-alert="bag_overflow">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                <ng-container i18n>Anomalie dans l'équipement : Pas assez de place dans le sac</ng-container>
+            </p>
+        }
+        @if (heavy_left() < 0) {
+            <p class="alert" data-alert="too_many_heavy">
+                <mat-icon aria-hidden="true">warning</mat-icon>
+                <ng-container i18n>Anomalie dans l'équipement : Trop d'encombrants</ng-container>
+            </p>
+        }
+        @if (alerts().length > 0) {
             <ul class="alerts">
-                @for (alert of row().alerts; track $index) {
+                @for (alert of alerts(); track $index) {
                     <li class="alert" [attr.data-alert]="alert.kind">
                         <mat-icon aria-hidden="true">warning</mat-icon>
                         <span>
@@ -152,5 +145,5 @@
                 }
             </ul>
         }
-    </mat-card-content>
+    </div>
 </mat-card>

@@ -157,6 +157,8 @@ public partial class MhoContext : DbContext
 
     public virtual DbSet<TownNightwatchPlan> TownNightwatchPlans { get; set; }
 
+    public virtual DbSet<TownNightwatchSimulation> TownNightwatchSimulations { get; set; }
+
     public virtual DbSet<PreTown> PreTowns { get; set; }
 
     public virtual DbSet<PreTownMember> PreTownMembers { get; set; }

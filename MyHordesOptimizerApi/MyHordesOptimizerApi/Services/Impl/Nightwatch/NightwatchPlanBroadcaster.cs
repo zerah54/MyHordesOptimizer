@@ -36,6 +36,11 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
             return SendAsync(mapId, NightwatchPlansHubEvent.PlanLockChanged, lockDto, null);
         }
 
+        public Task SimulationsChangedAsync(int mapId, string? exceptConnectionId)
+        {
+            return SendAsync(mapId, NightwatchPlansHubEvent.SimulationsChanged, new object(), exceptConnectionId);
+        }
+
         private Task SendAsync(int mapId, NightwatchPlansHubEvent hubEvent, object payload, string? exceptConnectionId)
         {
             var group = mapId.ToString();

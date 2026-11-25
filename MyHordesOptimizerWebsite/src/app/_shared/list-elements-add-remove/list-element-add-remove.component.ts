@@ -6,6 +6,7 @@ import {
     booleanAttribute,
     ChangeDetectionStrategy,
     Component,
+    computed,
     DestroyRef,
     inject,
     input,
@@ -66,6 +67,10 @@ export class ListElementAddRemoveComponent {
     /** Liste à quantités (sac, coffre) : un objet peut y figurer plusieurs fois. Un clic sur une icône ouvre alors
      *  son sélecteur de quantité ; sans quantités, il retire l'élément. */
     public withQuantity: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
+    /** Places du sac : les emplacements vides sont dessinés jusqu'à elle et les éléments au-delà marqués ; nulle = pas d'emplacements. */
+    public capacity: InputSignal<number | null> = input<number | null>(null);
+    /** La capacité n'est qu'un minimum : emplacements vides dessinés, aucun élément marqué en trop. */
+    public capacityUncertain: InputSignalWithTransform<boolean, unknown> = input(false, { transform: booleanAttribute });
     /** Tri du menu d'ajout, pour les listes qui fournissent leurs quantités ; à lier pour l'enregistrer. */
     public sortMode: ModelSignal<ItemsSortMode> = model<ItemsSortMode>(DEFAULT_ITEMS_SORT_MODE);
 
@@ -83,6 +88,13 @@ export class ListElementAddRemoveComponent {
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
     /** La langue du site */
     protected readonly locale: string = moment.locale();
+    /** Emplacements vides à dessiner après les éléments. */
+    protected readonly empty_slots: Signal<number[]> = computed((): number[] => {
+        const capacity: number | null = this.capacity();
+        return capacity === null ? [] : Array.from({ length: Math.max(0, capacity - this.currentList().length) }, (_: unknown, index: number): number => index);
+    });
+    protected readonly empty_slot_img: string = HORDES_IMG_REPO + 'inventory/large_empty_inv.png';
+
     /** Objet dont le sélecteur de quantité est ouvert. */
     protected readonly quantity_item: WritableSignal<Item | null> = signal(null);
 

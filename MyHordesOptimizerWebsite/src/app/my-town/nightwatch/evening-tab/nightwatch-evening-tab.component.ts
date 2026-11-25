@@ -1,17 +1,26 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, Signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import moment from 'moment';
+import { catchError, Observable, of } from 'rxjs';
 
+import { ApiService } from '../../../_abstract_model/services/api.service';
 import { Imports } from '../../../_abstract_model/types/_types';
+import { Item } from '../../../_abstract_model/types/item.class';
+import { displayedBagCapacity } from '../../../_shared/bag/bag-capacity.util';
+import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { NightwatchStore, PLAN_ONLY_STATUSES, STALE_CHEST_HOURS } from '../nightwatch.store';
-import { NightwatchCitizenStateDTO, NightwatchPlanDTO, NightwatchWatcherDTO } from '../nightwatch.types';
+import { NightwatchCitizenStateDTO, NightwatchItemDefDTO, NightwatchPlanDTO, NightwatchWatcherDTO } from '../nightwatch.types';
+import { bagItems, bagItemUids, bagUsed } from '../nightwatch-bag.util';
 import { WatcherGap } from '../nightwatch-compare.util';
 import { injectItemLabeler } from '../nightwatch-item-labels';
 import { statusLabel } from '../nightwatch-status-labels';
 import { tierLabel } from '../nightwatch-tier-labels';
 
+const angular_common: Imports = [NgTemplateOutlet];
 const material_modules: Imports = [MatChipsModule, MatIconModule, MatTableModule];
 
 const MS_PER_HOUR: number = 3600000;
@@ -35,6 +44,16 @@ interface EveningRow {
     missing_statuses: string[];
     /** Statuts recopiés du plan dans le réel faute de donnée (chien) : prévus, non vérifiés. */
     unverified_statuses: string[];
+    planned_bag: BagView;
+    real_bag: BagView;
+}
+
+/** Sac affiché : contenu, places occupées et capacité (minimum sûr si le niveau Endurant est inconnu). */
+interface BagView {
+    items: Item[];
+    used: number;
+    capacity: number;
+    known: boolean;
 }
 
 /** Données de sac d'un veilleur : date de mise à jour et état périmé (date inconnue ou trop ancienne). */
@@ -50,14 +69,23 @@ interface BagAge {
     templateUrl: './nightwatch-evening-tab.component.html',
     styleUrls: ['./nightwatch-evening-tab.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [...material_modules]
+    imports: [...angular_common, ListElementAddRemoveComponent, ...material_modules]
 })
 export class NightwatchEveningTabComponent {
 
     protected readonly store: NightwatchStore = inject(NightwatchStore);
-    protected readonly columns: readonly string[] = ['name', 'defense', 'risk', 'phrase', 'missing_items', 'extra_items', 'missing_statuses', 'to_contact'];
+    protected readonly columns: readonly string[] = ['name', 'bags', 'defense', 'risk', 'phrase', 'missing_items', 'extra_items', 'missing_statuses', 'to_contact'];
+    protected readonly planned_label: string = $localize`Prévu`;
+    protected readonly real_label: string = $localize`Réel`;
 
     private readonly itemLabel: (item_id: number) => string = injectItemLabeler();
+    private readonly items: Signal<readonly Item[]> = toSignal(inject(ApiService).getItems().pipe(catchError((): Observable<Item[]> => of([]))), { initialValue: [] as Item[] });
+
+    /** Objets essentiels du référentiel de veille (ils ne prennent pas de place). */
+    private readonly essential_ids: Signal<ReadonlySet<number>> = computed((): ReadonlySet<number> => new Set<number>(
+        Object.entries(this.store.referential()?.items ?? {})
+            .filter(([, def]: [string, NightwatchItemDefDTO]): boolean => def.isEssential)
+            .map(([item_id]: [string, NightwatchItemDefDTO]): number => Number(item_id))));
 
     /** La proposition affichée est la proposition effective du jour. */
     protected readonly is_effective: Signal<boolean> = computed((): boolean => this.store.selected_plan()?.isEffective === true);
@@ -70,6 +98,8 @@ export class NightwatchEveningTabComponent {
     protected readonly rows: Signal<EveningRow[]> = computed((): EveningRow[] =>
         this.store.gaps().map((gap: WatcherGap): EveningRow => ({
             gap,
+            planned_bag: this.bagView(gap.user_id, this.plannedWatcher(gap.user_id)?.items ?? {}, this.plannedWatcher(gap.user_id)?.hasDiscourse === true),
+            real_bag: this.bagView(gap.user_id, this.store.citizenState(gap.user_id)?.bag ?? {}, false),
             name: this.citizen(gap.user_id)?.name ?? '?',
             planned_risk: this.percent(gap.planned_risk),
             real_risk: this.percent(gap.real_risk),
@@ -148,5 +178,30 @@ export class NightwatchEveningTabComponent {
         return Object.entries(quantities).map(([item_id, quantity]: [string, number]): ItemQuantity => ({
             label: this.itemLabel(Number(item_id)), quantity
         }));
+    }
+
+    /**
+     * Veilleur prévu dans la copie de travail.
+     * @param {number} user_id Citoyen.
+     * @returns {NightwatchWatcherDTO | undefined} Veilleur, absent s'il n'est pas prévu.
+     */
+    private plannedWatcher(user_id: number): NightwatchWatcherDTO | undefined {
+        return this.store.draft()?.watchers.find((watcher: NightwatchWatcherDTO): boolean => watcher.userId === user_id);
+    }
+
+    /**
+     * Sac d'un veilleur à afficher, capacité calculée sur ses propres extensions.
+     * @param {number} user_id Citoyen.
+     * @param {Record<number, number>} items Contenu du sac.
+     * @param {boolean} discourse Porte le Discours rassurant.
+     * @returns {BagView} Sac affiché.
+     */
+    private bagView(user_id: number, items: Record<number, number>, discourse: boolean): BagView {
+        return {
+            items: bagItems(items, this.items(), discourse),
+            used: bagUsed(items, this.essential_ids(), discourse),
+            capacity: displayedBagCapacity(this.store.enduranceLevel(user_id), bagItemUids(items, this.items())),
+            known: this.store.enduranceLevel(user_id) !== null
+        };
     }
 }

@@ -9,12 +9,17 @@ import { Imports } from '../../../_abstract_model/types/_types';
 import { ConfirmDialogComponent, ConfirmDialogData } from '../../../_shared/confirm-dialog/confirm-dialog.component';
 import { DaySelectorComponent } from '../../../_shared/day-selector/day-selector.component';
 import {
+    PlanningCopyDayDialogComponent,
+    PlanningCopyDayDialogData,
+    PlanningCopyDayDialogResult
+} from '../../buildings/planning/copy-day-dialog/planning-copy-day-dialog.component';
+import {
     PlanningNameDialogComponent,
     PlanningNameDialogData,
     PlanningNameDialogResult
 } from '../../buildings/planning/name-dialog/planning-name-dialog.component';
 import { NightwatchStore } from '../nightwatch.store';
-import { NightwatchPlanDTO } from '../nightwatch.types';
+import { NightwatchPlanDTO, NightwatchSimulationDTO } from '../nightwatch.types';
 import { defaultPlanName } from '../nightwatch-plan-name';
 
 const components: Imports = [DaySelectorComponent];
@@ -41,6 +46,18 @@ export class NightwatchHeaderComponent {
      */
     protected isSelected(plan: NightwatchPlanDTO): boolean {
         return this.store.selected_plan()?.id === plan.id;
+    }
+
+    /**
+     * Libellé de la puce : nom de la proposition, suivi de celui de sa simulation s'il y en a une et qu'il diffère.
+     * @param {NightwatchPlanDTO} plan Proposition.
+     * @returns {string} Libellé.
+     */
+    protected chipLabel(plan: NightwatchPlanDTO): string {
+        const simulation: NightwatchSimulationDTO | undefined = plan.simulationId === null || plan.simulationId === undefined
+            ? undefined
+            : this.store.simulations().find((candidate: NightwatchSimulationDTO): boolean => candidate.id === plan.simulationId);
+        return simulation === undefined || simulation.name === plan.name ? plan.name : `${plan.name} (${simulation.name})`;
     }
 
     /**
@@ -93,6 +110,17 @@ export class NightwatchHeaderComponent {
         }
     }
 
+    /** Remplace veilleurs et consignes de la proposition affichée par ceux d'un autre jour (choisi dans la boîte). */
+    protected copyFromDay(): void {
+        this.askDay($localize`Copier depuis le jour`, false, false, (result: PlanningCopyDayDialogResult): void => this.store.copyPlanFromDay(result.day));
+    }
+
+    /** Copie la proposition du jour affiché vers un autre jour (choisi dans la boîte), sous un nouveau nom. */
+    protected copyToDay(): void {
+        this.askDay($localize`Copier vers le jour`, true, true, (result: PlanningCopyDayDialogResult): void =>
+            this.store.copyPlanBetweenDays(this.store.selected_day(), result.day, result.name));
+    }
+
     /** Supprime la proposition affichée après confirmation (elle est partagée par toute la ville). */
     protected remove(): void {
         const plan: NightwatchPlanDTO | null = this.store.selected_plan();
@@ -106,6 +134,30 @@ export class NightwatchHeaderComponent {
             .subscribe((confirmed: boolean | undefined): void => {
                 if (confirmed) {
                     this.store.deletePlan();
+                }
+            });
+    }
+
+    /**
+     * Demande un jour (et un nom pour une copie vers un jour) puis applique l'action ; une boîte annulée ne fait rien.
+     * @param {string} title Titre de la boîte.
+     * @param {boolean} future_only Ne propose que les jours à partir d'aujourd'hui (cible d'une copie).
+     * @param {boolean} ask_name Demande le nom de la nouvelle proposition.
+     * @param {(result: PlanningCopyDayDialogResult) => void} apply Action à appliquer.
+     */
+    private askDay(title: string, future_only: boolean, ask_name: boolean, apply: (result: PlanningCopyDayDialogResult) => void): void {
+        const plan: NightwatchPlanDTO | null = this.store.selected_plan();
+        const today: number = this.store.current_day;
+        const days: number[] = future_only ? this.store.days().filter((day: number): boolean => day >= today) : this.store.days();
+        const data: PlanningCopyDayDialogData = {
+            title, name: plan === null ? '' : $localize`${plan.name}:name: (copie)`, day: Math.max(this.store.selected_day(), future_only ? today : 0), days, today,
+            askParts: false, askName: ask_name
+        };
+        this.dialog.open<PlanningCopyDayDialogComponent, PlanningCopyDayDialogData, PlanningCopyDayDialogResult>(PlanningCopyDayDialogComponent, { data, width: '24rem', maxWidth: '95vw' })
+            .afterClosed()
+            .subscribe((result: PlanningCopyDayDialogResult | undefined): void => {
+                if (result !== undefined) {
+                    apply(result);
                 }
             });
     }

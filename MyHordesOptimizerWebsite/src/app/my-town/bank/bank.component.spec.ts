@@ -2,6 +2,7 @@ import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import moment from 'moment';
 import { of, Subject, throwError } from 'rxjs';
 
@@ -34,7 +35,7 @@ describe('BankComponent', (): void => {
     beforeEach(async (): Promise<void> => {
         await TestBed.configureTestingModule({
             imports: [BankComponent],
-            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
+            providers: [provideHttpClient(withXhr()), provideHttpClientTesting(), provideRouter([]), { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' }]
         }).compileComponents();
 
         townService = TestBed.inject(TownService);
@@ -116,6 +117,20 @@ describe('BankComponent', (): void => {
         expect(bank.selected_version_id()).toBe(12);
         expect(fixture.nativeElement.querySelector('mho-day-selector')).not.toBeNull();
         expect(fixture.nativeElement.querySelector('mho-bank-version-selector')).not.toBeNull();
+    });
+
+    it('ouvre sur le jour du lien de la page (?day=) et le reprend dans l\'URL au changement de jour', async (): Promise<void> => {
+        await TestBed.inject(Router).navigateByUrl('/?day=2');
+        const get_version: ReturnType<typeof vi.spyOn> = vi.spyOn(townService, 'getBankVersion').mockReturnValue(of(bankOf([makeItem(1, 'Pelle')])));
+        open([makeVersion(2, 10), makeVersion(2, 11), makeVersion(3, 12)]);
+        const bank: BankInternals = fixture.componentInstance as unknown as BankInternals;
+
+        expect(bank.selected_day()).toBe(2);
+        expect(get_version).toHaveBeenCalledWith(7, 11);
+
+        const navigate: ReturnType<typeof vi.spyOn> = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
+        (fixture.componentInstance as unknown as { selectDay(day: number): void }).selectDay(3);
+        expect(navigate.mock.lastCall?.[0].toString()).toBe('/?day=3');
     });
 
     it('le sélecteur de version est masqué sur un jour écoulé', (): void => {

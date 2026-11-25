@@ -29,7 +29,13 @@ export interface MapRouteDetail {
     readonly visibility: string;
     readonly edition: string;
     readonly author: string;
-    readonly linked_parts: readonly string[];
+    readonly linked_parts: readonly LinkedPartLink[];
+}
+
+/** Partie d'expédition liée à un tracé : libellé et jour de l'expédition (nul s'il est inconnu). */
+export interface LinkedPartLink {
+    readonly label: string;
+    readonly day: number | null;
 }
 
 /** Index des cases de la carte par coordonnées absolues, construit une fois par carte. */
@@ -115,6 +121,6 @@ export function buildRouteDetail(view: MapRouteView, cells: ReadonlyMap<string, 
             : $localize`Toute la ville`,
         edition: route.is_editable_by_all ? $localize`Tous ceux qui le voient` : $localize`${author}:author: seulement`,
         author,
-        linked_parts: route.linked_parts.map(linkedPartLabel)
+        linked_parts: route.linked_parts.map((part: MapRouteLinkedPart): LinkedPartLink => ({ label: linkedPartLabel(part), day: part.day }))
     };
 }

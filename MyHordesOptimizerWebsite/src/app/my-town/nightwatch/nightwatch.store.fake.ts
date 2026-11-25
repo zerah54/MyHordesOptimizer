@@ -1,23 +1,28 @@
 import { computed, Signal, signal, WritableSignal } from '@angular/core';
 import type { Mock } from 'vitest';
 
+import { BuildingPlanDTO } from '../buildings/planning/plan.types';
 import { PlanConflict, PlanLockState, PlanSaveState } from '../buildings/planning/planning.store';
 import { WatcherGap } from './nightwatch-compare.util';
+import { PlannedBuildings } from './nightwatch-planned-buildings.util';
 import { StockLine } from './nightwatch-stock.util';
-import { NightwatchStore, NightwatchTotals, NightwatchWatcherRow } from './nightwatch.store';
+import { NightwatchStore, NightwatchTotals, NightwatchWatcherRow, SimulationDayView } from './nightwatch.store';
 import {
     emptyNightwatchContent,
     NightwatchCitizenStateDTO,
     NightwatchPlanContentDTO,
     NightwatchPlanDTO,
     NightwatchReferentialDTO,
+    NightwatchSimulationDTO,
     NightwatchStateDTO
 } from './nightwatch.types';
 
 /** Actions du store, espionnées. */
 type FakeAction = 'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'renamePlan' | 'deletePlan' | 'setEffective' | 'addWatcher'
     | 'removeWatcher' | 'setItem' | 'toggleStatus' | 'setPastWatches' | 'setDiscourse' | 'setInstructions' | 'setAttackOverride' | 'save' | 'dismissConflict'
-    | 'takeLock' | 'leave' | 'updateDraft' | 'setManualStock';
+    | 'takeLock' | 'leave' | 'updateDraft' | 'setManualStock' | 'copyItems' | 'pasteItems' | 'copyPlanFromDay' | 'copyPlanBetweenDays' | 'setBuildingPlan' | 'enduranceLevel'
+    | 'selectSimulation' | 'createSimulation' | 'renameSimulation' | 'setSimulationLastDay' | 'setSimulationStock' | 'clearSimulationStock' | 'duplicateSimulation' | 'deleteSimulation'
+    | 'setCityDefense' | 'setGlobalItem' | 'setAllowedOverflow' | 'setAttackReduction' | 'setReactorDamage';
 
 /** Doublure du store : signaux modifiables par le test et actions espionnées. */
 export interface FakeNightwatchStore {
@@ -34,6 +39,7 @@ export interface FakeNightwatchStore {
     can_edit: WritableSignal<boolean>;
     can_write: WritableSignal<boolean>;
     can_create: WritableSignal<boolean>;
+    can_edit_simulations: WritableSignal<boolean>;
     selected_day: WritableSignal<number>;
     selected_plan: WritableSignal<NightwatchPlanDTO | null>;
     plans_of_day: WritableSignal<NightwatchPlanDTO[]>;
@@ -41,7 +47,13 @@ export interface FakeNightwatchStore {
     conflict: WritableSignal<PlanConflict | null>;
     save_state: WritableSignal<PlanSaveState>;
     loading: WritableSignal<boolean>;
+    copied_items: WritableSignal<Record<number, number> | null>;
+    building_plans_of_day: WritableSignal<BuildingPlanDTO[]>;
+    planned_buildings: WritableSignal<PlannedBuildings | null>;
     load_failed: WritableSignal<boolean>;
+    simulations: WritableSignal<NightwatchSimulationDTO[]>;
+    selected_simulation_id: WritableSignal<number | null>;
+    simulation_days: WritableSignal<SimulationDayView[]>;
     actions: Record<FakeAction, Mock>;
 }
 
@@ -77,20 +89,30 @@ export function createFakeNightwatchStore(content: NightwatchPlanContentDTO = em
         can_write,
         can_edit: signal(true),
         can_create: signal(false),
+        can_edit_simulations: signal(true),
         selected_day: signal(10),
         selected_plan: signal<NightwatchPlanDTO | null>(plan),
         plans_of_day: signal<NightwatchPlanDTO[]>([plan]),
         lock,
         conflict: signal<PlanConflict | null>(null),
         save_state: signal<PlanSaveState>('idle'),
+        copied_items: signal<Record<number, number> | null>(null),
+        building_plans_of_day: signal<BuildingPlanDTO[]>([]),
+        planned_buildings: signal<PlannedBuildings | null>(null),
         loading: signal(false),
-        load_failed: signal(false)
+        load_failed: signal(false),
+        simulations: signal<NightwatchSimulationDTO[]>([]),
+        selected_simulation_id: signal<number | null>(null),
+        simulation_days: signal<SimulationDayView[]>([])
     };
     const names: FakeAction[] = ['load', 'selectDay', 'selectPlan', 'createPlan', 'duplicatePlan', 'renamePlan', 'deletePlan', 'setEffective', 'addWatcher',
         'removeWatcher', 'setItem', 'toggleStatus', 'setPastWatches', 'setDiscourse', 'setInstructions', 'setAttackOverride', 'save', 'dismissConflict', 'takeLock', 'leave',
-        'updateDraft', 'setManualStock'];
+        'updateDraft', 'setManualStock', 'copyItems', 'pasteItems', 'copyPlanFromDay', 'copyPlanBetweenDays', 'setBuildingPlan', 'enduranceLevel',
+        'selectSimulation', 'createSimulation', 'renameSimulation', 'setSimulationLastDay', 'setSimulationStock', 'clearSimulationStock', 'duplicateSimulation', 'deleteSimulation',
+        'setCityDefense', 'setGlobalItem', 'setAllowedOverflow', 'setAttackReduction', 'setReactorDamage'];
     const actions: Record<FakeAction, Mock> = Object.fromEntries(names.map((name: FakeAction): [FakeAction, Mock] => [name, vi.fn()])) as Record<FakeAction, Mock>;
     actions.leave.mockImplementation((): Promise<boolean> => Promise.resolve(true));
+    actions.enduranceLevel.mockReturnValue(null);
     const days: Signal<number[]> = computed((): number[] => [10, 11, 12]);
     const citizenState: (user_id: number) => NightwatchCitizenStateDTO | undefined = (user_id: number): NightwatchCitizenStateDTO | undefined =>
         fake.state()?.citizens.find((citizen: NightwatchCitizenStateDTO): boolean => citizen.userId === user_id);

@@ -88,7 +88,9 @@ describe('DaySelectorComponent', (): void => {
         expect(items.length).toBe(3);
         expect(items[0].textContent).toContain('J1');
         expect(items[1].classList.contains('selected')).toBe(true);
-        expect(items[2].querySelector('.today')).not.toBeNull();
+        expect(items[2].getAttribute('aria-current')).toBe('date');
+        expect(items[0].getAttribute('aria-current')).toBeNull();
+        expect(document.querySelector('.mat-mdc-menu-panel.mho-days-menu .days-grid')).not.toBeNull();
 
         items[0].click();
 

@@ -1,6 +1,7 @@
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ANIMATION_MODULE_TYPE } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { NEVER, Subject } from 'rxjs';
 import type { Mock } from 'vitest';
 
@@ -44,7 +45,8 @@ describe('NightwatchComponent', (): void => {
                 { provide: SnackbarService, useValue: { successSnackbar: success, errorSnackbar: failure } },
                 { provide: TownContextService, useValue: { isReadonly: (): boolean => readonly } },
                 { provide: ApiService, useValue: { getItems: (): Subject<never[]> => new Subject<never[]>() } },
-                { provide: NightwatchBuildingNeedsService, useValue: { needsOfDay: (): typeof NEVER => NEVER } }
+                { provide: NightwatchBuildingNeedsService, useValue: { needsOfDay: (): typeof NEVER => NEVER } },
+                provideRouter([])
             ]
         });
         TestBed.overrideComponent(NightwatchComponent, { set: { providers: [{ provide: NightwatchStore, useValue: fake.store }] } });
@@ -66,7 +68,7 @@ describe('NightwatchComponent', (): void => {
     it('affiche le titre « Veilles », charge le store et déclare la présence à l\'ouverture', async (): Promise<void> => {
         await render();
 
-        expect(root().querySelector('mat-card-title')?.textContent?.trim()).toBe('Veilles');
+        expect(root().querySelector('mat-card-title mho-page-title')?.textContent?.trim()).toBe('Veilles');
         expect(fake.actions.load).toHaveBeenCalledTimes(1);
         expect(join).toHaveBeenCalledTimes(1);
     });
@@ -87,11 +89,18 @@ describe('NightwatchComponent', (): void => {
         expect(join).not.toHaveBeenCalled();
     });
 
-    it('propose les onglets Plan, Bilan et Soir de veille', async (): Promise<void> => {
+    it('propose les onglets Simulations, Plan, Bilan et Soir de veille', async (): Promise<void> => {
         await render();
 
         const labels: string[] = Array.from(root().querySelectorAll('[role="tab"]')).map((tab: Element): string => tab.textContent?.trim() ?? '');
-        expect(labels).toEqual(['Plan', 'Bilan', 'Soir de veille']);
+        expect(labels).toEqual(['Simulations', 'Plan', 'Bilan', 'Soir de veille']);
+    });
+
+    it('ouvre l\'onglet Plan par défaut', async (): Promise<void> => {
+        await render();
+
+        const selected: Element | null = root().querySelector('[role="tab"][aria-selected="true"]');
+        expect(selected?.textContent?.trim()).toBe('Plan');
     });
 
     it('ville observée : message de lecture seule', async (): Promise<void> => {
@@ -146,6 +155,14 @@ describe('NightwatchComponent', (): void => {
         root().querySelector<HTMLButtonElement>('button[data-action="retry"]')?.click();
 
         expect(fake.actions.load).toHaveBeenCalledTimes(2);
+    });
+
+    it('partage forum comme les autres pages : icône à côté du titre, infobulle « Copier au format forum »', async (): Promise<void> => {
+        await render();
+
+        const button: HTMLButtonElement | null = root().querySelector<HTMLButtonElement>('mat-card-title button[mat-icon-button][data-action="copy-forum"]');
+        expect(button?.querySelector('mat-icon')?.textContent?.trim()).toBe('share');
+        expect(root().querySelector('.actions')).toBeNull();
     });
 
     it('bouton « Copier le message forum » désactivé sans veilleur', async (): Promise<void> => {

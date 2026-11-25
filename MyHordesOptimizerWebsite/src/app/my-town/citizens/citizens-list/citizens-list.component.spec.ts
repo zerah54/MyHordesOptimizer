@@ -1,8 +1,9 @@
 import { HttpRequest, provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
-import { ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, DebugElement } from '@angular/core';
 import { ComponentFixture, DeferBlockBehavior, DeferBlockFixture, DeferBlockState, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { By } from '@angular/platform-browser';
 import { provideRouter, Router } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import type { MockInstance } from 'vitest';
@@ -28,6 +29,7 @@ import { TownDetails } from '../../../_abstract_model/types/town-details.class';
 import { UpdateInfo } from '../../../_abstract_model/types/update-info.class';
 import { TownContextService } from '../../../_core/services/town-context.service';
 import { citizenBoolValue } from '../../../_shared/citizen-filters/citizen-filter-sort.util';
+import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { CitizenPictosDialogComponent } from '../citizen-pictos-dialog/citizen-pictos-dialog.component';
 import { CitizensListComponent } from './citizens-list.component';
 
@@ -571,6 +573,16 @@ describe('CitizensListComponent — compétences S, U, P, E, R', (): void => {
         expect(root.querySelector('.hero-skills-band')).toBeNull();
     });
 
+    it('sac : emplacements selon le SUPER Endurant (Maître : 4 + 3)', async (): Promise<void> => {
+        await renderList();
+
+        const bag: ListElementAddRemoveComponent | undefined = fixture.debugElement.queryAll(By.directive(ListElementAddRemoveComponent))
+            .map((element: DebugElement): ListElementAddRemoveComponent => element.componentInstance as ListElementAddRemoveComponent)
+            .find((list: ListElementAddRemoveComponent): boolean => list.label() === 'Sac');
+        expect(bag?.capacity()).toBe(7);
+        expect(bag?.capacityUncertain()).toBe(false);
+    });
+
     it('affiche la lettre et le niveau, « ? » si inconnu', async (): Promise<void> => {
         const root: HTMLElement = await renderList();
 
@@ -676,9 +688,10 @@ describe('CitizensListComponent — actions selon les chantiers construits', ():
     /**
      * Crée le composant avec les chantiers construits donnés.
      * @param {ReadonlySet<string> | null} built Uids construits (nul = inconnu).
+     * @param {Citizen[]} [citizens] Citoyens vivants chargés.
      * @returns {string[]} Clés des actions quotidiennes affichées.
      */
-    async function displayedActions(built: ReadonlySet<string> | null): Promise<string[]> {
+    async function displayedActions(built: ReadonlySet<string> | null, citizens: Citizen[] = []): Promise<string[]> {
         await TestBed.configureTestingModule({
             imports: [CitizensListComponent],
             providers: [
@@ -686,15 +699,26 @@ describe('CitizensListComponent — actions selon les chantiers construits', ():
                 { provide: BuiltBuildingsService, useValue: { builtUids: (): Observable<ReadonlySet<string> | null> => of(built) } }
             ]
         }).compileComponents();
-        const instance: CitizensListComponent = TestBed.createComponent(CitizensListComponent).componentInstance;
-        return (instance as unknown as { daily_action_keys: () => DailyActionEnum[] }).daily_action_keys().map((action: DailyActionEnum): string => action.key);
+        type ActionsTestable = { citizen_list: { data: Citizen[] }; buildValueOptions(): void; daily_action_keys: () => DailyActionEnum[] };
+        const instance: ActionsTestable = TestBed.createComponent(CitizensListComponent).componentInstance as unknown as ActionsTestable;
+        instance.citizen_list.data = citizens;
+        instance.buildValueOptions();
+        return instance.daily_action_keys().map((action: DailyActionEnum): string => action.key);
     }
 
     it('masque les actions dont le chantier n\'est pas construit', async (): Promise<void> => {
-        expect(await displayedActions(new Set<string>(['small_gallery_#00']))).toEqual(['home_clean', 'home_rest', 'home_scavenge', 'item_dice', 'item_cards', 'item_soccer']);
+        expect(await displayedActions(new Set<string>(['small_gallery_#00']))).toEqual(['home_clean', 'home_scavenge', 'item_dice', 'item_cards', 'item_soccer']);
     });
 
     it('n\'affiche que les actions sans chantier si les chantiers sont inconnus', async (): Promise<void> => {
-        expect(await displayedActions(null)).toEqual(['home_clean', 'home_rest', 'item_dice', 'item_cards', 'item_soccer']);
+        expect(await displayedActions(null)).toEqual(['home_clean', 'item_dice', 'item_cards', 'item_soccer']);
+    });
+
+    it('affiche la sieste dès qu\'un citoyen a un Coin sieste', async (): Promise<void> => {
+        const without_rest: Citizen = new Citizen();
+        const with_rest: Citizen = new Citizen();
+        with_rest.home = Object.assign(new Home(), { content: [{ element: HomeEnum.REST_LEVEL, value: 1 }] });
+
+        expect(await displayedActions(null, [without_rest, with_rest])).toEqual(['home_clean', 'home_rest', 'item_dice', 'item_cards', 'item_soccer']);
     });
 });

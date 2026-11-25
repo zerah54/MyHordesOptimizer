@@ -1,3 +1,4 @@
+@use '@angular/material' as mat;
 @use 'components';
 @use 'scrollbars';
 @use 'tables';
@@ -165,4 +166,28 @@ a {
 .mho-side-sheet {
     --mat-dialog-container-shape: 0;
     --mat-dialog-container-max-width: 100vw;
+}
+
+// Menu des jours de mho-day-selector : grille compacte (panneau d'overlay hors du composant, ciblé par sa classe).
+.mat-mdc-menu-panel.mho-days-menu {
+    @include mat.menu-overrides((item-leading-spacing: 0.5em, item-trailing-spacing: 0.5em));
+
+    .days-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .mat-mdc-menu-item {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .selected {
+        font-weight: 600;
+    }
+
+    .today {
+        text-decoration: underline;
+        text-underline-offset: 0.2em;
+    }
 }

@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { RealtimeNightwatchPlansService } from '../../_abstract_model/realtime-services/realtime-nightwatch-plans.service';
 import { Imports } from '../../_abstract_model/types/_types';
@@ -21,12 +22,14 @@ import { statusLabel } from './nightwatch-status-labels';
 import { NightwatchStore, NightwatchTotals } from './nightwatch.store';
 import { NightwatchPlanContentDTO } from './nightwatch.types';
 import { NightwatchPlanTabComponent } from './plan-tab/nightwatch-plan-tab.component';
+import { NightwatchSimulationsTabComponent } from './simulations-tab/nightwatch-simulations-tab.component';
 import { NightwatchStockTabComponent } from './stock-tab/nightwatch-stock-tab.component';
 
 const angular_common: Imports = [];
-const components: Imports = [NightwatchEveningTabComponent, NightwatchHeaderComponent, NightwatchPlanTabComponent, NightwatchStockTabComponent, PageTitleComponent];
+const components: Imports = [NightwatchEveningTabComponent, NightwatchHeaderComponent, NightwatchPlanTabComponent, NightwatchSimulationsTabComponent, NightwatchStockTabComponent,
+                             PageTitleComponent];
 const pipes: Imports = [];
-const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule, MatTabsModule];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatIconModule, MatProgressSpinnerModule, MatTabsModule, MatTooltipModule];
 
 /** Page des plans de veille : en-tête (jour, propositions), bannières de lecture seule, de main et de conflit, puis onglets. */
 @Component({

@@ -198,7 +198,7 @@ describe('MyProgramComponent', (): void => {
         expect(root().querySelector('.block.expedition mho-program-expedition')).toBeNull();
         expect(flat('.block.expedition .not-registered')).toContain('Vous n\'êtes inscrit sur aucune expédition aujourd\'hui.');
         expect(flat('.block.expedition .open-expeditions')).toContain('Sud : 2 places libres');
-        expect(root().querySelector('.block.expedition a')?.getAttribute('routerLink')).toBe('../expeditions');
+        expect(root().querySelector('.block.expedition a')?.getAttribute('href')).toMatch(/\/expeditions\?day=\d+$/);
         expect(flat('.summary-strip')).toContain('Sud : 2 places libres');
     });
 

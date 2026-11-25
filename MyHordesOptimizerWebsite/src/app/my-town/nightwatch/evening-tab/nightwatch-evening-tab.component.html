@@ -71,6 +71,14 @@
                         <td mat-cell *matCellDef="let row" data-field="name">{{ row.name }}</td>
                     </ng-container>
 
+                    <ng-container matColumnDef="bags">
+                        <th mat-header-cell *matHeaderCellDef scope="col" i18n>Sac prévu / réel</th>
+                        <td mat-cell *matCellDef="let row" data-field="bags">
+                            <ng-container *ngTemplateOutlet="bag; context: { $implicit: row.planned_bag, label: planned_label }"/>
+                            <ng-container *ngTemplateOutlet="bag; context: { $implicit: row.real_bag, label: real_label }"/>
+                        </td>
+                    </ng-container>
+
                     <ng-container matColumnDef="defense">
                         <th mat-header-cell *matHeaderCellDef scope="col" i18n>Défense prévue / réelle</th>
                         <td mat-cell *matCellDef="let row" data-field="defense">{{ row.gap.planned_defense }} / {{ row.gap.real_defense }}</td>
@@ -147,3 +155,16 @@
         }
     }
 </div>
+
+<ng-template #bag let-view let-label="label">
+    <div class="bag">
+        <mho-list-element-add-remove readonly withQuantity [label]="label" [currentList]="view.items" [lists]="[]" [capacity]="view.capacity"
+                                     [capacityUncertain]="!view.known"
+                                     addLabel="" removeLabel="" emptyLabel=""/>
+        @if (view.known) {
+            <span class="bag-capacity">{{ view.used }} / {{ view.capacity }}</span>
+        } @else {
+            <span class="bag-capacity" i18n-title title="Niveau Endurant inconnu">{{ view.used }} / {{ view.capacity }}+?</span>
+        }
+    </div>
+</ng-template>

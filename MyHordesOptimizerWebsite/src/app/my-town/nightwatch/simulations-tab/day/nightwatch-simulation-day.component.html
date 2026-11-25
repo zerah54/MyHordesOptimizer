@@ -1,0 +1,137 @@
+<section class="attack">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Attaque</mat-label>
+        <input matInput type="number" min="0" step="1" data-field="attack" [value]="store.draft()?.attackOverride ?? ''"
+               [placeholder]="day().attack === null ? '' : '' + day().attack" [disabled]="!editable()"
+               #attack (change)="store.setAttackOverride(toNumber(attack.value))">
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Débordement autorisé</mat-label>
+        <input matInput type="number" min="0" step="1" data-field="overflow" [value]="store.draft()?.allowedOverflow ?? ''" placeholder="0"
+               [disabled]="!editable()" #overflow (change)="store.setAllowedOverflow(toNumber(overflow.value))">
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>% retranché</mat-label>
+        <input matInput type="number" min="0" max="100" step="1" data-field="reduction" [value]="store.draft()?.attackReductionPercent ?? ''" placeholder="0"
+               [disabled]="!editable()" #reduction (change)="store.setAttackReduction(toNumber(reduction.value))">
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label i18n>Dégâts du réacteur</mat-label>
+        <input matInput type="number" min="0" step="1" data-field="reactor" [value]="store.draft()?.reactorDamage ?? ''" placeholder="0"
+               [disabled]="!editable()" #reactor (change)="store.setReactorDamage(toNumber(reactor.value))">
+    </mat-form-field>
+    <mat-form-field appearance="outline" subscriptSizing="dynamic" floatLabel="always">
+        <mat-label i18n>Niveau AD</mat-label>
+        <mat-select data-field="adLevel" [value]="entered('adLevel')" [placeholder]="adLabel(day().defense.adLevel)" [disabled]="!editable()"
+                    (selectionChange)="store.setCityDefense('adLevel', $event.value ?? null)">
+            <mat-option data-ad="prefill" [value]="null"></mat-option>
+            <mat-option [value]="-1">
+                <ng-container i18n>Non construit</ng-container>
+            </mat-option>
+            @for (level of ad_levels; track level) {
+                <mat-option [value]="level">{{ level }}</mat-option>
+            }
+        </mat-select>
+    </mat-form-field>
+</section>
+
+<section class="posts">
+    @for (post of posts; track post.key) {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ post.label }}</mat-label>
+            <input matInput type="number" min="0" step="any" [attr.data-field]="post.key" [value]="entered(post.key) ?? ''"
+                   [placeholder]="'' + day().defense[post.key]"
+                   [disabled]="!editable()" #field (change)="store.setCityDefense(post.key, toNumber(field.value))">
+        </mat-form-field>
+    }
+</section>
+
+<section class="watchers">
+    @for (citizen of citizens(); track citizen.userId) {
+        <div class="citizen">
+            <mat-checkbox [attr.data-citizen]="citizen.userId" [checked]="watcher(citizen.userId) !== null" [disabled]="!editable()"
+                          (change)="toggleWatcher(citizen.userId, $event.checked)">{{ citizen.name }}
+            </mat-checkbox>
+            @if (watcher(citizen.userId) !== null) {
+                <mat-chip-listbox class="statuses" multiple [disabled]="!editable()" i18n-aria-label aria-label="Statuts prévus">
+                    @for (status of status_options; track status.key) {
+                        <mat-chip-option [attr.data-status]="status.key" [selected]="hasStatus(citizen.userId, status.key)" [disabled]="!editable()"
+                                         (selectionChange)="onStatusChange(citizen.userId, status.key, $event.isUserInput)">
+                            <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
+                            {{ status.label }}
+                        </mat-chip-option>
+                    }
+                </mat-chip-listbox>
+                <mho-list-element-add-remove withQuantity [attr.data-bag]="'survival-' + citizen.userId" label="Objets de survie" i18n-label
+                                             [currentList]="survival_bags().get(citizen.userId) ?? []" [lists]="survival_lists()"
+                                             addLabel="Ajouter" i18n-addLabel (add)="changeSurvival(citizen.userId, +$event, 1)"
+                                             removeLabel="Retirer" i18n-removeLabel (remove)="changeSurvival(citizen.userId, +$event, -1)"
+                                             emptyLabel="Vider" i18n-emptyLabel (empty)="emptySurvival(citizen.userId)" [readonly]="!editable()"/>
+            }
+        </div>
+    }
+</section>
+
+<section class="global">
+    <mho-list-element-add-remove withQuantity data-bag="global" label="Stuff global" i18n-label [currentList]="global_bag()" [lists]="global_lists()"
+                                 addLabel="Ajouter" i18n-addLabel (add)="changeGlobal(+$event, 1)"
+                                 removeLabel="Retirer" i18n-removeLabel (remove)="changeGlobal(+$event, -1)"
+                                 emptyLabel="Vider" i18n-emptyLabel (empty)="emptyGlobal()"
+                                 [capacity]="day().offered.slots" [capacityUncertain]="!day().offered.slots_known" [readonly]="!editable()"/>
+    @if (slots_overflow()) {
+        <p class="alert" data-alert="slots">
+            <mat-icon aria-hidden="true">warning</mat-icon>
+            <ng-container i18n>Anomalie dans l'équipement : Pas assez de place dans le sac</ng-container>
+        </p>
+    }
+    @if (heavy_overflow()) {
+        <p class="alert" data-alert="heavy">
+            <mat-icon aria-hidden="true">warning</mat-icon>
+            <ng-container i18n>Anomalie dans l'équipement : Trop d'encombrants</ng-container>
+        </p>
+    }
+</section>
+
+@if (stock_rows().length > 0) {
+    <section class="stock">
+        <h3 i18n>Stock restant</h3>
+        <ul>
+            @for (row of stock_rows(); track row.item_id) {
+                <li [attr.data-stock]="row.item_id">
+                    @if (row.icon !== '') {
+                        <img [src]="row.icon" [alt]="row.label">
+                    }
+                    {{ row.label }} : {{ row.quantity }}
+                </li>
+            }
+        </ul>
+    </section>
+}
+
+<section class="kpis">
+    <div class="kpi" data-field="remaining">
+        <span class="title" i18n>Reste à couvrir</span>
+        <strong class="value">{{ day().remaining ?? '?' }}</strong>
+    </div>
+    <div class="kpi" data-field="watch-defense">
+        <span class="title" i18n>Défense de la veille</span>
+        <strong class="value">{{ day().watch_defense }}</strong>
+    </div>
+    <div class="kpi" data-field="verdict" [class.negative]="day().verdict?.covered === false">
+        <span class="title" i18n>Verdict</span>
+        <strong class="value">
+            @if (day().verdict; as verdict) {
+                @if (verdict.covered) {
+                    <ng-container i18n>Couvert</ng-container>
+                } @else if (verdict.missing_watchers !== null) {
+                    <ng-container i18n>Manque</ng-container> {{ verdict.missing_watchers }}
+                    <ng-container i18n>{verdict.missing_watchers, plural, =1 {veilleur} other {veilleurs}}</ng-container>
+                } @else {
+                    <ng-container i18n>Non couvert</ng-container>
+                }
+            } @else {
+                ?
+            }
+        </strong>
+    </div>
+</section>

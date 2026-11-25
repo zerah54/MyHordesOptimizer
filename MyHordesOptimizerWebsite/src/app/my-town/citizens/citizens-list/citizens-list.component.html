@@ -526,16 +526,17 @@
 <ng-template #sacContent let-row>
     <div class="bag">
         <mho-list-element-add-remove withQuantity
-            (add)="addItem(row.id, +$event)"
-            (empty)="emptyBag(row.id)"
-            (remove)="removeItem(row.id, +$event)" [currentList]="row.bag?.items || []"
-            [lists]="bag_lists"
-            [readonly]="is_readonly()" addLabel="Ajouter au sac"
-            emptyLabel="Vider le sac"
-            i18n-addLabel i18n-emptyLabel
-            i18n-label
-            i18n-removeLabel label="Sac"
-            removeLabel="Retirer du sac">
+                                     (add)="addItem(row.id, +$event)"
+                                     (empty)="emptyBag(row.id)"
+                                     (remove)="removeItem(row.id, +$event)" [currentList]="row.bag?.items || []"
+                                     [capacity]="bagCapacity(row)" [capacityUncertain]="row.hero_skills.e === null"
+                                     [lists]="bag_lists"
+                                     [readonly]="is_readonly()" addLabel="Ajouter au sac"
+                                     emptyLabel="Vider le sac"
+                                     i18n-addLabel i18n-emptyLabel
+                                     i18n-label
+                                     i18n-removeLabel label="Sac"
+                                     removeLabel="Retirer du sac">
         </mho-list-element-add-remove>
     </div>
 </ng-template>
@@ -543,16 +544,16 @@
 <ng-template #coffreContent let-row>
     <div class="chest">
         <mho-list-element-add-remove withQuantity
-            (add)="addChestItem(row.id, +$event)"
-            (empty)="emptyChest(row.id)"
-            (remove)="removeChestItem(row.id, +$event)" [currentList]="row.chest?.items || []"
-            [lists]="chest_lists"
-            [readonly]="is_readonly()" addLabel="Ajouter au coffre"
-            emptyLabel="Vider le coffre"
-            i18n-addLabel i18n-emptyLabel
-            i18n-label
-            i18n-removeLabel label="Coffre"
-            removeLabel="Retirer du coffre">
+                                     (add)="addChestItem(row.id, +$event)"
+                                     (empty)="emptyChest(row.id)"
+                                     (remove)="removeChestItem(row.id, +$event)" [currentList]="row.chest?.items || []"
+                                     [lists]="chest_lists"
+                                     [readonly]="is_readonly()" addLabel="Ajouter au coffre"
+                                     emptyLabel="Vider le coffre"
+                                     i18n-addLabel i18n-emptyLabel
+                                     i18n-label
+                                     i18n-removeLabel label="Coffre"
+                                     removeLabel="Retirer du coffre">
         </mho-list-element-add-remove>
     </div>
 </ng-template>

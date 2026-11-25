@@ -1,31 +1,49 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { computed, DestroyRef, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { computed, DestroyRef, effect, inject, Injectable, Signal, signal, untracked, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { filter, forkJoin, Observable } from 'rxjs';
+import { Router } from '@angular/router';
+import { filter, forkJoin, Observable, take } from 'rxjs';
 
+import { JobEnum } from '../../_abstract_model/enum/job.enum';
 import { PlanLockDTO } from '../../_abstract_model/realtime-services/realtime-building-plans.service';
 import { RealtimeNightwatchPlansService } from '../../_abstract_model/realtime-services/realtime-nightwatch-plans.service';
+import { ApiService } from '../../_abstract_model/services/api.service';
+import { BuildingPlanService } from '../../_abstract_model/services/building-plan.service';
 import { NightwatchPlanService } from '../../_abstract_model/services/nightwatch-plan.service';
+import { TownService } from '../../_abstract_model/services/town.service';
+import { Building } from '../../_abstract_model/types/building.class';
+import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
+import { Item } from '../../_abstract_model/types/item.class';
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
+import { currentDeepLinkId, DEEP_LINK_PARAMS, replaceDeepLinkParams } from '../../_core/utilities/deep-link.util';
 import { getTown, getUserId } from '../../_core/utilities/localstorage.util';
+import { plannableDays } from '../../_shared/day-selector/plannable-days';
 import { simulatedNightwatchCitizens } from '../../pre-town/simulated-citizens.util';
+import { BuildingPlanDTO, BuildingPlansDTO, BuildingPlanStateDTO, TownDefenseStateDTO } from '../buildings/planning/plan.types';
 import { PlanConflict, PlanLockState, PlanSaveState } from '../buildings/planning/planning.store';
 import {
     emptyNightwatchContent,
     NightwatchCitizenStateDTO,
+    NightwatchCityDefenseDTO,
+    NightwatchItemDefDTO,
     NightwatchPlanContentDTO,
     NightwatchPlanDTO,
     NightwatchPlanRequestDTO,
     NightwatchPlansDTO,
     NightwatchReferentialDTO,
+    NightwatchSimulationDTO,
+    NightwatchSimulationRequestDTO,
     NightwatchStateDTO,
     NightwatchWatcherDTO
 } from './nightwatch.types';
 import { NightwatchAttackService } from './nightwatch-attack.service';
 import { compareTotals, compareWatchers, WatcherGap } from './nightwatch-compare.util';
 import {
+    buildingFlags,
     deathRisk,
+    itemDefense,
     NightwatchContext,
     PlannedWatcher,
     RealWatcher,
@@ -37,10 +55,17 @@ import {
     watcherCap,
     watcherDefense
 } from './nightwatch-model.util';
+import { PlannedBuildings, plannedBuildings, RealBuildings } from './nightwatch-planned-buildings.util';
+import {
+    CityDefenseValues,
+    offeredCapacity,
+    remainingStock,
+    remainingToCover,
+    resolvedCityDefense,
+    simulationPastWatches,
+    verdict
+} from './nightwatch-simulation.util';
 import { ChestStock, computeCost, computeStock, CostSummary, StockLine, StockSources } from './nightwatch-stock.util';
-
-/** Nombre de jours futurs proposés en plus d'aujourd'hui. */
-const FUTURE_DAYS: number = 7;
 
 /** Délai d'enregistrement automatique après la dernière modification de la copie de travail. */
 export const NIGHTWATCH_AUTOSAVE_DELAY_MS: number = 400;
@@ -53,6 +78,36 @@ export const STALE_CHEST_HOURS: number = 24;
 
 /** Statuts du plan sans équivalent dans l'état réel (chien) : repris tels quels du plan pour le réel. */
 export const PLAN_ONLY_STATUSES: readonly string[] = ['dog', 'dogSteak'];
+
+/** Plafond des saisies numériques entières (limite de l'API). */
+const MAX_INPUT: number = 100000;
+
+/**
+ * Saisie numérique bornée : nul conservé, plancher 0, plafond, arrondie à l'entier sauf mention contraire.
+ * @param {number | null} value Saisie.
+ * @param {number} max Plafond.
+ * @param {boolean} integer Arrondir à l'entier.
+ * @returns {number | null} Valeur bornée.
+ */
+function clampInput(value: number | null, max: number, integer: boolean = true): number | null {
+    if (value === null) {
+        return null;
+    }
+    return Math.min(max, Math.max(0, integer ? Math.round(value) : value));
+}
+
+/**
+ * Poste de défense borné : coefficient FDD décimal plafonné à 10, niveau AD inchangé (-1 = non construit), les autres entiers.
+ * @param {keyof NightwatchCityDefenseDTO} field Poste.
+ * @param {number | null} value Saisie.
+ * @returns {number | null} Valeur bornée.
+ */
+function cityDefenseInput(field: keyof NightwatchCityDefenseDTO, value: number | null): number | null {
+    if (field === 'adLevel') {
+        return value;
+    }
+    return field === 'fddCoefficient' ? clampInput(value, 10, false) : clampInput(value, MAX_INPUT);
+}
 
 /** Goule forcée dans le plan. */
 const GHOUL_KEY: string = 'ghoul';
@@ -106,6 +161,49 @@ export interface NightwatchTotals {
     cap: number;
 }
 
+/** Places de sac et encombrants offerts par les veilleurs d'un jour. */
+export type OfferedCapacity = ReturnType<typeof offeredCapacity>;
+
+/** Verdict de couverture d'un jour de simulation. */
+export type SimulationVerdict = ReturnType<typeof verdict>;
+
+/** Veilleur d'un jour de simulation. */
+export interface SimulationWatcherView {
+    user_id: number;
+    risk: number;
+    defense: number;
+}
+
+/** Calculs d'un jour de la simulation sélectionnée ; reste et verdict nuls tant que l'attaque est inconnue. */
+export interface SimulationDayView {
+    day: number;
+    plan_id: number;
+    attack: number | null;
+    defense: CityDefenseValues;
+    remaining: number | null;
+    watch_defense: number;
+    offered: OfferedCapacity;
+    stock: Record<number, number>;
+    verdict: SimulationVerdict | null;
+    watchers: SimulationWatcherView[];
+}
+
+/**
+ * Défense des objets du stuff global qu'aucun veilleur ne porte.
+ * @param {NightwatchPlanContentDTO} content Contenu de la proposition.
+ * @param {NightwatchContext} ctx Contexte de calcul du jour.
+ * @returns {number} Défense de veille des objets non attribués.
+ */
+function unassignedDefense(content: NightwatchPlanContentDTO, ctx: NightwatchContext): number {
+    let defense: number = 0;
+    for (const [id, quantity] of Object.entries(content.globalItems ?? {})) {
+        const item_id: number = Number(id);
+        const assigned: number = content.watchers.reduce((sum: number, watcher: NightwatchWatcherDTO): number => sum + (watcher.items[item_id] ?? 0), 0);
+        defense += Math.max(0, quantity - assigned) * itemDefense(item_id, ctx);
+    }
+    return defense;
+}
+
 /**
  * Copie profonde d'un contenu de plan.
  * @param {NightwatchPlanContentDTO} content Contenu à copier.
@@ -128,6 +226,20 @@ export class NightwatchStore {
     private readonly snackbar: SnackbarService = inject(SnackbarService);
     private readonly attack_service: NightwatchAttackService = inject(NightwatchAttackService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly building_plan_service: BuildingPlanService = inject(BuildingPlanService);
+    private readonly api: ApiService = inject(ApiService);
+    private readonly router: Router = inject(Router);
+    private readonly town_service: TownService = inject(TownService);
+    /** Niveau Endurant MHO de chaque citoyen (taille du sac) ; vide tant que les citoyens ne sont pas chargés. */
+    private readonly endurance_levels: WritableSignal<ReadonlyMap<number, number | null>> = signal<ReadonlyMap<number, number | null>>(new Map<number, number | null>());
+    /** Propositions de Chantiers de la ville ; vides tant qu'elles manquent. */
+    private readonly building_plans: WritableSignal<BuildingPlanDTO[]> = signal<BuildingPlanDTO[]>([]);
+    /** Uid de chaque chantier, par identifiant ; nul tant que le référentiel manque. */
+    private readonly building_uids: WritableSignal<ReadonlyMap<number, string> | null> = signal<ReadonlyMap<number, string> | null>(null);
+    /** Défense de chaque chantier, par uid ; vide tant que le référentiel manque. */
+    private readonly building_defences: WritableSignal<ReadonlyMap<string, number>> = signal<ReadonlyMap<string, number>>(new Map<string, number>());
+    /** Uid de chaque objet, par identifiant ; vide tant que le catalogue manque. */
+    private readonly item_uids: WritableSignal<ReadonlyMap<number, string>> = signal<ReadonlyMap<number, string>>(new Map<number, string>());
 
     private readonly _loading: WritableSignal<boolean> = signal(false);
     private readonly _load_failed: WritableSignal<boolean> = signal(false);
@@ -135,6 +247,15 @@ export class NightwatchStore {
     private readonly plans_dto: WritableSignal<NightwatchPlansDTO | null> = signal(null);
     private readonly _referential: WritableSignal<NightwatchReferentialDTO | null> = signal(null);
     private readonly _state: WritableSignal<NightwatchStateDTO | null> = signal(null);
+    /** État du jour courant relevé à l'ouverture : veilles réelles et banque des simulations (l'état d'un autre jour compte ses plans effectifs). */
+    private readonly today_state: WritableSignal<NightwatchStateDTO | null> = signal<NightwatchStateDTO | null>(null);
+    /** Défense réelle de la ville poste par poste ; nulle tant qu'elle manque. */
+    private readonly town_defense: WritableSignal<TownDefenseStateDTO | null> = signal<TownDefenseStateDTO | null>(null);
+    /** Attaque lue par jour pour les simulations. */
+    private readonly simulation_attacks: WritableSignal<ReadonlyMap<number, number | null>> = signal<ReadonlyMap<number, number | null>>(new Map<number, number | null>());
+    /** Jours dont l'attaque a déjà été demandée. */
+    private readonly requested_attack_days: Set<number> = new Set<number>();
+    private readonly _selected_simulation_id: WritableSignal<number | null> = signal<number | null>(null);
     private readonly _estimated_attack: WritableSignal<number | null> = signal<number | null>(null);
     private readonly _selected_day: WritableSignal<number> = signal(getTown()?.day ?? 1);
     private readonly selected_plan_id: WritableSignal<number | null> = signal(null);
@@ -155,6 +276,10 @@ export class NightwatchStore {
     /** Incrémenté à chaque remplacement de la copie de travail : une réponse tardive ne touche pas à la suivante. */
     private draft_epoch: number = 0;
     private creating: boolean = false;
+    /** Enregistrement d'une simulation en cours : un seul à la fois. */
+    private simulation_saving: boolean = false;
+    /** Modification de simulation arrivée pendant un enregistrement, à renvoyer ensuite. */
+    private simulation_save_pending: boolean = false;
 
     public readonly current_day: number = getTown()?.day ?? 1;
 
@@ -164,6 +289,10 @@ export class NightwatchStore {
     public readonly load_failed: Signal<boolean> = this._load_failed.asReadonly();
     public readonly conflict: Signal<PlanConflict | null> = this._conflict.asReadonly();
     public readonly selected_day: Signal<number> = this._selected_day.asReadonly();
+
+    private readonly _copied_items: WritableSignal<Record<number, number> | null> = signal<Record<number, number> | null>(null);
+    /** Stuff copié par « Copier le stuff », nul tant que rien n'a été copié. */
+    public readonly copied_items: Signal<Record<number, number> | null> = this._copied_items.asReadonly();
     public readonly draft: Signal<NightwatchPlanContentDTO | null> = this._draft.asReadonly();
     public readonly dirty: Signal<boolean> = this._dirty.asReadonly();
     public readonly save_state: Signal<PlanSaveState> = this._save_state.asReadonly();
@@ -176,6 +305,18 @@ export class NightwatchStore {
     /** Propositions de la ville. */
     public readonly plans: Signal<NightwatchPlanDTO[]> = computed((): NightwatchPlanDTO[] => this.plans_dto()?.plans ?? []);
 
+    /** Simulations de la ville. */
+    public readonly simulations: Signal<NightwatchSimulationDTO[]> = computed((): NightwatchSimulationDTO[] => this.plans_dto()?.simulations ?? []);
+
+    public readonly selected_simulation_id: Signal<number | null> = this._selected_simulation_id.asReadonly();
+
+    private readonly selected_simulation: Signal<NightwatchSimulationDTO | null> = computed((): NightwatchSimulationDTO | null =>
+        this.simulations().find((simulation: NightwatchSimulationDTO): boolean => simulation.id === this._selected_simulation_id()) ?? null);
+
+    /** Modification des simulations : citoyen hors mode observateur, quel que soit le jour affiché. */
+    public readonly can_edit_simulations: Signal<boolean> = computed((): boolean =>
+        this.plans_dto()?.access.canEdit === true && !this.town_context.isReadonly());
+
     /** Droit d'écriture, main mise à part : citoyen, hors mode observateur, sur aujourd'hui ou un jour à venir (jour passé : lecture seule). */
     public readonly can_write: Signal<boolean> = computed((): boolean =>
         this.plans_dto()?.access.canEdit === true && !this.town_context.isReadonly() && this._selected_day() >= this.current_day);
@@ -186,24 +327,33 @@ export class NightwatchStore {
     /** Jour modifiable sans proposition : la création est proposée. */
     public readonly can_create: Signal<boolean> = computed((): boolean => this.can_write() && this.plans_of_day().length === 0);
 
-    /** Jours proposés : d'aujourd'hui à aujourd'hui + 7 (ou au lendemain du jour affiché), plus les jours passés qui ont une proposition. */
-    public readonly days: Signal<number[]> = computed((): number[] => {
-        const days: Set<number> = new Set<number>();
-        const last_day: number = Math.max(this.current_day + FUTURE_DAYS, this._selected_day() + 1);
-        for (let day: number = this.current_day; day <= last_day; day++) {
-            days.add(day);
-        }
-        for (const plan of this.plans()) {
-            days.add(plan.day);
-        }
-        return Array.from(days).sort((a: number, b: number): number => a - b);
-    });
+    /** Jours proposés : voir `plannableDays`. */
+    public readonly days: Signal<number[]> = computed((): number[] =>
+        plannableDays(this.current_day, this.plans().map((plan: NightwatchPlanDTO): number => plan.day)));
 
     public readonly plans_of_day: Signal<NightwatchPlanDTO[]> = computed((): NightwatchPlanDTO[] =>
         this.plans().filter((plan: NightwatchPlanDTO): boolean => plan.day === this._selected_day()));
 
     public readonly selected_plan: Signal<NightwatchPlanDTO | null> = computed((): NightwatchPlanDTO | null =>
         this.plans_of_day().find((plan: NightwatchPlanDTO): boolean => plan.id === this.selected_plan_id()) ?? null);
+
+    /**
+     * Chantiers au soir du jour affiché d'après les propositions de Chantiers (relues à l'ouverture et à chaque changement de jour) ;
+     * nul pour un jour passé ou tant que le référentiel des chantiers manque.
+     */
+    public readonly planned_buildings: Signal<PlannedBuildings | null> = computed((): PlannedBuildings | null => {
+        const uids: ReadonlyMap<number, string> | null = this.building_uids();
+        const state: NightwatchStateDTO | null = this._state();
+        if (uids === null || state === null) {
+            return null;
+        }
+        const real: RealBuildings = { built_uids: state.builtBuildingUids, round_path_level: state.roundPathLevel };
+        return plannedBuildings(this.building_plans(), uids, real, this.current_day, this._selected_day(), this._draft()?.buildingPlanId ?? null);
+    });
+
+    /** Propositions de Chantiers du jour affiché, dont la veille peut retenir une. */
+    public readonly building_plans_of_day: Signal<BuildingPlanDTO[]> = computed((): BuildingPlanDTO[] =>
+        this.building_plans().filter((plan: BuildingPlanDTO): boolean => plan.day === this._selected_day()));
 
     /** Contexte de calcul ; nul tant que le référentiel et l'état ne sont pas chargés. */
     private readonly context: Signal<NightwatchContext | null> = computed((): NightwatchContext | null => {
@@ -212,10 +362,7 @@ export class NightwatchStore {
         return referential === null || state === null ? null : {
             referential,
             town_is_panda: state.townIsPanda,
-            round_path_level: state.roundPathLevel,
-            has_guard_room: state.hasGuardRoom,
-            has_sprinkler: state.hasSprinkler,
-            built_building_uids: new Set<string>(state.builtBuildingUids)
+            ...buildingFlags(state, this.planned_buildings())
         };
     });
 
@@ -226,17 +373,65 @@ export class NightwatchStore {
     /** Veilleurs du brouillon tels que prévus. */
     private readonly planned: Signal<PlannedWatcher[]> = computed((): PlannedWatcher[] => {
         const state: NightwatchStateDTO | null = this._state();
-        return (this._draft()?.watchers ?? []).map((watcher: NightwatchWatcherDTO): PlannedWatcher => ({
-            user_id: watcher.userId,
-            items: watcher.items,
-            items_broken: {},
-            statuses: watcher.statuses.filter((status: string): boolean => status !== NOT_GHOUL_KEY),
-            is_ghoul: plannedGhoul(watcher.statuses, this.citizenState(watcher.userId)?.isGhoul === true),
-            past_watches: watcher.pastWatches ?? state?.pastWatches[watcher.userId] ?? 0,
-            is_pro: false,
-            hero_bonus: 0,
-            baths: 0
-        }));
+        const simulation_id: number | null | undefined = this.selected_plan()?.simulationId;
+        const day: number = this._selected_day();
+        return (this._draft()?.watchers ?? []).map((watcher: NightwatchWatcherDTO): PlannedWatcher => {
+            const past: number = simulation_id === null || simulation_id === undefined
+                ? state?.pastWatches[watcher.userId] ?? 0
+                : this.simulationPast(simulation_id, day, watcher.userId);
+            return this.plannedWatcher(watcher, watcher.pastWatches ?? past);
+        });
+    });
+
+    /** Jours de la simulation sélectionnée. */
+    public readonly simulation_days: Signal<SimulationDayView[]> = computed((): SimulationDayView[] => {
+        const simulation: NightwatchSimulationDTO | null = this.selected_simulation();
+        const referential: NightwatchReferentialDTO | null = this._referential();
+        const state: NightwatchStateDTO | null = this._state();
+        if (simulation === null || referential === null || state === null) {
+            return [];
+        }
+        const days: NightwatchPlanDTO[] = this.simulationPlans(simulation.id);
+        const prefill: CityDefenseValues = this.defensePrefill();
+        const planned_of_days: (PlannedBuildings | null)[] = days.map((plan: NightwatchPlanDTO): PlannedBuildings | null =>
+            this.plannedOfDay(state, plan.day, plan.content.buildingPlanId ?? null));
+        const defenses: CityDefenseValues[] = resolvedCityDefense(days, planned_of_days.map((planned: PlannedBuildings | null): CityDefenseValues =>
+            ({ ...prefill, buildings: prefill.buildings + this.plannedBuildingsDefence(state, planned) })));
+        const item_uids: ReadonlyMap<number, string> = this.item_uids();
+        const single_use_ids: ReadonlySet<number> = new Set<number>(Object.entries(referential.items)
+            .filter(([, def]: [string, NightwatchItemDefDTO]): boolean => def.usage === 'single')
+            .map(([id]: [string, NightwatchItemDefDTO]): number => Number(id)));
+        const attacks: ReadonlyMap<number, number | null> = this.simulation_attacks();
+        return days.map((plan: NightwatchPlanDTO, index: number): SimulationDayView => {
+            const ctx: NightwatchContext = { referential, town_is_panda: state.townIsPanda, ...buildingFlags(state, planned_of_days[index]) };
+            const discourse: boolean = plan.content.watchers.some((watcher: NightwatchWatcherDTO): boolean => watcher.hasDiscourse);
+            const watchers: SimulationWatcherView[] = plan.content.watchers.map((watcher: NightwatchWatcherDTO): SimulationWatcherView => {
+                const input: PlannedWatcher = this.plannedWatcher(watcher, watcher.pastWatches ?? this.simulationPast(simulation.id, plan.day, watcher.userId));
+                return { user_id: watcher.userId, risk: deathRisk(input, ctx), defense: watcherDefense(input, ctx, discourse) };
+            });
+            const watchers_defense: number = townWatchDefense(watchers.map((watcher: SimulationWatcherView): number => watcher.defense));
+            const watch_defense: number = watchers_defense + unassignedDefense(plan.content, ctx);
+            const attack: number | null = plan.content.attackOverride ?? attacks.get(plan.day) ?? null;
+            const remaining: number | null = attack === null ? null : remainingToCover(attack, defenses[index], plan.content);
+            return {
+                day: plan.day,
+                plan_id: plan.id,
+                attack,
+                defense: defenses[index],
+                remaining,
+                watch_defense,
+                offered: offeredCapacity(plan.content.watchers.map((watcher: NightwatchWatcherDTO): Parameters<typeof offeredCapacity>[0][number] => ({
+                    endurance_level: this.enduranceLevel(watcher.userId),
+                    item_uids: Object.keys(watcher.items)
+                        .map((id: string): string | undefined => item_uids.get(Number(id)))
+                        .filter((uid: string | undefined): uid is string => uid !== undefined),
+                    is_guardian: this.citizenState(watcher.userId)?.jobUid === JobEnum.GUARDIAN.key
+                }))),
+                stock: remainingStock(simulation.stock, days, plan.day, single_use_ids),
+                verdict: remaining === null ? null : verdict(remaining, watch_defense, watchers.length === 0 ? 0 : watchers_defense / watchers.length),
+                watchers
+            };
+        });
     });
 
     /** État réel des veilleurs du brouillon ; les statuts chien sont repris du plan. */
@@ -339,6 +534,14 @@ export class NightwatchStore {
 
     /** Suit les événements temps réel ; la main tenue est libérée à la destruction du store. */
     public constructor() {
+        // L'URL suit le jour et la proposition affichés (lien partageable), une fois les propositions chargées.
+        effect((): void => {
+            const day: number = this._selected_day();
+            const plan_id: number | null = this.selected_plan_id();
+            if (this.plans_dto() !== null) {
+                untracked((): void => replaceDeepLinkParams(this.router, { [DEEP_LINK_PARAMS.day]: day, [DEEP_LINK_PARAMS.plan]: plan_id }));
+            }
+        });
         this.destroy_ref.onDestroy((): void => {
             void this.leavePlan(true);
         });
@@ -346,6 +549,7 @@ export class NightwatchStore {
         this.follow(this.realtime.plan_deleted$, (plan_id: number): void => this.onPlanDeleted(plan_id));
         this.follow(this.realtime.plan_effective_changed$, (plan: NightwatchPlanDTO): void => this.markEffective(plan));
         this.follow(this.realtime.plan_lock_changed$, (lock: PlanLockDTO): void => this.onLockChanged(lock));
+        this.follow(this.realtime.simulations_changed$, (): void => this.reloadPlans());
         this.follow(this.realtime.reconnected$, (): void => {
             void this.onReconnected();
         });
@@ -374,9 +578,16 @@ export class NightwatchStore {
                 this.plans_dto.set(data.plans);
                 this._referential.set(data.referential);
                 this._state.set(this.withSimulatedCitizens(data.state));
+                this.today_state.set(this._state());
                 this._selected_day.set(this.current_day);
                 this.selectPlanForDay(this.current_day);
                 this.loadAttack(this.current_day);
+                this.loadBuildingPlans();
+                this.loadTownDefense();
+                this.loadItemUids();
+                this.loadBuildingUids();
+                this.loadEnduranceLevels();
+                this.openDeepLink();
                 this._loading.set(false);
                 // Le hub suit la ville du jeton reçu à l'ouverture de la connexion : la remettre à jour avant de relire les mains.
                 void this.realtime.ensureTown().then((): Promise<void> => this.refreshLocks()).catch((error: unknown): void => console.warn('EnsureTown', error));
@@ -397,6 +608,7 @@ export class NightwatchStore {
         this._selected_day.set(day);
         this.selectPlanForDay(day);
         this.loadAttack(day);
+        this.loadBuildingPlans();
         this.plan_service.getState(day, this.map_id).subscribe({
             next: (state: NightwatchStateDTO): void => {
                 if (this._selected_day() === day) {
@@ -410,6 +622,443 @@ export class NightwatchStore {
                     this.snackbar.errorSnackbar($localize`Impossible de lire l'état de la ville pour ce jour`);
                 }
             }
+        });
+    }
+
+    /** Ouvre le jour et la proposition demandés par le lien de la page (`?day=&plan=`), s'ils existent. */
+    private openDeepLink(): void {
+        const day: number | null = currentDeepLinkId(this.router, DEEP_LINK_PARAMS.day);
+        if (day !== null && day !== this._selected_day() && this.days().includes(day)) {
+            this.selectDay(day);
+        }
+        const plan_id: number | null = currentDeepLinkId(this.router, DEEP_LINK_PARAMS.plan);
+        if (plan_id !== null && plan_id !== this.selected_plan_id() && this.plans_of_day().some((plan: NightwatchPlanDTO): boolean => plan.id === plan_id)) {
+            this.selectPlan(plan_id);
+        }
+    }
+
+    /** Relit les propositions de Chantiers ; sans elles, rien n'est prévu. */
+    private loadBuildingPlans(): void {
+        this.building_plan_service.getPlans(this.map_id).pipe(take(1), takeUntilDestroyed(this.destroy_ref)).subscribe({
+            next: (dto: BuildingPlansDTO): void => this.building_plans.set(dto.plans),
+            error: (error: unknown): void => console.warn('Chantiers indisponibles pour la veille', error)
+        });
+    }
+
+    /** Lit la défense réelle de la ville ; sans elle, les postes des simulations partent de 0. */
+    private loadTownDefense(): void {
+        this.building_plan_service.getState(true, this.map_id).pipe(take(1), takeUntilDestroyed(this.destroy_ref)).subscribe({
+            next: (state: BuildingPlanStateDTO): void => this.town_defense.set(state.defense),
+            error: (error: unknown): void => console.warn('Défense de la ville indisponible pour les simulations', error)
+        });
+    }
+
+    /**
+     * Pré-remplissage de la défense des simulations : défense réelle de la ville, la veille exclue.
+     * @returns {CityDefenseValues} Postes du premier jour sans saisie.
+     */
+    private defensePrefill(): CityDefenseValues {
+        const defense: TownDefenseStateDTO | null = this.town_defense();
+        return {
+            wall: defense?.base ?? 0,
+            bankDefenseItems: defense?.items ?? 0,
+            // Coefficient inconnu : les ODs comptent pour leur valeur brute.
+            fddCoefficient: defense?.itemsMul ?? 1,
+            homes: defense?.citizenHomes ?? 0,
+            guardians: defense?.citizenGuardians ?? 0,
+            souls: defense?.souls ?? 0,
+            cemetery: defense?.cadavers ?? 0,
+            buildings: defense?.buildings ?? 0,
+            upgrades: defense?.upgrades ?? 0,
+            guardTowerPa: 0,
+            eveningVote: 0,
+            dumpContribution: 0,
+            adLevel: -1
+        };
+    }
+
+    /**
+     * Chantiers au soir d'un jour d'après les propositions de Chantiers.
+     * @param {NightwatchStateDTO} state État réel.
+     * @param {number} day Jour.
+     * @param {number | null} building_plan_id Proposition de Chantiers retenue ; nulle = l'effective.
+     * @returns {PlannedBuildings | null} Chantiers prévus ; nuls pour un jour passé ou sans référentiel des chantiers.
+     */
+    private plannedOfDay(state: NightwatchStateDTO, day: number, building_plan_id: number | null): PlannedBuildings | null {
+        const uids: ReadonlyMap<number, string> | null = this.building_uids();
+        const real: RealBuildings = { built_uids: state.builtBuildingUids, round_path_level: state.roundPathLevel };
+        return uids === null ? null : plannedBuildings(this.building_plans(), uids, real, this.current_day, day, building_plan_id);
+    }
+
+    /**
+     * Défense des chantiers prévus mais pas encore construits.
+     * @param {NightwatchStateDTO} state État réel.
+     * @param {PlannedBuildings | null} planned Chantiers prévus au soir du jour.
+     * @returns {number} Défense ajoutée à celle des chantiers réels.
+     */
+    private plannedBuildingsDefence(state: NightwatchStateDTO, planned: PlannedBuildings | null): number {
+        if (planned === null) {
+            return 0;
+        }
+        const defences: ReadonlyMap<string, number> = this.building_defences();
+        let defence: number = 0;
+        for (const uid of planned.built_uids) {
+            if (!state.builtBuildingUids.includes(uid)) {
+                defence += defences.get(uid) ?? 0;
+            }
+        }
+        return defence;
+    }
+
+    /** Charge le catalogue des objets (uid par identifiant) ; sans lui, les extensions de sac sont ignorées. */
+    private loadItemUids(): void {
+        this.api.getItems().pipe(take(1), takeUntilDestroyed(this.destroy_ref)).subscribe({
+            next: (items: Item[]): void => this.item_uids.set(new Map<number, string>(items.map((item: Item): [number, string] => [item.id, item.uid]))),
+            error: (error: unknown): void => console.warn('Catalogue des objets indisponible pour les simulations', error)
+        });
+    }
+
+    /**
+     * Veilleur tel que prévu pour le calcul.
+     * @param {NightwatchWatcherDTO} watcher Veilleur de la proposition.
+     * @param {number} past_watches Veilles passées retenues.
+     * @returns {PlannedWatcher} Entrée du moteur.
+     */
+    private plannedWatcher(watcher: NightwatchWatcherDTO, past_watches: number): PlannedWatcher {
+        return {
+            user_id: watcher.userId,
+            items: watcher.items,
+            items_broken: {},
+            statuses: watcher.statuses.filter((status: string): boolean => status !== NOT_GHOUL_KEY),
+            is_ghoul: plannedGhoul(watcher.statuses, this.citizenState(watcher.userId)?.isGhoul === true),
+            past_watches,
+            is_pro: false,
+            hero_bonus: 0,
+            baths: 0
+        };
+    }
+
+    /**
+     * Propositions d'une simulation par jour croissant ; la proposition sélectionnée y figure avec sa copie de travail.
+     * @param {number} simulation_id Simulation.
+     * @returns {NightwatchPlanDTO[]} Propositions.
+     */
+    private simulationPlans(simulation_id: number): NightwatchPlanDTO[] {
+        const draft: NightwatchPlanContentDTO | null = this._draft();
+        const selected_id: number | null = this.selected_plan_id();
+        return this.plans()
+            .filter((plan: NightwatchPlanDTO): boolean => plan.simulationId === simulation_id)
+            .map((plan: NightwatchPlanDTO): NightwatchPlanDTO => (plan.id === selected_id && draft !== null ? { ...plan, content: draft } : plan))
+            .sort((a: NightwatchPlanDTO, b: NightwatchPlanDTO): number => a.day - b.day);
+    }
+
+    /**
+     * Veilles passées d'un citoyen dans une simulation : réelles au jour courant plus celles de la simulation entre le jour courant et le jour considéré.
+     * @param {number} simulation_id Simulation.
+     * @param {number} day Jour considéré.
+     * @param {number} user_id Citoyen.
+     * @returns {number} Nombre de veilles.
+     */
+    private simulationPast(simulation_id: number, day: number, user_id: number): number {
+        return simulationPastWatches(this.simulationPlans(simulation_id), day, user_id, this.today_state()?.pastWatches[user_id] ?? 0, this.current_day);
+    }
+
+    /**
+     * Proposition d'une simulation pour un jour.
+     * @param {number} simulation_id Simulation.
+     * @param {number} day Jour.
+     * @returns {NightwatchPlanDTO | undefined} Proposition, absente hors des jours de la simulation.
+     */
+    private simulationPlanOfDay(simulation_id: number, day: number): NightwatchPlanDTO | undefined {
+        return this.plans().find((plan: NightwatchPlanDTO): boolean => plan.simulationId === simulation_id && plan.day === day);
+    }
+
+    /** Lit l'attaque des jours de la simulation sélectionnée pas encore demandés. */
+    private loadSimulationAttacks(): void {
+        const simulation_id: number | null = this._selected_simulation_id();
+        if (simulation_id === null) {
+            return;
+        }
+        for (const plan of this.simulationPlans(simulation_id)) {
+            const day: number = plan.day;
+            if (this.requested_attack_days.has(day)) {
+                continue;
+            }
+            this.requested_attack_days.add(day);
+            this.attack_service.attackOfDay(day).pipe(takeUntilDestroyed(this.destroy_ref)).subscribe((attack: number | null): void => {
+                this.simulation_attacks.update((attacks: ReadonlyMap<number, number | null>): ReadonlyMap<number, number | null> =>
+                    new Map<number, number | null>(attacks).set(day, attack));
+            });
+        }
+    }
+
+    /**
+     * Sélectionne une simulation et sa proposition du jour affiché (jour courant si elle ne couvre pas le jour affiché) ;
+     * sans simulation, revient à la proposition effective du jour.
+     * @param {number | null} simulation_id Simulation ; nulle pour n'en suivre aucune.
+     */
+    public selectSimulation(simulation_id: number | null): void {
+        this._selected_simulation_id.set(simulation_id);
+        this.loadSimulationAttacks();
+        const day: number = this._selected_day();
+        if (simulation_id !== null && this.simulationPlanOfDay(simulation_id, day) === undefined && day !== this.current_day) {
+            this.selectDay(this.current_day);
+            return;
+        }
+        const plan: NightwatchPlanDTO | undefined = simulation_id === null ? this.planOfDay(day) : this.simulationPlanOfDay(simulation_id, day);
+        if (plan !== undefined && plan.id !== this.selected_plan_id()) {
+            this.selectPlan(plan.id);
+        }
+    }
+
+    /**
+     * Crée une simulation jusqu'au dernier jour à défendre, stock de départ = banque, puis l'ouvre.
+     * @param {string} name Nom.
+     * @param {number} last_day Dernier jour à défendre.
+     */
+    public createSimulation(name: string, last_day: number): void {
+        if (!this.can_edit_simulations()) {
+            return;
+        }
+        const request: NightwatchSimulationRequestDTO = { name, lastDay: last_day, stock: { ...(this.today_state()?.bank ?? {}) } };
+        this.plan_service.saveSimulation(request, this.realtime.connectionId(), this.map_id).subscribe({
+            next: (saved: NightwatchSimulationDTO): void => this.reloadPlans(saved.id),
+            error: (): void => this.reloadPlans()
+        });
+    }
+
+    /**
+     * Renomme la simulation sélectionnée.
+     * @param {string} name Nouveau nom (rogné ; vide = ignoré).
+     */
+    public renameSimulation(name: string): void {
+        const trimmed: string = name.trim();
+        if (trimmed !== '') {
+            this.updateSimulation({ name: trimmed });
+        }
+    }
+
+    /**
+     * Change le dernier jour à défendre ; le serveur crée ou supprime les propositions concernées.
+     * @param {number} last_day Dernier jour.
+     */
+    public setSimulationLastDay(last_day: number): void {
+        this.updateSimulation({ lastDay: last_day });
+    }
+
+    /**
+     * Quantité d'un objet du stock de départ ; une quantité nulle le retire.
+     * @param {number} item_id Objet.
+     * @param {number} quantity Quantité.
+     */
+    public setSimulationStock(item_id: number, quantity: number): void {
+        const stock: Record<number, number> = { ...(this.selected_simulation()?.stock ?? {}) };
+        if (quantity > 0) {
+            stock[item_id] = quantity;
+        } else {
+            delete stock[item_id];
+        }
+        this.updateSimulation({ stock });
+    }
+
+    /** Vide le stock de départ en un seul enregistrement. */
+    public clearSimulationStock(): void {
+        this.updateSimulation({ stock: {} });
+    }
+
+    /**
+     * Duplique la simulation sélectionnée (avec ses propositions) et ouvre la copie.
+     * @param {string} name Nom de la copie.
+     */
+    public duplicateSimulation(name: string): void {
+        const simulation: NightwatchSimulationDTO | null = this.selected_simulation();
+        if (!this.can_edit_simulations() || simulation === null) {
+            return;
+        }
+        this.plan_service.duplicateSimulation(simulation.id, name, this.realtime.connectionId(), this.map_id).subscribe({
+            next: (copy: NightwatchSimulationDTO): void => this.reloadPlans(copy.id),
+            error: (): void => this.reloadPlans()
+        });
+    }
+
+    /** Supprime la simulation sélectionnée ; ses propositions effectives restent, détachées. */
+    public deleteSimulation(): void {
+        const simulation: NightwatchSimulationDTO | null = this.selected_simulation();
+        if (!this.can_edit_simulations() || simulation === null) {
+            return;
+        }
+        this.plan_service.deleteSimulation(simulation.id, this.realtime.connectionId(), this.map_id).subscribe({
+            next: (): void => {
+                this._selected_simulation_id.set(null);
+                this.reloadPlans();
+            },
+            error: (): void => this.reloadPlans()
+        });
+    }
+
+    /**
+     * Applique tout de suite la modification de la simulation sélectionnée, puis l'enregistre ; pendant un envoi, les modifications
+     * suivantes s'accumulent et repartent ensemble sur la version rendue.
+     * @param {Partial<Pick<NightwatchSimulationRequestDTO, 'name' | 'lastDay' | 'stock'>>} changes Champs modifiés.
+     */
+    private updateSimulation(changes: Partial<Pick<NightwatchSimulationRequestDTO, 'name' | 'lastDay' | 'stock'>>): void {
+        const simulation: NightwatchSimulationDTO | null = this.selected_simulation();
+        if (!this.can_edit_simulations() || simulation === null) {
+            return;
+        }
+        this.replaceSimulation({ ...simulation, ...changes });
+        if (this.simulation_saving) {
+            this.simulation_save_pending = true;
+            return;
+        }
+        this.sendSimulation(simulation.id);
+    }
+
+    /**
+     * Envoie l'état local d'une simulation ; enchaîne l'envoi suivant si des modifications sont arrivées entre-temps.
+     * @param {number} simulation_id Simulation.
+     */
+    private sendSimulation(simulation_id: number): void {
+        const simulation: NightwatchSimulationDTO | undefined = this.simulations().find((candidate: NightwatchSimulationDTO): boolean => candidate.id === simulation_id);
+        if (simulation === undefined) {
+            return;
+        }
+        this.simulation_saving = true;
+        this.simulation_save_pending = false;
+        const request: NightwatchSimulationRequestDTO = {
+            id: simulation.id, version: simulation.version, name: simulation.name, lastDay: simulation.lastDay, stock: simulation.stock
+        };
+        this.plan_service.saveSimulation(request, this.realtime.connectionId(), this.map_id).subscribe({
+            next: (saved: NightwatchSimulationDTO): void => {
+                this.simulation_saving = false;
+                if (this.simulation_save_pending) {
+                    const local: NightwatchSimulationDTO | undefined = this.simulations().find((candidate: NightwatchSimulationDTO): boolean => candidate.id === simulation_id);
+                    if (local !== undefined) {
+                        this.replaceSimulation({ ...local, version: saved.version });
+                    }
+                    this.sendSimulation(simulation_id);
+                    return;
+                }
+                this.reloadPlans();
+            },
+            error: (error: unknown): void => {
+                this.simulation_saving = false;
+                this.simulation_save_pending = false;
+                if (error instanceof HttpErrorResponse && error.status === 409) {
+                    this.snackbar.warningSnackbar($localize`La simulation a été modifiée entre-temps : elle a été rechargée.`);
+                }
+                this.reloadPlans();
+            }
+        });
+    }
+
+    /**
+     * Remplace localement une simulation de la liste (modification affichée avant son enregistrement).
+     * @param {NightwatchSimulationDTO} simulation Simulation modifiée.
+     */
+    private replaceSimulation(simulation: NightwatchSimulationDTO): void {
+        this.plans_dto.update((dto: NightwatchPlansDTO | null): NightwatchPlansDTO | null => dto === null ? null : {
+            ...dto,
+            simulations: (dto.simulations ?? []).map((candidate: NightwatchSimulationDTO): NightwatchSimulationDTO => candidate.id === simulation.id ? simulation : candidate)
+        });
+    }
+
+    /**
+     * Poste de défense de la ville saisi pour le jour ; nul = valeur reportée ou pré-remplie.
+     * @param {keyof NightwatchCityDefenseDTO} field Poste.
+     * @param {number | null} value Valeur.
+     */
+    public setCityDefense(field: keyof NightwatchCityDefenseDTO, value: number | null): void {
+        this.updateDraft((content: NightwatchPlanContentDTO): void => {
+            content.cityDefense = { ...(content.cityDefense ?? {}), [field]: cityDefenseInput(field, value) };
+        });
+    }
+
+    /**
+     * Quantité d'un objet du stuff global du jour, jamais sous le total attribué aux veilleurs ; une quantité nulle le retire.
+     * @param {number} item_id Objet.
+     * @param {number} quantity Quantité.
+     */
+    public setGlobalItem(item_id: number, quantity: number): void {
+        this.updateDraft((content: NightwatchPlanContentDTO): void => {
+            const globals: Record<number, number> = { ...(content.globalItems ?? {}) };
+            const assigned: number = content.watchers.reduce((sum: number, watcher: NightwatchWatcherDTO): number => sum + (watcher.items[item_id] ?? 0), 0);
+            const floored: number = Math.max(quantity, assigned);
+            if (floored > 0) {
+                globals[item_id] = floored;
+            } else {
+                delete globals[item_id];
+            }
+            content.globalItems = globals;
+        });
+    }
+
+    /**
+     * Débordement autorisé.
+     * @param {number | null} value Valeur, ou `null`.
+     */
+    public setAllowedOverflow(value: number | null): void {
+        this.updateDraft((content: NightwatchPlanContentDTO): void => {
+            content.allowedOverflow = clampInput(value, MAX_INPUT);
+        });
+    }
+
+    /**
+     * Pourcentage retranché à l'attaque.
+     * @param {number | null} value Pourcentage, ou `null`.
+     */
+    public setAttackReduction(value: number | null): void {
+        this.updateDraft((content: NightwatchPlanContentDTO): void => {
+            content.attackReductionPercent = clampInput(value, 100);
+        });
+    }
+
+    /**
+     * Dégâts du réacteur.
+     * @param {number | null} value Dégâts, ou `null`.
+     */
+    public setReactorDamage(value: number | null): void {
+        this.updateDraft((content: NightwatchPlanContentDTO): void => {
+            content.reactorDamage = clampInput(value, MAX_INPUT);
+        });
+    }
+
+    /**
+     * Niveau Endurant MHO d'un citoyen (taille du sac).
+     * @param {number} user_id Citoyen.
+     * @returns {number | null} Niveau, nul s'il est inconnu.
+     */
+    public enduranceLevel(user_id: number): number | null {
+        return this.endurance_levels().get(user_id) ?? null;
+    }
+
+    /** Charge le niveau Endurant des citoyens ; sans eux, la taille des sacs reste inconnue. */
+    private loadEnduranceLevels(): void {
+        this.town_service.getCitizens().pipe(take(1), takeUntilDestroyed(this.destroy_ref)).subscribe({
+            next: (info: CitizenInfo): void => this.endurance_levels.set(new Map<number, number | null>(
+                info.citizens.map((citizen: Citizen): [number, number | null] => [citizen.id, citizen.hero_skills.e]))),
+            error: (error: unknown): void => console.warn('Citoyens indisponibles pour les sacs de veille', error)
+        });
+    }
+
+    /** Charge le référentiel des chantiers (uid par identifiant). */
+    private loadBuildingUids(): void {
+        this.api.getBuildings().pipe(take(1), takeUntilDestroyed(this.destroy_ref)).subscribe({
+            next: (buildings: Building[]): void => {
+                this.building_uids.set(new Map<number, string>(buildings.map((building: Building): [number, string] => [building.id, building.uid])));
+                this.building_defences.set(new Map<string, number>(buildings.map((building: Building): [string, number] => [building.uid, building.defence ?? 0])));
+            },
+            error: (error: unknown): void => console.warn('Référentiel des chantiers indisponible pour la veille', error)
+        });
+    }
+
+    /**
+     * Choisit la proposition de Chantiers du jour sur laquelle s'appuie la veille.
+     * @param {number | null} building_plan_id Proposition ; nulle = l'effective.
+     */
+    public setBuildingPlan(building_plan_id: number | null): void {
+        this.updateDraft((content: NightwatchPlanContentDTO): void => {
+            content.buildingPlanId = building_plan_id;
         });
     }
 
@@ -532,17 +1181,103 @@ export class NightwatchStore {
     }
 
     /**
+     * Remplace veilleurs et consignes par ceux d'un jour ; attaque et stock saisis restent ceux de la proposition affichée.
+     * @param {number} from_day Jour source : sa proposition effective, sinon la première (la copie de travail pour le jour affiché).
+     */
+    public copyPlanFromDay(from_day: number): void {
+        const copied: NightwatchPlanContentDTO | null = this.copySource(from_day);
+        if (copied !== null) {
+            this.updateDraft((content: NightwatchPlanContentDTO): void => {
+                content.watchers = copied.watchers;
+                content.instructions = copied.instructions;
+            });
+        }
+    }
+
+    /**
+     * Crée sur un autre jour une proposition reprenant veilleurs et consignes d'un jour ; jamais vers un jour passé.
+     * @param {number} from_day Jour source.
+     * @param {number} to_day Jour cible.
+     * @param {string} name Nom de la nouvelle proposition.
+     */
+    public copyPlanBetweenDays(from_day: number, to_day: number, name: string): void {
+        if (to_day < this.current_day) {
+            return;
+        }
+        const copied: NightwatchPlanContentDTO | null = this.copySource(from_day);
+        if (copied !== null) {
+            this.addPlan(name, copied, to_day);
+        }
+    }
+
+    /**
+     * Veilleurs et consignes d'un jour, prêts à copier : veilles passées recalculées (le nombre de nuits change), attaque et stock vides.
+     * @param {number} from_day Jour source.
+     * @returns {NightwatchPlanContentDTO | null} Contenu copié, nul si le jour n'a pas de proposition.
+     */
+    private copySource(from_day: number): NightwatchPlanContentDTO | null {
+        const source: NightwatchPlanContentDTO | null | undefined = from_day === this._selected_day() ? this._draft() : this.planOfDay(from_day)?.content;
+        if (source === null || source === undefined) {
+            return null;
+        }
+        const copied: NightwatchPlanContentDTO = cloneContent(source);
+        return {
+            ...emptyNightwatchContent(),
+            instructions: copied.instructions ?? null,
+            watchers: copied.watchers.map((watcher: NightwatchWatcherDTO): NightwatchWatcherDTO => ({ ...watcher, pastWatches: null }))
+        };
+    }
+
+    /**
+     * Mémorise le stuff d'un veilleur pour le coller sur un autre (y compris d'une autre proposition ou d'un autre jour).
+     * @param {number} user_id Citoyen copié.
+     */
+    public copyItems(user_id: number): void {
+        const watcher: NightwatchWatcherDTO | undefined = this.draft()?.watchers.find((candidate: NightwatchWatcherDTO): boolean => candidate.userId === user_id);
+        if (watcher !== undefined) {
+            this._copied_items.set({ ...watcher.items });
+        }
+    }
+
+    /**
+     * Remplace le stuff d'un veilleur par le stuff copié ; rien si aucun n'a été copié.
+     * @param {number} user_id Citoyen visé.
+     */
+    public pasteItems(user_id: number): void {
+        const copied: Record<number, number> | null = this._copied_items();
+        if (copied !== null) {
+            this.updateWatcher(user_id, (watcher: NightwatchWatcherDTO): void => {
+                watcher.items = { ...copied };
+            });
+        }
+    }
+
+    /**
      * Attribue une quantité d'un objet à un veilleur ; une quantité nulle retire l'objet.
      * @param {number} user_id Citoyen.
      * @param {number} item_id Objet.
      * @param {number} quantity Quantité attribuée.
      */
     public setItem(user_id: number, item_id: number, quantity: number): void {
-        this.updateWatcher(user_id, (watcher: NightwatchWatcherDTO): void => {
+        const simulation_id: number | null | undefined = this.selected_plan()?.simulationId;
+        this.updateDraft((content: NightwatchPlanContentDTO): void => {
+            const watcher: NightwatchWatcherDTO | undefined = content.watchers.find((candidate: NightwatchWatcherDTO): boolean => candidate.userId === user_id);
+            if (watcher === undefined) {
+                return;
+            }
             if (quantity > 0) {
                 watcher.items[item_id] = quantity;
             } else {
                 delete watcher.items[item_id];
+            }
+            if (simulation_id === null || simulation_id === undefined) {
+                return;
+            }
+            // Simulation : les attributions sont un sous-ensemble du stuff global, qui grandit si besoin.
+            const assigned: number = content.watchers.reduce((sum: number, candidate: NightwatchWatcherDTO): number => sum + (candidate.items[item_id] ?? 0), 0);
+            const globals: Record<number, number> = content.globalItems ?? {};
+            if (assigned > (globals[item_id] ?? 0)) {
+                content.globalItems = { ...globals, [item_id]: assigned };
             }
         });
     }
@@ -631,7 +1366,7 @@ export class NightwatchStore {
      */
     public setAttackOverride(attack: number | null): void {
         this.updateDraft((content: NightwatchPlanContentDTO): void => {
-            content.attackOverride = attack;
+            content.attackOverride = clampInput(attack, MAX_INPUT);
         });
     }
 
@@ -719,13 +1454,23 @@ export class NightwatchStore {
     }
 
     /**
+     * Proposition de référence d'un jour : l'effective, sinon la première.
+     * @param {number} day Jour.
+     * @returns {NightwatchPlanDTO | undefined} Proposition, absente si le jour n'en a aucune.
+     */
+    private planOfDay(day: number): NightwatchPlanDTO | undefined {
+        const of_day: NightwatchPlanDTO[] = this.plans().filter((plan: NightwatchPlanDTO): boolean => plan.day === day);
+        return of_day.find((plan: NightwatchPlanDTO): boolean => plan.isEffective) ?? of_day[0];
+    }
+
+    /**
      * Sélectionne la proposition effective du jour (ou la première) et en fait la copie de travail.
      * @param {number} day Jour affiché.
      */
     private selectPlanForDay(day: number): void {
-        const of_day: NightwatchPlanDTO[] = this.plans().filter((plan: NightwatchPlanDTO): boolean => plan.day === day);
-        const chosen: NightwatchPlanDTO | undefined = of_day.find((plan: NightwatchPlanDTO): boolean => plan.isEffective) ?? of_day[0];
-        this.selected_plan_id.set(chosen?.id ?? null);
+        const simulation_id: number | null = this._selected_simulation_id();
+        const of_simulation: NightwatchPlanDTO | undefined = simulation_id === null ? undefined : this.simulationPlanOfDay(simulation_id, day);
+        this.selected_plan_id.set((of_simulation ?? this.planOfDay(day))?.id ?? null);
         this._conflict.set(null);
         this.resetDraft();
     }
@@ -765,20 +1510,24 @@ export class NightwatchStore {
     }
 
     /**
-     * Crée une proposition au jour sélectionné puis la sélectionne ; le serveur donne la main sur la nouvelle à cette connexion.
+     * Crée une proposition puis l'affiche ; le serveur donne la main sur la nouvelle à cette connexion.
      * @param {string} name Nom.
      * @param {NightwatchPlanContentDTO} content Contenu.
+     * @param {number} day Jour de la proposition, par défaut le jour affiché.
      */
-    private addPlan(name: string, content: NightwatchPlanContentDTO): void {
+    private addPlan(name: string, content: NightwatchPlanContentDTO, day: number = this._selected_day()): void {
         if (!this.can_write() || this.creating) {
             return;
         }
         this.creating = true;
-        const request: NightwatchPlanRequestDTO = { day: this._selected_day(), name: name.slice(0, 64), content };
+        const request: NightwatchPlanRequestDTO = { day, name: name.slice(0, 64), content };
         this.plan_service.savePlan(request, this.realtime.connectionId(), this.map_id).subscribe({
             next: (saved: NightwatchPlanDTO): void => {
                 this.creating = false;
                 this.replacePlan(saved);
+                if (saved.day !== this._selected_day()) {
+                    this.selectDay(saved.day);
+                }
                 this.selectPlan(saved.id);
             },
             error: (): void => {
@@ -1281,14 +2030,25 @@ export class NightwatchStore {
         }
     }
 
-    /** Relit les propositions (refus de main, coupure) ; la copie de travail suit si rien n'attend. */
-    private reloadPlans(): void {
+    /**
+     * Relit propositions et simulations (refus de main, coupure, simulation modifiée) ; la copie de travail suit si rien n'attend.
+     * Une simulation disparue est désélectionnée.
+     * @param {number | null} open_simulation_id Simulation à ouvrir une fois relue.
+     */
+    private reloadPlans(open_simulation_id: number | null = null): void {
         this.plan_service.getPlans(this.map_id).subscribe({
             next: (dto: NightwatchPlansDTO): void => {
                 this.plans_dto.set(dto);
+                if (this.selected_simulation() === null) {
+                    this._selected_simulation_id.set(null);
+                }
                 if (!this._dirty()) {
                     this.resyncDraft();
                 }
+                if (open_simulation_id !== null) {
+                    this.selectSimulation(open_simulation_id);
+                }
+                this.loadSimulationAttacks();
             },
             error: (error: unknown): void => console.warn('GetPlans', error)
         });

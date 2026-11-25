@@ -1,13 +1,15 @@
-import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 
 import { StatusEnum } from '../../../_abstract_model/enum/status.enum';
 import { ApiService } from '../../../_abstract_model/services/api.service';
 import { Item } from '../../../_abstract_model/types/item.class';
+import { ListElementAddRemoveComponent } from '../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { NightwatchStore } from '../nightwatch.store';
 import { createFakeNightwatchStore, FAKE_NIGHTWATCH_STATE, FakeNightwatchStore } from '../nightwatch.store.fake';
-import { NightwatchCitizenStateDTO, NightwatchPlanDTO } from '../nightwatch.types';
+import { emptyNightwatchContent, NightwatchCitizenStateDTO, NightwatchPlanDTO, NightwatchStateDTO } from '../nightwatch.types';
 import { WatcherGap } from '../nightwatch-compare.util';
 import { NightwatchEveningTabComponent } from './nightwatch-evening-tab.component';
 
@@ -72,6 +74,26 @@ describe('NightwatchEveningTabComponent', (): void => {
         expect((row.querySelector('[data-field="risk"]')?.textContent ?? '')).toContain('8.33');
         expect((row.querySelector('[data-field="risk"]')?.textContent ?? '')).toContain('30');
         expect(row.textContent).toContain('Alice');
+    });
+
+    it('sacs prévu et réel côte à côte : le réel compte aussi les objets hors veille', async (): Promise<void> => {
+        await render([gap()]);
+        fake.draft.set({ ...emptyNightwatchContent(), watchers: [{ userId: 1, statuses: [], items: { 5: 1 }, pastWatches: null, hasDiscourse: false }] });
+        fake.state.update((state: NightwatchStateDTO | null): NightwatchStateDTO | null => state === null ? null : {
+            ...state,
+            citizens: state.citizens.map((citizen: NightwatchCitizenStateDTO): NightwatchCitizenStateDTO => citizen.userId === 1 ? { ...citizen, bag: { 5: 1, 9: 2 } } : citizen)
+        });
+        fixture.detectChanges();
+
+        const bags: ListElementAddRemoveComponent[] = fixture.debugElement.queryAll(By.css('td[data-field="bags"] mho-list-element-add-remove'))
+            .map((element: DebugElement): ListElementAddRemoveComponent => element.componentInstance as ListElementAddRemoveComponent);
+        const capacities: string[] = Array.from(root().querySelectorAll('td[data-field="bags"] .bag-capacity'))
+            .map((element: Element): string => (element.textContent ?? '').replace(/\s+/g, ' ').trim());
+        expect(bags.length).toBe(2);
+        expect(bags.every((bag: ListElementAddRemoveComponent): boolean => bag.readonly())).toBe(true);
+        expect(bags[0].currentList().length).toBe(1);
+        expect(bags[1].currentList().length).toBe(1);
+        expect(capacities).toEqual(['1 / 4+?', '3 / 4+?']);
     });
 
     it('tous conformes : aucune ligne à contacter', async (): Promise<void> => {

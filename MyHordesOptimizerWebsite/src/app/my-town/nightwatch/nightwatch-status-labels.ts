@@ -4,7 +4,7 @@ import { StatusEnum } from '../../_abstract_model/enum/status.enum';
 export interface StatusOption {
     key: string;
     label: string;
-    img: string | null;
+    img: string;
 }
 
 /**
@@ -17,9 +17,9 @@ export function statusOptions(): StatusOption[] {
         { key: 'drunk', label: StatusEnum.DRUNK.label, img: StatusEnum.DRUNK.img },
         { key: 'thirsty', label: StatusEnum.THIRST1.label, img: StatusEnum.THIRST1.img },
         { key: 'immune', label: StatusEnum.IMMUNE.label, img: StatusEnum.IMMUNE.img },
-        { key: 'dog', label: $localize`Chien`, img: null },
-        { key: 'dogSteak', label: $localize`Chien avec steak`, img: null },
-        { key: 'ghoul', label: $localize`Goule`, img: null }
+        { key: 'dog', label: $localize`Chien`, img: 'status/status_tamer_watch_1.gif' },
+        { key: 'dogSteak', label: $localize`Chien avec steak`, img: 'status/status_tamer_watch_2.gif' },
+        { key: 'ghoul', label: $localize`Goule`, img: StatusEnum.GHOUL.img }
     ];
 }
 

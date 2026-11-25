@@ -8,6 +8,8 @@ import {
     NightwatchPlanRequestDTO,
     NightwatchPlansDTO,
     NightwatchReferentialDTO,
+    NightwatchSimulationDTO,
+    NightwatchSimulationRequestDTO,
     NightwatchStateDTO
 } from '../../my-town/nightwatch/nightwatch.types';
 import { GlobalService } from './_global.service';
@@ -74,6 +76,42 @@ export class NightwatchPlanService extends GlobalService {
     public setEffective(plan_id: number, connection_id: string | null = null, map_id?: number): Observable<NightwatchPlanDTO> {
         return this.put<NightwatchPlanDTO>(`${this.baseUrl(map_id)}/plans/${plan_id}/effective`, {}, undefined, false, null, NightwatchPlanService.connectionHeaders(connection_id))
             .pipe(map(NightwatchPlanService.body));
+    }
+
+    /**
+     * Crée (sans `id`) ou modifie une simulation de stock.
+     * @param {NightwatchSimulationRequestDTO} request Simulation ; `version` obligatoire pour une modification.
+     * @param {string | null} connection_id Connexion au hub de l'appelant (exclue de la diffusion).
+     * @param {number} [map_id] Ville de la page appelante ; par défaut celle du contexte au moment de l'appel.
+     * @returns {Observable<NightwatchSimulationDTO>} Simulation enregistrée.
+     */
+    public saveSimulation(request: NightwatchSimulationRequestDTO, connection_id: string | null = null, map_id?: number): Observable<NightwatchSimulationDTO> {
+        return this.put<NightwatchSimulationDTO>(`${this.baseUrl(map_id)}/simulations`, request, undefined, false, null, NightwatchPlanService.connectionHeaders(connection_id))
+            .pipe(map(NightwatchPlanService.body));
+    }
+
+    /**
+     * Duplique une simulation sous un nouveau nom.
+     * @param {number} simulation_id Simulation source.
+     * @param {string} name Nom de la copie.
+     * @param {string | null} connection_id Connexion au hub de l'appelant (exclue de la diffusion).
+     * @param {number} [map_id] Ville de la page appelante ; par défaut celle du contexte au moment de l'appel.
+     * @returns {Observable<NightwatchSimulationDTO>} Copie créée.
+     */
+    public duplicateSimulation(simulation_id: number, name: string, connection_id: string | null = null, map_id?: number): Observable<NightwatchSimulationDTO> {
+        return this.post<NightwatchSimulationDTO>(
+            `${this.baseUrl(map_id)}/simulations/${simulation_id}/duplicate?name=${encodeURIComponent(name)}`, undefined, false, NightwatchPlanService.connectionHeaders(connection_id));
+    }
+
+    /**
+     * Supprime une simulation.
+     * @param {number} simulation_id Identifiant de la simulation.
+     * @param {string | null} connection_id Connexion au hub de l'appelant.
+     * @param {number} [map_id] Ville de la page appelante ; par défaut celle du contexte au moment de l'appel.
+     * @returns {Observable<void>} Complète une fois la simulation supprimée.
+     */
+    public deleteSimulation(simulation_id: number, connection_id: string | null = null, map_id?: number): Observable<void> {
+        return this.delete<void>(`${this.baseUrl(map_id)}/simulations/${simulation_id}`, NightwatchPlanService.connectionHeaders(connection_id)).pipe(map((): void => undefined));
     }
 
     /**

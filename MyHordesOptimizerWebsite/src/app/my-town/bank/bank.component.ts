@@ -7,8 +7,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import moment from 'moment';
-import { catchError, EMPTY, ignoreElements, Observable, Subject, Subscriber, Subscription, switchMap, tap, throwError } from 'rxjs';
+import { catchError, EMPTY, Observable, Subject, Subscriber, Subscription, switchMap, tap, throwError } from 'rxjs';
 
 import { BANK_CONDENSED_DISPLAY_KEY, HORDES_IMG_REPO } from '../../_abstract_model/const';
 import { Action } from '../../_abstract_model/enum/action.enum';
@@ -21,6 +22,7 @@ import { Item } from '../../_abstract_model/types/item.class';
 import { ItemImgPipe } from '../../_core/pipes/item-img.pipe';
 import { ItemsGroupByCategoryPipe } from '../../_core/pipes/items-group-by-category.pipe';
 import { LocalizedLabelPipe } from '../../_core/pipes/localized-label.pipe';
+import { DEEP_LINK_PARAMS, linkedDay, replaceDeepLinkParams } from '../../_core/utilities/deep-link.util';
 import { getTown } from '../../_core/utilities/localstorage.util';
 import { localizedLabel, normalizeString } from '../../_core/utilities/string.utils';
 import { DaySelectorComponent } from '../../_shared/day-selector/day-selector.component';
@@ -61,6 +63,7 @@ export class BankComponent implements OnInit {
     private bank!: BankInfo;
     private town_service: TownService = inject(TownService);
     private readonly destroy_ref: DestroyRef = inject(DestroyRef);
+    private readonly router: Router = inject(Router);
 
     /** Versions de la banque, par `last_update_id` croissant. */
     protected readonly versions: WritableSignal<BankVersion[]> = signal([]);
@@ -104,13 +107,14 @@ export class BankComponent implements OnInit {
         this.content_requests.next(null);
     }
 
-    /** Sélectionne la dernière version d'un jour et charge son contenu. */
+    /** Sélectionne la dernière version d'un jour (repris dans l'URL) et charge son contenu. */
     protected selectDay(day: number): void {
         const of_day: BankVersion[] = this.versions().filter((version: BankVersion): boolean => version.day === day);
         if (of_day.length === 0) {
             return;
         }
         this.selected_day.set(day);
+        replaceDeepLinkParams(this.router, { [DEEP_LINK_PARAMS.day]: day });
         this.selectVersion(of_day[of_day.length - 1].last_update_id);
     }
 
@@ -120,20 +124,37 @@ export class BankComponent implements OnInit {
         this.content_requests.next(last_update_id);
     }
 
-    /** Affiche la banque courante (avec synchro) puis charge les versions, listées après la synchro. */
+    /** Affiche la banque courante (avec synchro), charge les versions, listées après la synchro, puis le jour du lien de la page. */
     private open(): Observable<BankInfo> {
         return new Observable<BankInfo>((subscriber: Subscriber<BankInfo>): (() => void) => {
             const subscription: Subscription = this.town_service.getBank(true)
                 .pipe(
                     tap((bank: BankInfo): void => subscriber.next(bank)),
-                    switchMap((): Observable<never> => this.fetchVersions().pipe(
+                    switchMap((): Observable<BankInfo> => this.fetchVersions().pipe(
                         tap((): void => { this.displayed_version_id = this.selected_version_id(); }),
-                        ignoreElements()
+                        switchMap((): Observable<BankInfo> => this.linkedDayVersion())
                     ))
                 )
-                .subscribe({ error: (error: unknown): void => subscriber.error(error), complete: (): void => subscriber.complete() });
+                .subscribe({
+                    next: (bank: BankInfo): void => subscriber.next(bank),
+                    error: (error: unknown): void => subscriber.error(error),
+                    complete: (): void => subscriber.complete()
+                });
             return (): void => subscription.unsubscribe();
         });
+    }
+
+    /** Dernière version du jour demandé par le lien de la page (`?day=`), si ce jour en a et n'est pas déjà affiché. */
+    private linkedDayVersion(): Observable<BankInfo> {
+        const day: number | null = linkedDay(this.router);
+        const of_day: BankVersion[] = this.versions().filter((version: BankVersion): boolean => version.day === day);
+        if (day === null || day === this.selected_day() || of_day.length === 0) {
+            return EMPTY;
+        }
+        const version_id: number = of_day[of_day.length - 1].last_update_id;
+        this.selected_day.set(day);
+        this.selected_version_id.set(version_id);
+        return this.loadVersion(version_id, true);
     }
 
     /** Charge une version ; sur 404, un seul repli vers la plus récente, sans nouvelle tentative ; toute autre erreur est propagée. */

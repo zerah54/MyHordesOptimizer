@@ -77,6 +77,7 @@ import { getHeroicIcon, getHomeIcon } from '../../../_core/utilities/citizen.uti
 import { DEEP_LINK_PARAMS, deepLinkTargets } from '../../../_core/utilities/deep-link.util';
 import { getTown, getUser, user } from '../../../_core/utilities/localstorage.util';
 import { AvatarComponent } from '../../../_shared/avatar/avatar.component';
+import { displayedBagCapacity } from '../../../_shared/bag/bag-capacity.util';
 import { CitizenFilterPanelComponent } from '../../../_shared/citizen-filters/citizen-filter-panel/citizen-filter-panel.component';
 import { CitizenFilterSortStore } from '../../../_shared/citizen-filters/citizen-filter-sort.store';
 import {
@@ -164,11 +165,17 @@ export class CitizensListComponent implements OnInit {
     protected readonly display_mode: WritableSignal<CitizensDisplayMode> = signal<CitizensDisplayMode>(
         (localStorage.getItem(CITIZENS_LIST_DISPLAY_MODE_KEY) as CitizensDisplayMode | null) ?? 'grouped'
     );
-    /** Actions quotidiennes affichables (chantier requis construit) : pilotent la bande compacte, les colonnes et les filtres. */
-    protected readonly daily_action_keys: Signal<DailyActionEnum[]> = toSignal(
+    /** Citoyens vivants, réémis à chaque recalcul des options de filtre (amélioration de maison modifiée en place comprise). */
+    private readonly alive_citizens: WritableSignal<readonly Citizen[]> = signal<readonly Citizen[]>([]);
+    /** Actions quotidiennes dont le chantier requis est construit. */
+    private readonly built_daily_actions: Signal<DailyActionEnum[]> = toSignal(
         inject(BuiltBuildingsService).builtUids().pipe(map(displayableDailyActions)),
         { initialValue: displayableDailyActions(null) }
     );
+    /** Actions quotidiennes affichables (chantier construit, amélioration de maison présente chez au moins un citoyen) : pilotent la bande compacte, les colonnes et les filtres. */
+    protected readonly daily_action_keys: Signal<DailyActionEnum[]> = computed((): DailyActionEnum[] =>
+        this.built_daily_actions().filter((action: DailyActionEnum): boolean =>
+            action.value.home_upgrade === undefined || this.alive_citizens().some((citizen: Citizen): boolean => isDailyActionAvailable(action, citizen))));
     /** Toutes les actions héroïques possibles, ordonnées (booléens puis niveaux) : pilotent les colonnes du mode étendu. */
     protected readonly heroic_actions_all: readonly HeroicActionEnum[] = HEROIC_FIELDS;
     /** Champs de la maison, le niveau d'habitation en tête : pilotent les colonnes du mode étendu. */
@@ -303,6 +310,7 @@ export class CitizensListComponent implements OnInit {
                     const index: number = this.citizen_list.data.findIndex((c: Citizen) => c.id === citizen.id);
                     if (index === -1 || this.citizen_list.data[index] === citizen) return;
                     this.citizen_list.data = this.citizen_list.data.map((c: Citizen) => c.id === citizen.id ? citizen : c);
+                    this.buildValueOptions();
                 }
             });
 
@@ -520,6 +528,15 @@ export class CitizensListComponent implements OnInit {
      */
     private refreshCitizenLists(): void {
         this.change_detector_ref.detectChanges();
+    }
+
+    /**
+     * Capacité du sac d'un citoyen : SUPER Endurant et extensions portées ; minimum d'un habitant si le niveau est inconnu.
+     * @param {Citizen} citizen Citoyen.
+     * @returns {number} Places.
+     */
+    protected bagCapacity(citizen: Citizen): number {
+        return displayedBagCapacity(citizen.hero_skills.e, (citizen.bag?.items ?? []).map((item: Item): string => item.uid));
     }
 
     /**
@@ -1005,6 +1022,7 @@ export class CitizensListComponent implements OnInit {
     /** Recalcule les valeurs proposées par les filtres de valeurs, d'après les citoyens chargés. */
     private buildValueOptions(): void {
         this.value_options.set(citizenValueOptions(this.citizen_list.data));
+        this.alive_citizens.set([...this.citizen_list.data]);
     }
 
     /** Nom de chaque groupe de compétences, lu dans les compétences servies par l'API (sa lettre à défaut). */

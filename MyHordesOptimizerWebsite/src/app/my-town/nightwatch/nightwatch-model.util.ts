@@ -1,4 +1,5 @@
-import { NightwatchItemDefDTO, NightwatchReferentialDTO, NightwatchStatusDefDTO } from './nightwatch.types';
+import { PlannedBuildings } from './nightwatch-planned-buildings.util';
+import { NightwatchItemDefDTO, NightwatchReferentialDTO, NightwatchStateDTO, NightwatchStatusDefDTO } from './nightwatch.types';
 
 /** Contexte de calcul : référentiel et état de la ville. */
 export interface NightwatchContext {
@@ -8,6 +9,34 @@ export interface NightwatchContext {
     has_guard_room: boolean;
     has_sprinkler: boolean;
     built_building_uids: ReadonlySet<string>;
+}
+
+const GUARD_ROOM_UID: string = 'small_watchmen_#02';
+const SPRINKLER_UID: string = 'small_sprinkler_#00';
+
+/** Chantiers du contexte de calcul. */
+export type BuildingFlags = Pick<NightwatchContext, 'built_building_uids' | 'has_guard_room' | 'has_sprinkler' | 'round_path_level'>;
+
+/** Chantiers de l'état réel de la ville. */
+export type NightwatchBuildingState = Pick<NightwatchStateDTO, 'builtBuildingUids' | 'hasGuardRoom' | 'hasSprinkler' | 'roundPathLevel'>;
+
+/**
+ * Chantiers pris en compte : ceux prévus par les Chantiers pour le jour de la veille, sinon l'état réel de la ville.
+ * @param {NightwatchBuildingState} state État réel.
+ * @param {PlannedBuildings | null} planned Chantiers au soir du jour d'après les Chantiers ; nul = inconnu.
+ * @returns {BuildingFlags} Chantiers du contexte.
+ */
+export function buildingFlags(state: NightwatchBuildingState, planned: PlannedBuildings | null): BuildingFlags {
+    if (planned === null) {
+        return {
+            built_building_uids: new Set<string>(state.builtBuildingUids), has_guard_room: state.hasGuardRoom, has_sprinkler: state.hasSprinkler,
+            round_path_level: state.roundPathLevel
+        };
+    }
+    return {
+        built_building_uids: planned.built_uids, has_guard_room: planned.built_uids.has(GUARD_ROOM_UID), has_sprinkler: planned.built_uids.has(SPRINKLER_UID),
+        round_path_level: planned.round_path_level
+    };
 }
 
 /** Données d'un veilleur nécessaires au calcul ; `items_broken[id]` = unités cassées de `items[id]`. */

@@ -2,6 +2,7 @@ import { HttpErrorResponse, provideHttpClient, withInterceptors, withXhr } from 
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Provider } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { convertToParamMap, DefaultUrlSerializer, Params, Router, UrlTree } from '@angular/router';
 import { NEVER, Observable, of, Subject, throwError } from 'rxjs';
 import type { Mock, MockInstance } from 'vitest';
 
@@ -148,6 +149,9 @@ function static_data(plans: BuildingPlansDTO): PlanningStatic {
 }
 
 describe('PlanningStore', (): void => {
+    /** Paramètres de l'URL de la page. */
+    let query_params: Params = {};
+    const navigate_by_url: Mock = vi.fn();
     const load_static: Mock<() => Observable<PlanningStatic>> = vi.fn();
     const load_day: Mock<(day: number) => Observable<PlanningDay>> = vi.fn();
     const get_plans: Mock<(map_id?: number) => Observable<BuildingPlansDTO>> = vi.fn();
@@ -165,7 +169,8 @@ describe('PlanningStore', (): void => {
         return [
             { provide: RealtimeBuildingPlansService, useValue: realtime },
             { provide: SnackbarService, useValue: snackbar },
-            { provide: TownService, useValue: { getCitizen: get_citizen } }
+            { provide: TownService, useValue: { getCitizen: get_citizen } },
+            { provide: Router, useValue: { routerState: { snapshot: { root: { queryParamMap: convertToParamMap(query_params) } } }, url: '/', parseUrl: (url: string): UrlTree => new DefaultUrlSerializer().parse(url), navigateByUrl: navigate_by_url } }
         ];
     }
 
@@ -187,6 +192,7 @@ describe('PlanningStore', (): void => {
     beforeEach((): void => {
         vi.resetAllMocks();
         TestBed.resetTestingModule();
+        query_params = {};
         setTown(Object.assign(new TownDetails(), { town_id: 42, day: TODAY, town_type: 'RNE' }));
         setUser(Object.assign(new Me(), { id: ME }));
         load_day.mockImplementation((day: number): Observable<PlanningDay> => of({ expeditions: [], attack: 1000 + day }));
@@ -216,14 +222,25 @@ describe('PlanningStore', (): void => {
         expect(store.days()).toContain(TODAY + 7);
     });
 
-    it('propose toujours le jour suivant du jour affiché, sans limite dans le futur', (): void => {
+    it('propose les jours d\'aujourd\'hui à J50', (): void => {
         store = create();
 
-        store.selectDay(TODAY + 7);
-        expect(store.days()).toContain(TODAY + 8);
+        expect(store.days()[0]).toBe(TODAY);
+        expect(store.days()[store.days().length - 1]).toBe(50);
+    });
 
-        store.selectDay(TODAY + 8);
-        expect(store.days()).toContain(TODAY + 9);
+    it('load : ouvre le jour et la proposition du lien (?day=&plan=), ignore une proposition d\'un autre jour', (): void => {
+        query_params = { day: String(TODAY + 2), plan: '9' };
+        store = create(plans_dto([plan(), plan({ id: 8, day: TODAY + 2 }), plan({ id: 9, day: TODAY + 2, isEffective: false })]));
+
+        expect(store.selected_day()).toBe(TODAY + 2);
+        expect(store.selected_plan()?.id).toBe(9);
+
+        TestBed.resetTestingModule();
+        query_params = { day: String(TODAY), plan: '9' };
+        store = create(plans_dto([plan(), plan({ id: 9, day: TODAY + 2, isEffective: false })]));
+        expect(store.selected_day()).toBe(TODAY);
+        expect(store.selected_plan()?.id).toBe(7);
     });
 
     it('load : les consignes sans identifiant en reçoivent un stable, sans marquer la copie comme modifiée', (): void => {

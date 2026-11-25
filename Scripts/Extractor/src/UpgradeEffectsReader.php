@@ -36,8 +36,9 @@ use RuntimeException;
  * Lecture des effets d'évolution des chantiers dans le CODE PHP de MyHordes, sans l'exécuter.
  *
  * Ces valeurs par niveau ne sont pas dans les fixtures : elles sont écrites dans des `match` du code
- * du jeu. Trois formes sont reconnues :
+ * du jeu. Quatre formes sont reconnues :
  * - `BuildingUpgradeListener` : `$event->X = match (…getName()) { 'uid' => [v0, v1, …][niveau] ?? défaut, … }` ;
+ * - `BuildingConstructionListener` : `$event->X = match (…getName()) { 'uid' => v, … }`, valeur unique (défaut sans niveau) ;
  * - `BuildingQueryListener` : `BuildingValueQuery::Y => match (…getBuilding(…, 'uid', …)?->getLevel() …) { 0 => v, 1, 2 => v, default => d }` ;
  * - `TownHandler` : `if (…getName() === 'uid') { $z = match (…getLevel()) { … } }`.
  * Toute autre forme rencontrée sur ces chemins est listée dans `ignores()` plutôt qu'interprétée :
@@ -49,6 +50,7 @@ final class UpgradeEffectsReader
 {
     public const LISTENER_EVOLUTION = 'src/EventListener/Game/Town/Basic/Buildings/BuildingUpgradeListener.php';
     public const LISTENER_VALEURS = 'src/EventListener/Game/Town/Basic/Buildings/BuildingQueryListener.php';
+    public const LISTENER_CONSTRUCTION = 'src/EventListener/Game/Town/Basic/Buildings/BuildingConstructionListener.php';
     public const TOWN_HANDLER = 'src/Service/TownHandler.php';
 
     private readonly Parser $parser;
@@ -74,6 +76,7 @@ final class UpgradeEffectsReader
         $effets = [];
 
         $this->lireListenerEvolution($effets);
+        $this->lireListenerConstruction($effets);
         $this->lireListenerValeurs($effets);
         $this->lireTownHandler($effets);
 
@@ -127,6 +130,37 @@ final class UpgradeEffectsReader
                     'defaut' => $tableau['defaut'],
                     'source' => 'BuildingUpgradeListener',
                 ];
+            }
+        }
+    }
+
+    /** @param array<string, array<string, array<string, mixed>>> $effets */
+    private function lireListenerConstruction(array &$effets): void
+    {
+        $fichier = self::LISTENER_CONSTRUCTION;
+
+        foreach ($this->finder->findInstanceOf($this->analyser($fichier), Assign::class) as $affectation) {
+            if (!$affectation->var instanceof PropertyFetch || !$affectation->var->name instanceof Identifier || !$affectation->expr instanceof Match_) {
+                continue;
+            }
+
+            $effet = $affectation->var->name->toString();
+
+            foreach ($affectation->expr->arms as $bras) {
+                if ($bras->conds === null) {
+                    continue;
+                }
+
+                $uid = self::chaineUnique($bras->conds);
+                $valeur = self::nombre($bras->body);
+
+                if ($uid === null || $valeur === null) {
+                    $this->ignores[] = "$fichier : bras de « $effet » non reconnu (ligne {$bras->getStartLine()})";
+
+                    continue;
+                }
+
+                $effets[$uid][$effet] = ['valeurs' => [], 'defaut' => $valeur, 'source' => 'BuildingConstructionListener'];
             }
         }
     }

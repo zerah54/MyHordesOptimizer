@@ -5,13 +5,13 @@ import { provideRouter } from '@angular/router';
 import { MapRouteDTO, MapRouteLinkedPartDTO } from '../../../_abstract_model/dto/map-route.dto';
 import { Cell } from '../../../_abstract_model/types/cell.class';
 import { Citizen } from '../../../_abstract_model/types/citizen.class';
-import { MapRouteGame } from '../../../_abstract_model/types/map-route-game.class';
 import { MapRoute } from '../../../_abstract_model/types/map-route.class';
+import { MapRouteGame } from '../../../_abstract_model/types/map-route-game.class';
 import { MapRouteAccess } from '../../../_abstract_model/types/map-routes.class';
 import { Town } from '../../../_abstract_model/types/town.class';
 import { buildRouteViews, MapRouteView } from '../map-routes/map-route-views';
-import { DEFAULT_ROUTES_DISPLAY, MapRouteKey, MapRoutesDisplay } from '../map-routes/map-routes-display';
 import { MapRoutesStatus } from '../map-routes/map-routes.store';
+import { DEFAULT_ROUTES_DISPLAY, MapRouteKey, MapRoutesDisplay } from '../map-routes/map-routes-display';
 import { MapRouteCommonColor, MapRoutePersonalColor, MapRoutesPanelComponent } from './map-routes-panel.component';
 
 const CITIZEN: MapRouteAccess = { is_citizen: true, is_current_town: true, can_create: true };
@@ -195,6 +195,7 @@ describe('MapRoutesPanelComponent', (): void => {
         expect(card).toContain('Privé · Silex');
         expect(card).toContain('Zerah seulement');
         expect(card).toContain('Expé Nord · partie 2 · J5');
+        expect(element.querySelector('.route-detail a.detail-link')?.getAttribute('href')).toBe('/expeditions?day=5');
         expect(card).not.toContain('Consignes');
     });
 

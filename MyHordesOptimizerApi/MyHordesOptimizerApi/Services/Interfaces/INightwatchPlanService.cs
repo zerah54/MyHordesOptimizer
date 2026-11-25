@@ -26,5 +26,17 @@ namespace MyHordesOptimizerApi.Services.Interfaces
 
         /// <summary>Rend une proposition effective pour son jour ; les autres du jour ne le sont plus.</summary>
         Task<NightwatchPlanDto> SetEffectiveAsync(int mapId, int planId);
+
+        /// <summary>
+        /// Crée (sans Id) une simulation et une proposition non effective par jour, du jour courant au dernier jour ; ou la modifie
+        /// (version obligatoire) : allonger crée les jours manquants, raccourcir supprime les propositions au-delà, sauf une effective qui est détachée.
+        /// </summary>
+        Task<NightwatchSimulationDto> SaveSimulationAsync(int mapId, NightwatchSimulationRequestDto request);
+
+        /// <summary>Copie une simulation et le contenu de ses propositions des jours non passés, copies non effectives.</summary>
+        Task<NightwatchSimulationDto> DuplicateSimulationAsync(int mapId, int simulationId, string name);
+
+        /// <summary>Supprime une simulation : ses propositions effectives sont détachées, les autres supprimées.</summary>
+        Task DeleteSimulationAsync(int mapId, int simulationId);
     }
 }

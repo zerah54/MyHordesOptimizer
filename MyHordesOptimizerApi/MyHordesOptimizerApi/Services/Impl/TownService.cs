@@ -322,6 +322,7 @@ namespace MyHordesOptimizerApi.Services.Impl
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBuildingPlan WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownBuildingPlanSettings WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM TownNightwatchPlan WHERE idTown = {0}", townId);
+            DbContext.Database.ExecuteSqlRaw("DELETE FROM TownNightwatchSimulation WHERE idTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("UPDATE PreTown SET linkedIdTown = NULL, linkedMapId = NULL WHERE linkedIdTown = {0}", townId);
             DbContext.Database.ExecuteSqlRaw("DELETE FROM Town WHERE idTown = {0}", townId);
 

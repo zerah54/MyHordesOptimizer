@@ -1,6 +1,12 @@
 <mat-card-header>
     <mat-card-title>
         <mho-page-title page="townNightwatch"/>
+        @if (!store.loading() && !store.load_failed()) {
+            <button mat-icon-button type="button" data-action="copy-forum" [disabled]="!can_copy()" (click)="copyForumPost()"
+                    i18n-matTooltip matTooltip="Copier au format forum" i18n-aria-label aria-label="Copier au format forum">
+                <mat-icon>share</mat-icon>
+            </button>
+        }
     </mat-card-title>
 </mat-card-header>
 <mat-card-content class="mho-nightwatch">
@@ -61,14 +67,11 @@
             }
         }
 
-        <div class="actions">
-            <button mat-stroked-button type="button" data-action="copy-forum" [disabled]="!can_copy()" (click)="copyForumPost()">
-                <mat-icon aria-hidden="true">content_copy</mat-icon>
-                <ng-container i18n>Copier le message forum</ng-container>
-            </button>
-        </div>
-
-        <mat-tab-group [mat-stretch-tabs]="false" mat-align-tabs="start">
+        <!-- Plan ouvert par défaut, Simulations le précède. -->
+        <mat-tab-group [mat-stretch-tabs]="false" mat-align-tabs="start" [selectedIndex]="1">
+            <mat-tab label="Simulations" i18n-label>
+                <mho-nightwatch-simulations-tab/>
+            </mat-tab>
             <mat-tab label="Plan" i18n-label>
                 <mho-nightwatch-plan-tab/>
             </mat-tab>

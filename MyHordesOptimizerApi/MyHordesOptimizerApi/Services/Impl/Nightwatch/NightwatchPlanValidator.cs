@@ -1,4 +1,5 @@
 using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch;
+using MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch.Request;
 using MyHordesOptimizerApi.Exceptions;
 using MyHordesOptimizerApi.Extensions;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
         private const int MaxWatchers = 500;
         private const int MaxItems = 500;
         private const int MaxQuantity = 10000;
+        private const int MaxDefenseValue = 100000;
         private const int MaxPastWatches = 1000;
         private const int MaxNote = 200;
         private const int MaxInstructions = 2000;
@@ -41,10 +43,23 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
             }
             Check(content.AttackOverride is null || (content.AttackOverride >= 0 && content.AttackOverride <= 100000), "Attaque invalide.");
             Check(content.Instructions is null || content.Instructions.Length <= MaxInstructions, "Consignes trop longues.");
+            Check(content.BuildingPlanId is null || content.BuildingPlanId > 0, "Proposition de Chantiers invalide.");
             Check(content.Watchers.Count <= MaxWatchers, "Trop de veilleurs.");
             Check(content.Watchers.Select(watcher => watcher.UserId).Distinct().Count() == content.Watchers.Count, "Veilleur en double.");
             Check(content.ManualStock.Count <= MaxItems, "Trop d'objets en stock manuel.");
             Check(content.ManualStock.Values.All(quantity => quantity >= 0 && quantity <= MaxQuantity), "Stock manuel invalide.");
+
+            Check(content.GlobalItems is null || content.GlobalItems.Count <= MaxItems, "Trop d'objets globaux.");
+            Check(content.GlobalItems is null || content.GlobalItems.Values.All(quantity => quantity >= 0 && quantity <= MaxQuantity), "Objets globaux invalides.");
+            Check(InRange(content.AllowedOverflow), "Débordement autorisé invalide.");
+            Check(content.AttackReductionPercent is null || (content.AttackReductionPercent >= 0 && content.AttackReductionPercent <= 100), "Réduction d'attaque invalide.");
+            Check(InRange(content.ReactorDamage), "Dégâts du réacteur invalides.");
+            if (content.CityDefense is { } defense)
+            {
+                Check(defense.AdLevel is null || (defense.AdLevel >= -1 && defense.AdLevel <= 3), "Niveau d'AD invalide.");
+                Check(defense.FddCoefficient is null || (double.IsFinite(defense.FddCoefficient.Value) && defense.FddCoefficient >= 0 && defense.FddCoefficient <= 10), "Coefficient FDD invalide.");
+                Check(new[] { defense.Buildings, defense.Upgrades, defense.Wall, defense.BankDefenseItems, defense.Homes, defense.Guardians, defense.GuardTowerPa, defense.Souls, defense.Cemetery, defense.EveningVote, defense.DumpContribution }.All(InRange), "Défense de la ville invalide.");
+            }
 
             foreach (var watcher in content.Watchers)
             {
@@ -60,6 +75,18 @@ namespace MyHordesOptimizerApi.Services.Impl.Nightwatch
             Check(Encoding.UTF8.GetByteCount(json) <= MaxContentBytes, "La proposition dépasse la taille maximale (256 Ko).");
             return json;
         }
+
+        /// <summary>Valide une simulation (nom, dernier jour au moins égal au jour courant, stock borné) ; renvoie le nom normalisé.</summary>
+        public static string ValidateSimulation(NightwatchSimulationRequestDto request, int currentDay)
+        {
+            var name = NormalizeName(request.Name);
+            Check(request.LastDay >= currentDay, "Le dernier jour de la simulation ne peut pas précéder le jour courant.");
+            Check(request.Stock.Count <= MaxItems, "Trop d'objets dans le stock.");
+            Check(request.Stock.Values.All(quantity => quantity >= 0 && quantity <= MaxQuantity), "Stock invalide.");
+            return name;
+        }
+
+        private static bool InRange(int? value) => value is null || (value >= 0 && value <= MaxDefenseValue);
 
         private static void Check(bool condition, string message)
         {

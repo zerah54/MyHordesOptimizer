@@ -253,6 +253,8 @@ namespace MyHordesOptimizerApi.Hubs
         [Description("PlanEffectiveChanged")]
         PlanEffectiveChanged,
         [Description("PlanLockChanged")]
-        PlanLockChanged
+        PlanLockChanged,
+        [Description("SimulationsChanged")]
+        SimulationsChanged
     }
 }

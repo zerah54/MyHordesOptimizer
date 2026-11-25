@@ -26,6 +26,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import { ChartConfiguration, ChartDataset, ChartEvent, LegendElement, LegendItem } from 'chart.js';
 import Chart from 'chart.js/auto';
 import { Color } from 'chartjs-plugin-datalabels/types/options';
@@ -42,6 +43,7 @@ import { EstimationGraphValues, EstimationsResult } from '../../../_abstract_mod
 import { ChartsThemingService } from '../../../_core/services/charts-theming.service';
 import { ClipboardService } from '../../../_core/services/clipboard.service';
 import { TownContextService } from '../../../_core/services/town-context.service';
+import { DEEP_LINK_PARAMS, linkedDay, replaceDeepLinkParams } from '../../../_core/utilities/deep-link.util';
 import { getMaxAttack, getMinAttack, getSoulFactor } from '../../../_core/utilities/estimations.util';
 import { getTown } from '../../../_core/utilities/localstorage.util';
 import { CompactStepperComponent } from '../../../_shared/compact-stepper/compact-stepper.component';
@@ -204,6 +206,7 @@ export class EstimationsComponent implements OnInit, OnDestroy {
     private town_statistics_service: TownStatisticsService = inject(TownStatisticsService);
     private refiner: AttackRefinerService = inject(AttackRefinerService);
     private readonly injector: Injector = inject(Injector);
+    private readonly router: Router = inject(Router);
     private readonly charts_theming: ChartsThemingService = inject(ChartsThemingService);
 
     public onResize(): void {
@@ -222,6 +225,20 @@ export class EstimationsComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit(): void {
+        const linked: number | null = linkedDay(this.router);
+        if (linked !== null && linked <= this.current_day) {
+            this.selected_day = linked;
+        }
+        this.getEstimations();
+    }
+
+    /**
+     * Affiche les estimations d'un autre jour, repris dans l'URL.
+     * @param {number} day Jour choisi.
+     */
+    protected selectDay(day: number): void {
+        this.selected_day = day;
+        replaceDeepLinkParams(this.router, { [DEEP_LINK_PARAMS.day]: day });
         this.getEstimations();
     }
 

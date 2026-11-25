@@ -13,13 +13,14 @@ using MyHordesOptimizerApi.Services.Impl.Nightwatch;
 using MyHordesOptimizerApi.Services.Interfaces;
 using MyHordesOptimizerApiIntegrationTests.ApplicationFactory;
 using MyHordesOptimizerApiIntegrationTests.Controllers;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace MyHordesOptimizerApiIntegrationTests.Services
 {
-    /// <summary>Requiert 2026_11_13_town_nightwatch_plan.sql sur la base de test.</summary>
+    /// <summary>Requiert 2026_11_13_town_nightwatch_plan.sql et 2026_11_24_town_nightwatch_simulation.sql sur la base de test.</summary>
     public class NightwatchPlanServiceTests : IClassFixture<MyHordesOptimizerApplicationFactory>
     {
         private const int Day = 5;
@@ -233,6 +234,232 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
             var created = await NewService(town.Dead).SavePlanAsync(town.TownId, NewRequest());
 
             (await NewService(town.Dead).GetPlansAsync(town.TownId)).Plans.Should().ContainSingle(plan => plan.Id == created.Id);
+        }
+
+        private const int SimulationDay = 10;
+
+        private (int TownId, int Alive) SeedSimulationTown()
+        {
+            var seeded = AttackTestSupport.SeedTown(NewContext(), SimulationDay);
+            return (seeded.townId, seeded.aliveUserId);
+        }
+
+        private static NightwatchSimulationRequestDto NewSimulation(int lastDay, string name = "Simu") => new()
+        {
+            Name = name,
+            LastDay = lastDay,
+            Stock = new Dictionary<int, int> { [1] = 3 }
+        };
+
+        private static NightwatchSimulationRequestDto Update(NightwatchSimulationDto simulation, int lastDay) => new()
+        {
+            Id = simulation.Id,
+            Version = simulation.Version,
+            Name = simulation.Name,
+            LastDay = lastDay,
+            Stock = simulation.Stock
+        };
+
+        private async Task<List<NightwatchPlanDto>> SimulationPlansAsync(int townId, int userId, int simulationId)
+        {
+            return (await NewService(userId).GetPlansAsync(townId)).Plans.Where(plan => plan.SimulationId == simulationId).OrderBy(plan => plan.Day).ToList();
+        }
+
+        [Fact]
+        public async Task SaveSimulation_CreatesOneNonEffectivePlanPerDay()
+        {
+            var town = SeedSimulationTown();
+
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(12));
+
+            var plans = await SimulationPlansAsync(town.TownId, town.Alive, simulation.Id);
+            plans.Select(plan => plan.Day).Should().Equal(10, 11, 12);
+            plans.Should().OnlyContain(plan => !plan.IsEffective && plan.Name == "Simu");
+            simulation.LastDay.Should().Be(12);
+            simulation.Stock.Should().Equal(new Dictionary<int, int> { [1] = 3 });
+        }
+
+        [Fact]
+        public async Task SaveSimulation_ShrinkDeletesAndDetachesEffective()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(13));
+            var plans = await SimulationPlansAsync(town.TownId, town.Alive, simulation.Id);
+            var day12 = plans.Single(plan => plan.Day == 12);
+            var day13 = plans.Single(plan => plan.Day == 13);
+            await NewService(town.Alive).SetEffectiveAsync(town.TownId, day13.Id);
+
+            var updated = await NewService(town.Alive).SaveSimulationAsync(town.TownId, Update(simulation, 11));
+
+            var all = (await NewService(town.Alive).GetPlansAsync(town.TownId)).Plans;
+            updated.LastDay.Should().Be(11);
+            all.Should().NotContain(plan => plan.Id == day12.Id);
+            var detached = all.Single(plan => plan.Id == day13.Id);
+            detached.SimulationId.Should().BeNull();
+            detached.IsEffective.Should().BeTrue();
+            all.Where(plan => plan.SimulationId == simulation.Id).Select(plan => plan.Day).Should().BeEquivalentTo(new[] { 10, 11 });
+        }
+
+        [Fact]
+        public async Task SaveSimulation_ExtendCreatesMissingDays()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(11));
+
+            await NewService(town.Alive).SaveSimulationAsync(town.TownId, Update(simulation, 13));
+
+            var plans = await SimulationPlansAsync(town.TownId, town.Alive, simulation.Id);
+            plans.Select(plan => plan.Day).Should().Equal(10, 11, 12, 13);
+            plans.Should().OnlyContain(plan => !plan.IsEffective);
+        }
+
+        [Fact]
+        public async Task SaveSimulation_StaleVersion_Conflicts()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(11));
+            var updated = await NewService(town.Alive).SaveSimulationAsync(town.TownId, Update(simulation, 11));
+
+            var stale = async () => await NewService(town.Alive).SaveSimulationAsync(town.TownId, Update(simulation, 12));
+
+            updated.Version.Should().Be(simulation.Version + 1);
+            await stale.Should().ThrowAsync<MhoConflictException>();
+        }
+
+        [Fact]
+        public async Task SavePlan_SecondPlanSameDaySameSimulation_Rejected()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(10));
+
+            var act = async () => await NewService(town.Alive).SavePlanAsync(town.TownId,
+                new NightwatchPlanRequestDto { Day = 10, Name = "Bis", SimulationId = simulation.Id, Content = new NightwatchPlanContentDto() });
+
+            await act.Should().ThrowAsync<MhoTechnicalException>();
+        }
+
+        [Theory]
+        [InlineData(13)]
+        [InlineData(9)]
+        public async Task SavePlan_WithSimulation_DayOutsideCurrentDayToLastDay_Rejected(int day)
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(12));
+
+            var act = async () => await NewService(town.Alive).SavePlanAsync(town.TownId,
+                new NightwatchPlanRequestDto { Day = day, Name = "Hors bornes", SimulationId = simulation.Id, Content = new NightwatchPlanContentDto() });
+
+            await act.Should().ThrowAsync<MhoTechnicalException>();
+            (await SimulationPlansAsync(town.TownId, town.Alive, simulation.Id)).Select(plan => plan.Day).Should().Equal(10, 11, 12);
+        }
+
+        [Fact]
+        public async Task SavePlan_WithSimulationOfAnotherTown_Rejected()
+        {
+            var mine = SeedSimulationTown();
+            var other = SeedSimulationTown();
+            var foreign = await NewService(other.Alive).SaveSimulationAsync(other.TownId, NewSimulation(10));
+
+            var act = async () => await NewService(mine.Alive).SavePlanAsync(mine.TownId,
+                new NightwatchPlanRequestDto { Day = 11, Name = "x", SimulationId = foreign.Id, Content = new NightwatchPlanContentDto() });
+
+            await act.Should().ThrowAsync<MhoForbiddenException>();
+        }
+
+        [Fact]
+        public async Task SavePlan_WithSimulation_IsNotEffective()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(10));
+            await NewService(town.Alive).DeletePlanAsync(town.TownId, (await SimulationPlansAsync(town.TownId, town.Alive, simulation.Id)).Single().Id);
+
+            var created = await NewService(town.Alive).SavePlanAsync(town.TownId,
+                new NightwatchPlanRequestDto { Day = 10, Name = "Recréée", SimulationId = simulation.Id, Content = new NightwatchPlanContentDto() });
+
+            created.SimulationId.Should().Be(simulation.Id);
+            created.IsEffective.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task DeleteSimulation_DetachesEffectiveDeletesOthers()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(11));
+            var plans = await SimulationPlansAsync(town.TownId, town.Alive, simulation.Id);
+            var effective = plans.Single(plan => plan.Day == 10);
+            var other = plans.Single(plan => plan.Day == 11);
+            await NewService(town.Alive).SetEffectiveAsync(town.TownId, effective.Id);
+
+            await NewService(town.Alive).DeleteSimulationAsync(town.TownId, simulation.Id);
+
+            var result = await NewService(town.Alive).GetPlansAsync(town.TownId);
+            result.Simulations.Should().NotContain(row => row.Id == simulation.Id);
+            result.Plans.Should().NotContain(plan => plan.Id == other.Id);
+            var kept = result.Plans.Single(plan => plan.Id == effective.Id);
+            kept.SimulationId.Should().BeNull();
+            kept.IsEffective.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task DuplicateSimulation_CopiesFutureDaysContent()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(11));
+            var day11 = (await SimulationPlansAsync(town.TownId, town.Alive, simulation.Id)).Single(plan => plan.Day == 11);
+            await NewService(town.Alive).SavePlanAsync(town.TownId, new NightwatchPlanRequestDto
+            {
+                Id = day11.Id, Version = day11.Version, Day = 11, Name = day11.Name,
+                Content = new NightwatchPlanContentDto { GlobalItems = new Dictionary<int, int> { [5] = 2 } }
+            });
+            await NewService(town.Alive).SetEffectiveAsync(town.TownId, day11.Id);
+
+            var copy = await NewService(town.Alive).DuplicateSimulationAsync(town.TownId, simulation.Id, "Copie");
+
+            var copies = await SimulationPlansAsync(town.TownId, town.Alive, copy.Id);
+            copy.Id.Should().NotBe(simulation.Id);
+            copy.Name.Should().Be("Copie");
+            copy.LastDay.Should().Be(11);
+            copy.Stock.Should().Equal(simulation.Stock);
+            copies.Select(plan => plan.Day).Should().Equal(10, 11);
+            copies.Should().OnlyContain(plan => !plan.IsEffective);
+            copies.Single(plan => plan.Day == 11).Content.GlobalItems.Should().Equal(new Dictionary<int, int> { [5] = 2 });
+        }
+
+        [Fact]
+        public async Task GetPlans_ReturnsSimulationsAndLinks()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(10));
+            var loose = await NewService(town.Alive).SavePlanAsync(town.TownId, NewRequest(10, "Hors simulation"));
+
+            var result = await NewService(town.Alive).GetPlansAsync(town.TownId);
+
+            result.Simulations.Should().ContainSingle(row => row.Id == simulation.Id && row.Name == "Simu" && row.LastDay == 10);
+            result.Plans.Single(plan => plan.Id == loose.Id).SimulationId.Should().BeNull();
+            result.Plans.Should().ContainSingle(plan => plan.SimulationId == simulation.Id);
+        }
+
+        [Fact]
+        public async Task SimulationPastDays_StayReadable_FutureEditable()
+        {
+            var town = SeedSimulationTown();
+            var simulation = await NewService(town.Alive).SaveSimulationAsync(town.TownId, NewSimulation(13));
+            using (var context = NewContext())
+            {
+                context.Towns.Single(row => row.IdTown == town.TownId).Day = 12;
+                context.SaveChanges();
+            }
+
+            var plans = await SimulationPlansAsync(town.TownId, town.Alive, simulation.Id);
+            var day13 = plans.Single(plan => plan.Day == 13);
+            var saved = await NewService(town.Alive).SavePlanAsync(town.TownId, new NightwatchPlanRequestDto
+            {
+                Id = day13.Id, Version = day13.Version, Day = 13, Name = "Modifiée", Content = day13.Content
+            });
+
+            plans.Select(plan => plan.Day).Should().Equal(10, 11, 12, 13);
+            saved.Name.Should().Be("Modifiée");
+            saved.SimulationId.Should().Be(simulation.Id);
         }
     }
 }

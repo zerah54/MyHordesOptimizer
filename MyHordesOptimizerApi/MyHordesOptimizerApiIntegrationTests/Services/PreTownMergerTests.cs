@@ -108,6 +108,35 @@ namespace MyHordesOptimizerApiIntegrationTests.Services
         }
 
         [Fact]
+        public async Task NightwatchPlanMerger_DetachesSimulation()
+        {
+            var (db, from, to) = Seed();
+            db.TownNightwatchPlans.Add(new TownNightwatchPlan { IdTown = from, Day = 3, Name = "Sim", IsEffective = true, Content = "s", IdAuthor = 5, IdTownNightwatchSimulation = 42 });
+            await db.SaveChangesAsync();
+
+            await new NightwatchPlanMerger().MergeAsync(db, from, to);
+
+            var copy = await db.TownNightwatchPlans.AsNoTracking().SingleAsync(p => p.IdTown == to);
+            copy.IdTownNightwatchSimulation.Should().BeNull();
+            copy.IsEffective.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task NightwatchPlanMerger_IgnoreLesPropositionsDeSimulationNonEffectives()
+        {
+            var (db, from, to) = Seed();
+            db.TownNightwatchPlans.Add(new TownNightwatchPlan { IdTown = from, Day = 3, Name = "Sim", IsEffective = false, Content = "s", IdAuthor = 5, IdTownNightwatchSimulation = 42 });
+            db.TownNightwatchPlans.Add(new TownNightwatchPlan { IdTown = from, Day = 3, Name = "Ordinaire", IsEffective = false, Content = "o", IdAuthor = 5 });
+            await db.SaveChangesAsync();
+
+            var report = await new NightwatchPlanMerger().MergeAsync(db, from, to);
+
+            var copy = await db.TownNightwatchPlans.AsNoTracking().SingleAsync(p => p.IdTown == to);
+            copy.Name.Should().Be("Ordinaire");
+            report.AddedRowKeys.Should().Equal(copy.IdTownNightwatchPlan.ToString());
+        }
+
+        [Fact]
         public async Task Plans_VersVraieVille_RetirentLesCitoyensSimules()
         {
             var (db, from, to) = Seed();

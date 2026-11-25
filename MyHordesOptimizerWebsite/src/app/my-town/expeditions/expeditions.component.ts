@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { Router } from '@angular/router';
 import moment from 'moment';
 import { firstValueFrom, map } from 'rxjs';
 
@@ -51,6 +52,7 @@ import { ClipboardService } from '../../_core/services/clipboard.service';
 import { SnackbarService } from '../../_core/services/snackbar.service';
 import { TownContextService } from '../../_core/services/town-context.service';
 import { getCitizenFromId } from '../../_core/utilities/citizen.util';
+import { DEEP_LINK_PARAMS, linkedDay, replaceDeepLinkParams } from '../../_core/utilities/deep-link.util';
 import { getTown, user } from '../../_core/utilities/localstorage.util';
 import { localizedLabel } from '../../_core/utilities/string.utils';
 import { ActiveCitizensComponent } from '../../_shared/active-citizens/active-citizens.component';
@@ -130,7 +132,9 @@ export class ExpeditionsComponent implements OnInit {
         .filter((action: HeroicActionEnum) => action.value.count_in_daily && action.value.action !== ''));
 
     public edition_mode: ModelSignal<boolean> = model(JSON.parse(localStorage.getItem(EXPEDITIONS_EDITION_MODE_KEY) || 'false'));
-    protected readonly selected_day: WritableSignal<number> = signal(this.currentDay());
+    private readonly router: Router = inject(Router);
+    /** Jour affiché : celui du lien de la page (`?day=`), sinon aujourd'hui. */
+    protected readonly selected_day: WritableSignal<number> = signal(linkedDay(this.router) ?? this.currentDay());
 
     protected all_citizens: WritableSignal<Citizen[]> = signal([]);
     protected all_citizens_job: WritableSignal<JobEnum[]> = signal([]);
@@ -676,11 +680,12 @@ export class ExpeditionsComponent implements OnInit {
     }
 
     /**
-     * Affiche un autre jour ; la réponse d'un jour quitté entre-temps est ignorée.
+     * Affiche un autre jour, repris dans l'URL ; la réponse d'un jour quitté entre-temps est ignorée.
      * @param {number} day Jour à afficher.
      */
     protected async changeDay(day: number): Promise<void> {
         this.selected_day.set(day);
+        replaceDeepLinkParams(this.router, { [DEEP_LINK_PARAMS.day]: day });
         const existing_expeditions: Expedition[] = await firstValueFrom(this.expedition_service.getExpeditions(day));
         if (day !== this.selected_day()) {
             return;

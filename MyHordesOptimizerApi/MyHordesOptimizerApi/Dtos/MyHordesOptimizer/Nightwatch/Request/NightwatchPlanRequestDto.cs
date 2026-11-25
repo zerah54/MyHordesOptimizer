@@ -8,6 +8,8 @@ namespace MyHordesOptimizerApi.Dtos.MyHordesOptimizer.Nightwatch.Request
         public string Name { get; set; } = "";
         /// <summary>Obligatoire pour une modification.</summary>
         public int? Version { get; set; }
+        /// <summary>Simulation rattachée ; pris en compte à la création seulement.</summary>
+        public int? SimulationId { get; set; }
         public NightwatchPlanContentDto Content { get; set; } = new();
     }
 }

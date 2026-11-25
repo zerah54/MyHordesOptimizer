@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<mat-dialog-content>
+    @if (data.name !== null) {
+        <p>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label i18n>Nom de la simulation</mat-label>
+                <input matInput type="text" data-field="name" cdkFocusInitial [maxlength]="max_length" [ngModel]="name()" (ngModelChange)="name.set($event)"
+                       (keydown.enter)="confirm()">
+            </mat-form-field>
+        </p>
+    }
+    @if (data.last_day !== null) {
+        <p>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label i18n>Dernier jour à défendre</mat-label>
+                <input matInput type="number" data-field="last-day" step="1" [min]="data.min_day" [ngModel]="last_day()" (ngModelChange)="last_day.set($event)"
+                       (keydown.enter)="confirm()">
+            </mat-form-field>
+        </p>
+    }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close i18n>Annuler</button>
+    <button mat-flat-button type="button" data-action="confirm" [disabled]="!valid()" (click)="confirm()" i18n>Valider</button>
+</mat-dialog-actions>

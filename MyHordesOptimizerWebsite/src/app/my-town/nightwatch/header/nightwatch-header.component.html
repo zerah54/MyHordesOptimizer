@@ -11,7 +11,7 @@
                             <mat-icon class="effective" role="img" i18n-aria-label aria-label="Proposition effective du jour" i18n-matTooltip
                                       matTooltip="Proposition effective du jour">star</mat-icon>
                         }
-                        {{ plan.name }}
+                        {{ chipLabel(plan) }}
                     </span>
                 </button>
                 @if (isSelected(plan) && store.can_write()) {
@@ -52,6 +52,14 @@
     <button mat-menu-item type="button" data-action="duplicate" (click)="duplicate()">
         <mat-icon>content_copy</mat-icon>
         <span i18n>Dupliquer</span>
+    </button>
+    <button mat-menu-item type="button" data-action="copy-from-day" [disabled]="!store.can_edit()" (click)="copyFromDay()">
+        <mat-icon>event_repeat</mat-icon>
+        <span i18n>Copier depuis le jour…</span>
+    </button>
+    <button mat-menu-item type="button" data-action="copy-to-day" (click)="copyToDay()">
+        <mat-icon>event_repeat</mat-icon>
+        <span i18n>Copier vers le jour…</span>
     </button>
     <button mat-menu-item type="button" data-action="effective" [disabled]="store.selected_plan()?.isEffective === true" (click)="store.setEffective()">
         <mat-icon>star</mat-icon>

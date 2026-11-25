@@ -1,7 +1,9 @@
 import { NightwatchItemDefDTO, NightwatchReferentialDTO } from './nightwatch.types';
 import {
+    buildingFlags,
     deathRisk,
     itemDefense,
+    NightwatchBuildingState,
     NightwatchContext,
     survivalTier,
     townWatchDefense,
@@ -69,6 +71,20 @@ function watcher(patch: Partial<WatcherInput> = {}): WatcherInput {
 }
 
 describe('nightwatch-model.util', () => {
+    describe('buildingFlags', () => {
+        const state: NightwatchBuildingState = { builtBuildingUids: ['wall'], hasGuardRoom: false, hasSprinkler: true, roundPathLevel: 1 };
+
+        it('sans prévision : état réel de la ville', () => {
+            expect(buildingFlags(state, null)).toEqual({ built_building_uids: new Set(['wall']), has_guard_room: false, has_sprinkler: true, round_path_level: 1 });
+        });
+
+        it('avec prévision : chantiers et chemin de ronde projetés, salle de garde et arroseurs compris', () => {
+            expect(buildingFlags(state, { built_uids: new Set(['wall', 'small_watchmen_#02']), round_path_level: 2, plan_id: 70 })).toEqual({
+                built_building_uids: new Set(['wall', 'small_watchmen_#02']), has_guard_room: true, has_sprinkler: false, round_path_level: 2
+            });
+        });
+    });
+
     describe('deathRisk', () => {
         it('veilleur nu : risque de base', () => {
             expect(deathRisk(watcher(), ctx())).toBe(0.08);
