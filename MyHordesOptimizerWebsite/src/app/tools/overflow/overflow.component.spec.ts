@@ -616,11 +616,101 @@ describe('OverflowComponent', (): void => {
         expect(component['citizen_defenses']()[0].defense).toBe(60);
     });
 
+    describe('défense à atteindre pour un risque accepté', (): void => {
+        beforeEach((): void => {
+            component['attack'].set(500);
+            component['door_state'] = 'closed';
+            component['watch_defense'] = 0;
+            component['iterations'] = 500;
+        });
+
+        it('personne ne peut mourir : tout le débordement est autorisé, aucune défense à atteindre', (): void => {
+            component['applySnapshot']({ ...component['toSnapshot'](), home_defense: 999999, defenses: [] });
+            component['risk_threshold'] = 0;
+            component['compute']();
+
+            expect(component['allowed_overflow']()).toBe(500);
+            expect(component['required_defense']()).toBe(0);
+        });
+
+        it('défense personnelle nulle et risque 0 % : aucun zombie ne doit passer', (): void => {
+            component['home_defense'] = 0;
+            component['applyHomeDefenseToAll']();
+            component['risk_threshold'] = 0;
+            component['compute']();
+
+            expect(component['allowed_overflow']()).toBe(0);
+            expect(component['required_defense']()).toBe(500);
+        });
+
+        it('la défense de veille est déduite de la défense de ville à atteindre', (): void => {
+            component['home_defense'] = 0;
+            component['applyHomeDefenseToAll']();
+            component['risk_threshold'] = 0;
+            component['watch_defense'] = 100;
+            component['compute']();
+
+            expect(component['required_defense']()).toBe(400);
+        });
+
+        it('porte ouverte : la défense de ville ne compte pas, c\'est la défense de veille qui doit couvrir', (): void => {
+            component['home_defense'] = 0;
+            component['applyHomeDefenseToAll']();
+            component['risk_threshold'] = 0;
+            component['door_state'] = 'open';
+            component['watch_defense'] = 100;
+            component['town_defense'] = 9999;
+            component['compute']();
+
+            expect(component['required_defense']()).toBe(500);
+        });
+
+        it('le débordement autorisé est le plus grand dont le risque d\'au moins un mort reste sous le seuil', (): void => {
+            component['applySnapshot']({ ...component['toSnapshot'](), home_defense: 10, defenses: [] });
+            component['risk_threshold'] = 5;
+            component['compute']();
+
+            const allowed: number = component['allowed_overflow']() ?? -1;
+            const risk_at = (overflow: number): number => component['deathRiskAt'](overflow, 500, false, false);
+            expect(allowed).toBeGreaterThan(0);
+            expect(allowed).toBeLessThan(275);
+            expect(risk_at(allowed)).toBeLessThanOrEqual(0.05);
+            expect(risk_at(allowed + 1)).toBeGreaterThan(0.05);
+            expect(risk_at(allowed - 20)).toBeLessThanOrEqual(0.05);
+        });
+
+        it('champ de risque vidé : calcul inverse désactivé, aucune défense à atteindre affichée', (): void => {
+            component['risk_threshold'] = null;
+            const risk_spy: MockInstance = vi.spyOn(<never>component, 'deathRiskAt');
+            component['compute']();
+            fixture.detectChanges();
+
+            expect(risk_spy).not.toHaveBeenCalled();
+            expect(component['required_defense']()).toBeNull();
+            const labels: string[] = fixture.debugElement.queryAll(By.css('.kpi .mho-kpi-label'))
+                .map((el: DebugElement): string => el.nativeElement.textContent.trim());
+            expect(labels).not.toContain('Défense à atteindre');
+        });
+
+        it('un snapshot au champ de risque vide le restitue vide', (): void => {
+            component['applySnapshot']({ ...component['toSnapshot'](), risk_threshold: null });
+
+            expect(component['risk_threshold']).toBeNull();
+        });
+
+        it('le risque estimé est reproductible d\'un calcul à l\'autre (même tirage)', (): void => {
+            component['home_defense'] = 10;
+            component['applyHomeDefenseToAll']();
+
+            expect(component['deathRiskAt'](150, 500, false, false)).toBe(component['deathRiskAt'](150, 500, false, false));
+        });
+    });
+
     describe('snapshot', (): void => {
         const house_counts: number[] = [0, 1, 2, 0, 0, 0, 0, 0, 0];
         const valid_snapshot: Record<string, unknown> = {
             v: 1, attack: 900, town_defense: 250, door_state: 'open', watch_defense: 40, day: 12, nb_alive: 3, population: 30,
-            house_counts, chaos: true, devastated: false, home_defense: 7, iterations: 500, defenses: [1, 2, 3]
+            house_counts, chaos: true, devastated: false, home_defense: 7, iterations: 500, risk_threshold: 2, defenses: [1, 2, 3]
         };
 
         it('toSnapshot décrit la configuration saisie, avec les défenses seules (jamais les noms)', (): void => {
@@ -635,6 +725,7 @@ describe('OverflowComponent', (): void => {
             component['chaos'] = true;
             component['home_defense'] = 7;
             component['iterations'] = 500;
+            component['risk_threshold'] = 2;
             component['citizen_defenses'].set([
                 { label: 'Alice', named: true, defense: 5 },
                 { label: 'Citoyen 2', named: false, defense: 9 }

@@ -132,6 +132,11 @@
                     <mat-label i18n>Nombre de simulations</mat-label>
                     <input [(ngModel)]="iterations" (ngModelChange)="scheduleCompute()" [min]="100" matInput type="number">
                 </mat-form-field>
+
+                <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                    <mat-label i18n>Risque de mort accepté (%)</mat-label>
+                    <input [(ngModel)]="risk_threshold" (ngModelChange)="scheduleCompute()" [min]="0" [max]="100" matInput type="number">
+                </mat-form-field>
             </div>
 
             <!-- Jusqu'à quarante champs : repliés, l'étendue des défenses dit déjà si quelque
@@ -176,6 +181,18 @@
                     <span class="kpi-value">{{ overflow_after_watch() | number:'1.0-0':locale }}</span>
                     <span class="kpi-sub" i18n>zombies qui franchissent</span>
                 </div>
+                @if (required_defense() !== null) {
+                    <div class="kpi">
+                        @if (door_state === 'closed' && !devastated) {
+                            <span class="mho-kpi-label" i18n>Défense à atteindre</span>
+                        } @else {
+                            <span class="mho-kpi-label" i18n>Défense de veille à atteindre</span>
+                        }
+                        <span class="kpi-value">{{ required_defense() | number:'1.0-0':locale }}</span>
+                        <span class="kpi-sub"><ng-container
+                            i18n>Débordement autorisé</ng-container>&nbsp;: {{ allowed_overflow() | number:'1.0-0':locale }}</span>
+                    </div>
+                }
                 @if (overflow_after_watch() > 0 && realistic(); as scenario) {
                     <div class="kpi">
                         <span class="mho-kpi-label" i18n>Citoyens tués</span>
@@ -186,12 +203,12 @@
                     </div>
                     <div class="kpi">
                         <span class="mho-kpi-label" i18n>Au moins un mort</span>
-                        <span class="kpi-value">{{ scenario.death_at_least_one * 100 | number:'1.0-1':locale }}&nbsp;%</span>
+                        <span class="kpi-value">{{ scenario.death_at_least_one * 100 | number:'1.0-2':locale }}&nbsp;%</span>
                         @if (!bounds_saturated()) {
-                            <span class="kpi-sub">{{ ((favorable()?.death_at_least_one ?? 0) * 100) | number:'1.0-1':locale }}&nbsp;%
-                                – {{ ((defavorable()?.death_at_least_one ?? 0) * 100) | number:'1.0-1':locale }}&nbsp;%</span>
+                            <span class="kpi-sub">{{ ((favorable()?.death_at_least_one ?? 0) * 100) | number:'1.0-2':locale }}&nbsp;%
+                                – {{ ((defavorable()?.death_at_least_one ?? 0) * 100) | number:'1.0-2':locale }}&nbsp;%</span>
                         }
-                        <span class="kpi-sub" i18n>Au moins un survivant&nbsp;: {{ scenario.survivor_at_least_one * 100 | number:'1.0-1':locale }}&nbsp;%</span>
+                        <span class="kpi-sub" i18n>Au moins un survivant&nbsp;: {{ scenario.survivor_at_least_one * 100 | number:'1.0-2':locale }}&nbsp;%</span>
                     </div>
                 }
             </div>

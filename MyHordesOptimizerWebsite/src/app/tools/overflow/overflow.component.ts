@@ -19,11 +19,11 @@ import { catchError, debounceTime, forkJoin, of, Subject, take } from 'rxjs';
 import { RefinementViewDTO } from '../../_abstract_model/dto/refinement.dto';
 import { HomeEnum } from '../../_abstract_model/enum/home.enum';
 import { BuiltBuildingsService } from '../../_abstract_model/services/built-buildings.service';
-import { TownStatisticsService } from '../../_abstract_model/services/town-statistics.service';
 import { TownService } from '../../_abstract_model/services/town.service';
+import { TownStatisticsService } from '../../_abstract_model/services/town-statistics.service';
 import { I18nLabels, Imports } from '../../_abstract_model/types/_types';
-import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { Citizen } from '../../_abstract_model/types/citizen.class';
+import { CitizenInfo } from '../../_abstract_model/types/citizen-info.class';
 import { EstimationsResult } from '../../_abstract_model/types/estimations-result.class';
 import { HomeWithValue } from '../../_abstract_model/types/home.class';
 import { TownDetails } from '../../_abstract_model/types/town-details.class';
@@ -50,6 +50,21 @@ const SNAPSHOT_MAX_CITIZENS: number = 100;
 const SNAPSHOT_MAX_DAY: number = 1000;
 const SNAPSHOT_MAX_ITERATIONS: number = 100_000;
 const MIN_ITERATIONS: number = 100;
+
+/** Graine fixe du risque estimé (une par nuit simulée) : chaque essai de la dichotomie rejoue les mêmes nuits. */
+const RISK_SEED: number = 0x4d484f;
+
+/** Générateur pseudo-aléatoire déterministe (mulberry32), même contrat que Math.random. */
+function seededRandom(seed: number): () => number {
+    let state: number = seed >>> 0;
+    return (): number => {
+        state = (state + 0x6d2b79f5) >>> 0;
+        let t: number = state;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
 
 const angular_common: Imports = [CommonModule, FormsModule];
 const components: Imports = [ToolPresetsComponent, PageTitleComponent];
@@ -186,6 +201,12 @@ export class OverflowComponent implements OnInit {
     protected iterations: number = 10000;
     /** Affichage de la répartition finale : nombre de morts ou de survivants (même distribution, lue dans l'autre sens). */
     protected histogram_view: 'deaths' | 'survivors' = 'deaths';
+    /** Risque accepté (en %) d'avoir au moins un mort, pour le calcul inverse ; `null` (champ vidé) le désactive. */
+    protected risk_threshold: number | null = 0;
+    /** Plus grand débordement dont le risque d'au moins un mort reste sous {@link risk_threshold} ; `null` si désactivé. */
+    protected readonly allowed_overflow: WritableSignal<number | null> = signal(null);
+    /** Défense à atteindre pour ce débordement (de ville porte fermée, de veille porte ouverte) ; `null` si désactivé. */
+    protected readonly required_defense: WritableSignal<number | null> = signal(null);
     // --- Résultats de compute(), tous mutés depuis un .subscribe() (debounce ou forkJoin) : signaux. ---
     protected readonly overflow_after_watch: WritableSignal<number> = signal(0);
     protected readonly targeted_count: WritableSignal<number> = signal(0);
@@ -276,6 +297,7 @@ export class OverflowComponent implements OnInit {
             devastated: this.devastated,
             home_defense: this.home_defense,
             iterations: this.iterations,
+            risk_threshold: this.risk_threshold,
             defenses: this.citizen_defenses().map((row: CitizenDefenseRow): number => row.defense)
         };
     }
@@ -304,6 +326,8 @@ export class OverflowComponent implements OnInit {
         this.chaos = this.devastated || raw['chaos'] === true;
         this.home_defense = toBoundedNumber(raw['home_defense'], 0, SNAPSHOT_MAX_VALUE, this.home_defense);
         this.iterations = Math.round(toBoundedNumber(raw['iterations'], MIN_ITERATIONS, SNAPSHOT_MAX_ITERATIONS, this.iterations));
+        const raw_risk: unknown = raw['risk_threshold'];
+        this.risk_threshold = raw_risk === null ? null : toBoundedNumber(raw_risk, 0, 100, this.risk_threshold ?? 0);
         this.citizen_defenses.set(this.parseDefenses(raw['defenses']));
         this.compute();
         return true;
@@ -434,6 +458,17 @@ export class OverflowComponent implements OnInit {
         // favorable/défavorable/réaliste finissent avec la même attaque servie.
         this.bounds_saturated.set(active_zombies_min >= overflow_after_watch);
 
+        // Calcul inverse : débordement autorisé pour le risque accepté, puis défense qui le garantit.
+        const risk: number | null = this.risk_threshold;
+        if (typeof risk === 'number' && Number.isFinite(risk)) {
+            const allowed_overflow: number = this.findAllowedOverflow(Math.min(100, Math.max(0, risk)) / 100, attack, door_open, door_long);
+            this.allowed_overflow.set(allowed_overflow);
+            this.required_defense.set(Math.max(0, attack - allowed_overflow - (door_open ? 0 : Math.max(0, this.watch_defense))));
+        } else {
+            this.allowed_overflow.set(null);
+            this.required_defense.set(null);
+        }
+
         // Scénario détaillé : le facteur est retiré aléatoirement (45–55, un entier comme mt_rand en jeu) à chaque itération.
         this.scenarios.set([
             this.runScenario(
@@ -558,8 +593,57 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
     }
 
     /** Tirage de la base du facteur de zombies actifs : un entier 45–55, comme mt_rand(45, 55) en jeu. */
-    private drawFactorBase(): number {
-        return 45 + Math.floor(Math.random() * 11);
+    private drawFactorBase(random: () => number = Math.random): number {
+        return 45 + Math.floor(random() * 11);
+    }
+
+    /**
+     * Plus grand débordement dont le risque d'au moins un mort (facteur tiré comme en jeu) reste sous
+     * `target`. Le risque croît avec le débordement : recherche par dichotomie.
+     * @param target risque accepté, entre 0 et 1
+     */
+    private findAllowedOverflow(target: number, attack: number, door_open: boolean, door_long: boolean): number {
+        // Au-delà du facteur maximal, le surplus de débordement n'attaque personne : le risque ne bouge plus.
+        const ceiling: number = Math.min(attack, Math.round(attack * this.activeFactor(55, door_open, door_long)));
+        if (this.deathRiskAt(ceiling, attack, door_open, door_long) <= target) {
+            return attack;
+        }
+        let safe: number = 0;
+        let unsafe: number = ceiling;
+        while (unsafe - safe > 1) {
+            const middle: number = Math.floor((safe + unsafe) / 2);
+            if (this.deathRiskAt(middle, attack, door_open, door_long) <= target) {
+                safe = middle;
+            } else {
+                unsafe = middle;
+            }
+        }
+        return safe;
+    }
+
+    /** Probabilité d'au moins un mort pour un débordement donné, sur des tirages à graine fixe. */
+    private deathRiskAt(overflow: number, attack: number, door_open: boolean, door_long: boolean): number {
+        const n: number = this.targeted_count();
+        const thresholds: number[] = this.citizen_defenses().map((row: CitizenDefenseRow): number => Math.max(0, row.defense));
+        if (overflow <= 0 || n <= 0 || thresholds.length === 0) {
+            return 0;
+        }
+        const iterations: number = Math.max(MIN_ITERATIONS, Math.round(this.iterations));
+        let nights_with_death: number = 0;
+        for (let iter: number = 0; iter < iterations; iter++) {
+            const random: () => number = seededRandom(RISK_SEED + iter);
+            const factor: number = this.activeFactor(this.drawFactorBase(random), door_open, door_long);
+            const attacking: number = Math.min(Math.round(attack * factor), overflow);
+            if (attacking <= 0) {
+                continue;
+            }
+            const chosen: number[] = this.pickTargets(thresholds.length, n, random);
+            const received: number[] = this.distribute(attacking, n, random);
+            if (chosen.some((citizen: number, slot: number): boolean => received[slot] > thresholds[citizen])) {
+                nights_with_death++;
+            }
+        }
+        return nights_with_death / iterations;
     }
 
     /**
@@ -789,9 +873,9 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
      * poids aléatoires, un citoyen « malchanceux » (+0,3), normalisation puis distribution du reliquat.
      * @returns une valeur par emplacement, dans l'ordre d'entrée (correspond à l'ordre de {@link pickTargets})
      */
-    private distribute(attacking: number, n: number): number[] {
-        const rep: number[] = Array.from({ length: n }, () => Math.random());
-        rep[Math.floor(Math.random() * n)] += 0.3;
+    private distribute(attacking: number, n: number, random: () => number = Math.random): number[] {
+        const rep: number[] = Array.from({ length: n }, () => random());
+        rep[Math.floor(random() * n)] += 0.3;
 
         const sum: number = rep.reduce((a: number, b: number) => a + b, 0);
 
@@ -802,7 +886,7 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
             remaining -= value;
         }
         while (remaining > 0) {
-            rep[Math.floor(Math.random() * n)] += 1;
+            rep[Math.floor(random() * n)] += 1;
             remaining--;
         }
 
@@ -813,11 +897,11 @@ ${this.formatPercent(overflow_min)} – ${this.formatPercent(overflow_max)} du d
      * Tire `count` emplacements distincts parmi `[0, pool_size)` (mélange de Fisher-Yates partiel),
      * pour reproduire le tirage aléatoire des citoyens ciblés (NightlyHandler::random->pick).
      */
-    private pickTargets(pool_size: number, count: number): number[] {
+    private pickTargets(pool_size: number, count: number, random: () => number = Math.random): number[] {
         const indices: number[] = Array.from({ length: pool_size }, (_: unknown, i: number) => i);
         const picked: number = Math.min(count, pool_size);
         for (let i: number = 0; i < picked; i++) {
-            const j: number = i + Math.floor(Math.random() * (pool_size - i));
+            const j: number = i + Math.floor(random() * (pool_size - i));
             [indices[i], indices[j]] = [indices[j], indices[i]];
         }
         return indices.slice(0, picked);
