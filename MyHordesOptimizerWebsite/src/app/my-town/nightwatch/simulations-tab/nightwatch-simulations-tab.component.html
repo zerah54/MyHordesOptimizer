@@ -66,6 +66,15 @@
                 </span>
             </button>
         }
+        @if (store.can_edit_simulations() && selected(); as simulation) {
+            <button type="button" class="day add" data-action="add-day" i18n-matTooltip matTooltip="Ajouter un jour à la simulation"
+                    (click)="store.setSimulationLastDay(simulation.lastDay + 1)">
+                <mat-icon aria-hidden="true">add</mat-icon>
+                <strong class="number">
+                    <ng-container i18n>J</ng-container>
+                    {{ simulation.lastDay + 1 }}</strong>
+            </button>
+        }
     </div>
 
     @if (selected_day_view(); as day) {

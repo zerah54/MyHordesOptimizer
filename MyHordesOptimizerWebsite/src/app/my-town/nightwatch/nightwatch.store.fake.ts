@@ -3,9 +3,6 @@ import type { Mock } from 'vitest';
 
 import { BuildingPlanDTO } from '../buildings/planning/plan.types';
 import { PlanConflict, PlanLockState, PlanSaveState } from '../buildings/planning/planning.store';
-import { WatcherGap } from './nightwatch-compare.util';
-import { PlannedBuildings } from './nightwatch-planned-buildings.util';
-import { StockLine } from './nightwatch-stock.util';
 import { NightwatchStore, NightwatchTotals, NightwatchWatcherRow, SimulationDayView } from './nightwatch.store';
 import {
     emptyNightwatchContent,
@@ -16,13 +13,16 @@ import {
     NightwatchSimulationDTO,
     NightwatchStateDTO
 } from './nightwatch.types';
+import { WatcherGap } from './nightwatch-compare.util';
+import { PlannedBuildings } from './nightwatch-planned-buildings.util';
+import { StockLine } from './nightwatch-stock.util';
 
 /** Actions du store, espionnées. */
 type FakeAction = 'load' | 'selectDay' | 'selectPlan' | 'createPlan' | 'duplicatePlan' | 'renamePlan' | 'deletePlan' | 'setEffective' | 'addWatcher'
     | 'removeWatcher' | 'setItem' | 'toggleStatus' | 'setPastWatches' | 'setDiscourse' | 'setInstructions' | 'setAttackOverride' | 'save' | 'dismissConflict'
     | 'takeLock' | 'leave' | 'updateDraft' | 'setManualStock' | 'copyItems' | 'pasteItems' | 'copyPlanFromDay' | 'copyPlanBetweenDays' | 'setBuildingPlan' | 'enduranceLevel'
     | 'selectSimulation' | 'createSimulation' | 'renameSimulation' | 'setSimulationLastDay' | 'setSimulationStock' | 'clearSimulationStock' | 'duplicateSimulation' | 'deleteSimulation'
-    | 'setCityDefense' | 'setGlobalItem' | 'setAllowedOverflow' | 'setAttackReduction' | 'setReactorDamage';
+    | 'setCityDefense' | 'setGlobalItem' | 'setSurvivalItem' | 'setAllowedOverflow' | 'setAttackReduction' | 'setReactorDamage';
 
 /** Doublure du store : signaux modifiables par le test et actions espionnées. */
 export interface FakeNightwatchStore {
@@ -106,10 +106,10 @@ export function createFakeNightwatchStore(content: NightwatchPlanContentDTO = em
         simulation_days: signal<SimulationDayView[]>([])
     };
     const names: FakeAction[] = ['load', 'selectDay', 'selectPlan', 'createPlan', 'duplicatePlan', 'renamePlan', 'deletePlan', 'setEffective', 'addWatcher',
-        'removeWatcher', 'setItem', 'toggleStatus', 'setPastWatches', 'setDiscourse', 'setInstructions', 'setAttackOverride', 'save', 'dismissConflict', 'takeLock', 'leave',
-        'updateDraft', 'setManualStock', 'copyItems', 'pasteItems', 'copyPlanFromDay', 'copyPlanBetweenDays', 'setBuildingPlan', 'enduranceLevel',
-        'selectSimulation', 'createSimulation', 'renameSimulation', 'setSimulationLastDay', 'setSimulationStock', 'clearSimulationStock', 'duplicateSimulation', 'deleteSimulation',
-        'setCityDefense', 'setGlobalItem', 'setAllowedOverflow', 'setAttackReduction', 'setReactorDamage'];
+                                 'removeWatcher', 'setItem', 'toggleStatus', 'setPastWatches', 'setDiscourse', 'setInstructions', 'setAttackOverride', 'save', 'dismissConflict', 'takeLock', 'leave',
+                                 'updateDraft', 'setManualStock', 'copyItems', 'pasteItems', 'copyPlanFromDay', 'copyPlanBetweenDays', 'setBuildingPlan', 'enduranceLevel',
+                                 'selectSimulation', 'createSimulation', 'renameSimulation', 'setSimulationLastDay', 'setSimulationStock', 'clearSimulationStock', 'duplicateSimulation', 'deleteSimulation',
+                                 'setCityDefense', 'setGlobalItem', 'setSurvivalItem', 'setAllowedOverflow', 'setAttackReduction', 'setReactorDamage'];
     const actions: Record<FakeAction, Mock> = Object.fromEntries(names.map((name: FakeAction): [FakeAction, Mock] => [name, vi.fn()])) as Record<FakeAction, Mock>;
     actions.leave.mockImplementation((): Promise<boolean> => Promise.resolve(true));
     actions.enduranceLevel.mockReturnValue(null);

@@ -566,6 +566,10 @@
                 <source>Clôture</source>
                 <target state="final">Valla</target>
             </trans-unit>
+            <trans-unit id="7689589218625122742" datatype="html">
+                <source>Ajouter un jour à la simulation</source>
+                <target state="translated">Añadir un día a la simulación</target>
+            </trans-unit>
             <trans-unit id="7689728654084980044" datatype="html" approved="yes">
                 <source>Consigne sur cette case</source>
                 <target state="final">Instrucción en esta casilla</target>
@@ -4458,6 +4462,10 @@
                 <source>Ont pris le télescope</source>
                 <target state="final">Han cogido el telescopio</target>
             </trans-unit>
+            <trans-unit id="1668563803986565381" datatype="html">
+                <source>Sans catégorie</source>
+                <target state="translated">Sin categoría</target>
+            </trans-unit>
             <trans-unit id="1670753538069771791" datatype="html">
                 <source>Ajouter une consigne individuelle</source>
                 <target state="translated">Añadir una consigna individual</target>
@@ -4981,6 +4989,10 @@
             <trans-unit id="5357452818210220345" datatype="html" approved="yes">
                 <source>Aucun citoyen ne correspond aux filtres</source>
                 <target state="final">Ningún habitante coincide con los filtros</target>
+            </trans-unit>
+            <trans-unit id="5359694161217327084" datatype="html">
+                <source>Sans chien</source>
+                <target state="translated">Sin perro</target>
             </trans-unit>
             <trans-unit id="8948278701313201115" datatype="html" approved="yes">
                 <source>Derniers mots :</source>
@@ -5689,6 +5701,10 @@
             <trans-unit id="3623818903326968730" datatype="html" approved="yes">
                 <source>Couleur</source>
                 <target state="final">Color</target>
+            </trans-unit>
+            <trans-unit id="3625702279965590582" datatype="html">
+                <source>Objets affichés</source>
+                <target state="translated">Objetos mostrados</target>
             </trans-unit>
             <trans-unit id="3626918246274425174" datatype="html">
                 <source><x id="total" equiv-text="route_ap + ruin_ap"/> PA (<x id="route" equiv-text="route_ap"/> + <x id="ruins" equiv-text="ruin_ap"/>)</source>

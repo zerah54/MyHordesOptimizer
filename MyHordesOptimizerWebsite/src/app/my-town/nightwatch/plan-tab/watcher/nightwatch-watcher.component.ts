@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, InputSigna
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -21,9 +20,9 @@ import { NightwatchItemDefDTO, NightwatchPlanContentDTO, NightwatchWatcherDTO } 
 import { bagItems, bagItemUids, bagUsed, DISCOURSE_UID } from '../../nightwatch-bag.util';
 import { HEAVY_TOLERANCE, heavySlotsLeft, isHeavy } from '../../nightwatch-heavy.util';
 import { WatcherAlert } from '../../nightwatch-model.util';
-import { StatusOption, statusOptions } from '../../nightwatch-status-labels';
+import { NightwatchStatusesComponent } from '../../statuses/nightwatch-statuses.component';
 
-const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule];
+const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule, MatInputModule, MatTooltipModule];
 
 /** Veilleur d'une proposition : statuts, sac, veilles passées, Discours rassurant, note et valeurs calculées. */
 @Component({
@@ -31,7 +30,7 @@ const material_modules: Imports = [MatButtonModule, MatCardModule, MatCheckboxMo
     templateUrl: './nightwatch-watcher.component.html',
     styleUrls: ['./nightwatch-watcher.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [ListElementAddRemoveComponent, ...material_modules]
+    imports: [ListElementAddRemoveComponent, NightwatchStatusesComponent, ...material_modules]
 })
 export class NightwatchWatcherComponent {
 
@@ -41,7 +40,6 @@ export class NightwatchWatcherComponent {
 
     protected readonly store: NightwatchStore = inject(NightwatchStore);
     private readonly snackbar: SnackbarService = inject(SnackbarService);
-    protected readonly status_options: readonly StatusOption[] = statusOptions();
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
 
     private readonly locale: string = moment.locale();
@@ -123,25 +121,7 @@ export class NightwatchWatcherComponent {
         return item === undefined ? `#${item_id}` : (item.label?.[this.locale] ?? item.uid);
     }
 
-    /**
-     * Statut prévu coché.
-     * @param {string} key Clé du statut.
-     * @returns {boolean} Vrai s'il est prévu.
-     */
-    protected hasStatus(key: string): boolean {
-        return key === 'ghoul' ? this.store.isGhoul(this.row().user_id) : this.watcher()?.statuses.includes(key) === true;
-    }
 
-    /**
-     * Répercute dans le brouillon un statut coché ou décoché par l'utilisateur.
-     * @param {string} key Clé du statut.
-     * @param {boolean} is_user_input Faux pour un changement venu du modèle.
-     */
-    protected onStatusChange(key: string, is_user_input: boolean): void {
-        if (is_user_input) {
-            this.store.toggleStatus(this.row().user_id, key);
-        }
-    }
 
     /**
      * Risque en pourcentage, à deux décimales.

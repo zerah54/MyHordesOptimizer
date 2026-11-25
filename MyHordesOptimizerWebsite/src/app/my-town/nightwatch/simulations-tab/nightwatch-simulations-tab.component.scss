@@ -30,6 +30,13 @@
         gap: 0.4em;
     }
 
+    // Panneaux sur la surface des cartes, comme Débordement et le wiki : lisibles sur le fond de page.
+    mat-expansion-panel {
+        background: var(--mho-surface);
+        border: 1px solid var(--mho-line);
+        box-shadow: none;
+    }
+
     mat-panel-description {
         justify-content: flex-end;
     }
@@ -75,6 +82,13 @@
         .count {
             font-size: 0.85em;
             opacity: 0.75;
+        }
+
+        &.add {
+            flex-direction: row;
+            align-items: center;
+            min-width: auto;
+            border-style: dashed;
         }
     }
 

@@ -997,6 +997,36 @@ export class NightwatchStore {
     }
 
     /**
+     * Objet de survie d'un veilleur de simulation : le stuff global gagne ou perd autant d'exemplaires que le veilleur.
+     * @param {number} user_id Citoyen.
+     * @param {number} item_id Objet.
+     * @param {number} quantity Nouvelle quantité portée.
+     */
+    public setSurvivalItem(user_id: number, item_id: number, quantity: number): void {
+        this.updateDraft((content: NightwatchPlanContentDTO): void => {
+            const watcher: NightwatchWatcherDTO | undefined = content.watchers.find((candidate: NightwatchWatcherDTO): boolean => candidate.userId === user_id);
+            if (watcher === undefined) {
+                return;
+            }
+            const delta: number = quantity - (watcher.items[item_id] ?? 0);
+            if (quantity > 0) {
+                watcher.items[item_id] = quantity;
+            } else {
+                delete watcher.items[item_id];
+            }
+            const globals: Record<number, number> = { ...(content.globalItems ?? {}) };
+            const assigned: number = content.watchers.reduce((sum: number, candidate: NightwatchWatcherDTO): number => sum + (candidate.items[item_id] ?? 0), 0);
+            const total: number = Math.max((globals[item_id] ?? 0) + delta, assigned);
+            if (total > 0) {
+                globals[item_id] = total;
+            } else {
+                delete globals[item_id];
+            }
+            content.globalItems = globals;
+        });
+    }
+
+    /**
      * Débordement autorisé.
      * @param {number | null} value Valeur, ou `null`.
      */

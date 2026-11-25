@@ -24,15 +24,7 @@
     </mat-card-header>
 
     <div class="body">
-        <mat-chip-listbox class="statuses" multiple [disabled]="!store.can_edit()" i18n-aria-label aria-label="Statuts prévus">
-            @for (status of status_options; track status.key) {
-                <mat-chip-option class="status" [attr.data-status]="status.key" [selected]="hasStatus(status.key)" [disabled]="!store.can_edit()"
-                                 (selectionChange)="onStatusChange(status.key, $event.isUserInput)">
-                    <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
-                    {{ status.label }}
-                </mat-chip-option>
-            }
-        </mat-chip-listbox>
+        <mho-nightwatch-statuses [userId]="row().user_id" [disabled]="!store.can_edit()"/>
 
         <div class="bag">
             <mho-list-element-add-remove withQuantity label="Sac" i18n-label [currentList]="bag_items()" [lists]="bag_lists()"

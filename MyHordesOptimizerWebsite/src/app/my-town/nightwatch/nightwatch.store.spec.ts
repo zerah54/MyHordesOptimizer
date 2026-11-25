@@ -1086,6 +1086,23 @@ describe('NightwatchStore', (): void => {
             expect(store.draft()?.globalItems).toEqual({ 8: 2 });
         });
 
+        it('setSurvivalItem : le stuff global suit l\'ajout et le retrait ; setItem (sacs du Plan) rend au global', async (): Promise<void> => {
+            store = create(sim_dto([sim_plan(TODAY, { globalItems: { 8: 1 }, watchers: [watcher(1)] }), sim_plan(TODAY + 1)]));
+            store.selectSimulation(SIM_ID);
+
+            store.setSurvivalItem(1, 9, 2);
+            store.setSurvivalItem(1, 9, 1);
+            await settle();
+            expect(store.draft()?.globalItems).toEqual({ 8: 1, 9: 1 });
+            store.setSurvivalItem(1, 9, 0);
+            expect(store.draft()?.globalItems).toEqual({ 8: 1 });
+            expect(store.draft()?.watchers[0].items).toEqual({});
+
+            store.setItem(1, 8, 1);
+            store.setItem(1, 8, 0);
+            expect(store.draft()?.globalItems).toEqual({ 8: 1 });
+        });
+
         it('setGlobalItem : jamais sous le total attribué aux veilleurs', async (): Promise<void> => {
             store = create(sim_dto([sim_plan(TODAY, { watchers: [watcher(1), watcher(2)] }), sim_plan(TODAY + 1)]));
             store.selectSimulation(SIM_ID);

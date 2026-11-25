@@ -1,0 +1,21 @@
+<mat-chip-listbox class="statuses" multiple [disabled]="disabled()" i18n-aria-label aria-label="Statuts prévus">
+    @for (status of chip_options; track status.key) {
+        <mat-chip-option class="status" [attr.data-status]="status.key" [selected]="hasStatus(status.key)" [disabled]="disabled()"
+                         (selectionChange)="onStatusChange(status.key, $event.isUserInput)">
+            <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
+            {{ status.label }}
+        </mat-chip-option>
+    }
+</mat-chip-listbox>
+<mat-button-toggle-group class="dog" [value]="dog()" [disabled]="disabled()" hideSingleSelectionIndicator i18n-aria-label aria-label="Chien"
+                         (change)="setDog($event.value)">
+    <mat-button-toggle data-dog="none" [value]="NO_DOG" i18n>Sans chien</mat-button-toggle>
+    @for (status of dog_options; track status.key) {
+        <mat-button-toggle [attr.data-dog]="status.key" [value]="status.key">
+            <span class="option">
+                <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
+                {{ status.label }}
+            </span>
+        </mat-button-toggle>
+    }
+</mat-button-toggle-group>

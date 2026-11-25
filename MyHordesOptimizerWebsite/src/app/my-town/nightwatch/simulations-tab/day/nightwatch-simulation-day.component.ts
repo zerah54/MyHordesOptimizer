@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, InputSignal, LOCALE_ID, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, InputSignal, LOCALE_ID, Signal, signal, WritableSignal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,7 @@ import { HORDES_IMG_REPO } from '../../../../_abstract_model/const';
 import { ApiService } from '../../../../_abstract_model/services/api.service';
 import { Imports, ListForAddRemove } from '../../../../_abstract_model/types/_types';
 import { Item } from '../../../../_abstract_model/types/item.class';
+import { localizedLabel } from '../../../../_core/utilities/string.utils';
 import { BAG_SPACE_UIDS, maxBagCapacity } from '../../../../_shared/bag/bag-capacity.util';
 import { ListElementAddRemoveComponent } from '../../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { itemIcon, itemLabel } from '../../../buildings/planning/planning-labels.util';
@@ -25,10 +26,10 @@ import { AddableCitizen, addableCitizens } from '../../nightwatch-addable-citize
 import { bagItems, bagItemUids, bagUsed } from '../../nightwatch-bag.util';
 import { isHeavy } from '../../nightwatch-heavy.util';
 import { cityDefenseTotal, CityDefenseValues } from '../../nightwatch-simulation.util';
-import { StatusOption, statusOptions } from '../../nightwatch-status-labels';
+import { NightwatchStatusesComponent } from '../../statuses/nightwatch-statuses.component';
 
 const material_modules: Imports = [
-    MatButtonModule, MatCardModule, MatChipsModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatTooltipModule
+    MatButtonModule, MatButtonToggleModule, MatCardModule, MatExpansionModule, MatFormFieldModule, MatIconModule, MatInputModule, MatSelectModule, MatTooltipModule
 ];
 
 /** Poste de défense saisi par un champ numérique. */
@@ -54,13 +55,23 @@ interface StockRow {
     quantity: number;
 }
 
+/** Catégorie du stock restant et ses objets. */
+interface StockGroup {
+    label: string;
+    ordering: number;
+    rows: StockRow[];
+}
+
+/** Objets montrés dans le stock restant : objets de veille seulement, ou tous. */
+type StockFilter = 'watch' | 'all';
+
 /** Vue du jour sélectionné d'une simulation : attaque, postes de défense, veilleurs, stuff global, stock restant et verdict. */
 @Component({
     selector: 'mho-nightwatch-simulation-day',
     templateUrl: './nightwatch-simulation-day.component.html',
     styleUrls: ['./nightwatch-simulation-day.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [ListElementAddRemoveComponent, ...material_modules]
+    imports: [ListElementAddRemoveComponent, NightwatchStatusesComponent, ...material_modules]
 })
 export class NightwatchSimulationDayComponent {
 
@@ -68,7 +79,6 @@ export class NightwatchSimulationDayComponent {
 
     protected readonly store: NightwatchStore = inject(NightwatchStore);
     protected readonly HORDES_IMG_REPO: string = HORDES_IMG_REPO;
-    protected readonly status_options: readonly StatusOption[] = statusOptions();
     protected readonly ad_levels: readonly number[] = [-1, 0, 1, 2, 3];
     protected readonly posts: readonly DefensePost[] = [
         { key: 'buildings', label: $localize`Chantiers` },
@@ -184,6 +194,32 @@ export class NightwatchSimulationDayComponent {
             }))
             .filter((row: StockRow): boolean => this.items().some((item: Item): boolean => item.id === row.item_id)));
 
+    /** Filtre du stock restant. */
+    protected readonly stock_filter: WritableSignal<StockFilter> = signal<StockFilter>('watch');
+
+    /** Stock restant par catégorie (ordre du jeu), filtré ; objets par libellé. */
+    protected readonly stock_groups: Signal<StockGroup[]> = computed((): StockGroup[] => {
+        const known: Record<number, NightwatchItemDefDTO> = this.store.referential()?.items ?? {};
+        const groups: Map<number, StockGroup> = new Map<number, StockGroup>();
+        for (const row of this.stock_rows()) {
+            const item: Item | undefined = this.items().find((candidate: Item): boolean => candidate.id === row.item_id);
+            if (item === undefined || (this.stock_filter() === 'watch' && known[item.id] === undefined && !BAG_SPACE_UIDS.includes(item.uid))) {
+                continue;
+            }
+            const key: number = item.category?.id_category ?? -1;
+            const group: StockGroup = groups.get(key) ?? {
+                label: localizedLabel(item.category?.label, this.locale) || $localize`Sans catégorie`,
+                ordering: item.category?.ordering ?? Number.MAX_SAFE_INTEGER,
+                rows: []
+            };
+            group.rows.push(row);
+            groups.set(key, group);
+        }
+        return [...groups.values()]
+            .sort((a: StockGroup, b: StockGroup): number => a.ordering - b.ordering)
+            .map((group: StockGroup): StockGroup => ({ ...group, rows: group.rows.sort((a: StockRow, b: StockRow): number => a.label.localeCompare(b.label, this.site_locale)) }));
+    });
+
     /**
      * Valeur saisie d'un poste de défense, nulle s'il est pré-rempli.
      * @param {keyof CityDefenseValues} key Poste.
@@ -232,27 +268,7 @@ export class NightwatchSimulationDayComponent {
         return Math.round(risk * 10000) / 100;
     }
 
-    /**
-     * Statut prévu coché.
-     * @param {number} user_id Citoyen.
-     * @param {string} key Clé du statut.
-     * @returns {boolean} Vrai s'il est prévu.
-     */
-    protected hasStatus(user_id: number, key: string): boolean {
-        return key === 'ghoul' ? this.store.isGhoul(user_id) : this.watcher(user_id)?.statuses.includes(key) === true;
-    }
 
-    /**
-     * Répercute un statut coché ou décoché par l'utilisateur.
-     * @param {number} user_id Citoyen.
-     * @param {string} key Clé du statut.
-     * @param {boolean} is_user_input Faux pour un changement venu du modèle.
-     */
-    protected onStatusChange(user_id: number, key: string, is_user_input: boolean): void {
-        if (is_user_input) {
-            this.store.toggleStatus(user_id, key);
-        }
-    }
 
     /**
      * Ajoute ou retire un exemplaire d'objet de survie à un veilleur (le stuff global suit dans le store).
@@ -261,7 +277,7 @@ export class NightwatchSimulationDayComponent {
      * @param {number} delta +1 ou -1.
      */
     protected changeSurvival(user_id: number, item_id: number, delta: number): void {
-        this.store.setItem(user_id, item_id, Math.max(0, (this.watcher(user_id)?.items[item_id] ?? 0) + delta));
+        this.store.setSurvivalItem(user_id, item_id, Math.max(0, (this.watcher(user_id)?.items[item_id] ?? 0) + delta));
     }
 
     /**
@@ -269,7 +285,7 @@ export class NightwatchSimulationDayComponent {
      * @param {number} user_id Citoyen.
      */
     protected emptySurvival(user_id: number): void {
-        (this.survival_bags().get(user_id) ?? []).forEach((item: Item): void => this.store.setItem(user_id, item.id, 0));
+        (this.survival_bags().get(user_id) ?? []).forEach((item: Item): void => this.store.setSurvivalItem(user_id, item.id, 0));
     }
 
     /**

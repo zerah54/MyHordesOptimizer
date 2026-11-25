@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 
 import { ApiService } from '../../../../_abstract_model/services/api.service';
 import { ListForAddRemove } from '../../../../_abstract_model/types/_types';
+import { Category } from '../../../../_abstract_model/types/category.class';
 import { Item } from '../../../../_abstract_model/types/item.class';
 import { ListElementAddRemoveComponent } from '../../../../_shared/list-elements-add-remove/list-element-add-remove.component';
 import { NightwatchStore, SimulationDayView } from '../../nightwatch.store';
@@ -12,9 +13,12 @@ import { createFakeNightwatchStore, FakeNightwatchStore } from '../../nightwatch
 import { emptyNightwatchContent, NightwatchPlanContentDTO, NightwatchReferentialDTO } from '../../nightwatch.types';
 import { NightwatchSimulationDayComponent } from './nightwatch-simulation-day.component';
 
+const DEFENSE: Category = Object.assign(new Category(), { id_category: 1, label: { fr: 'Défense', en: 'Defense' }, ordering: 1 });
+const RESOURCES: Category = Object.assign(new Category(), { id_category: 2, label: { fr: 'Matériaux', en: 'Resources' }, ordering: 2 });
 const COFFEE: Item = Object.assign(new Item(), { id: 20, uid: 'coffee_#00', label: { fr: 'Café', en: 'Coffee' }, img: 'item/item_coffee.gif', is_heaver: false });
-const DOOR: Item = Object.assign(new Item(), { id: 21, uid: 'door_#00', label: { fr: 'Porte', en: 'Door' }, img: 'item/item_door.gif', is_heaver: true });
-const WOOD: Item = Object.assign(new Item(), { id: 22, uid: 'wood_#00', label: { fr: 'Planche', en: 'Wood' }, img: 'item/item_wood.gif', is_heaver: false });
+const DOOR: Item = Object.assign(new Item(), { id: 21, uid: 'door_#00', label: { fr: 'Porte', en: 'Door' }, img: 'item/item_door.gif', is_heaver: true, category: DEFENSE });
+const WOOD: Item = Object.assign(new Item(), { id: 22, uid: 'wood_#00', label: { fr: 'Planche', en: 'Wood' }, img: 'item/item_wood.gif', is_heaver: false, category: RESOURCES });
+const ROCK: Item = Object.assign(new Item(), { id: 23, uid: 'rock_#00', label: { fr: 'Pierre', en: 'Rock' }, img: 'item/item_rock.gif', is_heaver: false, category: RESOURCES });
 
 /** Référentiel réduit : le café a un effet de survie, porte et planche n'en ont pas. */
 const REFERENTIAL: NightwatchReferentialDTO = {
@@ -60,7 +64,7 @@ describe('NightwatchSimulationDayComponent', (): void => {
             providers: [
                 { provide: ANIMATION_MODULE_TYPE, useValue: 'NoopAnimations' },
                 { provide: NightwatchStore, useValue: fake.store },
-                { provide: ApiService, useValue: { getItems: (): unknown => of([COFFEE, DOOR, WOOD]) } }
+                { provide: ApiService, useValue: { getItems: (): unknown => of([COFFEE, DOOR, WOOD, ROCK]) } }
             ]
         }).compileComponents();
         fixture = TestBed.createComponent(NightwatchSimulationDayComponent);
@@ -182,14 +186,14 @@ describe('NightwatchSimulationDayComponent', (): void => {
         expect(fake.actions.addWatcher).toHaveBeenCalledWith(1);
     });
 
-    it('objets de survie d\'un veilleur : seuls ceux à watchImpact non nul, ajout → setItem', async (): Promise<void> => {
+    it('objets de survie d\'un veilleur : seuls ceux à watchImpact non nul, ajout → setSurvivalItem (le stuff global suit)', async (): Promise<void> => {
         await render({ watchers: [{ userId: 1, statuses: [], items: { 20: 1, 22: 1 }, hasDiscourse: false }] });
 
         const survival: ListElementAddRemoveComponent = bag('survival-1');
         expect((survival.lists()[0].list as Item[]).map((item: Item): number => item.id)).toEqual([20]);
         expect((survival.currentList() as Item[]).map((item: Item): number => item.id)).toEqual([20]);
         survival.add.emit(20);
-        expect(fake.actions.setItem).toHaveBeenCalledWith(1, 20, 2);
+        expect(fake.actions.setSurvivalItem).toHaveBeenCalledWith(1, 20, 2);
     });
 
     it('stuff global : ajout et retrait → setGlobalItem', async (): Promise<void> => {
@@ -252,6 +256,18 @@ describe('NightwatchSimulationDayComponent', (): void => {
         const lines: string[] = Array.from(root().querySelectorAll('[data-stock]')).map((line: Element): string => line.getAttribute('data-stock') ?? '');
         expect(lines).toEqual(['22']);
         expect(text(root().querySelector('[data-stock="22"]'))).toContain('3');
+    });
+
+    it('stock restant : par catégorie, objets de veille par défaut, « Tous » montre le reste', async (): Promise<void> => {
+        await render({}, { stock: { 21: 1, 22: 3, 23: 4 } });
+        const shown: () => string[] = (): string[] => Array.from(root().querySelectorAll('[data-stock]')).map((line: Element): string => line.getAttribute('data-stock') ?? '');
+
+        expect(Array.from(root().querySelectorAll('.stock-category h4')).map((title: Element): string => text(title))).toEqual(['Defense', 'Resources']);
+        expect(shown()).toEqual(['21', '22']);
+
+        root().querySelector<HTMLButtonElement>('mat-button-toggle[data-stock-filter="all"] button')?.click();
+        fixture.detectChanges();
+        expect(shown()).toEqual(['21', '23', '22']);
     });
 
     it('lecture seule si la proposition sélectionnée n\'est pas celle du jour', async (): Promise<void> => {

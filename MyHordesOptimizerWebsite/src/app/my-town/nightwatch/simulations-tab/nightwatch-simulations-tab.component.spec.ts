@@ -252,6 +252,22 @@ describe('NightwatchSimulationsTabComponent', (): void => {
         expect(fake.actions.setSimulationLastDay).toHaveBeenCalledWith(10);
     });
 
+    it('frise : « + J13 » ajoute un jour à la simulation ; absent sans droit', async (): Promise<void> => {
+        await render();
+        selectSimulation();
+        fake.simulation_days.set([simDay(10, [], null), simDay(11, [], null), simDay(12, [], null)]);
+        fixture.detectChanges();
+
+        const add: HTMLButtonElement | null = root().querySelector<HTMLButtonElement>('button[data-action="add-day"]');
+        expect(text(add)).toContain('J 13');
+        add?.click();
+        expect(fake.actions.setSimulationLastDay).toHaveBeenCalledWith(13);
+
+        fake.can_edit_simulations.set(false);
+        fixture.detectChanges();
+        expect(root().querySelector('button[data-action="add-day"]')).toBeNull();
+    });
+
     it('allonger le dernier jour : sans confirmation', async (): Promise<void> => {
         await render();
         selectSimulation();

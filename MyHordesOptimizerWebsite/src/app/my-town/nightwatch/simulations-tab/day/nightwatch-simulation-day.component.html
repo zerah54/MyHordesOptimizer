@@ -152,15 +152,7 @@
                             <mat-icon>close</mat-icon>
                         </button>
                     </div>
-                    <mat-chip-listbox class="statuses" multiple [disabled]="!editable()" i18n-aria-label aria-label="Statuts prévus">
-                        @for (status of status_options; track status.key) {
-                            <mat-chip-option [attr.data-status]="status.key" [selected]="hasStatus(card.user_id, status.key)" [disabled]="!editable()"
-                                             (selectionChange)="onStatusChange(card.user_id, status.key, $event.isUserInput)">
-                                <img class="status-icon" [src]="HORDES_IMG_REPO + status.img" alt="">
-                                {{ status.label }}
-                            </mat-chip-option>
-                        }
-                    </mat-chip-listbox>
+                    <mho-nightwatch-statuses [userId]="card.user_id" [disabled]="!editable()"/>
                     <mho-list-element-add-remove withQuantity [attr.data-bag]="'survival-' + card.user_id" label="Objets de survie" i18n-label
                                                  [currentList]="survival_bags().get(card.user_id) ?? []" [lists]="survival_lists()"
                                                  addLabel="Ajouter" i18n-addLabel (add)="changeSurvival(card.user_id, +$event, 1)"
@@ -207,16 +199,26 @@
                 <mat-panel-title i18n>Stock restant</mat-panel-title>
                 <mat-panel-description>{{ stock_rows().length }}</mat-panel-description>
             </mat-expansion-panel-header>
-            <div class="stock">
-                @for (row of stock_rows(); track row.item_id) {
-                    <span class="item" [attr.data-stock]="row.item_id" [title]="row.label">
-                        @if (row.icon !== '') {
-                            <img [src]="row.icon" [alt]="row.label">
+            <mat-button-toggle-group class="stock-filter" [value]="stock_filter()" hideSingleSelectionIndicator i18n-aria-label
+                                     aria-label="Objets affichés" (change)="stock_filter.set($event.value)">
+                <mat-button-toggle data-stock-filter="watch" value="watch" i18n>Objets de veille</mat-button-toggle>
+                <mat-button-toggle data-stock-filter="all" value="all" i18n>Tous</mat-button-toggle>
+            </mat-button-toggle-group>
+            @for (group of stock_groups(); track group.label) {
+                <div class="stock-category">
+                    <h4>{{ group.label }}</h4>
+                    <div class="stock">
+                        @for (row of group.rows; track row.item_id) {
+                            <span class="item" [attr.data-stock]="row.item_id" [title]="row.label">
+                                @if (row.icon !== '') {
+                                    <img [src]="row.icon" [alt]="row.label">
+                                }
+                                {{ row.quantity }}
+                            </span>
                         }
-                        {{ row.quantity }}
-                    </span>
-                }
-            </div>
+                    </div>
+                </div>
+            }
         </mat-expansion-panel>
     }
 </mat-accordion>
