@@ -100,9 +100,36 @@
         margin-left: 0.3em;
     }
 
-    .resources li.missing {
-        color: var(--mho-danger);
-        font-weight: 600;
+    .resources li {
+        cursor: pointer;
+
+        &.missing {
+            color: var(--mho-danger);
+            font-weight: 600;
+        }
+
+        &.selected {
+            outline: 2px solid var(--mho-accent);
+            border-radius: var(--mho-radius-s);
+        }
+    }
+
+    .resource-filter {
+        flex: 0 1 14em;
+    }
+
+    .resource-total {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3em;
+
+        &.missing {
+            color: var(--mho-danger);
+        }
+    }
+
+    tr.building-row.dimmed td {
+        opacity: 0.5;
     }
 
     .state {

@@ -1,4 +1,4 @@
-import { ANIMATION_MODULE_TYPE } from '@angular/core';
+import { ANIMATION_MODULE_TYPE, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import type { Mock } from 'vitest';
@@ -9,7 +9,7 @@ import { setTown } from '../../../../_core/utilities/localstorage.util';
 import { BuildingProgress } from '../building-progress.util';
 import { WELL_WATER_EFFECT } from '../building-upgrades.types';
 import { BuildingPlanContentDTO, emptyPlanContent, isBuildingStep, PlanItemDTO, PlanPool } from '../plan.types';
-import { DayEvaluation, WORKSHOP_UID } from '../plan-evaluation.util';
+import { BuildingRef, DayEvaluation, WORKSHOP_UID } from '../plan-evaluation.util';
 import { PlanningStore } from '../planning.store';
 import { createFakeStore, FAKE_REGULAR_CITIZENS, fakeCatalog, fakeEvaluation, FakePlanningStore } from '../planning.store.fake';
 import { PlanningTreeDrawerComponent } from './planning-tree-drawer.component';
@@ -203,6 +203,64 @@ describe('PlanningTreeDrawerComponent', (): void => {
         fixture.detectChanges();
 
         expect(names()).toEqual(['Porte']);
+    });
+
+    it('cliquer une ressource ne garde que les chantiers qui la demandent, avec le besoin total et la banque', async (): Promise<void> => {
+        await render();
+        expect(root().querySelector('[data-field="resource-total"]')).toBeNull();
+
+        row(1).querySelector<HTMLElement>('.resources li')?.click();
+        fixture.detectChanges();
+
+        expect(names()).toEqual(['Mur']);
+        expect(row(1).querySelector('.resources li.selected')).not.toBeNull();
+        expect(root().querySelector<HTMLInputElement>('input[data-field="resource"]')?.value).toBe('wood');
+        const total: string = root().querySelector('[data-field="resource-total"]')?.textContent ?? '';
+        expect(total).toMatch(/2\D+1/);
+
+        click('clear-resource');
+        expect(names()).toEqual(['Mur', 'Porte']);
+    });
+
+    it('l\'autocomplétion propose les ressources demandées et filtre sur celle choisie', async (): Promise<void> => {
+        await render();
+        const input: HTMLInputElement = root().querySelector<HTMLInputElement>('input[data-field="resource"]') as HTMLInputElement;
+        input.focus();
+        input.value = 'woo';
+        input.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        const options: HTMLElement[] = Array.from(document.querySelectorAll<HTMLElement>('mat-option'));
+        expect(options.map((option: HTMLElement): string => option.textContent?.trim() ?? '')).toEqual(['wood']);
+        options[0].click();
+        fixture.detectChanges();
+
+        expect(names()).toEqual(['Mur']);
+        expect(input.value).toBe('wood');
+
+        input.value = '';
+        input.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+        expect(names()).toEqual(['Mur', 'Porte']);
+    });
+
+    it('le filtre par ressource garde les construits, en retrait et hors du total', async (): Promise<void> => {
+        await render();
+        const buildings: WritableSignal<ReadonlyMap<number, BuildingRef>> = fake.store.buildings as WritableSignal<ReadonlyMap<number, BuildingRef>>;
+        buildings.set(new Map<number, BuildingRef>([...buildings(), [3, { ...buildings().get(3) as BuildingRef, resources: [{ itemId: 5, count: 4 }] }]]));
+        fixture.detectChanges();
+
+        row(1).querySelector<HTMLElement>('.resources li')?.click();
+        fixture.detectChanges();
+
+        expect(names()).toEqual(['Mur', 'Porte']);
+        expect(row(3).classList).toContain('dimmed');
+        expect(row(1).classList).not.toContain('dimmed');
+        expect(root().querySelector('[data-field="resource-total"]')?.textContent).toMatch(/2\D+1/);
+
+        click('hide-built');
+        expect(names()).toEqual(['Mur']);
     });
 
     it('trie par défense par PA, avec le ratio affiché', async (): Promise<void> => {

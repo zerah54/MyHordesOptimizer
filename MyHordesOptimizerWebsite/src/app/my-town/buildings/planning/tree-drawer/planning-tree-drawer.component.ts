@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, Signal, signal, WritableSignal } from '@angular/core';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -42,7 +43,7 @@ import { workshopCap } from '../workshop.util';
 
 const components: Imports = [CompactStepperComponent, IconApComponent, PlanningKpisComponent];
 const material_modules: Imports = [
-    MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
+    MatAutocompleteModule, MatButtonModule, MatButtonToggleModule, MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatInputModule,
     MatSlideToggleModule, MatTooltipModule
 ];
 
@@ -63,10 +64,18 @@ interface ResourceView {
     missing: boolean;
 }
 
-/** Ligne du tiroir. */
+/** Choix du filtre par ressource. */
+interface ResourceOption {
+    itemId: number;
+    label: string;
+    /** Chemin relatif au dépôt d'images. */
+    img: string;
+}
+
 /** Sous-chantiers de la Décharge supprimés du jeu (absorbés par ses évolutions) mais que l'API renvoie encore. */
 const OBSOLETE_BUILDING_UIDS: ReadonlySet<string> = new Set<string>(['small_trash_#01', 'small_trash_#02', 'small_trash_#03', 'small_trash_#04', 'small_trash_#05']);
 
+/** Ligne du tiroir. */
 interface TreeRow {
     building: Building;
     id: number;
@@ -114,6 +123,9 @@ export class PlanningTreeDrawerComponent {
     /** Débloqués seulement par défaut, sauf en Pandémonium où l'on règle le niveau de plan des chantiers non débloqués. */
     protected readonly unlocked_only: WritableSignal<boolean> = signal(!this.hard_mode);
     protected readonly hide_built: WritableSignal<boolean> = signal(false);
+    /** Ressource requise par les chantiers affichés, nulle sans filtre. */
+    protected readonly resource_filter: WritableSignal<number | null> = signal<number | null>(null);
+    protected readonly resource_query: WritableSignal<string> = signal('');
     protected readonly sort: WritableSignal<'tree' | 'ratio'> = signal<'tree' | 'ratio'>('tree');
     protected readonly collapsed: WritableSignal<ReadonlySet<number>> = signal<ReadonlySet<number>>(new Set<number>());
 
@@ -146,6 +158,77 @@ export class PlanningTreeDrawerComponent {
             .filter((row: TreeRow): boolean => shown(row.building) && normalizeString(row.name).includes(needle))
             .sort((a: TreeRow, b: TreeRow): number => (b.ratio ?? Number.NEGATIVE_INFINITY) - (a.ratio ?? Number.NEGATIVE_INFINITY) || a.name.localeCompare(b.name));
     });
+
+    /** Ressources demandées par au moins un chantier planifiable, par nom. */
+    protected readonly resource_options: Signal<ResourceOption[]> = computed((): ResourceOption[] => {
+        const options: Map<number, ResourceOption> = new Map<number, ResourceOption>();
+        this.views().forEach((row: TreeRow): void => {
+            if (!this.isPlannable(row)) {
+                return;
+            }
+            row.resources.forEach((resource: ResourceView): void => {
+                if (!options.has(resource.itemId)) {
+                    const item: Item | undefined = this.store.items().find((candidate: Item): boolean => candidate.id === resource.itemId);
+                    options.set(resource.itemId, { itemId: resource.itemId, label: resource.label, img: item?.img ?? '' });
+                }
+            });
+        });
+        return Array.from(options.values()).sort((a: ResourceOption, b: ResourceOption): number => a.label.localeCompare(b.label));
+    });
+
+    /** Besoin de la ressource filtrée sur les chantiers affichés non construits, face à la banque ; nul sans filtre. */
+    protected readonly resource_total: Signal<{ need: number; bank: number; img: string; label: string } | null> = computed((): { need: number; bank: number; img: string; label: string } | null => {
+        const item_id: number | null = this.resource_filter();
+        if (item_id === null) {
+            return null;
+        }
+        let need: number = 0;
+        let view: ResourceView | undefined;
+        this.rows().forEach((row: TreeRow): void => {
+            const resource: ResourceView | undefined = row.resources.find((candidate: ResourceView): boolean => candidate.itemId === item_id);
+            view ??= resource;
+            if (resource !== undefined && row.state !== 'built') {
+                need += resource.count;
+            }
+        });
+        return { need, bank: this.store.bank().get(item_id) ?? 0, img: view?.img ?? '', label: view?.label ?? '' };
+    });
+
+    /** Ressources proposées par l'autocomplétion pour la saisie en cours. */
+    protected readonly matching_resources: Signal<ResourceOption[]> = computed((): ResourceOption[] => {
+        const needle: string = normalizeString(this.resource_query()).trim();
+        return this.resource_options().filter((option: ResourceOption): boolean => normalizeString(option.label).includes(needle));
+    });
+
+    /** Texte affiché dans le champ pour l'option choisie. */
+    protected readonly optionLabel: (option: ResourceOption | string | null) => string = (option: ResourceOption | string | null): string =>
+        typeof option === 'string' ? option : option?.label ?? '';
+
+    /**
+     * Filtre sur une ressource, depuis l'autocomplétion ou une icône de ligne.
+     * @param {{ itemId: number; label: string }} resource Ressource choisie.
+     */
+    protected selectResource(resource: { itemId: number; label: string }): void {
+        this.resource_filter.set(resource.itemId);
+        this.resource_query.set(resource.label);
+    }
+
+    /**
+     * Saisie dans le champ ressource : vider le champ retire le filtre.
+     * @param {string} value Texte saisi.
+     */
+    protected onResourceInput(value: string): void {
+        this.resource_query.set(value);
+        if (value.trim() === '') {
+            this.resource_filter.set(null);
+        }
+    }
+
+    /** Retire le filtre par ressource. */
+    protected clearResource(): void {
+        this.resource_filter.set(null);
+        this.resource_query.set('');
+    }
 
     /** Titre de la section ouverte. */
     protected poolLabel(): string {
@@ -208,13 +291,26 @@ export class PlanningTreeDrawerComponent {
      * @returns {boolean} Vrai si affichée.
      */
     private isShown(row: TreeRow | undefined): boolean {
-        if (row === undefined || OBSOLETE_BUILDING_UIDS.has(row.building.uid) || !this.plannable().has(row.id)) {
+        if (row === undefined || !this.isPlannable(row)) {
             return false;
         }
         if (this.unlocked_only() && row.state === 'locked') {
             return false;
         }
+        const item_id: number | null = this.resource_filter();
+        if (item_id !== null && !row.resources.some((resource: ResourceView): boolean => resource.itemId === item_id)) {
+            return false;
+        }
         return !(this.hide_built() && row.state === 'built');
+    }
+
+    /**
+     * Chantier proposé à la ville (ni obsolète, ni hors de son type de ville).
+     * @param {TreeRow} row Vue du chantier.
+     * @returns {boolean} Vrai si planifiable.
+     */
+    private isPlannable(row: TreeRow): boolean {
+        return !OBSOLETE_BUILDING_UIDS.has(row.building.uid) && this.plannable().has(row.id);
     }
 
     /** Chantiers que la ville peut planifier. */

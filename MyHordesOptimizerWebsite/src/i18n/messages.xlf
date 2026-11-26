@@ -149,6 +149,9 @@
             <trans-unit id="2142671952702245426" datatype="html">
                 <source>&lt;p&gt;Vos choix d&apos;affichage (options de la carte, affichage de la banque et des citoyens, mode édition…) sont mémorisés dans votre navigateur, pour toutes vos villes.&lt;/p&gt;</source>
             </trans-unit>
+            <trans-unit id="2145131806661214787" datatype="html">
+                <source>Défense de veille à atteindre</source>
+            </trans-unit>
             <trans-unit id="2146677198730100981" datatype="html">
                 <source>Compris</source>
             </trans-unit>
@@ -1163,6 +1166,9 @@
             <trans-unit id="5684971926721196687" datatype="html">
                 <source>Thème de la carte</source>
             </trans-unit>
+            <trans-unit id="5687940404519702050" datatype="html">
+                <source>en banque</source>
+            </trans-unit>
             <trans-unit id="1229846018197621216" datatype="html">
                 <source>Objet encombrant</source>
             </trans-unit>
@@ -1689,7 +1695,7 @@
                 <source>Imposé : la ville est déjà en chaos, ou un jour précédent le prévoit</source>
             </trans-unit>
             <trans-unit id="1948268959990709736" datatype="html">
-                <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</source>
+                <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-2&apos;:locale }}"/> %</source>
             </trans-unit>
             <trans-unit id="1951560998886997402" datatype="html">
                 <source>Aucun citoyen trouvé</source>
@@ -1795,6 +1801,9 @@
             </trans-unit>
             <trans-unit id="3193976279273491157" datatype="html">
                 <source>Actions</source>
+            </trans-unit>
+            <trans-unit id="3196909481869782172" datatype="html">
+                <source>Ressource requise</source>
             </trans-unit>
             <trans-unit id="3197202105243682681" datatype="html">
                 <source>Aucun plan de chantiers effectif lisible pour ce jour.</source>
@@ -2326,6 +2335,9 @@
             </trans-unit>
             <trans-unit id="5833055296319952035" datatype="html">
                 <source>Métier</source>
+            </trans-unit>
+            <trans-unit id="5841102214560008169" datatype="html">
+                <source>Retirer le filtre par ressource</source>
             </trans-unit>
             <trans-unit id="4000330220140769347" datatype="html">
                 <source> — coché : oui · décoché : non · indéterminé : tous</source>
@@ -3091,6 +3103,9 @@
             </trans-unit>
             <trans-unit id="7990466204671039960" datatype="html">
                 <source>Partir d&apos;une copie de la proposition affichée</source>
+            </trans-unit>
+            <trans-unit id="5402202079809475400" datatype="html">
+                <source>Risque de mort accepté (%)</source>
             </trans-unit>
             <trans-unit id="5406770459454197462" datatype="html">
                 <source>Vous pouvez retrouver ce plan en suivant</source>
@@ -4597,6 +4612,9 @@
             </trans-unit>
             <trans-unit id="5793486985259132009" datatype="html">
                 <source>&lt;p&gt;Les fouilles de chaque citoyen, jour par jour. « + » ajoute une fouille au jour affiché : renseignez sa position (la ville est en 0/0), les fouilles réussies et totales, puis enregistrez. Chaque fouille se modifie ou se supprime.&lt;/p&gt;</source>
+            </trans-unit>
+            <trans-unit id="5795230241658653743" datatype="html">
+                <source>Défense à atteindre</source>
             </trans-unit>
             <trans-unit id="4843074552222243213" datatype="html">
                 <source>Brun</source>

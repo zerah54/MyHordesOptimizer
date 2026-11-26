@@ -198,6 +198,10 @@
                 <source>&lt;p&gt;Vos choix d&apos;affichage (options de la carte, affichage de la banque et des citoyens, mode édition…) sont mémorisés dans votre navigateur, pour toutes vos villes.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Deine Anzeigeeinstellungen (Kartenoptionen, Anzeige der Bank und der Bürger, Bearbeitungsmodus…) werden in deinem Browser gespeichert, für alle deine Städte.&lt;/p&gt;</target>
             </trans-unit>
+            <trans-unit id="2145131806661214787" datatype="html">
+                <source>Défense de veille à atteindre</source>
+                <target state="translated">Zu erreichende Wachverteidigung</target>
+            </trans-unit>
             <trans-unit id="2146677198730100981" datatype="html">
                 <source>Compris</source>
                 <target state="translated">Verstanden</target>
@@ -2115,8 +2119,8 @@
                 <target state="translated">Erzwungen: Die Stadt ist bereits im Chaos, oder ein früherer Tag sieht es vor</target>
             </trans-unit>
             <trans-unit id="1948268959990709736" datatype="html" approved="yes">
-                <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</source>
-                <target state="translated">Mindestens ein Überlebender: <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-1&apos;:locale }}"/> %</target>
+                <source>Au moins un survivant : <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-2&apos;:locale }}"/> %</source>
+                <target state="translated">Mindestens ein Überlebender: <x id="INTERPOLATION" equiv-text="{{ scenario.survivor_at_least_one * 100 | number:&apos;1.0-2&apos;:locale }}"/> %</target>
             </trans-unit>
             <trans-unit id="1951560998886997402" datatype="html" approved="yes">
                 <source>Aucun citoyen trouvé</source>
@@ -2257,6 +2261,10 @@
             <trans-unit id="3193976279273491157" datatype="html" approved="yes">
                 <source>Actions</source>
                 <target state="final">Aktionen</target>
+            </trans-unit>
+            <trans-unit id="3196909481869782172" datatype="html">
+                <source>Ressource requise</source>
+                <target state="translated">Benötigte Ressource</target>
             </trans-unit>
             <trans-unit id="3197202105243682681" datatype="html">
                 <source>Aucun plan de chantiers effectif lisible pour ce jour.</source>
@@ -2537,6 +2545,10 @@
             <trans-unit id="5833055296319952035" datatype="html" approved="yes">
                 <source>Métier</source>
                 <target state="final">Beruf</target>
+            </trans-unit>
+            <trans-unit id="5841102214560008169" datatype="html">
+                <source>Retirer le filtre par ressource</source>
+                <target state="translated">Ressourcenfilter entfernen</target>
             </trans-unit>
             <trans-unit id="4000330220140769347" datatype="html" approved="yes">
                 <source> — coché : oui · décoché : non · indéterminé : tous</source>
@@ -3301,6 +3313,10 @@
             <trans-unit id="7990466204671039960" datatype="html">
                 <source>Partir d&apos;une copie de la proposition affichée</source>
                 <target state="translated">Mit einer Kopie des angezeigten Vorschlags beginnen</target>
+            </trans-unit>
+            <trans-unit id="5402202079809475400" datatype="html">
+                <source>Risque de mort accepté (%)</source>
+                <target state="translated">Akzeptiertes Todesrisiko (%)</target>
             </trans-unit>
             <trans-unit id="5406770459454197462" datatype="html">
                 <source>Vous pouvez retrouver ce plan en suivant</source>
@@ -5414,6 +5430,10 @@
                 <source>Thème de la carte</source>
                 <target state="translated">Kartenthema</target>
             </trans-unit>
+            <trans-unit id="5687940404519702050" datatype="html">
+                <source>en banque</source>
+                <target state="translated">in der Bank</target>
+            </trans-unit>
             <trans-unit id="8555761515915840353" datatype="html" approved="yes">
                 <source>Supprimer la simulation</source>
                 <target state="final">Simulation löschen</target>
@@ -5653,6 +5673,10 @@
             <trans-unit id="5793486985259132009" datatype="html" approved="yes">
                 <source>&lt;p&gt;Les fouilles de chaque citoyen, jour par jour. « + » ajoute une fouille au jour affiché : renseignez sa position (la ville est en 0/0), les fouilles réussies et totales, puis enregistrez. Chaque fouille se modifie ou se supprime.&lt;/p&gt;</source>
                 <target state="final">&lt;p&gt;Die Ausgrabungen jedes Bürgers, Tag für Tag. „+“ fügt dem angezeigten Tag eine Ausgrabung hinzu: Gib ihre Position an (die Stadt liegt bei 0/0), die erfolgreichen und die gesamten Ausgrabungen, und speichere dann. Jede Ausgrabung kann bearbeitet oder gelöscht werden.&lt;/p&gt;</target>
+            </trans-unit>
+            <trans-unit id="5795230241658653743" datatype="html">
+                <source>Défense à atteindre</source>
+                <target state="translated">Zu erreichende Verteidigung</target>
             </trans-unit>
             <trans-unit id="4843074552222243213" datatype="html" approved="yes">
                 <source>Brun</source>

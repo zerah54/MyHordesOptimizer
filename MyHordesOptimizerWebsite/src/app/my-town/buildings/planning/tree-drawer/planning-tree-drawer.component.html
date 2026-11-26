@@ -19,6 +19,35 @@
             <mat-label i18n>Rechercher</mat-label>
             <input matInput type="text" data-field="search" [value]="search()" (input)="search.set($any($event.target).value)">
         </mat-form-field>
+        <mat-form-field class="resource-filter" appearance="outline" subscriptSizing="dynamic">
+            <mat-label i18n>Ressource requise</mat-label>
+            <input matInput type="text" data-field="resource" [value]="resource_query()" (input)="onResourceInput($any($event.target).value)"
+                   [matAutocomplete]="resource_auto">
+            <mat-autocomplete #resource_auto="matAutocomplete" [displayWith]="optionLabel" (optionSelected)="selectResource($event.option.value)">
+                @for (option of matching_resources(); track option.itemId) {
+                    <mat-option [value]="option">
+                        @if (option.img) {
+                            <img [src]="HORDES_IMG_REPO + option.img" alt="">
+                        }
+                        {{ option.label }}
+                    </mat-option>
+                }
+            </mat-autocomplete>
+        </mat-form-field>
+        @if (resource_total(); as total) {
+            <span class="resource-total" data-field="resource-total" [class.missing]="total.bank < total.need">
+                @if (total.img) {
+                    <img [src]="total.img" [alt]="total.label">
+                }
+                <ng-container i18n>Besoin</ng-container>
+                {{ total.need }} · <ng-container i18n>en banque</ng-container>
+                {{ total.bank }}
+            </span>
+            <button mat-icon-button type="button" data-action="clear-resource" (click)="clearResource()" i18n-matTooltip
+                    matTooltip="Retirer le filtre par ressource">
+                <mat-icon>close</mat-icon>
+            </button>
+        }
         <button mat-stroked-button type="button" data-action="unlocked-only" [class.on]="unlocked_only()" (click)="unlocked_only.set(!unlocked_only())">
             <span class="label"><mat-icon>{{ unlocked_only() ? 'check_box' : 'check_box_outline_blank' }}</mat-icon><ng-container
                 i18n>Débloqués seulement</ng-container></span>
@@ -53,7 +82,8 @@
             </thead>
             <tbody>
                 @for (row of rows(); track row.id) {
-                    <tr class="building-row" [attr.data-building]="row.id" [class.checked]="row.checked">
+                    <tr class="building-row" [attr.data-building]="row.id" [class.checked]="row.checked"
+                        [class.dimmed]="resource_filter() !== null && row.state === 'built'">
                         <td class="center">
                             @if (row.togglable) {
                                 <mat-checkbox data-action="toggle" [checked]="row.checked" [disabled]="!store.can_edit()" (change)="toggle(row)"
@@ -140,7 +170,9 @@
                         <td>
                             <ul class="resources">
                                 @for (resource of row.resources; track resource.itemId) {
-                                    <li [class.missing]="resource.missing" [matTooltip]="resource.label">
+                                    <li [class.missing]="resource.missing" [class.selected]="resource.itemId === resource_filter()"
+                                        [matTooltip]="resource.label"
+                                        role="button" tabindex="0" (click)="selectResource(resource)" (keydown.enter)="selectResource(resource)">
                                         @if (resource.img) {
                                             <img [src]="resource.img" [alt]="resource.label">
                                         }
